@@ -244,7 +244,7 @@ class WorkflowPhonon(Workflow):
         parameters = self.get_parameters()
 
         if 'pre_optimize' in parameters:
-           self.add_attribute('counter', 3) #define number of optimization iterations
+           self.add_attribute('counter', 1) #define number of optimization iterations
            self.next(self.optimize)
         else:
             self.next(self.displacements)
