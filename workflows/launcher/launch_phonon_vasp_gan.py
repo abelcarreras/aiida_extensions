@@ -7,22 +7,18 @@ ParameterData = DataFactory('parameter')
 
 import numpy as np
 
-# Silicon structure
-a = 5.404
-cell = [[a, 0, 0],
-        [0, a, 0],
-        [0, 0, a]]
+# GaN
+cell = [[ 3.1900000572, 0,           0],
+        [-1.5950000286, 2.762621076, 0],
+        [ 0.0,          0,           5.1890001297]]
 
-symbols=['Si'] * 8
-scaled_positions=[(0.875,  0.875,  0.875),
-	          (0.875,  0.375,  0.375),
-     	          (0.375,  0.875,  0.375),
-	          (0.375,  0.375,  0.875),
-	          (0.125,  0.125,  0.125),
-	          (0.125,  0.625,  0.625),
-                  (0.625,  0.125,  0.625),
-                  (0.625,  0.625,  0.125)]
 
+scaled_positions=[(0.6666669,  0.3333334,  0.0000000),
+                  (0.3333331,  0.6666663,  0.5000000),
+                  (0.6666669,  0.3333334,  0.3750000),
+                  (0.3333331,  0.6666663,  0.8750000)]
+
+symbols=['Ga', 'Ga', 'N', 'N']
 
 structure = StructureData(cell=cell)
 positions = np.dot(scaled_positions, cell)
@@ -33,7 +29,6 @@ for i, scaled_position in enumerate(scaled_positions):
 
 structure.store()
 
-# VASP input parameters
 
 incar_dict = {
     'NELMIN' : 5,
@@ -52,26 +47,23 @@ kpoints_dict = {'points' : [2, 2, 2],
                 'shift'  : [0.0, 0.0, 0.0]}
 
 
-# Cluster information
-machine_dict = {
+machine_dict = { 
     'codename' : 'vasp541mpi@stern',
-    'num_machines': 1,
-    'parallel_env':'mpi*',
+    'num_machines': 1, 
+    'parallel_env':'mpi*', 
     'tot_num_mpiprocs' : 16}
 
 
-# Phonopy input parameters
 ph_dict = ParameterData(dict={'supercell': [[2,0,0],
                                             [0,2,0],
                                             [0,0,2]],
-                              'primitive': [[0.0, 0.5, 0.5],
-                                            [0.5, 0.0, 0.5],
-                                            [0.5, 0.5, 0.0]],
+                              'primitive': [[1.0, 0.0, 0.0],
+                                            [0.0, 1.0, 0.0],
+                                            [0.0, 0.0, 1.0]],
                               'distance': 0.01,
                               'mesh' : [20, 20, 20]}
                        ).store()
 
-# Collect workflow input data
 wf_parameters = {
      'structure': structure,
      'phonopy_input' : ph_dict,
@@ -82,8 +74,9 @@ wf_parameters = {
      'pre_optimize' : 3   # comment this line to skip structure optimization (This key contains the value of ISIF)
 }
 
+
 #Submit workflow
-from aiida.workflows.wf_phonon import WorkflowPhonon
+from aiida.workflows.wf_phonon_vasp import WorkflowPhonon
 wf = WorkflowPhonon(params=wf_parameters)
 
 wf.start()
