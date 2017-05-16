@@ -301,9 +301,9 @@ class WorkflowPhonon(Workflow):
         code = Code.get_from_string(parameters['code'])
         plugin = code.get_attrs()['input_plugin'].split('.')[0]
         if plugin == 'lammps':
-            return self.generate_calculation_lammps(self, structure, parameters)
+            return self.generate_calculation_lammps(structure, parameters)
         elif plugin == 'vasp':
-            return self.generate_calculation_vasp(self, structure, parameters, type=type)
+            return self.generate_calculation_vasp(structure, parameters, type=type)
         else:
             self.append_to_report('The plugin: {}, is not implemented in this workflow'.format(plugin))
             self.next(self.exit)
