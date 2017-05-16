@@ -260,7 +260,7 @@ class WorkflowPhonon(Workflow):
 
         parameters = self.get_parameters()
         vasp_input = parameters['vasp_optimize']['parameters']
-        tolerance = abs(parameters['vasp_optimize']['parameters']['EDIFFG'])
+        tolerance = 1e-04
 
         counter = self.get_attribute('counter')
 
