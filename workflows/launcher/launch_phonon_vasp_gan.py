@@ -48,8 +48,7 @@ kpoints_dict = {'points' : [2, 2, 2],
 
 
 machine_dict = { 
-    'codename' : 'vasp541mpi@stern',
-    'num_machines': 1, 
+    'num_machines': 1,
     'parallel_env':'mpi*', 
     'tot_num_mpiprocs' : 16}
 
@@ -67,12 +66,12 @@ ph_dict = ParameterData(dict={'supercell': [[2,0,0],
 wf_parameters = {
      'structure': structure,
      'phonopy_input': ph_dict,
-     'vasp_force': {'code': 'lammps_force@boston',
+     'vasp_force': {'code': 'vasp541mpi@stern',
                     'parameters': incar_dict,
                     'resources': machine_dict,
                     'pseudo': pseudo_dict,
                     'kpoints': kpoints_dict},
-     'vasp_optimize': {'code': 'lammps_optimize@boston',
+     'vasp_optimize': {'code': 'vasp541mpi@stern',
                        'parameters': incar_dict,
                        'resources': machine_dict,
                        'pseudo': pseudo_dict,

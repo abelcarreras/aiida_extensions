@@ -165,13 +165,12 @@ class WorkflowPhonon(Workflow):
                     scaled_positions[i][j] -= 1.0
         return
 
-    def generate_calculation_vasp(self, structure, input_params, pseudo, kpoints, type='energy'):
+    def generate_calculation_vasp(self, structure, input_params, pseudo, kpoints, codename, type='energy'):
         import pymatgen as mg
         from pymatgen.io import vasp as vaspio
 
         ParameterData = DataFactory('parameter')
 
-        codename = input_params['resources']['codename']
         code = Code.get_from_string(codename)
 
         # Set calculation
@@ -292,7 +291,8 @@ class WorkflowPhonon(Workflow):
         calc = self.generate_calculation_vasp(structure,
                                               vasp_input_optimize,
                                               parameters['vasp_optimize']['pseudo'],
-                                              parameters['vasp_optimize']['kpoints'])
+                                              parameters['vasp_optimize']['kpoints'],
+                                              parameters['vasp_optimize']['code'])
 
         calc.label = 'optimization'
         print 'created calculation with PK={}'.format(calc.pk)
