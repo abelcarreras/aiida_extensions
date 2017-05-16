@@ -260,7 +260,7 @@ class WorkflowPhonon(Workflow):
 
         parameters = self.get_parameters()
         vasp_input = parameters['vasp_optimize']['parameters']
-        tolerance = 1e-04
+        tolerance = 0.01
 
         counter = self.get_attribute('counter')
 
@@ -272,7 +272,7 @@ class WorkflowPhonon(Workflow):
             # last_calc = self.get_step_calculations(self.optimize).latest('id')
             forces = last_calc.out.output_array.get_array('forces')
             not_converged_forces = len(np.where(abs(forces) > tolerance)[0])
-            self.append_to_report('Not converged forces: '.format(not_converged_forces))
+            self.append_to_report('Not converged forces: {}'.format(not_converged_forces))
             if not_converged_forces == 0:
                 self.next(self.displacements)
         else:
@@ -296,7 +296,7 @@ class WorkflowPhonon(Workflow):
             'LREAL'  : '.FALSE.'})
 
         if counter < 5:
-            self.append_to_report('Last optimization: use conjugated gradient')
+            self.append_to_report('Changed to conjugated gradient')
             vasp_input_optimize.update({'IBRION': 1})
 
         calc = self.generate_calculation_vasp(structure,
