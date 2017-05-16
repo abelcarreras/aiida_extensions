@@ -191,7 +191,7 @@ class WorkflowPhonon(Workflow):
 #        calc.use_poscar(ParameterData(dict=poscar_param))
 
         #INCAR
-        incar = vaspio.Incar(input_params['incar'])
+        incar = vaspio.Incar(input_params)
         calc.use_incar(ParameterData(dict=incar.as_dict()))
 
         #KPOINTS
