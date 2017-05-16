@@ -253,9 +253,9 @@ class WorkflowPhonon(Workflow):
     @Workflow.step
     def optimize(self):
 
-        parameters = self.get_parameters()['vasp_optimize']
+        parameters = self.get_parameters()
 
-        vasp_input = parameters['parameters']
+        vasp_input = parameters['vasp_optimize']['parameters']
 
         counter = self.get_attribute('counter')
 
@@ -291,8 +291,8 @@ class WorkflowPhonon(Workflow):
 
         calc = self.generate_calculation_vasp(structure,
                                               vasp_input_optimize,
-                                              parameters['pseudo'],
-                                              parameters['kpoints'])
+                                              parameters['vasp_optimize']['pseudo'],
+                                              parameters['vasp_optimize']['kpoints'])
 
         calc.label = 'optimization'
         print 'created calculation with PK={}'.format(calc.pk)
