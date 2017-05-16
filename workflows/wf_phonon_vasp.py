@@ -340,7 +340,7 @@ class WorkflowPhonon(Workflow):
         
         cells_with_disp = create_supercells_with_displacements_inline(**inline_params)[1]
   
-        vasp_input = parameters['vasp_force']['vasp_input']
+        vasp_input = parameters['vasp_force']['parameters']
 
         #Prepare vasp input for atomic forces calculation
         vasp_input_forces = dict(vasp_input)
@@ -360,8 +360,10 @@ class WorkflowPhonon(Workflow):
    #         calc = load_node(nodes[i])  #for debuging
             calc = self.generate_calculation_vasp(cells_with_disp['structure_{}'.format(i)],
                                                   vasp_input_forces,
-                                                  parameters['pseudo'],
-                                                  parameters['kpoints'])
+                                                  parameters['vasp_force']['pseudo'],
+                                                  parameters['vasp_force']['kpoints'],
+                                                  parameters['vasp_force']['code'],
+                                                  parameters['vasp_force']['resources'])
             calc.label = 'force_{}'.format(i)
             self.append_to_report('created calculation with PK={}'.format(calc.pk))
             self.attach_calculation(calc)
