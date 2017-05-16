@@ -132,14 +132,9 @@ wf_parameters = {
     }
 
 #Submit workflow
-from aiida.workflows.wf_phonon_lammps import WorkflowPhonon
-wf = WorkflowPhonon(params=wf_parameters)
+from aiida.workflows.wf_phonon import WorkflowPhonon
+wf = WorkflowPhonon(params=wf_parameters, optimize=True)
 
-#from aiida.workflows.wf_quasiparticle import WorkflowQuasiparticle
-#wf = WorkflowQuasiparticle(params=wf_parameters)
-
-#from aiida.workflows.wf_qha import WorkflowQHA
-#wf = WorkflowQHA(params=wf_parameters)
 
 wf.label = 'crystal'
 wf.start()
