@@ -249,8 +249,8 @@ class WorkflowPhonon(Workflow):
         parameters = self.get_parameters()
 
         if 'pre_optimize' in parameters:
-           self.add_attribute('counter', 3) #define number of optimization iterations
-           self.next(self.optimize)
+            self.add_attribute('counter', 1) # define max number of optimization iterations
+            self.next(self.optimize)
         else:
             self.next(self.displacements)
 
@@ -259,17 +259,22 @@ class WorkflowPhonon(Workflow):
     def optimize(self):
 
         parameters = self.get_parameters()
-
         vasp_input = parameters['vasp_optimize']['parameters']
 
         counter = self.get_attribute('counter')
 
         optimized = self.get_step_calculations(self.optimize)
-
         if len(optimized):
-            calc = self.get_step_calculations(self.optimize).latest('id')
-    #        calc = calc[len(calc)-1]
-            structure = calc.get_outputs_dict()['structure']
+            last_calc = self.get_step_calculations(self.optimize).latest('id')
+            # last_calc = calc[len(calc)-1]
+            structure = last_calc.get_outputs_dict()['structure']
+            tolerance = abs(parameters['vasp_optimize']['parameters']['EDIFFG'])
+            # last_calc = self.get_step_calculations(self.optimize).latest('id')
+            forces = last_calc.out.output_array.get_array('forces')
+            not_converged_forces = len(np.where(abs(forces) > tolerance)[0])
+            self.append_to_report('Not converged forces: '.format(not_converged_forces))
+            if not_converged_forces == 0:
+                self.next(self.displacements)
         else:
             structure = parameters['structure']
 
