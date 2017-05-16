@@ -405,7 +405,7 @@ class WorkflowPhonon(Workflow):
         self.append_to_report('created parameters')
 
         for calc in calcs:
-            data = calc.get_outputs_dict()['array_data']
+            data = calc.get_outputs_dict()['output_array']
             inline_params[calc.label] = data
             self.append_to_report('extract force from {}'.format(calc.label))
 
