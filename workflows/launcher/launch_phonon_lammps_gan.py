@@ -122,10 +122,10 @@ parameters_opt = {'relaxation': 'tri',  # iso/aniso/tri
 wf_parameters = {
      'structure': structure,
      'phonopy_input': ph_dict,
-     'lammps_force': {'code': 'lammps_force@boston',
+     'input_force': {'code': 'lammps_force@boston',
                       'potential': potential,
                       'resources': lammps_machine},
-     'lammps_optimize': {'code': 'lammps_optimize@boston',
+     'input_optimize': {'code': 'lammps_optimize@boston',
                          'potential': potential,
                          'parameters': parameters_opt,
                          'resources': lammps_machine},
