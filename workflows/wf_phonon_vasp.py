@@ -73,7 +73,7 @@ def get_force_constants_inline(**kwargs):
     for i, first_atoms in enumerate(data_sets['first_atoms']):
         # force = kwargs.pop('force_{}'.format(i)).get_array('forces')
         # first_atoms['forces'] = np.array(force, dtype='double', order='c')
-        first_atoms['forces'] = kwargs.pop('force_{}'.format(i)).get_array('forces')
+        first_atoms['forces'] = kwargs.pop('force_{}'.format(i)).get_array('forces')[0]
 
  # Calculate and get force constants    
     phonon.set_displacement_dataset(data_sets)
@@ -249,7 +249,7 @@ class WorkflowPhonon(Workflow):
         parameters = self.get_parameters()
 
         if 'pre_optimize' in parameters:
-           self.add_attribute('counter', 1) #define number of optimization iterations
+           self.add_attribute('counter', 3) #define number of optimization iterations
            self.next(self.optimize)
         else:
             self.next(self.displacements)
