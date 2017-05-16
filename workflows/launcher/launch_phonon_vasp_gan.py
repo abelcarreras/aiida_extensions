@@ -76,17 +76,12 @@ wf_parameters = {
                        'pseudo': pseudo_dict,
                        'kpoints': kpoints_dict},
 
-#    'vasp_input' : {'incar': incar_dict,
-#                     'resources': machine_dict},
-#     'pseudo' : pseudo_dict,
-#     'kpoints' : kpoints_dict,
-     'pre_optimize' : 3   # comment this line to skip structure optimization (This key contains the value of ISIF)
 }
 
 
 #Submit workflow
 from aiida.workflows.wf_phonon_vasp import WorkflowPhonon
-wf = WorkflowPhonon(params=wf_parameters)
+wf = WorkflowPhonon(params=wf_parameters, optimize=False)
 
 wf.start()
 print ('pk: {}'.format(wf.pk))
