@@ -216,11 +216,7 @@ class WorkflowPhonon(Workflow):
         # Parser settings
         settings = {'PARSER_INSTRUCTIONS': []}
         pinstr = settings['PARSER_INSTRUCTIONS']
-        pinstr.append({
-            'instr': 'custom_vasprun_parser',
-            'type': 'data',
-            'params': {}
-        })
+
         pinstr.append({
             'instr': 'array_data_parser',
             'type': 'data',
@@ -332,11 +328,14 @@ class WorkflowPhonon(Workflow):
         if not isinstance(optimized, type(None)):
             self.append_to_report('Optimized structure')
             # case where we launched calculations
-            last_calc = self.get_step_calculations(self.optimize).latest('id') 
+            opt_calc = self.get_step_calculations(self.optimize).latest('id')
      #       last_calc = last_calc[len(calcs)-1]  #Last optimization
-            structure = last_calc.get_outputs_dict()['structure']
-            data = last_calc.get_outputs_dict()['vasp_parameters@Custom_vasprun_parserInstruction']
-            self.add_result('optimized_structure_data', data)           
+            structure = opt_calc.get_outputs_dict()['structure']
+            #data = last_calc.get_outputs_dict()['vasp_parameters@Custom_vasprun_parserInstruction']
+            #self.add_result('optimized_structure_data', data)
+            optimized_data = opt_calc.out.output_parameters
+            self.add_result('optimized_structure_data', optimized_data)
+
         else:
             self.append_to_report('From parameters')
             structure = parameters['structure']
@@ -406,9 +405,14 @@ class WorkflowPhonon(Workflow):
         self.append_to_report('created parameters')
 
         for calc in calcs:
-            data = calc.get_outputs_dict()['vasp_parameters@Custom_vasprun_parserInstruction']
+            data = calc.get_outputs_dict()['array_data']
             inline_params[calc.label] = data
             self.append_to_report('extract force from {}'.format(calc.label))
+
+ #       for calc in calcs:
+ #           data = calc.get_outputs_dict()['vasp_parameters@Custom_vasprun_parserInstruction']
+ #           inline_params[calc.label] = data
+ #           self.append_to_report('extract force from {}'.format(calc.label))
 
 
         # Get the force constants and store it in DB as a Workflow result
@@ -425,7 +429,6 @@ class WorkflowPhonon(Workflow):
 
         self.add_result('thermal_properties', results['thermal_properties'])
         self.add_result('dos', results['dos'])
-
 
         self.next(self.exit)
 
