@@ -146,9 +146,9 @@ class WorkflowPhonon(Workflow):
     def __init__(self, **kwargs):
         super(WorkflowPhonon, self).__init__(**kwargs)
         if 'optimize' in kwargs:
-            self.add_attribute('optimize', kwargs['optimize'])
+            self._optimize = kwargs['optimize']
         else:
-            self.add_attribute('optimize', True)  # By default optimization is done
+            self._optimize = True  # By default optimization is done
 
     # Correct scaled coordinates (not in use now)
     def get_scaled_positions_lines(self, scaled_positions):
@@ -291,7 +291,7 @@ class WorkflowPhonon(Workflow):
 #        else:
 #            self.next(self.displacements)
 
-        if self.get_attribute('optimize'):
+        if self._optimize:
             self.add_attribute('counter', 10)  # define max number of optimization iterations
             self.next(self.optimize)
         else:
