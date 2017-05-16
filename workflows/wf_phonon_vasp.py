@@ -295,7 +295,7 @@ class WorkflowPhonon(Workflow):
             'ADDGRID': '.TRUE.',
             'LREAL'  : '.FALSE.'})
 
-        if counter == 0:
+        if counter < 5:
             self.append_to_report('Last optimization: use conjugated gradient')
             vasp_input_optimize.update({'IBRION': 1})
 
