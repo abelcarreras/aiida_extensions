@@ -91,4 +91,5 @@ from aiida.workflows.wf_phonon_vasp import WorkflowPhonon
 wf = WorkflowPhonon(params=wf_parameters)
 
 wf.start()
+print ('pk: {}'.format(wf.pk))
 
