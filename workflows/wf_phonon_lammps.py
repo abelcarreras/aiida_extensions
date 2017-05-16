@@ -201,7 +201,7 @@ class WorkflowPhonon(Workflow):
         self.append_to_report('Optimize')
         parameters = self.get_parameters()
 
-        calc = self.generate_calculation_lammps(parameters['structure'], parameters['lammps_optimize'])
+        calc = self.generate_calculation_lammps(parameters['structure'], parameters['input_optimize'])
         calc.label = 'lammps optimization'
         self.append_to_report('created calculation with PK={}'.format(calc.pk))
   #      calc = load_node(11191)
@@ -242,7 +242,7 @@ class WorkflowPhonon(Workflow):
             if not key.startswith(prefix):
                 continue
             suffix = key[len(prefix):]
-            calc = self.generate_calculation_lammps(cell, parameters['lammps_force'])
+            calc = self.generate_calculation_lammps(cell, parameters['input_force'])
             calc.label = 'force_{}'.format(suffix)
 
             self.append_to_report('created calculation with PK={}'.format(calc.pk))
