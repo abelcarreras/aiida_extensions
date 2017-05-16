@@ -71,9 +71,9 @@ def get_force_constants_inline(**kwargs):
  # Build data_sets from forces of supercells with displacments
     data_sets = phonon.get_displacement_dataset()
     for i, first_atoms in enumerate(data_sets['first_atoms']):
-        data = kwargs.pop('force_{}'.format(i)).get_dict()
-        force = data['atomic_force']
-        first_atoms['forces'] = np.array(force, dtype='double', order='c')  
+        # force = kwargs.pop('force_{}'.format(i)).get_array('forces')
+        # first_atoms['forces'] = np.array(force, dtype='double', order='c')
+        first_atoms['forces'] = kwargs.pop('force_{}'.format(i)).get_array('forces')
 
  # Calculate and get force constants    
     phonon.set_displacement_dataset(data_sets)
