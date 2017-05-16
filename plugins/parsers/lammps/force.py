@@ -97,7 +97,7 @@ def read_lammps_forces(file_name):
 
     file_map.close()
 
-    forces = np.array([forces])
+    forces = np.array([forces], dtype=float)
 
 
     return forces

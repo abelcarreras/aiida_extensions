@@ -139,7 +139,7 @@ def read_lammps_positions_and_forces(file_name):
     file_map.close()
 
     positions = np.array([positions])
-    forces = np.array([forces])
+    forces = np.array([forces], dtype=float)
 
     return positions, forces, read_elements, cell
 
