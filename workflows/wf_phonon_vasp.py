@@ -13,7 +13,7 @@ KpointsData = DataFactory('array.kpoints')
 import numpy as np
 
 
- # Create supercells with displacements to calculate forces
+# Create supercells with displacements to calculate forces
 @make_inline
 def create_supercells_with_displacements_inline(**kwargs):
     from phonopy.structure.atoms import Atoms as PhonopyAtoms
@@ -22,7 +22,7 @@ def create_supercells_with_displacements_inline(**kwargs):
     structure = kwargs.pop('structure')
     phonopy_input = kwargs.pop('phonopy_input').get_dict()
 
- # Generate phonopy phonon object 
+    # Generate phonopy phonon object
     bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
                         positions=[site.position for site in structure.sites],
                         cell=structure.cell)
@@ -35,7 +35,7 @@ def create_supercells_with_displacements_inline(**kwargs):
 
     cells_with_disp = phonon.get_supercells_with_displacements()
 
- # Transform cells to StructureData and set them ready to return
+    # Transform cells to StructureData and set them ready to return
     disp_cells = {}
 
     for i, phonopy_supercell in enumerate(cells_with_disp):
@@ -57,7 +57,7 @@ def get_force_constants_inline(**kwargs):
     structure = kwargs.pop('structure')
     phonopy_input = kwargs.pop('phonopy_input').get_dict()
 
- # Generate phonopy phonon object 
+    # Generate phonopy phonon object
     bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
                         positions=[site.position for site in structure.sites],
                         cell=structure.cell)
@@ -67,21 +67,20 @@ def get_force_constants_inline(**kwargs):
                      primitive_matrix=phonopy_input['primitive'],
                      distance=phonopy_input['distance'])
 
-
- # Build data_sets from forces of supercells with displacments
+    # Build data_sets from forces of supercells with displacments
     data_sets = phonon.get_displacement_dataset()
     for i, first_atoms in enumerate(data_sets['first_atoms']):
         # force = kwargs.pop('force_{}'.format(i)).get_array('forces')
         # first_atoms['forces'] = np.array(force, dtype='double', order='c')
         first_atoms['forces'] = kwargs.pop('force_{}'.format(i)).get_array('forces')[0]
 
- # Calculate and get force constants    
+    # Calculate and get force constants
     phonon.set_displacement_dataset(data_sets)
     phonon.produce_force_constants()
     
     force_constants = phonon.get_force_constants().tolist()
 
-# Set force constants ready to return
+    # Set force constants ready to return
 
     force_constants = phonon.get_force_constants()
     data = ArrayData()
@@ -89,8 +88,6 @@ def get_force_constants_inline(**kwargs):
     data.set_array('force_sets', np.array(data_sets))
 
     return {'phonopy_output' : data}
-
-
 
 
 # Get calculation from phonopy
@@ -103,8 +100,7 @@ def phonopy_calculation_inline(**kwargs):
     phonopy_input = kwargs.pop('phonopy_input').get_dict()
     force_constants = kwargs.pop('force_constants').get_array('force_constants')
 
-
- # Generate phonopy phonon object 
+    # Generate phonopy phonon object
     bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
                         positions=[site.position for site in structure.sites],
                         cell=structure.cell)
@@ -116,8 +112,7 @@ def phonopy_calculation_inline(**kwargs):
 
     phonon.set_force_constants(force_constants) 
 
-
-    #Normalization factor primitive to unit cell
+    # Normalization factor primitive to unit cell
     normalization_factor = phonon.unitcell.get_number_of_atoms()/phonon.primitive.get_number_of_atoms()
 
     phonon.set_mesh(phonopy_input['mesh'], is_eigenvectors=True, is_mesh_symmetry=False)
@@ -134,8 +129,7 @@ def phonopy_calculation_inline(**kwargs):
     dos.set_array('total_dos',total_dos[1])
     dos.set_array('partial_dos',partial_dos[1])
 
-
-    #THERMAL PROPERTIES (per primtive cell)
+    # THERMAL PROPERTIES (per primtive cell)
     phonon.set_thermal_properties()
     t, free_energy, entropy, cv = phonon.get_thermal_properties()
 
@@ -243,7 +237,7 @@ class WorkflowPhonon(Workflow):
 
 
     def generate_calculation_vasp_new(self, structure, parameters, type='optimize'):
-        import pymatgen as mg
+        # import pymatgen as mg
         from pymatgen.io import vasp as vaspio
 
         ParameterData = DataFactory('parameter')
@@ -317,9 +311,6 @@ class WorkflowPhonon(Workflow):
         kpoints = parameters['kpoints']
         if not 'style' in kpoints:
             kpoints['style'] = 'Monkhorst'
-        # kpoints = vaspio.Kpoints.monkhorst_automatic(
-        #     kpts=kpoints['points'], shift=kpoints['shift']
-        # )
         # supported_modes = Enum(("Gamma", "Monkhorst", "Automatic", "Line_mode", "Cartesian", "Reciprocal"))
         kpoints = vaspio.Kpoints(comment='aiida generated',
                                  style=kpoints['style'],
@@ -369,7 +360,7 @@ class WorkflowPhonon(Workflow):
         parameters = self.get_parameters()
 
         if 'pre_optimize' in parameters:
-            self.add_attribute('counter', 10) # define max number of optimization iterations
+            self.add_attribute('counter', 10)  # define max number of optimization iterations
             self.next(self.optimize)
         else:
             self.next(self.displacements)
@@ -433,15 +424,13 @@ class WorkflowPhonon(Workflow):
         print 'created calculation with PK={}'.format(calc.pk)
         self.attach_calculation(calc)
 
-
         if counter < 1:
             self.next(self.displacements)
         else:        
             self.add_attribute('counter', counter - 1)
             self.next(self.optimize)
 
-
-    # Prepare supercells wuith displacements 
+    # Prepare supercells with displacements
     @Workflow.step
     def displacements(self):
 
@@ -453,7 +442,8 @@ class WorkflowPhonon(Workflow):
         parameters = self.get_parameters()
 
         optimized = self.get_step(self.optimize)
-        if not isinstance(optimized, type(None)):
+        # if not isinstance(optimized, type(None)):
+        if optimized is not None:
             self.append_to_report('Optimized structure')
             # case where we launched calculations
             opt_calc = self.get_step_calculations(self.optimize).latest('id')
@@ -465,46 +455,46 @@ class WorkflowPhonon(Workflow):
             self.add_result('optimized_structure_data', optimized_data)
 
         else:
-            self.append_to_report('From parameters')
+            self.append_to_report('Initial structure')
             structure = parameters['structure']
 
         self.add_result('final_structure', structure)
 #        self.add_attribute('structure', structure)
 
         inline_params = {"structure": structure,
-                         "phonopy_input":parameters['phonopy_input'],
+                         "phonopy_input": parameters['phonopy_input'],
                          } 
         
         cells_with_disp = create_supercells_with_displacements_inline(**inline_params)[1]
   
-        vasp_input = parameters['vasp_force']['parameters']
+   #     vasp_input = parameters['vasp_force']['parameters']
 
         #Prepare vasp input for atomic forces calculation
-        vasp_input_forces = dict(vasp_input)
-        vasp_input_forces.update({
-            'PREC'   : 'Accurate',
-            'ISTART' : 0,
-            'IBRION' : -1,
-            'NSW'    : 1,
-            'LWAVE'  : '.FALSE.',
-            'LCHARG' : '.FALSE.',
-            'EDIFF'  : 1e-08,
-            'ADDGRID': '.TRUE.',
-            'LREAL'  : '.FALSE.'})
+  #      vasp_input_forces = dict(vasp_input)
+  #      vasp_input_forces.update({
+  #          'PREC'   : 'Accurate',
+  #          'ISTART' : 0,
+  #          'IBRION' : -1,
+  #          'NSW'    : 1,
+  #          'LWAVE'  : '.FALSE.',
+  #          'LCHARG' : '.FALSE.',
+  #          'EDIFF'  : 1e-08,
+  #          'ADDGRID': '.TRUE.',
+  #          'LREAL'  : '.FALSE.'})
 
         # nodes = [ 762, 767, 772, 777]  #for debuging
         for i, cell in enumerate(cells_with_disp.iterkeys()):
-            # calc = self.generate_calculation_vasp_new(cells_with_disp['structure_{}'.format(i)],
-            #                                          parameters['vasp_force'], type='optimize')
+            calc = self.generate_calculation_vasp_new(cells_with_disp['structure_{}'.format(i)],
+                                                      parameters['vasp_force'], type='forces')
 
             # calc = load_node(nodes[i])  #for debuging
 
-            calc = self.generate_calculation_vasp(cells_with_disp['structure_{}'.format(i)],
-                                                  vasp_input_forces,
-                                                  parameters['vasp_force']['pseudo'],
-                                                  parameters['vasp_force']['kpoints'],
-                                                  parameters['vasp_force']['code'],
-                                                  parameters['vasp_force']['resources'])
+            #calc = self.generate_calculation_vasp(cells_with_disp['structure_{}'.format(i)],
+            #                                      vasp_input_forces,
+            #                                      parameters['vasp_force']['pseudo'],
+            #                                      parameters['vasp_force']['kpoints'],
+            #                                      parameters['vasp_force']['code'],
+            #                                      parameters['vasp_force']['resources'])
             calc.label = 'force_{}'.format(i)
             self.append_to_report('created calculation with PK={}'.format(calc.pk))
             self.attach_calculation(calc)
@@ -515,16 +505,14 @@ class WorkflowPhonon(Workflow):
     # Collects the forces and prepares force constants
     @Workflow.step
     def phonon_calculation(self):
-        from phonopy.structure.atoms import Atoms as PhonopyAtoms
-        from phonopy import Phonopy
+#        from phonopy.structure.atoms import Atoms as PhonopyAtoms
+#        from phonopy import Phonopy
 
         parameters = self.get_parameters()
         calcs = self.get_step_calculations(self.displacements)
 #        structure = self.get_attribute('structure')
 
         structure = self.get_result('final_structure')
-
-
 
 #        structure = parameters['structure']
 
@@ -551,7 +539,6 @@ class WorkflowPhonon(Workflow):
         phonopy_data = get_force_constants_inline(**inline_params)[1]        
 
         self.add_result('force_constants', phonopy_data['phonopy_output'])
-
 
         inline_params = {'structure': structure,
                          'phonopy_input': parameters['phonopy_input'],
