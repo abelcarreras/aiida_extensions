@@ -241,7 +241,127 @@ class WorkflowPhonon(Workflow):
 
         return calc
 
-    # Starting workflow  
+
+    def generate_calculation_vasp_new(self, structure, parameters, type='optimize'):
+        import pymatgen as mg
+        from pymatgen.io import vasp as vaspio
+
+        ParameterData = DataFactory('parameter')
+
+        code = Code.get_from_string(parameters['code'])
+
+        # Set calculation
+        calc = code.new_calc(
+            max_wallclock_seconds=3600,
+            resources=parameters['resources']
+        )
+        calc.set_withmpi(True)
+        calc.label = 'VASP'
+
+        # POSCAR
+        calc.use_structure(structure)
+
+        # INCAR
+        incar = parameters['parameters']
+
+        if type == 'optimize':
+            vasp_input_optimize = dict(incar)
+            vasp_input_optimize.update({
+                'PREC'   : 'Normal',
+                'ISTART' :  0,
+                'IBRION' :  2,
+                'ISIF'   :  3,
+                'NSW'    :  100,
+                'LWAVE'  : '.FALSE.',
+                'LCHARG' : '.FALSE.',
+                'EDIFF'  :  1e-04,
+                'EDIFFG' : -0.01,
+                'ADDGRID': '.TRUE.',
+                'LREAL'  : '.FALSE.'})
+            incar = vasp_input_optimize
+
+        if type == 'optimize_constant_volume':
+            vasp_input_optimize = dict(incar)
+            vasp_input_optimize.update({
+                'PREC'   : 'Normal',
+                'ISTART' :  0,
+                'IBRION' :  2,
+                'ISIF'   :  4,
+                'NSW'    :  100,
+                'LWAVE'  : '.FALSE.',
+                'LCHARG' : '.FALSE.',
+                'EDIFF'  :  1e-04,
+                'EDIFFG' : -0.01,
+                'ADDGRID': '.TRUE.',
+                'LREAL'  : '.FALSE.'})
+            incar = vasp_input_optimize
+
+        if type == 'forces':
+            vasp_input_forces = dict(incar)
+            vasp_input_forces.update({
+                'PREC'   : 'Accurate',
+                'ISTART' :  0,
+                'IBRION' : -1,
+                'NSW'    :  1,
+                'LWAVE'  : '.FALSE.',
+                'LCHARG' : '.FALSE.',
+                'EDIFF'  :  1e-08,
+                'ADDGRID': '.TRUE.',
+                'LREAL'  : '.FALSE.'})
+            incar = vasp_input_forces
+
+        incar = vaspio.Incar(incar)
+        calc.use_incar(ParameterData(dict=incar.as_dict()))
+
+        # KPOINTS
+        kpoints = parameters['kpoints']
+        if not 'style' in kpoints:
+            kpoints['style'] = 'Monkhorst'
+        # kpoints = vaspio.Kpoints.monkhorst_automatic(
+        #     kpts=kpoints['points'], shift=kpoints['shift']
+        # )
+        # supported_modes = Enum(("Gamma", "Monkhorst", "Automatic", "Line_mode", "Cartesian", "Reciprocal"))
+        kpoints = vaspio.Kpoints(comment='aiida generated',
+                                 style=kpoints['style'],
+                                 kpts=(kpoints['points'],), kpts_shift=kpoints['shift'])
+
+        calc.use_kpoints(ParameterData(dict=kpoints.as_dict()))
+
+        # POTCAR
+        pseudo = parameters['pseudo']
+        potcar = vaspio.Potcar(symbols=pseudo['symbols'],
+                               functional=pseudo['functional'])
+        calc.use_potcar(ParameterData(dict=potcar.as_dict()))
+
+        # Parser settings
+        settings = {'PARSER_INSTRUCTIONS': []}
+        pinstr = settings['PARSER_INSTRUCTIONS']
+
+        pinstr.append({
+            'instr': 'array_data_parser',
+            'type': 'data',
+            'params': {}
+        })
+        pinstr.append({
+            'instr': 'output_parameters',
+            'type': 'data',
+            'params': {}
+        })
+
+        # additional files to return
+        settings.setdefault(
+            'ADDITIONAL_RETRIEVE_LIST', [
+                'vasprun.xml',
+            ]
+        )
+
+        calc.use_settings(ParameterData(dict=settings))
+
+        calc.store_all()
+
+        return calc
+
+    # Starting workflow
     @Workflow.step
     def start(self):
         self.append_to_report('Workflow starting')
@@ -282,30 +402,32 @@ class WorkflowPhonon(Workflow):
         self.append_to_report('Optimize structure {}/{}'.format(len(optimized)+1,len(optimized)+counter+1))
 
         # Prepare vasp input for atomic forces calculation
-        vasp_input_optimize = dict(vasp_input)
-        vasp_input_optimize.update({
-            'PREC'   : 'Normal',
-            'ISTART' : 0,
-            'IBRION' : 2,
-            'ISIF'   : parameters['pre_optimize'],
-            'NSW'    : 100,
-            'LWAVE'  : '.FALSE.',
-            'LCHARG' : '.FALSE.',
-            'EDIFF'  : 1e-04,
-            'EDIFFG' : -0.01,
-            'ADDGRID': '.TRUE.',
-            'LREAL'  : '.FALSE.'})
+ #       vasp_input_optimize = dict(vasp_input)
+ #       vasp_input_optimize.update({
+ #           'PREC'   : 'Normal',
+ #           'ISTART' : 0,
+ #           'IBRION' : 2,
+ #           'ISIF'   : parameters['pre_optimize'],
+ #           'NSW'    : 100,
+ #           'LWAVE'  : '.FALSE.',
+ #           'LCHARG' : '.FALSE.',
+ #           'EDIFF'  : 1e-04,
+ #           'EDIFFG' : -0.01,
+ #           'ADDGRID': '.TRUE.',
+ #           'LREAL'  : '.FALSE.'})
 
-        if counter < 5:
-            self.append_to_report('Changed to conjugated gradient')
-            vasp_input_optimize.update({'IBRION': 1})
+ #       if counter < 5:
+ #           self.append_to_report('Changed to conjugated gradient')
+ #           vasp_input_optimize.update({'IBRION': 1})
 
-        calc = self.generate_calculation_vasp(structure,
-                                              vasp_input_optimize,
-                                              parameters['vasp_optimize']['pseudo'],
-                                              parameters['vasp_optimize']['kpoints'],
-                                              parameters['vasp_optimize']['code'],
-                                              parameters['vasp_optimize']['resources'])
+        calc = self.generate_calculation_vasp_new(structure, parameters['vasp_optimize'], type='optimize')
+
+#        calc = self.generate_calculation_vasp(structure,
+#                                              vasp_input_optimize,
+#                                              parameters['vasp_optimize']['pseudo'],
+#                                              parameters['vasp_optimize']['kpoints'],
+#                                              parameters['vasp_optimize']['code'],
+#                                              parameters['vasp_optimize']['resources'])
 
         calc.label = 'optimization'
         print 'created calculation with PK={}'.format(calc.pk)
@@ -370,9 +492,13 @@ class WorkflowPhonon(Workflow):
             'ADDGRID': '.TRUE.',
             'LREAL'  : '.FALSE.'})
 
-  #      nodes = [ 762, 767, 772, 777]  #for debuging
+        # nodes = [ 762, 767, 772, 777]  #for debuging
         for i, cell in enumerate(cells_with_disp.iterkeys()):
-   #         calc = load_node(nodes[i])  #for debuging
+            # calc = self.generate_calculation_vasp_new(cells_with_disp['structure_{}'.format(i)],
+            #                                          parameters['vasp_force'], type='optimize')
+
+            # calc = load_node(nodes[i])  #for debuging
+
             calc = self.generate_calculation_vasp(cells_with_disp['structure_{}'.format(i)],
                                                   vasp_input_forces,
                                                   parameters['vasp_force']['pseudo'],
