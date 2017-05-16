@@ -221,6 +221,16 @@ class WorkflowPhonon(Workflow):
             'type': 'data',
             'params': {}
         })
+        pinstr.append({
+            'instr': 'array_data_parser',
+            'type': 'data',
+            'params': {}
+        })
+        pinstr.append({
+            'instr': 'output_parameters',
+            'type': 'data',
+            'params': {}
+        })
 
         # additional files to return
         settings.setdefault(
