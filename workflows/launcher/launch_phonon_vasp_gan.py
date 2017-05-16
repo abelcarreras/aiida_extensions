@@ -65,19 +65,18 @@ ph_dict = ParameterData(dict={'supercell': [[2,0,0],
 wf_parameters = {
      'structure': structure,
      'phonopy_input': ph_dict,
-     'vasp_force': {'code': 'vasp541mpi@stern',
+     'input_force': {'code': 'vasp541mpi@stern',
                     'parameters': incar_dict,
                     'resources': machine_dict,
                     'pseudo': pseudo_dict,
                     'kpoints': kpoints_dict},
-     'vasp_optimize': {'code': 'vasp541mpi@stern',
+     'input_optimize': {'code': 'vasp541mpi@stern',
                        'parameters': incar_dict,
                        'resources': machine_dict,
                        'pseudo': pseudo_dict,
                        'kpoints': kpoints_dict},
 
 }
-
 
 #Submit workflow
 from aiida.workflows.wf_phonon_vasp import WorkflowPhonon

@@ -14,15 +14,14 @@ cell = [[a, 0, 0],
         [0, 0, a]]
 
 symbols=['Si'] * 8
-scaled_positions=[(0.875,  0.875,  0.875),
-	          (0.875,  0.375,  0.375),
-     	          (0.375,  0.875,  0.375),
-	          (0.375,  0.375,  0.875),
-	          (0.125,  0.125,  0.125),
-	          (0.125,  0.625,  0.625),
-                  (0.625,  0.125,  0.625),
-                  (0.625,  0.625,  0.125)]
-
+scaled_positions = [(0.875,  0.875,  0.875),
+                    (0.875,  0.375,  0.375),
+                    (0.375,  0.875,  0.375),
+                    (0.375,  0.375,  0.875),
+                    (0.125,  0.125,  0.125),
+                    (0.125,  0.625,  0.625),
+                    (0.625,  0.125,  0.625),
+                    (0.625,  0.625,  0.125)]
 
 structure = StructureData(cell=cell)
 positions = np.dot(scaled_positions, cell)
@@ -34,7 +33,6 @@ for i, scaled_position in enumerate(scaled_positions):
 structure.store()
 
 # VASP input parameters
-
 incar_dict = {
     'NELMIN' : 5,
     'NELM'   : 100,
@@ -54,7 +52,6 @@ kpoints_dict = {'points' : [2, 2, 2],
 
 # Cluster information
 machine_dict = {
-    'codename' : 'vasp541mpi@stern',
     'num_machines': 1,
     'parallel_env':'mpi*',
     'tot_num_mpiprocs' : 16}
@@ -74,17 +71,24 @@ ph_dict = ParameterData(dict={'supercell': [[2,0,0],
 # Collect workflow input data
 wf_parameters = {
      'structure': structure,
-     'phonopy_input' : ph_dict,
-     'vasp_input' : {'incar': incar_dict,
-                     'resources': machine_dict},
-     'pseudo' : pseudo_dict,
-     'kpoints' : kpoints_dict,
-     'pre_optimize' : 3   # comment this line to skip structure optimization (This key contains the value of ISIF)
+     'phonopy_input': ph_dict,
+     'input_force': {'code': 'vasp541mpi@stern',
+                    'parameters': incar_dict,
+                    'resources': machine_dict,
+                    'pseudo': pseudo_dict,
+                    'kpoints': kpoints_dict},
+     'input_optimize': {'code': 'vasp541mpi@stern',
+                       'parameters': incar_dict,
+                       'resources': machine_dict,
+                       'pseudo': pseudo_dict,
+                       'kpoints': kpoints_dict},
+
 }
+
 
 #Submit workflow
 from aiida.workflows.wf_phonon_vasp import WorkflowPhonon
-wf = WorkflowPhonon(params=wf_parameters)
+wf = WorkflowPhonon(params=wf_parameters, optimize=True)
 
 wf.start()
-
+print ('pk: {}'.format(wf.pk))
