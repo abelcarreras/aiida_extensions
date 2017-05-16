@@ -165,7 +165,7 @@ class WorkflowPhonon(Workflow):
                     scaled_positions[i][j] -= 1.0
         return
 
-    def generate_calculation(self, structure, input_params, pseudo, kpoints):
+    def generate_calculation_vasp(self, structure, input_params, pseudo, kpoints, type='energy'):
         import pymatgen as mg
         from pymatgen.io import vasp as vaspio
 
@@ -253,8 +253,9 @@ class WorkflowPhonon(Workflow):
     @Workflow.step
     def optimize(self):
 
-        parameters = self.get_parameters()
-        vasp_input = parameters['vasp_input']
+        parameters = self.get_parameters()['vasp_optimize']
+
+        vasp_input = parameters['parameters']
 
         counter = self.get_attribute('counter')
 
@@ -288,10 +289,10 @@ class WorkflowPhonon(Workflow):
             self.append_to_report('Last optimization: use conjugated gradient')
             vasp_input_optimize.update({'IBRION': 1})
 
-        calc = self.generate_calculation(structure, 
-                                         vasp_input_optimize,
-                                         parameters['pseudo'],
-                                         parameters['kpoints'])
+        calc = self.generate_calculation_vasp(structure,
+                                              vasp_input_optimize,
+                                              parameters['pseudo'],
+                                              parameters['kpoints'])
 
         calc.label = 'optimization'
         print 'created calculation with PK={}'.format(calc.pk)
@@ -338,7 +339,7 @@ class WorkflowPhonon(Workflow):
         
         cells_with_disp = create_supercells_with_displacements_inline(**inline_params)[1]
   
-        vasp_input = parameters['vasp_input']
+        vasp_input = parameters['vasp_force']['vasp_input']
 
         #Prepare vasp input for atomic forces calculation
         vasp_input_forces = dict(vasp_input)
@@ -356,10 +357,10 @@ class WorkflowPhonon(Workflow):
   #      nodes = [ 762, 767, 772, 777]  #for debuging
         for i, cell in enumerate(cells_with_disp.iterkeys()):
    #         calc = load_node(nodes[i])  #for debuging
-            calc = self.generate_calculation(cells_with_disp['structure_{}'.format(i)], 
-                                             vasp_input_forces,
-                                             parameters['pseudo'],
-                                             parameters['kpoints'])
+            calc = self.generate_calculation_vasp(cells_with_disp['structure_{}'.format(i)],
+                                                  vasp_input_forces,
+                                                  parameters['pseudo'],
+                                                  parameters['kpoints'])
             calc.label = 'force_{}'.format(i)
             self.append_to_report('created calculation with PK={}'.format(calc.pk))
             self.attach_calculation(calc)

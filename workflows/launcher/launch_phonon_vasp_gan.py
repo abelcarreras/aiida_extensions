@@ -78,8 +78,8 @@ wf_parameters = {
                        'pseudo': pseudo_dict,
                        'kpoints': kpoints_dict},
 
-    'vasp_input' : {'incar': incar_dict,
-                     'resources': machine_dict},
+#    'vasp_input' : {'incar': incar_dict,
+#                     'resources': machine_dict},
 #     'pseudo' : pseudo_dict,
 #     'kpoints' : kpoints_dict,
      'pre_optimize' : 3   # comment this line to skip structure optimization (This key contains the value of ISIF)
