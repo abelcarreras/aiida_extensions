@@ -165,7 +165,7 @@ class ForceParser(Parser):
 
         array_data = ArrayData()
         array_data.set_array('forces', forces)
-        new_nodes_list.append(('array_data', array_data))
+        new_nodes_list.append(('output_array', array_data))
 
         # add the dictionary with warnings
         outputa_data.update({'warnings': warnings})

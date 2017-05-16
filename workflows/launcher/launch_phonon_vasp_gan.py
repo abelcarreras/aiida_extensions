@@ -46,7 +46,6 @@ pseudo_dict = {'functional': 'PBE',
 kpoints_dict = {'points' : [2, 2, 2],
                 'shift'  : [0.0, 0.0, 0.0]}
 
-
 machine_dict = { 
     'num_machines': 1,
     'parallel_env':'mpi*', 

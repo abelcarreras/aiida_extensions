@@ -275,6 +275,7 @@ class WorkflowPhonon(Workflow):
             self.append_to_report('Not converged forces: {}'.format(not_converged_forces))
             if not_converged_forces == 0:
                 self.next(self.displacements)
+                return
         else:
             structure = parameters['structure']
 
