@@ -260,6 +260,7 @@ class WorkflowPhonon(Workflow):
 
         parameters = self.get_parameters()
         vasp_input = parameters['vasp_optimize']['parameters']
+        tolerance = abs(parameters['vasp_optimize']['parameters']['EDIFFG'])
 
         counter = self.get_attribute('counter')
 
@@ -268,7 +269,6 @@ class WorkflowPhonon(Workflow):
             last_calc = self.get_step_calculations(self.optimize).latest('id')
             # last_calc = calc[len(calc)-1]
             structure = last_calc.get_outputs_dict()['structure']
-            tolerance = abs(parameters['vasp_optimize']['parameters']['EDIFFG'])
             # last_calc = self.get_step_calculations(self.optimize).latest('id')
             forces = last_calc.out.output_array.get_array('forces')
             not_converged_forces = len(np.where(abs(forces) > tolerance)[0])
