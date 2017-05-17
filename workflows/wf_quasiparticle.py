@@ -106,7 +106,7 @@ class WorkflowQuasiparticle(Workflow):
         wf.start()
 
 
-        self.next(self.md_lammps)
+ #       self.next(self.md_lammps)
 
     # Generate the volume expanded cells
  #   @Workflow.step
