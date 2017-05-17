@@ -123,7 +123,7 @@ class DynaphopyParser(Parser):
         outfile = out_folder.get_abs_path( self._calc._OUTPUT_FILE_NAME)
         force_constants_file = out_folder.get_abs_path( self._calc._OUTPUT_FORCE_CONSTANTS)
         try:
-            phonon_data, thermal_properties = parse_dynaphopy_output(outfile)
+            quasiparticle_data, thermal_properties = parse_dynaphopy_output(outfile)
         except ValueError:
             pass
         try:
@@ -145,7 +145,7 @@ class DynaphopyParser(Parser):
 
         # save phonon data into node
         try:
-            new_nodes_list.append(('phonon_data', ParameterData(dict=phonon_data)))
+            new_nodes_list.append(('quasiparticle_data', ParameterData(dict=quasiparticle_data)))
         except KeyError:  # keys not
             pass
 

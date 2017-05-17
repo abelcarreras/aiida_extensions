@@ -136,11 +136,9 @@ class WorkflowQuasiparticle(Workflow):
         wf_parameters = self.get_parameters()
 
         harmonic_force_constants = self.get_step(self.start).get_sub_workflows()[0].get_result('force_constants')
-        harmonic_dos = self.get_step(self.start).get_sub_workflows()[0].get_result('dos')
         structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
 
         self.add_result('force_constants', harmonic_force_constants)
-        self.add_result('dos', harmonic_dos)
 
         md_calc = self.get_step_calculations(self.md_lammps)[0]
 
@@ -184,8 +182,12 @@ class WorkflowQuasiparticle(Workflow):
         self.add_result('thermal_properties', ParameterData(dict=thermal_properties))
 
         # Pass the final properties from phonon workflow
+        self.add_result('quasiparticle_data', calc.out.quasiparticle_data)
+        self.add_result('r_force_constants', calc.out.force_constants)
+
         optimization_data = self.get_step(self.start).get_sub_workflows()[0].get_result('optimized_structure_data')
         final_structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
+
         self.add_result('optimized_structure_data', optimization_data)
         self.add_result('final_structure', final_structure)
 
