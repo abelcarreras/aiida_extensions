@@ -56,6 +56,17 @@ class WorkflowQuasiparticle(Workflow):
     def __init__(self, **kwargs):
         super(WorkflowQuasiparticle, self).__init__(**kwargs)
 
+        if 'use_optimized_structure_for_md' in kwargs:
+            self._use_optimized_structure_for_md = kwargs['use_optimized_structure_for_md']
+        else:
+            self._use_optimized_structure_for_md = True  # By default optimized structure is used
+
+        if 'optimize' in kwargs:
+            self._optimize = kwargs['optimize_structure']
+        else:
+            self._optimize = True  # By default optimization is done
+
+
     def generate_md_lammps(self, structure, parameters):
 
         codename = parameters['code']
@@ -98,7 +109,7 @@ class WorkflowQuasiparticle(Workflow):
 
         wf_parameters = self.get_parameters()
 
-        wf = WorkflowPhonon(params=wf_parameters, optimize=True)
+        wf = WorkflowPhonon(params=wf_parameters, optimize=self._optimize)
         wf.store()
 
         # wf = load_workflow(127)
@@ -106,15 +117,18 @@ class WorkflowQuasiparticle(Workflow):
         wf.start()
 
 
- #       self.next(self.md_lammps)
+        self.next(self.md_lammps)
 
     # Generate the volume expanded cells
- #   @Workflow.step
- #   def md_lammps(self):
+    @Workflow.step
+    def md_lammps(self):
 
- #       wf_parameters = self.get_parameters()
- #       structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
-        structure = wf_parameters['structure']
+        wf_parameters = self.get_parameters()
+
+        if self._use_optimized_structure_for_md:
+            structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
+        else:
+            structure = wf_parameters['structure']
 
         inline_params = {'structure': structure,
                          'supercell': ParameterData(dict=wf_parameters['input_md'])}
