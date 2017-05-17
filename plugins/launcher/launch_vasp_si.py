@@ -1,7 +1,6 @@
 from aiida import load_dbenv
 load_dbenv()
 from aiida.orm import Code, DataFactory
-from aiida.orm.calculation.job.vasp import vasp as vplugin
 
 from pymatgen.io import vasp as vaspio
 
@@ -10,7 +9,7 @@ ParameterData = DataFactory('parameter')
 
 import numpy as np
 
-code_label = 'vasp541mpi@stern'
+codename = 'vasp541mpi@stern'
 
 ############################
 #  Define input parameters #
@@ -72,7 +71,7 @@ test_only = False
 # Set calculation #
 ###################
 
-code = Code.get_from_string(code_label)
+code = Code.get_from_string(codename)
 calc = code.new_calc(
     max_wallclock_seconds=3600,
     resources=machine_dict

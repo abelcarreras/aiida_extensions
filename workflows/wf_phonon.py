@@ -1,9 +1,7 @@
 from aiida.orm import Code, DataFactory
 from aiida.orm.workflow import Workflow
-from aiida.orm.calculation.job.vasp import vasp as vplugin
-
-from aiida.orm import load_node
 from aiida.orm.calculation.inline import make_inline
+
 
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
@@ -160,7 +158,7 @@ class WorkflowPhonon(Workflow):
                     scaled_positions[i][j] -= 1.0
         return
 
-    def generate_calculation_lammps(self, structure, parameters):
+    def generate_calculation_lammps(self, structure, parameters, type='optimize'):
 
         codename = parameters['code']
         code = Code.get_from_string(codename)
@@ -174,8 +172,11 @@ class WorkflowPhonon(Workflow):
         calc.use_code(code)
         calc.use_structure(structure)
         calc.use_potential(ParameterData(dict=parameters['potential']))
-        if code.get_input_plugin_name() == 'lammps.optimize':
+
+        #if code.get_input_plugin_name() == 'lammps.optimize':
+        if type == 'optimize':
             calc.use_parameters(ParameterData(dict=parameters['parameters']))
+
         calc.store_all()
 
         return calc
@@ -301,7 +302,7 @@ class WorkflowPhonon(Workflow):
         code = Code.get_from_string(parameters['code'])
         plugin = code.get_attrs()['input_plugin'].split('.')[0]
         if plugin == 'lammps':
-            return self.generate_calculation_lammps(structure, parameters)
+            return self.generate_calculation_lammps(structure, parameters, type=type)
         elif plugin == 'vasp':
             return self.generate_calculation_vasp(structure, parameters, type=type)
         else:
