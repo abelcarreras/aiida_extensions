@@ -62,7 +62,7 @@ class WorkflowQuasiparticle(Workflow):
             self._use_optimized_structure_for_md = True  # By default optimized structure is used
 
         if 'optimize' in kwargs:
-            self._optimize = kwargs['optimize_structure']
+            self._optimize = kwargs['optimize']
         else:
             self._optimize = True  # By default optimization is done
 
