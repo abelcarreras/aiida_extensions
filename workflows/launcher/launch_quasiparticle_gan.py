@@ -111,6 +111,6 @@ from aiida.workflows.wf_quasiparticle import WorkflowQuasiparticle
 wf = WorkflowQuasiparticle(params=wf_parameters)
 
 
-wf.label = 'crystal'
+wf.label = 'quasiparicle'
 wf.start()
 print ('pk: {}'.format(wf.pk))
