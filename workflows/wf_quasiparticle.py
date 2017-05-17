@@ -105,11 +105,8 @@ class WorkflowQuasiparticle(Workflow):
         self.attach_workflow(wf)
         wf.start()
 
-        md_code = Code.get_from_string(wf_parameters['input_md']['code'])
-        if md_code.get_input_plugin_name() == 'lammps.combinate':
-            self.next(self.md_combinate)
-        else:
-            self.next(self.md_lammps)
+
+        self.next(self.md_lammps)
 
     # Generate the volume expanded cells
     @Workflow.step
@@ -126,7 +123,7 @@ class WorkflowQuasiparticle(Workflow):
         supercell = generate_supercell_inline(**inline_params)[1]['supercell']
 
 
-        calc = self.generate_md_lammps(supercell, wf_parameters['lammps_md'])
+        calc = self.generate_md_lammps(supercell, wf_parameters['input_md'])
 #        self.append_to_report('created MD calculation with PK={}'.format(calc.pk))
         self.attach_calculation(calc)
 
