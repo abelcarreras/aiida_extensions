@@ -53,11 +53,9 @@ tersoff_gan = {'Ga Ga Ga': '1.0 0.007874 1.846 1.918000 0.75000 -0.301300 1.0 1.
 potential ={'pair_style': 'tersoff',
                           'data': tersoff_gan}
 
-lammps_machine = {
-    'num_machines': 1,
-    'parallel_env': 'mpi*',
-    'tot_num_mpiprocs': 16}
-
+lammps_machine = {'num_machines': 1,
+                  'parallel_env': 'mpi*',
+                  'tot_num_mpiprocs': 16}
 
 parameters_opt = {'relaxation': 'tri',  # iso/aniso/tri
                   'pressure': 0.0,  # bars
