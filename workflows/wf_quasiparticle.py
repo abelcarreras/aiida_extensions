@@ -160,38 +160,28 @@ class WorkflowQuasiparticle(Workflow):
     def collect(self):
 
         # Get the thermal properties at 0 K from phonopy calculation
-        h_temperature = [self.get_step('start').get_sub_workflows()[0].get_result('thermal_properties').get_array('temperature')[0]]
         h_free_energy = [self.get_step('start').get_sub_workflows()[0].get_result('thermal_properties').get_array('free_energy')[0]]
         h_entropy = [self.get_step('start').get_sub_workflows()[0].get_result('thermal_properties').get_array('entropy')[0]]
         h_cv = [self.get_step('start').get_sub_workflows()[0].get_result('thermal_properties').get_array('cv')[0]]
 
-        array_data = ArrayData()
-        array_data.set_array('temperature', np.array(h_temperature))
-        array_data.set_array('free_energy', np.array(h_free_energy))
-        array_data.set_array('entropy',  np.array(h_entropy))
-        array_data.set_array('cv', np.array(h_cv))
-        array_data.store()
-
-        self.add_result('h_thermal_properties', array_data)
+        h_thermal_properties = {'free energy': h_free_energy,
+                                'entropy': h_entropy,
+                                'cv': h_cv}
+        self.add_result('h_thermal_properties', ParameterData(dict=h_thermal_properties))
 
         # Get the thermal properties at finite temperature from dynaphopy calculation
         calc = self.get_step_calculations(self.dynaphopy)[0]
 
         thermal_properties = calc.out.thermal_properties
 
-        temperature = thermal_properties.dict.temperature
         entropy = thermal_properties.dict.entropy
         free_energy = thermal_properties.dict.free_energy
         cv = thermal_properties.dict.cv
 
-        array_data = ArrayData()
-        array_data.set_array('temperature', np.array(temperature))
-        array_data.set_array('free_energy', np.array(free_energy))
-        array_data.set_array('entropy',  np.array(entropy))
-        array_data.set_array('cv', np.array(cv))
-        array_data.store()
-
-        self.add_result('thermal_properties', array_data)
+        thermal_properties = {'free energy': free_energy,
+                              'entropy': entropy,
+                              'cv': cv}
+        self.add_result('thermal_properties', ParameterData(dict=thermal_properties))
 
         # Pass the final properties from phonon workflow
         optimization_data = self.get_step(self.start).get_sub_workflows()[0].get_result('optimized_structure_data')
