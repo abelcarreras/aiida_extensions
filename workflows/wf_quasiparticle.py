@@ -109,13 +109,12 @@ class WorkflowQuasiparticle(Workflow):
         self.next(self.md_lammps)
 
     # Generate the volume expanded cells
-    @Workflow.step
-    def md_lammps(self):
-        self.append_to_report('Temperatures expansion calculations')
+ #   @Workflow.step
+ #   def md_lammps(self):
 
-        wf_parameters = self.get_parameters()
-        structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
-
+ #       wf_parameters = self.get_parameters()
+ #       structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
+        structure = wf_parameters['structure']
 
         inline_params = {'structure': structure,
                          'supercell': ParameterData(dict=wf_parameters['input_md'])}
@@ -146,11 +145,8 @@ class WorkflowQuasiparticle(Workflow):
                                                         harmonic_force_constants,
                                                         wf_parameters['dynaphopy_input'],
                                                         md_calc.out.trajectory_data)
-        # dyna_calc = load_node(nodes[i])
 
-        # self.append_to_report('created QP calculation with PK={}'.format(dyna_calc.pk))
         self.attach_calculation(dyna_calc)
-
         self.next(self.collect)
 
     # Collects the forces and prepares force constants
