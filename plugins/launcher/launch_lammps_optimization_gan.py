@@ -82,3 +82,5 @@ calc.use_parameters(ParameterData(dict=parameters_opt))
 
 calc.store_all()
 
+calc.submit()
+print "submitted calculation with PK={}".format(calc.dbnode.pk)
