@@ -1,6 +1,6 @@
 from aiida.orm import Code, DataFactory
 from aiida.orm.workflow import Workflow
-from aiida.workflows.wf_phonon_lammps import WorkflowPhonon
+from aiida.workflows.wf_phonon import WorkflowPhonon
 from aiida.orm import load_node, load_workflow
 from aiida.orm.calculation.inline import make_inline
 
@@ -84,7 +84,6 @@ class WorkflowQuasiparticle(Workflow):
 
         calc = code.new_calc(max_wallclock_seconds=3600,
                              resources=parameters['resources'])
-
 
         calc.label = "md lammps calculation"
         calc.description = "A much longer description"
@@ -212,12 +211,12 @@ class WorkflowQuasiparticle(Workflow):
         temperatures = np.array(wf_parameters['dynaphopy_input']['temperatures'])
        # temperatures = np.array([200, 300, 400, 500, 600, 700, 800, 900, 1000])
         inline_params = {'structure': structure,
-                         'supercell': ParameterData(dict=wf_parameters['lammps_md'])}
+                         'supercell': ParameterData(dict=wf_parameters['input_md'])}
 
         supercell = generate_supercell_inline(**inline_params)[1]['supercell']
   #      nodes = [11504, 11507, 11510, 11513, 11516]
         for i, temperature in enumerate(temperatures):
-            wf_parameters_md = dict(wf_parameters['lammps_md'])
+            wf_parameters_md = dict(wf_parameters['input_md'])
             wf_parameters_md['parameters']['temperature'] = temperature
             dynaphopy_input = dict(wf_parameters['dynaphopy_input'])
             dynaphopy_input['parameters']['temperature'] = temperature
@@ -246,7 +245,7 @@ class WorkflowQuasiparticle(Workflow):
 
         # get temperature dependent properties from dynaphopy
         wf_parameters = self.get_parameters()
-        md_code = Code.get_from_string(wf_parameters['lammps_md']['code'])
+        md_code = Code.get_from_string(wf_parameters['input_md']['code'])
         if md_code.get_input_plugin_name() == 'lammps.combinate':
             calcs = self.get_step_calculations(self.md_combinate)
         else:

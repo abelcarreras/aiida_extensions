@@ -1,10 +1,15 @@
+quasiparticle = False
+
 from aiida import load_dbenv
 from aiida.orm import Code, DataFactory
 from aiida.orm.calculation.inline import make_inline
 
 from aiida.orm.workflow import Workflow
-from aiida.workflows.wf_phonon_lammps import WorkflowPhonon
-# from aiida.workflows.wf_quasiparticle import WorkflowQuasiparticle as WorkflowPhonon
+
+if quasiparticle:
+    from aiida.workflows.wf_quasiparticle import WorkflowQuasiparticle as WorkflowPhonon
+else:
+    from aiida.workflows.wf_phonon import WorkflowPhonon
 
 
 from aiida.orm import load_workflow
@@ -24,7 +29,6 @@ def calculate_qha_inline(**kwargs):
  #   structures = kwargs.pop('structures')
  #   optimized_data = kwargs.pop('optimized_data')
  #   thermodyamic_properties = kwargs.pop('thermodyamic_properties')
-
 
     entropy = []
     cv = []
@@ -203,7 +207,7 @@ class WorkflowQHA(Workflow):
             wf_param_vol = dict(wf_parameters)
             wf_param_vol['structure'] = structure
 
-            wf_param_vol['lammps_optimize']['parameters']['pressure'] = pressure[i] # set pressure instead of volume
+            wf_param_vol['input_optimize']['parameters']['pressure'] = pressure[i] # set pressure instead of volume
 
             # Submit workflow
             wf = WorkflowPhonon(params=wf_param_vol)

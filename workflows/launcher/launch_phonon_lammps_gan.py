@@ -54,13 +54,6 @@ for i, scaled_position in enumerate(scaled_positions):
                           symbols=symbols[i])
 
 
-
-
-#for symbol, scaled_position in zip(symbols, scaled_positions):
-#    structure.append_atom(position=np.dot(scaled_position, cell).tolist(),
-#                          symbols=symbol)
-
-
 structure.store()
 
 ph_dict = ParameterData(dict={'supercell': [[3, 0, 0],
@@ -79,7 +72,7 @@ dynaphopy_parameters ={'supercell': ph_dict.dict.supercell,
                        'mesh': [40, 40, 40],
                        'md_commensurate': True}
 
-
+# GaN Tersoff
 tersoff_gan = {'Ga Ga Ga': '1.0 0.007874 1.846 1.918000 0.75000 -0.301300 1.0 1.0 1.44970 410.132 2.87 0.15 1.60916 535.199',
                'N  N  N' : '1.0 0.766120 0.000 0.178493 0.20172 -0.045238 1.0 1.0 2.38426 423.769 2.20 0.20 3.55779 1044.77',
                'Ga Ga N' : '1.0 0.001632 0.000 65.20700 2.82100 -0.518000 1.0 0.0 0.00000 0.00000 2.90 0.20 0.00000 0.00000',
@@ -95,13 +88,6 @@ tersoff_si = {'Si  Si  Si ': '3.0 1.0 1.7322 1.0039e5 16.218 -0.59826 0.78734 1.
 
 potential ={'pair_style': 'tersoff',
                           'data': tersoff_gan}
-
-#codename = 'lammps_force@stern'
-#code = Code.get_from_string(codename)
-#calc = code.new_calc(max_wallclock_seconds=3600,
-#                     resources={'num_machines': 1,
-#                                'parallel_env': 'localmpi',
-#                                'tot_num_mpiprocs': 6})
 
 lammps_machine = {
     'num_machines': 1,
