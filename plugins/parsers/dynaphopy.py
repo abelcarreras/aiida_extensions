@@ -51,7 +51,7 @@ def parse_dynaphopy_output(file):
         for j, line in enumerate(fragment):
             if 'Peak' in line:
                 number = line.split()[2]
-                phonon_mode = {'width':     float(fragment[j+2].split()[2]),
+                phonon_mode = {'width':     float(fragment[j+2].split()[1]),
                                'positions': float(fragment[j+3].split()[1]),
                                'shift':     float(fragment[j+12].split()[2])}
                 phonon_modes.update({number: phonon_mode})
