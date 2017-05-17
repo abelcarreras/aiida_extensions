@@ -85,7 +85,7 @@ wf_parameters = {
      'phonopy_input': ph_dict,
      'dynaphopy_input': {'code': 'dynaphopy@boston',
                          'parameters': dynaphopy_parameters,
-                         'resources': lammps_machine,
+                         'resources': lammps_machine},
      'input_force': {'code': 'lammps_force@boston',
                      'potential': potential,
                      'resources': lammps_machine},
@@ -97,9 +97,8 @@ wf_parameters = {
                   'supercell': [3, 3, 3],
                   'potential': potential,
                   'parameters': parameters_md,
-                  'resources': lammps_machine}}
-}
-
+                  'resources': lammps_machine}
+    }
 
 
 from aiida.workflows.wf_quasiparticle_lammps import WorkflowQuasiparticle
