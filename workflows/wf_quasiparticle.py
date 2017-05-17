@@ -98,7 +98,7 @@ class WorkflowQuasiparticle(Workflow):
 
         wf_parameters = self.get_parameters()
 
-        wf = WorkflowPhonon(params=wf_parameters, optimize=False)
+        wf = WorkflowPhonon(params=wf_parameters, optimize=True)
         wf.store()
 
         # wf = load_workflow(127)

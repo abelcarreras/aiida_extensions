@@ -83,7 +83,6 @@ dynaphopy_parameters ={'supercell': ph_dict.dict.supercell,
                        'temperature': temperature}
 
 
-
 #structure = load_node(11233)
 
 wf_parameters = {
