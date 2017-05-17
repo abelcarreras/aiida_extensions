@@ -91,7 +91,7 @@ wf_parameters = {
      'dynaphopy_input': {'code': 'dynaphopy@stern',
                          'parameters': dynaphopy_parameters,
                          'resources': lammps_machine},
-     'input_force': {'code': 'lammps_force@stern',
+     'input_force': {'code': 'lammps_force@boston',
                      'potential': potential,
                      'resources': lammps_machine},
      'input_optimize': {'code': 'lammps_optimize@boston',
