@@ -122,9 +122,14 @@ class DynaphopyParser(Parser):
         # Get file and do the parsing
         outfile = out_folder.get_abs_path( self._calc._OUTPUT_FILE_NAME)
         force_constants_file = out_folder.get_abs_path( self._calc._OUTPUT_FORCE_CONSTANTS)
-
-        phonon_data, thermal_properties = parse_dynaphopy_output(outfile)
-        force_constants = parse_FORCE_CONSTANTS(force_constants_file)
+        try:
+            phonon_data, thermal_properties = parse_dynaphopy_output(outfile)
+        except ValueError:
+            pass
+        try:
+            force_constants = parse_FORCE_CONSTANTS(force_constants_file)
+        except:
+            pass
 
         # look at warnings
         warnings = []

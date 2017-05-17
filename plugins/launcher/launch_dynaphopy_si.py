@@ -45,7 +45,8 @@ dynaphopy_parameters ={'supercell': [[2, 0, 0],
                                       [0.0, 1.0, 0.0],
                                       [0.0, 0.0, 1.0]],
                        'mesh': [40, 40, 40],
-                       'md_commensurate': True}
+                       'md_commensurate': True,
+                       'temperature': 300}  # Temperature can be omitted (If ommited calculated from Max.-Boltz.)
 
 
 dynaphopy_machine = {
