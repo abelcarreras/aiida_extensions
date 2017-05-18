@@ -260,7 +260,7 @@ class DynaphopyCalculation(JobCalculation):
         codeinfo.cmdline_params = [self._INPUT_FILE_NAME, self._INPUT_TRAJECTORY,
                                    '-ts', '{}'.format(time_step), '--silent',
                                    '-sfc', self._OUTPUT_FORCE_CONSTANTS, '-thm',
-                                   '-psm','2']
+                                   '-psm','2', '--normalize_dos']
 
         if 'temperature' in parameters_data.get_dict():
             codeinfo.cmdline_params.append('--temperature')

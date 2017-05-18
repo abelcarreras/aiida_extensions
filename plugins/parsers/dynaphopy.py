@@ -64,7 +64,7 @@ def parse_dynaphopy_output(file):
 
                 temperature = float(fragment[j].split()[5].replace('(',''))
 
-                thermal_properties = {'temperature':temperature,
+                thermal_properties = {'temperature': temperature,
                                       'free_energy': free_energy,
                                       'entropy': entropy,
                                       'cv': cv,
