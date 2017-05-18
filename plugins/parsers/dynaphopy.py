@@ -73,7 +73,7 @@ def parse_dynaphopy_output(file):
 
         phonon_modes.update({'q_point': q_points[i].tolist()})
 
-        phonons.update({'phonon '+str(i): phonon_modes})
+        phonons.update({'wave_vector_'+str(i): phonon_modes})
 
         f.close()
 
