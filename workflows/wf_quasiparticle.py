@@ -168,28 +168,12 @@ class WorkflowQuasiparticle(Workflow):
     def collect(self):
 
         # Get the thermal properties at 0 K from phonopy calculation
-        h_free_energy = [self.get_step('start').get_sub_workflows()[0].get_result('thermal_properties').get_array('free_energy')[0]]
-        h_entropy = [self.get_step('start').get_sub_workflows()[0].get_result('thermal_properties').get_array('entropy')[0]]
-        h_cv = [self.get_step('start').get_sub_workflows()[0].get_result('thermal_properties').get_array('cv')[0]]
-
-        h_thermal_properties = {'free energy': h_free_energy,
-                                'entropy': h_entropy,
-                                'cv': h_cv}
-        self.add_result('h_thermal_properties', ParameterData(dict=h_thermal_properties))
+        self.add_result('h_thermal_properties',  self.get_step('start').get_sub_workflows()[0].get_result('thermal_properties'))
 
         # Get the thermal properties at finite temperature from dynaphopy calculation
         calc = self.get_step_calculations(self.dynaphopy)[0]
 
-        thermal_properties = calc.out.thermal_properties
-
-        entropy = thermal_properties.dict.entropy
-        free_energy = thermal_properties.dict.free_energy
-        cv = thermal_properties.dict.cv
-
-        thermal_properties = {'free energy': free_energy,
-                              'entropy': entropy,
-                              'cv': cv}
-        self.add_result('thermal_properties', ParameterData(dict=thermal_properties))
+        self.add_result('thermal_properties', calc.out.thermal_properties)
 
         # Pass the final properties from phonon workflow
         self.add_result('quasiparticle_data', calc.out.quasiparticle_data)
