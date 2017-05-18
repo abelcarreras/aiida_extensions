@@ -177,7 +177,7 @@ class WorkflowQuasiparticle(Workflow):
 
         # Pass the final properties from phonon workflow
         self.add_result('quasiparticle_data', calc.out.quasiparticle_data)
-        self.add_result('r_force_constants', calc.out.force_constants)
+        self.add_result('r_force_constants', calc.out.array_data)
 
         optimization_data = self.get_step(self.start).get_sub_workflows()[0].get_result('optimized_structure_data')
         final_structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
