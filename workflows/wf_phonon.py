@@ -140,7 +140,7 @@ def phonopy_calculation_inline(**kwargs):
     # Normalization factor primitive to unit cell
     normalization_factor = phonon.unitcell.get_number_of_atoms() / phonon.primitive.get_number_of_atoms()
 
-    phonon.set_band_structure(bands)
+    phonon.set_band_structure(bands['ranges'])
 
     phonon.set_mesh(phonopy_input['mesh'], is_eigenvectors=True, is_mesh_symmetry=False)
     phonon.set_total_DOS()
