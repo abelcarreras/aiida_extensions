@@ -82,6 +82,7 @@ wf_parameters = {
 from aiida.workflows.wf_phonon import WorkflowPhonon
 wf = WorkflowPhonon(params=wf_parameters, optimize=False)
 
+wf.label = 'VASP_GaN'
 wf.start()
 print ('pk: {}'.format(wf.pk))
 

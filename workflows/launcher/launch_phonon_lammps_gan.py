@@ -120,7 +120,6 @@ wf_parameters = {
 from aiida.workflows.wf_phonon import WorkflowPhonon
 wf = WorkflowPhonon(params=wf_parameters, optimize=True)
 
-
-wf.label = 'crystal'
+wf.label = 'lammps_GaN'
 wf.start()
 print ('pk: {}'.format(wf.pk))
