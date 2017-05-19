@@ -6,7 +6,6 @@ StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
 
 import numpy as np
-
 def get_gan():
     # GaN [-37000 bar  <->  23000 bar]
     cell = [[ 3.1900000572, 0,           0],

@@ -11,6 +11,33 @@ KpointsData = DataFactory('array.kpoints')
 import numpy as np
 
 
+def get_path_using_seekpath(structure, band_resolution=30):
+    import seekpath
+
+    cell = structure.cell
+    positions = [site.position for site in structure.sites]
+    scaled_positions = np.dot(positions, np.linalg.inv(cell))
+    numbers = np.unique([site.kind_name for site in structure.sites], return_inverse=True)[1]
+    structure2 = (cell, scaled_positions, numbers)
+    path_data = seekpath.get_path(structure2)
+
+    labels = path_data['point_coords']
+
+    band_ranges = []
+    for set in path_data['path']:
+        band_ranges.append([labels[set[0]], labels[set[1]]])
+
+    bands =[]
+    for q_start, q_end in band_ranges:
+        band = []
+        for i in range(band_resolution+1):
+            band.append(np.array(q_start) + (np.array(q_end) - np.array(q_start)) / band_resolution * i)
+        bands.append(band)
+
+    return {'ranges': bands,
+            'labels': path_data['path']}
+
+
 # Create supercells with displacements to calculate forces
 @make_inline
 def create_supercells_with_displacements_inline(**kwargs):
@@ -92,9 +119,11 @@ def phonopy_calculation_inline(**kwargs):
     from phonopy.structure.atoms import Atoms as PhonopyAtoms
     from phonopy import Phonopy
 
+
     structure = kwargs.pop('structure')
     phonopy_input = kwargs.pop('phonopy_input').get_dict()
     force_constants = kwargs.pop('force_constants').get_array('force_constants')
+    bands = get_path_using_seekpath(structure)
 
     # Generate phonopy phonon object
     bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
@@ -111,9 +140,25 @@ def phonopy_calculation_inline(**kwargs):
     # Normalization factor primitive to unit cell
     normalization_factor = phonon.unitcell.get_number_of_atoms() / phonon.primitive.get_number_of_atoms()
 
+    phonon.set_band_structure(bands)
+
     phonon.set_mesh(phonopy_input['mesh'], is_eigenvectors=True, is_mesh_symmetry=False)
     phonon.set_total_DOS()
     phonon.set_partial_DOS()
+
+    # get band structure
+    band_structure_phonopy = phonon.get_band_structure()
+    q_points = np.array(band_structure_phonopy[0])
+    q_path = np.array(band_structure_phonopy[1])
+    frequencies = np.array(band_structure_phonopy[2])
+    band_labels = np.array(bands['labels'])
+
+    # stores band structure
+    band_structure = ArrayData()
+    band_structure.set_array('q_points', q_points)
+    band_structure.set_array('q_path', q_path)
+    band_structure.set_array('frequencies', frequencies)
+    band_structure.set_array('labels', band_labels)
 
     # get DOS (normalized to unit cell)
     total_dos = phonon.get_total_DOS() * normalization_factor
@@ -136,7 +181,7 @@ def phonopy_calculation_inline(**kwargs):
     thermal_properties.set_array('entropy', entropy * normalization_factor)
     thermal_properties.set_array('cv', cv * normalization_factor)
 
-    return {'thermal_properties': thermal_properties, 'dos': dos}
+    return {'thermal_properties': thermal_properties, 'dos': dos, 'band_structure': band_structure}
 
 
 class WorkflowPhonon(Workflow):
@@ -431,6 +476,7 @@ class WorkflowPhonon(Workflow):
 
         self.add_result('thermal_properties', results['thermal_properties'])
         self.add_result('dos', results['dos'])
+        self.add_result('band_structure', results['band_structure'])
 
         self.next(self.exit)
 
