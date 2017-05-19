@@ -13,9 +13,12 @@ KpointsData = DataFactory('array.kpoints')
 
 import numpy as np
 
-bs = load_node(21014)
+#######################
+wf = load_workflow(432)
+#######################
 
-
+# Phonon Band structure
+bs = wf.get_result('band_structure')
 for i, freq in enumerate(bs.get_array('frequencies')):
     plt.plot(bs.get_array('q_path')[i], freq, color='r')
 
@@ -31,7 +34,6 @@ if 'labels' in bs.get_arraynames():
     plt.rcParams.update({'mathtext.default':  'regular' })
     labels = bs.get_array('labels')
 
-#    print labels
     labels_e = []
     x_labels = []
     for i, freq in enumerate(bs.get_array('q_path')):
@@ -48,11 +50,13 @@ if 'labels' in bs.get_arraynames():
 
 #plt.show()
 
-dos = load_node(20987)
+# Phonon density of states
+dos = wf.get_result('dos')
 
 frequency = dos.get_array('frequency')
 total_dos = dos.get_array('total_dos')
 partial_dos = dos.get_array('partial_dos')
+partial_symbols = dos.get_array('partial_symbols')
 
 plt.figure(2)
 plt.suptitle('Phonon density of states')
@@ -63,13 +67,13 @@ plt.ylim([0, np.max(total_dos)*1.1])
 plt.plot(frequency, total_dos, label='Total DOS')
 
 for i, dos in enumerate(partial_dos):
-    plt.plot(frequency, dos, label='Partial {}'.format(i))
+    plt.plot(frequency, dos, label='{}'.format(partial_symbols[i]))
 
 plt.legend()
 #plt.show()
 
-
-thermal = load_node(20988)
+# Termal properties
+thermal = wf.get_result('thermal_properties')
 
 free_energy = thermal.get_array('free_energy')
 entropy = thermal.get_array('entropy')
