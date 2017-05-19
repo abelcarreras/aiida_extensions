@@ -169,6 +169,7 @@ def phonopy_calculation_inline(**kwargs):
     dos.set_array('frequency', total_dos[0])
     dos.set_array('total_dos', total_dos[1])
     dos.set_array('partial_dos', partial_dos[1])
+    dos.set_array('partial_symbols', np.array(phonon.primitive.symbols))
 
     # THERMAL PROPERTIES (per primtive cell)
     phonon.set_thermal_properties()
