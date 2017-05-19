@@ -1,0 +1,89 @@
+from aiida import load_dbenv
+load_dbenv()
+
+from aiida.orm import load_node, load_workflow
+from aiida.orm import Code, DataFactory
+
+import matplotlib.pyplot as plt
+
+StructureData = DataFactory('structure')
+ParameterData = DataFactory('parameter')
+ArrayData = DataFactory('array')
+KpointsData = DataFactory('array.kpoints')
+
+import numpy as np
+
+bs = load_node(21014)
+
+
+for i, freq in enumerate(bs.get_array('frequencies')):
+    plt.plot(bs.get_array('q_path')[i], freq, color='r')
+
+plt.figure(1)
+plt.axes().get_xaxis().set_ticks([])
+plt.ylabel('Frequency [THz]')
+plt.xlabel('Wave vector')
+plt.xlim([0, bs.get_array('q_path')[-1][-1]])
+plt.axhline(y=0, color='k', ls='dashed')
+plt.suptitle('Phonon band structure')
+
+if 'labels' in bs.get_arraynames():
+    plt.rcParams.update({'mathtext.default':  'regular' })
+    labels = bs.get_array('labels')
+
+#    print labels
+    labels_e = []
+    x_labels = []
+    for i, freq in enumerate(bs.get_array('q_path')):
+        if labels[i][0] == labels[i-1][1]:
+            labels_e.append('$'+labels[i][0].replace('GAMMA', '\Gamma')+'$')
+        else:
+            labels_e.append('$'+labels[i-1][1].replace('GAMMA', '\Gamma')+'/'+labels[i][0].replace('GAMMA', '\Gamma')+'$')
+        x_labels.append(bs.get_array('q_path')[i][0])
+    x_labels.append(bs.get_array('q_path')[-1][-1])
+    labels_e.append('$'+labels[-1][1].replace('GAMMA', '\Gamma')+'$')
+    labels_e[0]='$'+labels[0][0].replace('GAMMA', '\Gamma')+'$'
+
+    plt.xticks(x_labels, labels_e, rotation='horizontal')
+
+#plt.show()
+
+dos = load_node(20987)
+
+frequency = dos.get_array('frequency')
+total_dos = dos.get_array('total_dos')
+partial_dos = dos.get_array('partial_dos')
+
+plt.figure(2)
+plt.suptitle('Phonon density of states')
+plt.ylabel('Density')
+plt.xlabel('Frequency [THz]')
+plt.ylim([0, np.max(total_dos)*1.1])
+
+plt.plot(frequency, total_dos, label='Total DOS')
+
+for i, dos in enumerate(partial_dos):
+    plt.plot(frequency, dos, label='Partial {}'.format(i))
+
+plt.legend()
+#plt.show()
+
+
+thermal = load_node(20988)
+
+free_energy = thermal.get_array('free_energy')
+entropy = thermal.get_array('entropy')
+temperature = thermal.get_array('temperature')
+cv = thermal.get_array('cv')
+
+plt.figure(3)
+
+plt.xlabel('Temperature [K]')
+
+plt.suptitle('Thermal properties')
+plt.plot(temperature, free_energy, label='Free energy (KJ/mol)')
+plt.plot(temperature, entropy, label='entropy (KJ/mol)')
+plt.plot(temperature, cv, label='Cv (J/mol)')
+
+plt.legend()
+plt.show()
