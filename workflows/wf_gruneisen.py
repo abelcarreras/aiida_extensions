@@ -87,6 +87,19 @@ def phonopy_gruneisen_inline(**kwargs):
     gruneisen.set_band_structure(bands['ranges'], 51)
 
     band_structure_phonopy = gruneisen.get_band_structure()
+
+    for band_structure in band_structure_phonopy._paths:
+         (qpoints,
+         distances,
+         gamma,
+         eigenvalues,
+         frequencies,
+         distances_with_shift) = band_structure
+         self.append_to_report('{}'.format(qpoints))
+         self.append_to_report('{}'.format(distances))
+         self.append_to_report('{}'.format(eigenvalues))
+         self.append_to_report('{}'.format(frequencies))
+
     q_points = np.array(band_structure_phonopy[0])
     q_path = np.array(band_structure_phonopy[1])
     frequencies = np.array(band_structure_phonopy[2])
