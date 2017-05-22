@@ -14,14 +14,14 @@ from phonopy import Phonopy
 wf = load_workflow(437)
 #######################
 
-print ('Results pk: {}'.format(load_workflow(pk).get_result('force_constants').pk))
+print ('Results pk: {}'.format(wf.get_result('force_constants').pk))
 # 1) Calculated and stored in database
 
-# DOS 
+# DOS
 if True:
     f = open ('density_of_states', 'w')
     print ('Writing density of states')
-    for i,j in zip(load_workflow(pk).get_result('dos').get_array('frequency'),load_workflow(pk).get_result('dos').get_array('total_dos')):
+    for i,j in zip(wf.get_result('dos').get_array('frequency'), wf.get_result('dos').get_array('total_dos')):
         f.write('{} {}\n'.format(i, j))
     f.close()
 
@@ -29,7 +29,7 @@ if True:
 if True:
     print ('Writing partial density of states')
     f = open('partial_density_of_states', 'w')
-    for i,j in zip(load_workflow(pk).get_result('dos').get_array('frequency'),load_workflow(pk).get_result('dos').get_array('partial_dos').T):
+    for i,j in zip(wf.get_result('dos').get_array('frequency'),wf.get_result('dos').get_array('partial_dos').T):
         f.write('{} {}\n'.format(i, ' '.join(map(str, j))))
     f.close()
 
@@ -37,14 +37,13 @@ if True:
 if True:
     print ('Writing FORCE_CONSTANTS')
     from phonopy.file_IO import write_FORCE_CONSTANTS, write_FORCE_SETS
-    force_constants = load_workflow(pk).get_result('force_constants').get_array('force_constants')
+    force_constants = wf.get_result('force_constants').get_array('force_constants')
     write_FORCE_CONSTANTS(force_constants, filename='FORCE_CONSTANTS')
 
 
-
 # 2) Load a complete PHONOPY object
-phonopy_input = load_workflow(pk).get_parameters()['phonopy_input'].get_dict()
-structure = load_workflow(pk).get_result('final_structure')
+phonopy_input = wf.get_parameters()['phonopy_input'].get_dict()
+structure = wf.get_result('final_structure')
 
 bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
                             positions=[site.position for site in structure.sites],
@@ -57,7 +56,7 @@ phonon = Phonopy(bulk,
 
 phonon.set_force_constants(force_constants)
 
-# Plot band structure
+# Save band structure to PDF
 bands = []
 q_start  = np.array([0.5, 0.5, 0.0])
 q_end    = np.array([0.0, 0.0, 0.0])
@@ -78,4 +77,3 @@ phonon.write_yaml_band_structure()
 
 plt = phonon.plot_band_structure()
 plt.savefig("phonon_band_structure.pdf")
-
