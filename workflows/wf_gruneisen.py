@@ -140,7 +140,7 @@ class WorkflowGruneisen(Workflow):
         wf.store()
 
         self.attach_workflow(wf)
-        wf.start()
+    #    wf.start()
 
         self.next(self.volume_expansions)
 
@@ -174,7 +174,7 @@ class WorkflowGruneisen(Workflow):
             wf.store()
 
             self.attach_workflow(wf)
-            wf.start()
+      #      wf.start()
 
         self.next(self.collect_data)
 
