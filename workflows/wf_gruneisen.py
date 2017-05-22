@@ -182,12 +182,12 @@ class WorkflowGruneisen(Workflow):
 
         self.append_to_report('reading structure')
 
-        inline_params = {'structure_origin': wf_origin.get_result('force_constants'),
-                         'structure_plus':   wf_plus.get_result('force_constants'),
-                         'structure_minus':  wf_minus.get_result('force_constants'),
-                         'force_constants_origin': wf_origin.get_result('final_structure'),
-                         'force_constants_plus':   wf_plus.get_result('final_structure'),
-                         'force_constants_minus':  wf_minus.get_result('final_structure'),
+        inline_params = {'structure_origin': wf_origin.get_result('final_structure'),
+                         'structure_plus':   wf_plus.get_result('final_structure'),
+                         'structure_minus':  wf_minus.get_result('final_structure'),
+                         'force_constants_origin': wf_origin.get_result('force_constants'),
+                         'force_constants_plus':   wf_plus.get_result('force_constants'),
+                         'force_constants_minus':  wf_minus.get_result('force_constants'),
                          'phonopy_input': parameters['phonopy_input']}
 
         # Do the phonopy Gruneisen parameters calculation
