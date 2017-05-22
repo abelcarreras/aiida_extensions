@@ -3,6 +3,8 @@ from aiida.orm.workflow import Workflow
 from aiida.orm.calculation.inline import make_inline
 
 from aiida.workflows.wf_phonon import WorkflowPhonon
+from aiida.orm import load_node, load_workflow
+
 
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
@@ -133,9 +135,10 @@ class WorkflowGruneisen(Workflow):
         wf_param_opt = dict(wf_parameters)
 
         wf = WorkflowPhonon(params=wf_param_opt)
+        wf = load_workflow(440)
+
         wf.store()
 
-        #        wf = load_workflow(30)
         self.attach_workflow(wf)
         wf.start()
 
@@ -156,6 +159,7 @@ class WorkflowGruneisen(Workflow):
         cells = create_volumes_inline(**inline_params)[1]
 
 
+        list = [441, 442]
         for i, structures in enumerate(cells.iterkeys()):
             structure_vol = cells['structure_{}'.format(i)]
             self.append_to_report('structure_{}: {}'.format(i, structure_vol.pk))
@@ -163,7 +167,10 @@ class WorkflowGruneisen(Workflow):
             wf_parameters_volume['structure'] = structure_vol
 
             # Submit workflow
+
             wf = WorkflowPhonon(params=wf_parameters_volume, optimize=False)
+            wf = load_workflow(list[i])
+
             wf.store()
 
             self.attach_workflow(wf)
