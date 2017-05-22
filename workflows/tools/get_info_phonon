@@ -9,8 +9,10 @@ import numpy as np
 from phonopy.structure.atoms import Atoms as PhonopyAtoms
 from phonopy import Phonopy
 
-#Workflow PK
-pk=106
+# Set WorkflowPhonon PK number
+#######################
+wf = load_workflow(437)
+#######################
 
 print ('Results pk: {}'.format(load_workflow(pk).get_result('force_constants').pk))
 # 1) Calculated and stored in database

@@ -13,6 +13,7 @@ KpointsData = DataFactory('array.kpoints')
 
 import numpy as np
 
+# Set WorkflowPhonon PK number
 #######################
 wf = load_workflow(437)
 #######################
