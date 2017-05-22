@@ -68,15 +68,15 @@ def phonopy_gruneisen_inline(**kwargs):
 
     phonon_plus = get_phonon(kwargs.pop('structure_plus'),
                              kwargs.pop('force_constants_plus').get_array('force_constants'),
-                             phonopy_input['supercell'])
+                             phonopy_input)
 
     phonon_minus = get_phonon(kwargs.pop('structure_minus'),
                               kwargs.pop('force_constants_minus').get_array('force_constants'),
-                              phonopy_input['supercell'])
+                              phonopy_input)
 
     phonon_origin = get_phonon(structure_origin,
                                kwargs.pop('force_constants_origin').get_array('force_constants'),
-                               phonopy_input['supercell'])
+                               phonopy_input)
 
     gruneisen = PhonopyGruneisen(phonon_origin,  # equilibrium
                                  phonon_plus,  # plus
