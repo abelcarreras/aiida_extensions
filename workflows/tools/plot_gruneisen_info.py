@@ -14,16 +14,16 @@ KpointsData = DataFactory('array.kpoints')
 import numpy as np
 
 
-def get_plot(data, q_path, data_name, labels=None):
+def get_plot(data, q_path, title=None, ylabel=None, labels=None):
     for i, freq in enumerate(data):
         plt.plot(q_path[i], freq, color='r')
 
     plt.axes().get_xaxis().set_ticks([])
-    plt.ylabel('Frequency [THz]')
+    plt.ylabel(ylabel)
     plt.xlabel('Wave vector')
     plt.xlim([0, q_path[-1][-1]])
     plt.axhline(y=0, color='k', ls='dashed')
-    plt.suptitle(data_name)
+    plt.suptitle(title)
 
     if labels is not None:
         plt.rcParams.update({'mathtext.default':  'regular' })
@@ -51,11 +51,19 @@ wf = load_workflow(447)
 bs = wf.get_result('band_structure')
 
 plt.figure(1)
-get_plot(bs.get_array('frequencies'), bs.get_array('q_path'), 'Phonon band structure', labels=bs.get_array('labels'))
+get_plot(bs.get_array('frequencies'), bs.get_array('q_path'),
+         title='Phonon band structure',
+         ylabel='Frequency [THz]',
+         labels=bs.get_array('labels'))
 plt.figure(2)
-get_plot(bs.get_array('eigenvalues'), bs.get_array('q_path'), 'Eigenvalues', labels=bs.get_array('labels'))
+get_plot(bs.get_array('eigenvalues'), bs.get_array('q_path'),
+         title='Eigenvalues',
+         labels=bs.get_array('labels'))
 plt.figure(3)
-get_plot(bs.get_array('gamma'), bs.get_array('q_path'), 'Mode Gruneisen parameter', labels=bs.get_array('labels'))
+get_plot(bs.get_array('gamma'), bs.get_array('q_path'),
+         title='Mode Gruneisen parameter',
+         ylabel='$\Gamma$',
+         labels=bs.get_array('labels'))
 plt.show()
 exit()
 
