@@ -21,7 +21,7 @@ def get_plot(data, q_path, title='', ylabel='', labels=None, q_points=None):
 
         if q_points is not None:
             for j, q_point in enumerate(q_points):
-                if np.linalg.norm(q_point[i]) > 0.1:
+                if np.linalg.norm(q_point) > 0.1:
                     print 'test'
                 else:
                     print 'puta merda joder'
