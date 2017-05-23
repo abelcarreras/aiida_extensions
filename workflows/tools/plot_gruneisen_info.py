@@ -14,11 +14,15 @@ KpointsData = DataFactory('array.kpoints')
 import numpy as np
 
 
-def get_plot(data, q_path, title='', ylabel='', labels=None, q_point=None):
+def get_plot(data, q_path, title='', ylabel='', labels=None, q_points=None):
 
     for i, freq in enumerate(data):
-        if q_point is not None:
-            print np.where(np.linalg.norm(q_point[i]) > 0.1)
+        q_point = q_points[i]
+        print np.where(np.linalg.norm(q_point) > 0.1)
+     #   if q_points is not None:
+      #      for j, q_point in enumerate(q_points):
+       #         if np.linalg.norm(q_point[i]) > 0.1:
+
 
         plt.plot(q_path[q_path][i], freq, color='r')
 
