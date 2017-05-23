@@ -10,7 +10,7 @@ def _generate_LAMMPS_potential(data):
 
 def _get_input_potential_lines(data, names=None, potential_filename='potential.pot'):
 
-    lammps_input_text = 'pair_style      Tersoff\n'
+    lammps_input_text = 'pair_style      tersoff\n'
     lammps_input_text += 'pair_coeff      * * {} {}\n'.format(potential_filename, ' '.join(names))
 
     return lammps_input_text
