@@ -14,10 +14,10 @@ KpointsData = DataFactory('array.kpoints')
 import numpy as np
 
 
-def get_plot(data, q_path, title='', ylabel='', labels=None, q_points=None):
+def get_plot(band_data, q_path, title='', ylabel='', labels=None, q_points=None):
 
-    for i, freq in enumerate(data):
-        plt.plot(q_path[q_path][i], freq, color='r')
+    for i, data in enumerate(band_data):
+        plt.plot(q_path[i], data, color='r')
 
     plt.axes().get_xaxis().set_ticks([])
     plt.ylabel(ylabel)
@@ -30,7 +30,7 @@ def get_plot(data, q_path, title='', ylabel='', labels=None, q_points=None):
         plt.rcParams.update({'mathtext.default':  'regular' })
         labels_e = []
         x_labels = []
-        for i, freq in enumerate(q_path):
+        for i, data in enumerate(q_path):
             if labels[i][0] == labels[i-1][1]:
                 labels_e.append('$'+labels[i][0].replace('GAMMA', '\Gamma')+'$')
             else:
