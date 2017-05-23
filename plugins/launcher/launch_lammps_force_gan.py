@@ -74,7 +74,7 @@ calc.store_all()
 
 print "submitted calculation with PK={}".format(calc.dbnode.pk)
 
-test_only = True
+test_only = False
 
 if test_only:  # It will not be submitted
     import os
