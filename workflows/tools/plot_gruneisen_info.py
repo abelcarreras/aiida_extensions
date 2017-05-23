@@ -17,7 +17,6 @@ import numpy as np
 def get_plot(data, q_path, title='', ylabel='', labels=None):
 
 
-
     plt.axes().get_xaxis().set_ticks([])
     plt.ylabel(ylabel)
     plt.xlabel('Wave vector')
