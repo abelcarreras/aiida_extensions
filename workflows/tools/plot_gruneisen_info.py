@@ -54,7 +54,6 @@ get_plot(bs.get_array('frequencies'), bs.get_array('q_path'),
          title='Phonon band structure',
          ylabel='Frequency [THz]',
          labels=bs.get_array('labels'))
-plt.plot()
 
 plt.figure(2)
 get_plot(bs.get_array('eigenvalues'), bs.get_array('q_path'),
