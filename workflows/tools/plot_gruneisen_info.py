@@ -19,6 +19,7 @@ def get_plot(data, q_path, title='', ylabel='', labels=None, q_point=None):
     for i, freq in enumerate(data):
         if q_point is not None:
             print np.where(np.linalg.norm(q_point[i]) > 0.1)
+
         plt.plot(q_path[q_path][i], freq, color='r')
 
     plt.axes().get_xaxis().set_ticks([])
@@ -57,7 +58,10 @@ plt.figure(1)
 get_plot(bs.get_array('frequencies'), bs.get_array('q_path'),
          title='Phonon band structure',
          ylabel='Frequency [THz]',
-         labels=bs.get_array('labels'))
+         labels=bs.get_array('labels'),
+         q_point=bs.get_array('q_point'))
+plt.plot()
+
 plt.figure(2)
 get_plot(bs.get_array('eigenvalues'), bs.get_array('q_path'),
          title='Eigenvalues',
