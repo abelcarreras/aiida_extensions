@@ -35,7 +35,7 @@ def get_path_using_seekpath(structure, band_resolution=30):
             band.append(np.array(q_start) + (np.array(q_end) - np.array(q_start)) / band_resolution * i)
         bands.append(band)
 
-    return {'ranges': bands,
+    return {'ranges': band_ranges,
             'labels': path_data['path']}
 
 
@@ -83,26 +83,15 @@ def phonopy_gruneisen_inline(**kwargs):
                                  phonon_minus)  # minus
 
     bands = get_path_using_seekpath(structure_origin)
-
     gruneisen.set_band_structure(bands['ranges'], 51)
+    band_structure_gruneisen = gruneisen.get_band_structure()._paths
 
-    band_structure_phonopy = gruneisen.get_band_structure()
-
-    for band_structure in band_structure_phonopy._paths:
-         (qpoints,
-         distances,
-         gamma,
-         eigenvalues,
-         frequencies,
-         distances_with_shift) = band_structure
-         self.append_to_report('{}'.format(qpoints))
-         self.append_to_report('{}'.format(distances))
-         self.append_to_report('{}'.format(eigenvalues))
-         self.append_to_report('{}'.format(frequencies))
-
-    q_points = np.array(band_structure_phonopy[0])
-    q_path = np.array(band_structure_phonopy[1])
-    frequencies = np.array(band_structure_phonopy[2])
+    q_points = np.array([band[0] for band in band_structure_gruneisen])
+    q_path = np.array([band[5] for band in band_structure_gruneisen])
+    frequencies = np.array([band[4] for band in band_structure_gruneisen])
+    gamma = np.array([band[2] for band in band_structure_gruneisen])
+    distances = np.array([band[1] for band in band_structure_gruneisen])
+    eigenvalues = np.array([band[3] for band in band_structure_gruneisen])
     band_labels = np.array(bands['labels'])
 
     # stores band structure
@@ -110,6 +99,9 @@ def phonopy_gruneisen_inline(**kwargs):
     band_structure.set_array('q_points', q_points)
     band_structure.set_array('q_path', q_path)
     band_structure.set_array('frequencies', frequencies)
+    band_structure.set_array('gamma', gamma)
+    band_structure.set_array('distances', distances)
+    band_structure.set_array('eigenvalues', eigenvalues)
     band_structure.set_array('labels', band_labels)
 
     return {'band_structure': band_structure}
@@ -218,6 +210,3 @@ class WorkflowGruneisen(Workflow):
         self.append_to_report('Finishing workflow_workflow')
 
         self.next(self.exit)
-
-
-
