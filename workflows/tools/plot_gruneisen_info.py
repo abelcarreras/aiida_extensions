@@ -14,20 +14,9 @@ KpointsData = DataFactory('array.kpoints')
 import numpy as np
 
 
-def get_plot(data, q_path, title='', ylabel='', labels=None, q_points=None):
-
-    for i, freq in enumerate(data):
-        q_point = q_points[i]
-
-        if q_points is not None:
-            for j, q_point in enumerate(q_points):
-                if np.linalg.norm(q_point) > 0.1:
-                    print 'test'
-                else:
-                    print 'puta merda joder'
+def get_plot(data, q_path, title='', ylabel='', labels=None):
 
 
-        plt.plot(q_path[q_path][i], freq, color='r')
 
     plt.axes().get_xaxis().set_ticks([])
     plt.ylabel(ylabel)
@@ -65,8 +54,7 @@ plt.figure(1)
 get_plot(bs.get_array('frequencies'), bs.get_array('q_path'),
          title='Phonon band structure',
          ylabel='Frequency [THz]',
-         labels=bs.get_array('labels'),
-         q_points=bs.get_array('q_points'))
+         labels=bs.get_array('labels'))
 plt.plot()
 
 plt.figure(2)
