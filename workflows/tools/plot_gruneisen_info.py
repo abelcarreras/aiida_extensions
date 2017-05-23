@@ -14,8 +14,10 @@ KpointsData = DataFactory('array.kpoints')
 import numpy as np
 
 
-def get_plot(data, q_path, title='', ylabel='', labels=None):
+def get_plot(data, q_path, title='', ylabel='', labels=None, q_points=None):
 
+    for i, freq in enumerate(data):
+        plt.plot(q_path[q_path][i], freq, color='r')
 
     plt.axes().get_xaxis().set_ticks([])
     plt.ylabel(ylabel)
@@ -64,9 +66,9 @@ get_plot(bs.get_array('gamma'), bs.get_array('q_path'),
          title='Mode Gruneisen parameter',
          ylabel='$\gamma$',
          labels=bs.get_array('labels'))
+
 plt.show()
 exit()
-
 
 plt.figure(1)
 for i, freq in enumerate(bs.get_array('frequencies')):
