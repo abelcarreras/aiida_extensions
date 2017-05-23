@@ -5,7 +5,6 @@ from aiida.common.exceptions import InputValidationError
 from aiida.common.datastructures import CalcInfo, CodeInfo
 from aiida.common.utils import classproperty
 
-
 def generate_LAMMPS_structure(structure):
     import numpy as np
 
@@ -73,6 +72,7 @@ def generate_LAMMPS_input(pair_style,
                           optimize_path_file='path.lammpstr',
                           potential_filename = 'GaN.tersoff'):
 
+
     names = [site.name for site in structure.kinds]
 #    asterisk_str = ' '.join(['*'] * len(names))
     names_str = ' '.join(names)
@@ -85,7 +85,7 @@ def generate_LAMMPS_input(pair_style,
     lammps_input_file += 'atom_style      atomic\n'
     lammps_input_file += 'read_data       {}\n'.format(structure_file)
     lammps_input_file += 'pair_style      {}\n'.format(pair_style.dict.pair_style)
-    lammps_input_file += 'pair_coeff      * * {} {}\n'.format( potential_filename, names_str)
+    lammps_input_file += 'pair_coeff      * * {} {}\n'.format(potential_filename, names_str)
     lammps_input_file += 'fix             int all box/relax {} {} vmax {}\n'.format(parameters['relaxation'],
                                                                                     parameters['pressure'],
                                                                                     parameters['vmax'])

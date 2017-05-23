@@ -5,6 +5,7 @@ from aiida.common.exceptions import InputValidationError
 from aiida.common.datastructures import CalcInfo, CodeInfo
 from aiida.common.utils import classproperty
 
+from potentials import LammpsPotential
 
 def generate_LAMMPS_structure(structure):
     import numpy as np
@@ -66,24 +67,26 @@ def generate_LAMMPS_structure(structure):
 
 
 
-def generate_LAMMPS_input(pair_style,
-                          structure,
+def generate_LAMMPS_input(potential_obj,
+                       #   structure,
                           structure_file='data.gan',
-                          trajectory_file='trajectory.lammpstr',
-                          potential_filename = 'GaN.tersoff'):
+                          trajectory_file='trajectory.lammpstr'):
 
-    names = [site.name for site in structure.kinds]
 #    asterisk_str = ' '.join(['*'] * len(names))
-    names_str = ' '.join(names)
+    names_str = ' '.join(potential_obj._names)
 
 
     lammps_input_file =  'units           metal\n'
     lammps_input_file += 'boundary        p p p\n'
     lammps_input_file += 'box tilt large\n'
     lammps_input_file += 'atom_style      atomic\n'
+
     lammps_input_file += 'read_data       {}\n'.format(structure_file)
-    lammps_input_file += 'pair_style      {}\n'.format(pair_style.dict.pair_style)
-    lammps_input_file += 'pair_coeff      * * {} {}\n'.format( potential_filename, names_str)
+
+    lammps_input_file += potential_obj.get_input_potential_lines()
+
+    #lammps_input_file += 'pair_style      {}\n'.format(pair_style.dict.pair_style)
+    #lammps_input_file += 'pair_coeff      * * {} {}\n'.format( potential_filename, names_str)
 
     lammps_input_file += 'neighbor        0.3 bin\n'
     lammps_input_file += 'neigh_modify    every 1 delay 0 check no\n'
@@ -125,6 +128,7 @@ class ForceCalculation(JobCalculation):
 
         self._OUTPUT_FILE_NAME = 'log.lammps'
         self._default_parser = 'lammps.force'
+
 
     @classproperty
     def _use_methods(cls):
@@ -186,14 +190,16 @@ class ForceCalculation(JobCalculation):
 
         # =================== prepare the python input files =====================
 
+        potential_object = LammpsPotential(potential_data, structure, potential_filename=self._INPUT_POTENTIAL)
+
+
         structure_txt = generate_LAMMPS_structure(structure)
-        input_txt = generate_LAMMPS_input(potential_data, structure,
+        input_txt = generate_LAMMPS_input(potential_object,
                                           structure_file=self._INPUT_STRUCTURE,
-                                          trajectory_file=self._OUTPUT_TRAJECTORY_FILE_NAME,
-                                          potential_filename=self._INPUT_POTENTIAL)
+                                          trajectory_file=self._OUTPUT_TRAJECTORY_FILE_NAME,)
 
-        potential_txt = generate_LAMMPS_potential(potential_data)
-
+      #  potential_txt = generate_LAMMPS_potential(potential_data)
+        potential_txt = potential_object.get_potential_file()
         # =========================== dump to file =============================
 
         input_filename = tempfolder.get_abs_path(self._INPUT_FILE_NAME)
@@ -204,9 +210,10 @@ class ForceCalculation(JobCalculation):
         with open(structure_filename, 'w') as infile:
             infile.write(structure_txt)
 
-        potential_filename = tempfolder.get_abs_path(self._INPUT_POTENTIAL)
-        with open(potential_filename, 'w') as infile:
-            infile.write(potential_txt)
+        if self._INPUT_POTENTIAL is not None:
+            potential_filename = tempfolder.get_abs_path(self._INPUT_POTENTIAL)
+            with open(potential_filename, 'w') as infile:
+                infile.write(potential_txt)
 
         # ============================ calcinfo ================================
 
