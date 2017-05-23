@@ -72,7 +72,6 @@ calc.use_potential(ParameterData(dict=potential))
 
 calc.store_all()
 
-calc.submit()
 print "submitted calculation with PK={}".format(calc.dbnode.pk)
 
 test_only = True
