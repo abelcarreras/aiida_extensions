@@ -5,7 +5,7 @@ class LammpsPotential:
 
         self._names = [site.name for site in structure.kinds]
 
-        self._type = data.dict.type
+        self._type = data.dict.pair_style
         self._data = data.dict.data
         self._potential_filename = potential_filename
 
