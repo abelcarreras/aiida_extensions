@@ -18,10 +18,13 @@ def get_plot(data, q_path, title='', ylabel='', labels=None, q_points=None):
 
     for i, freq in enumerate(data):
         q_point = q_points[i]
-        print np.where(np.linalg.norm(q_point) > 0.1)
-     #   if q_points is not None:
-      #      for j, q_point in enumerate(q_points):
-       #         if np.linalg.norm(q_point[i]) > 0.1:
+
+        if q_points is not None:
+            for j, q_point in enumerate(q_points):
+                if np.linalg.norm(q_point[i]) > 0.1:
+                    print 'test'
+                else:
+                    print 'puta merda joder'
 
 
         plt.plot(q_path[q_path][i], freq, color='r')
