@@ -16,7 +16,7 @@ import numpy as np
 
 def get_plot(data, q_path, title='', ylabel='', labels=None):
     for i, freq in enumerate(data):
-        plt.plot(q_path[i], freq, color='r')
+        plt.plot(q_path[np.linalg.norm(q_path) > 0.01 ][i], freq, color='r')
 
     plt.axes().get_xaxis().set_ticks([])
     plt.ylabel(ylabel)
