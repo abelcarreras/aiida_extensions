@@ -224,7 +224,9 @@ class OptimizeCalculation(JobCalculation):
 
 
         structure_txt = generate_LAMMPS_structure(structure)
-        input_txt = generate_LAMMPS_input(potential_data, structure, parameters_data,
+        input_txt = generate_LAMMPS_input(potential_data,
+                                          parameters_data,
+                                          structure_file=self._INPUT_STRUCTURE,
                                           optimize_path_file=self._OUTPUT_TRAJECTORY_FILE_NAME)
 
 #        potential_txt = generate_LAMMPS_potential(potential_data)
