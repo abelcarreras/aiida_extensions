@@ -75,7 +75,7 @@ calc.use_potential(ParameterData(dict=potential))
 calc.use_parameters(ParameterData(dict=parameters_md))
 
 
-test_only = False
+test_only = True
 
 if test_only:  # It will not be submitted
     import os
