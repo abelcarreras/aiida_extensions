@@ -75,7 +75,7 @@ def generate_LAMMPS_structure(structure):
 
 def generate_LAMMPS_input(parameters,
                           potential_obj,
-                          structure_file='data.gan',
+                          structure_file='potential.pot',
                           trajectory_file='trajectory.lammpstr'):
 
  #   names = [site.name for site in structure.kinds]
@@ -234,6 +234,7 @@ class MdCalculation(JobCalculation):
         structure_txt = generate_LAMMPS_structure(structure)
         input_txt = generate_LAMMPS_input(parameters_data,
                                           potential_object,
+                                          structure_file=self._INPUT_STRUCTURE,
                                           trajectory_file=self._OUTPUT_TRAJECTORY_FILE_NAME)
 
         potential_txt = generate_LAMMPS_potential(potential_data)
