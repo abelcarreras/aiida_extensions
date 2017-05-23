@@ -55,7 +55,7 @@ get_plot(bs.get_array('frequencies'), bs.get_array('q_path'), 'Phonon band struc
 plt.figure(2)
 get_plot(bs.get_array('eigenvalues'), bs.get_array('q_path'), 'Eigenvalues', labels=bs.get_array('labels'))
 plt.figure(3)
-get_plot(bs.get_array('frequencies'), bs.get_array('q_path'), 'Mode Gruneisen parameter', labels=bs.get_array('labels'))
+get_plot(bs.get_array('gamma'), bs.get_array('q_path'), 'Mode Gruneisen parameter', labels=bs.get_array('labels'))
 plt.show()
 exit()
 
