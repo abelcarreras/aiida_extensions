@@ -5,6 +5,8 @@ from aiida.common.exceptions import InputValidationError
 from aiida.common.datastructures import CalcInfo, CodeInfo
 from aiida.common.utils import classproperty
 
+from potentials import LammpsPotential
+
 def generate_LAMMPS_structure(structure):
     import numpy as np
 
@@ -64,24 +66,36 @@ def generate_LAMMPS_structure(structure):
     return lammps_data_file
 
 
-def generate_LAMMPS_input(parameters,
-                          pair_style,
-                          structure,
-                          structure_file='data.gan',
-                          trajectory_file='trajectory.lammpstr',
-                          potential_filename = 'GaN.tersoff'):
+#def generate_LAMMPS_input(parameters,
+#                          pair_style,
+#                          structure,
+#                          structure_file='data.gan',
+#                          trajectory_file='trajectory.lammpstr',
+#                          potential_filename = 'GaN.tersoff'):
 
-    names = [site.name for site in structure.kinds]
+def generate_LAMMPS_input(parameters,
+                          potential_obj,
+                          structure_file='data.gan',
+                          trajectory_file='trajectory.lammpstr'):
+
+ #   names = [site.name for site in structure.kinds]
 #    asterisk_str = ' '.join(['*'] * len(names))
-    names_str = ' '.join(names)
+
+    names_str = ' '.join(potential_obj._names)
+
+#    names_str = ' '.join(names)
 
     lammps_input_file = 'units           metal\n'
     lammps_input_file += 'boundary        p p p\n'
     lammps_input_file += 'box tilt large\n'
     lammps_input_file += 'atom_style      atomic\n'
     lammps_input_file += 'read_data       {}\n'.format(structure_file)
-    lammps_input_file += 'pair_style      {}\n'.format(pair_style.dict.pair_style)
-    lammps_input_file += 'pair_coeff      * * {} {}\n'.format( potential_filename, names_str)
+
+
+    lammps_input_file += potential_obj.get_input_potential_lines()
+
+#    lammps_input_file += 'pair_style      {}\n'.format(pair_style.dict.pair_style)
+#    lammps_input_file += 'pair_coeff      * * {} {}\n'.format( potential_filename, names_str)
 
     lammps_input_file += 'neighbor        0.3 bin\n'
     lammps_input_file += 'neigh_modify    every 1 delay 0 check no\n'
@@ -215,12 +229,12 @@ class MdCalculation(JobCalculation):
 
         # =================== prepare the python input files =====================
 
+        potential_object = LammpsPotential(potential_data, structure, potential_filename=self._INPUT_POTENTIAL)
+
         structure_txt = generate_LAMMPS_structure(structure)
         input_txt = generate_LAMMPS_input(parameters_data,
-                                          potential_data, structure,
-                                          structure_file=self._INPUT_STRUCTURE,
-                                          trajectory_file=self._OUTPUT_TRAJECTORY_FILE_NAME,
-                                          potential_filename=self._INPUT_POTENTIAL)
+                                          potential_object,
+                                          trajectory_file=self._OUTPUT_TRAJECTORY_FILE_NAME)
 
         potential_txt = generate_LAMMPS_potential(potential_data)
 
@@ -234,9 +248,10 @@ class MdCalculation(JobCalculation):
         with open(structure_filename, 'w') as infile:
             infile.write(structure_txt)
 
-        potential_filename = tempfolder.get_abs_path(self._INPUT_POTENTIAL)
-        with open(potential_filename, 'w') as infile:
-            infile.write(potential_txt)
+        if potential_txt is not None:
+            potential_filename = tempfolder.get_abs_path(self._INPUT_POTENTIAL)
+            with open(potential_filename, 'w') as infile:
+                infile.write(potential_txt)
 
         # ============================ calcinfo ================================
 
@@ -255,7 +270,6 @@ class MdCalculation(JobCalculation):
         calcinfo.retrieve_list = []
         calcinfo.retrieve_list.append(self._OUTPUT_TRAJECTORY_FILE_NAME)
         calcinfo.retrieve_list.append(self._OUTPUT_FILE_NAME)
-
 
         codeinfo = CodeInfo()
         codeinfo.cmdline_params = ['-in', self._INPUT_FILE_NAME]

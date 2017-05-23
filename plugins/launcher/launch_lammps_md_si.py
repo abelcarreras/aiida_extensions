@@ -72,7 +72,20 @@ calc.use_potential(ParameterData(dict=potential))
 
 calc.use_parameters(ParameterData(dict=parameters_md))
 
-calc.store_all()
 
-calc.submit()
-print "submitted calculation with PK={}".format(calc.dbnode.pk)
+test_only = False
+
+if test_only:  # It will not be submitted
+    import os
+    subfolder, script_filename = calc.submit_test()
+    print "Test_submit for calculation (uuid='{}')".format(calc.uuid)
+    print "Submit file in {}".format(os.path.join(
+                                     os.path.relpath(subfolder.abspath),
+                                     script_filename))
+else:
+    calc.store_all()
+    print "created calculation; calc=Calculation(uuid='{}') # ID={}".format(
+        calc.uuid, calc.dbnode.pk)
+    calc.submit()
+    print "submitted calculation; calc=Calculation(uuid='{}') # ID={}".format(
+        calc.uuid, calc.dbnode.pk)

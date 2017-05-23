@@ -68,11 +68,9 @@ def generate_LAMMPS_structure(structure):
 
 
 def generate_LAMMPS_input(potential_obj,
-                       #   structure,
                           structure_file='data.gan',
                           trajectory_file='trajectory.lammpstr'):
 
-#    asterisk_str = ' '.join(['*'] * len(names))
     names_str = ' '.join(potential_obj._names)
 
 
@@ -210,7 +208,7 @@ class ForceCalculation(JobCalculation):
         with open(structure_filename, 'w') as infile:
             infile.write(structure_txt)
 
-        if self._INPUT_POTENTIAL is not None:
+        if potential_txt is not None:
             potential_filename = tempfolder.get_abs_path(self._INPUT_POTENTIAL)
             with open(potential_filename, 'w') as infile:
                 infile.write(potential_txt)
