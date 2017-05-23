@@ -237,7 +237,9 @@ class MdCalculation(JobCalculation):
                                           structure_file=self._INPUT_STRUCTURE,
                                           trajectory_file=self._OUTPUT_TRAJECTORY_FILE_NAME)
 
-        potential_txt = generate_LAMMPS_potential(potential_data)
+        #potential_txt = generate_LAMMPS_potential(potential_data)
+
+        potential_txt = potential_object.get_potential_file()
 
         # =========================== dump to file =============================
 

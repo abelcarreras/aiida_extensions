@@ -5,6 +5,8 @@ from aiida.common.exceptions import InputValidationError
 from aiida.common.datastructures import CalcInfo, CodeInfo
 from aiida.common.utils import classproperty
 
+from potentials import LammpsPotential
+
 def generate_LAMMPS_structure(structure):
     import numpy as np
 
@@ -64,18 +66,18 @@ def generate_LAMMPS_structure(structure):
     return lammps_data_file
 
 
+#def generate_LAMMPS_input(potential_obj,
+#                          structure_file='data.gan',
+ #                         trajectory_file='trajectory.lammpstr'):
 
-def generate_LAMMPS_input(pair_style,
-                          structure,
+def generate_LAMMPS_input(potential_obj,
                           parameters_data,
                           structure_file='data.gan',
-                          optimize_path_file='path.lammpstr',
-                          potential_filename = 'GaN.tersoff'):
+                          optimize_path_file='path.lammpstr'):
+
+    names_str = ' '.join(potential_obj._names)
 
 
-    names = [site.name for site in structure.kinds]
-#    asterisk_str = ' '.join(['*'] * len(names))
-    names_str = ' '.join(names)
 
     parameters = parameters_data.get_dict()
 
@@ -84,8 +86,11 @@ def generate_LAMMPS_input(pair_style,
     lammps_input_file += 'box tilt large\n'
     lammps_input_file += 'atom_style      atomic\n'
     lammps_input_file += 'read_data       {}\n'.format(structure_file)
-    lammps_input_file += 'pair_style      {}\n'.format(pair_style.dict.pair_style)
-    lammps_input_file += 'pair_coeff      * * {} {}\n'.format(potential_filename, names_str)
+
+    lammps_input_file += potential_obj.get_input_potential_lines()
+
+#    lammps_input_file += 'pair_style      {}\n'.format(pair_style.dict.pair_style)
+#    lammps_input_file += 'pair_coeff      * * {} {}\n'.format(potential_filename, names_str)
     lammps_input_file += 'fix             int all box/relax {} {} vmax {}\n'.format(parameters['relaxation'],
                                                                                     parameters['pressure'],
                                                                                     parameters['vmax'])
@@ -215,13 +220,15 @@ class OptimizeCalculation(JobCalculation):
 
         # =================== prepare the python input files =====================
 
+        potential_object = LammpsPotential(potential_data, structure, potential_filename=self._INPUT_POTENTIAL)
+
+
         structure_txt = generate_LAMMPS_structure(structure)
         input_txt = generate_LAMMPS_input(potential_data, structure, parameters_data,
-                                          structure_file=self._INPUT_STRUCTURE,
-                                          optimize_path_file=self._OUTPUT_TRAJECTORY_FILE_NAME,
-                                          potential_filename=self._INPUT_POTENTIAL)
+                                          optimize_path_file=self._OUTPUT_TRAJECTORY_FILE_NAME)
 
-        potential_txt = generate_LAMMPS_potential(potential_data)
+#        potential_txt = generate_LAMMPS_potential(potential_data)
+        potential_txt = potential_object.get_potential_file()
 
         # =========================== dump to file =============================
 
@@ -233,9 +240,10 @@ class OptimizeCalculation(JobCalculation):
         with open(structure_filename, 'w') as infile:
             infile.write(structure_txt)
 
-        potential_filename = tempfolder.get_abs_path(self._INPUT_POTENTIAL)
-        with open(potential_filename, 'w') as infile:
-            infile.write(potential_txt)
+        if potential_txt is not None:
+            potential_filename = tempfolder.get_abs_path(self._INPUT_POTENTIAL)
+            with open(potential_filename, 'w') as infile:
+                infile.write(potential_txt)
 
         # ============================ calcinfo ================================
 
