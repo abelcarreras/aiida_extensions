@@ -23,7 +23,7 @@ def get_plot(data, q_path, data_name, labels=None):
     plt.xlabel('Wave vector')
     plt.xlim([0, q_path[-1][-1]])
     plt.axhline(y=0, color='k', ls='dashed')
-    plt.suptitle('Phonon band structure')
+    plt.suptitle(data_name)
 
     if labels is not None:
         plt.rcParams.update({'mathtext.default':  'regular' })
