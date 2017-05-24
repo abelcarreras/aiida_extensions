@@ -25,7 +25,7 @@ for i, scaled_position in enumerate(scaled_positions):
 
 structure.store()
 
-
+# Example LJ parameters for Argon. These may not be accurate at all
 potential ={'pair_style': 'lennard_jones',
             #                 epsilon,  sigma, cutoff
             'data': {'1  1':  '0.01029    3.4    5.0',
