@@ -18,9 +18,9 @@ class LammpsPotential:
         self._potential_filename = potential_filename
 
         try:
-            #self._potential_module = importlib.import_module('tersoff')
-            import tersoff
-            self._potential_module = tersoff
+            self._potential_module = importlib.import_module('.tersoff')
+            #import tersoff
+            #self._potential_module = tersoff
 
         except ImportError:
             raise ImportError('This lammps potential is not implemented')
