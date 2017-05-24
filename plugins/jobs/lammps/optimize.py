@@ -123,7 +123,7 @@ class OptimizeCalculation(JobCalculation):
         self._INPUT_POTENTIAL = 'potential.pot'
         self._INPUT_STRUCTURE = 'input.data'
 
-        self._OUTPUT_TRAJECTORY_FILE_NAME = 'path.lampstrj'
+        self._OUTPUT_TRAJECTORY_FILE_NAME = 'path.lammpstrj'
 
         self._OUTPUT_FILE_NAME = 'log.lammps'
         self._default_parser = 'lammps.optimize'
