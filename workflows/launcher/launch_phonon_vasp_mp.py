@@ -21,7 +21,7 @@ conventional = spa.get_conventional_standard_structure()
 primitive = spa.get_primitive_standard_structure()
 
 primitive_matrix = np.dot(np.linalg.inv(conventional.lattice_vectors()), primitive.lattice_vectors())
-np.round(primitive_matrix, decimals=6).tolist()
+primitive_matrix = np.round(primitive_matrix, decimals=6).tolist()
 
 structure = StructureData(pymatgen=conventional).store()
 
