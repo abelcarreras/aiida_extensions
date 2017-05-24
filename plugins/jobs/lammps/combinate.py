@@ -125,7 +125,7 @@ def generate_LAMMPS_input(parameters,
                           pair_style,
                           structure,
                           structure_file='data.gan',
-                          trajectory_file='trajectory.lammpstr',
+                          trajectory_file='trajectory.lammpstrj',
                           potential_filename = 'GaN.tersoff',
                           command=None):
 

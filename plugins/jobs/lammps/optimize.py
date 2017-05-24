@@ -70,7 +70,7 @@ def generate_LAMMPS_structure(structure):
 def generate_LAMMPS_input(potential_obj,
                           parameters_data,
                           structure_file='data.gan',
-                          optimize_path_file='path.lammpstr'):
+                          optimize_path_file='path.lammpstrj'):
 
     names_str = ' '.join(potential_obj._names)
 
