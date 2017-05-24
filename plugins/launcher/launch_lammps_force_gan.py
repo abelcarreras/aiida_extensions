@@ -72,7 +72,7 @@ calc.use_potential(ParameterData(dict=potential))
 
 print "submitted calculation with PK={}".format(calc.dbnode.pk)
 
-test_only = False
+test_only = True
 
 if test_only:  # It will not be submitted
     import os
