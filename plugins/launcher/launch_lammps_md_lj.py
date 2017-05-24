@@ -39,13 +39,11 @@ for i, scaled_position in enumerate(scaled_positions):
 structure.store()
 
 
-potential ={'pair_style': 'lennard_jones',  # epsilon, sigma, cutoff
-                          'data': [[1, 1,      1.0,     1.0,   2.5],
-                                   [2, 2,      1.0,     1.0,   2.5],
-                                   [1, 2,      1.0,     1.0,   2.5]]}
-
 potential ={'pair_style': 'lennard_jones',
-                          'data': potential}
+            #                  epsilon,    sigma, cutoff
+            'data': [[1, 1,      1.0,     1.0,   2.5],
+                     [2, 2,      1.0,     1.0,   2.5],
+                     [1, 2,      1.0,     1.0,   2.5]]}
 
 lammps_machine = {
     'num_machines': 1,
