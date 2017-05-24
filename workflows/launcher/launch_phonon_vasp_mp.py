@@ -10,7 +10,7 @@ import os
 import pymatgen
 
 ##########################
-structure_id = 'mp-804'
+structure_id = 'mp-406'
 ##########################
 
 rester =  pymatgen.MPRester(os.environ['PMG_MAPI_KEY'])
