@@ -18,7 +18,7 @@ class LammpsPotential:
         self._potential_filename = potential_filename
 
         try:
-            self._potential_module = importlib.import_module('.tersoff')
+            self._potential_module = importlib.import_module('.tersoff', __name__)
             #import tersoff
             #self._potential_module = tersoff
 
