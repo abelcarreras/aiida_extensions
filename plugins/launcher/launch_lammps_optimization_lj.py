@@ -14,16 +14,13 @@ codename = 'lammps_md@boston'
 #  Define input parameters #
 ############################
 
-a = 5.640772
-cell = [[a, 0, 0],
-        [0, a, 0],
-        [0, 0, a]]
+cell = [[ 3.987594, 0.000000, 0.000000],
+        [-1.993797, 3.453358, 0.000000],
+        [ 0.000000, 0.000000, 6.538394]]
 
-symbols=['Ar'] * 4
-scaled_positions = [(0.000,  0.000,  0.000),
-                    (0.000,  0.500,  0.500),
-                    (0.500,  0.000,  0.500),
-                    (0.500,  0.500,  0.000)]
+symbols=['Ar'] * 2
+scaled_positions = [(0.33333,  0.66666,  0.25000),
+                    (0.66667,  0.33333,  0.75000)]
 
 structure = StructureData(cell=cell)
 positions = np.dot(scaled_positions, cell)
@@ -47,14 +44,13 @@ lammps_machine = {
     'parallel_env': 'mpi*',
     'tot_num_mpiprocs': 16}
 
-
-parameters_md = {'timestep': 0.001,
-                 'temperature': 60,
-                 'thermostat_variable': 0.5,
-                 'equilibrium_steps': 100,
-                 'total_steps': 2000,
-                 'dump_rate': 1}
-
+parameters_opt = {'relaxation': 'tri',  # iso/aniso/tri
+                  'pressure': 0.0,  # bars
+                  'vmax': 0.000001,  # Angstrom^3
+                  'energy_tolerance': 1.0e-25,  # eV
+                  'force_tolerance': 1.0e-25,  # eV angstrom
+                  'max_evaluations': 1000000,
+                  'max_iterations': 500000}
 
 code = Code.get_from_string(codename)
 
@@ -67,8 +63,7 @@ calc.use_code(code)
 calc.use_structure(structure)
 calc.use_potential(ParameterData(dict=potential))
 
-calc.use_parameters(ParameterData(dict=parameters_md))
-
+calc.use_parameters(ParameterData(dict=parameters_opt))
 
 test_only = False
 
