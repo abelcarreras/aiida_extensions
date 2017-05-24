@@ -14,20 +14,16 @@ codename = 'lammps_md@boston'
 #  Define input parameters #
 ############################
 
-a = 5.404
+a = 5.640772
 cell = [[a, 0, 0],
         [0, a, 0],
         [0, 0, a]]
 
-symbols=['Si'] * 8
-scaled_positions = [(0.875,  0.875,  0.875),
-                    (0.875,  0.375,  0.375),
-                    (0.375,  0.875,  0.375),
-                    (0.375,  0.375,  0.875),
-                    (0.125,  0.125,  0.125),
-                    (0.125,  0.625,  0.625),
-                    (0.625,  0.125,  0.625),
-                    (0.625,  0.625,  0.125)]
+symbols=['Ar'] * 8
+scaled_positions = [(0.000,  0.000,  0.000),
+                    (0.000,  0.500,  0.500),
+                    (0.500,  0.000,  0.500),
+                    (0.500,  0.500,  0.000)]
 
 structure = StructureData(cell=cell)
 positions = np.dot(scaled_positions, cell)
@@ -41,7 +37,7 @@ structure.store()
 
 potential ={'pair_style': 'lennard_jones',
             #                 epsilon,  sigma, cutoff
-            'data': {'1  1':   '1.0      1.0    2.5',
+            'data': {'1  1':  '0.01029   3.4    2.5',
                      #'2  2':   '1.0      1.0    2.5',
                      #'1  2':   '1.0      1.0    2.5'
                      }}
