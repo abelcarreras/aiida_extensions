@@ -11,7 +11,7 @@ class LammpsPotential:
         self._potential_filename = potential_filename
 
         try:
-            potential_module=importlib.import_module(self._type)
+            potential_module = importlib.import_module(self._type)
             self._generate_LAMMPS_potential = potential_module._generate_LAMMPS_potential
             self._get_input_potential_lines = potential_module._get_input_potential_lines
         except ImportError:
