@@ -1,10 +1,14 @@
+import numpy as np
 
 
 def _generate_LAMMPS_potential(data):
     return None
 
+
 def _get_input_potential_lines(data, names=None, potential_filename='potential.pot'):
-    cut = 5.0
+
+    cut = np.max([float(i.split()[2]) for i in data.values()])
+
     lammps_input_text = 'pair_style  lj/cut {}\n'.format(cut)
 
     for key, value in data.iteritems():
