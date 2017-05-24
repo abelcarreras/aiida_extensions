@@ -11,17 +11,10 @@ class LammpsPotential:
         self._type = potential_data.dict.pair_style
         self._data = potential_data.dict.data
 
-        #self._type = potential_data['pair_style']
-        #self._data = potential_data['data']
-        #self._names = None
-
         self._potential_filename = potential_filename
 
         try:
             self._potential_module = importlib.import_module('.{}'.format(self._type), __name__)
-            #import tersoff
-            #self._potential_module = tersoff
-
         except ImportError:
             raise ImportError('This lammps potential is not implemented')
 
@@ -42,15 +35,3 @@ class LammpsPotential:
         return self._potential_module.get_input_potential_lines(self._data,
                                                                 potential_filename=self._potential_filename,
                                                                 names=self._names)
-
-if __name__ == "__main__":
-    potential = {'pair_style': 'lennard_jones',
-                 #                 epsilon,  sigma, cutoff
-                 'data': {'1  1': '0.01029   3.4    2.5',
-                          # '2  2':   '1.0      1.0    2.5',
-                          # '1  2':   '1.0      1.0    2.5'
-                          }}
-    structure = None
-    test = LammpsPotential(potential, structure)
-    print test.get_potential_file()
-    print test.get_input_potential_lines()
