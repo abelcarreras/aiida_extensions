@@ -42,8 +42,9 @@ structure.store()
 potential ={'pair_style': 'lennard_jones',
             #                 epsilon,  sigma, cutoff
             'data': {'1  1':   '1.0      1.0    2.5',
-                     '2  2':   '1.0      1.0    2.5',
-                     '1  2':   '1.0      1.0    2.5'}}
+                     #'2  2':   '1.0      1.0    2.5',
+                     #'1  2':   '1.0      1.0    2.5'
+                     }}
 
 lammps_machine = {
     'num_machines': 1,
@@ -73,7 +74,7 @@ calc.use_potential(ParameterData(dict=potential))
 calc.use_parameters(ParameterData(dict=parameters_md))
 
 
-test_only = True
+test_only = False
 
 if test_only:  # It will not be submitted
     import os
