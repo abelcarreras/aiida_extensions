@@ -46,6 +46,7 @@ incar_dict = {
 pseudo_dict = {'functional': 'PBE',
                'symbols': np.unique(symbols).tolist()}
 
+# Monkhorst-pack
 kpoints_dict = {'points' : [2, 2, 2],
                 'shift'  : [0.0, 0.0, 0.0]}
 

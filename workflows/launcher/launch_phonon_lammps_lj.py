@@ -28,7 +28,7 @@ structure.store()
 
 potential ={'pair_style': 'lennard_jones',
             #                 epsilon,  sigma, cutoff
-            'data': {'1  1':  '0.01029   3.4    2.5',
+            'data': {'1  1':  '0.01029    3.4    5.0',
                      #'2  2':   '1.0      1.0    2.5',
                      #'1  2':   '1.0      1.0    2.5'
                      }}
