@@ -1,3 +1,6 @@
+from aiida import load_dbenv
+load_dbenv()
+from aiida.orm import Code, DataFactory
 
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
