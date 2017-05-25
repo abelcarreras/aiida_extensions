@@ -67,7 +67,6 @@ get_plot(bs.get_array('gruneisen'), bs.get_array('q_path'),
          ylabel='$\gamma$',
          labels=bs.get_array('labels'))
 
-
 # Mesh
 
 mesh = wf.get_result('mesh')
@@ -79,7 +78,6 @@ plt.suptitle('Gruneisen')
 for (g, freq) in zip(mesh.get_array('frequencies').T, mesh.get_array('gruneisen').T):
     plt.plot(g, freq, marker='o', linestyle='None', markeredgecolor='black', color='red')
 
-plt.show()
 
 plt.show()
-exit()
+
