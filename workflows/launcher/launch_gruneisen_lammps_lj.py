@@ -7,7 +7,6 @@ ParameterData = DataFactory('parameter')
 
 import numpy as np
 
-
 cell = [[ 3.759417, 0.000000, 0.000000],
         [-1.879709, 3.255751, 0.000000],
         [ 0.000000, 0.000000, 6.064977]]
@@ -88,6 +87,6 @@ wf_parameters = {
 from aiida.workflows.wf_gruneisen import WorkflowGruneisen
 wf = WorkflowGruneisen(params=wf_parameters)
 
-wf.label = 'Gruneisen LJ Ar'
+wf.label = 'Gruneisen LJ Na'
 wf.start()
 print ('pk: {}'.format(wf.pk))
