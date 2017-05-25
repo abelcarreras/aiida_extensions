@@ -17,9 +17,13 @@ import numpy as np
 def get_plot(band_data, q_path, title='', ylabel='', labels=None, q_points=None, freq_tolerance=1e-5):
 
     for (data, q) in zip(band_data, q_path):
-        q = np.linalg.norm(q_points, axis=1)
-        indices =  np.where(q > freq_tolerance)[0]
-        plt.plot(q[indices], data[indices], color='r')
+        if q_points is not None:
+            q = np.linalg.norm(q_points, axis=1)
+            indices =  np.where(q > freq_tolerance)[0]
+            plt.plot(q[indices], data[indices], color='r')
+        else:
+            plt.plot(q, data, color='r')
+
 
     plt.axes().get_xaxis().set_ticks([])
     plt.ylabel(ylabel)
@@ -67,7 +71,8 @@ plt.figure(3)
 get_plot(bs.get_array('gruneisen'), bs.get_array('q_path'),
          title='Mode Gruneisen parameter',
          ylabel='$\gamma$',
-         labels=bs.get_array('labels'))
+         labels=bs.get_array('labels'),
+         q_points=bs.get_array('q_points'))
 
 # Mesh
 plt.figure(4)
