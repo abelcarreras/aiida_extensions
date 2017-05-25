@@ -8,11 +8,11 @@ ParameterData = DataFactory('parameter')
 import numpy as np
 
 
-cell = [[ 3.987594, 0.000000, 0.000000],
-        [-1.993797, 3.453358, 0.000000],
-        [ 0.000000, 0.000000, 6.538394]]
+cell = [[ 3.759417, 0.000000, 0.000000],
+        [-1.879709, 3.255751, 0.000000],
+        [ 0.000000, 0.000000, 6.064977]]
 
-symbols=['Ar'] * 2
+symbols=['Na'] * 2
 scaled_positions = [(0.33333,  0.66666,  0.25000),
                     (0.66667,  0.33333,  0.75000)]
 
@@ -25,10 +25,14 @@ for i, scaled_position in enumerate(scaled_positions):
 
 structure.store()
 
-# Example LJ parameters for Argon. These may not be accurate at all
+# LJ parameters extracted from :
+# Bhansali, A. P., Bayazitoglu, Y., & Maruyama, S. (1999).
+# Molecular dynamics simulation of an evaporating sodium droplet.
+# International Journal of Thermal Sciences, 38(1), 66-74
+
 potential ={'pair_style': 'lennard_jones',
             #                 epsilon,  sigma, cutoff
-            'data': {'1  1':  '0.01029    3.4    5.0',
+            'data': {'1  1':  '0.0202    3.24    5.0',
                      #'2  2':   '1.0      1.0    2.5',
                      #'1  2':   '1.0      1.0    2.5'
                      }}
