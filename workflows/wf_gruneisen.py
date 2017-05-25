@@ -3,14 +3,14 @@ from aiida.orm.workflow import Workflow
 from aiida.orm.calculation.inline import make_inline
 
 from aiida.workflows.wf_phonon import WorkflowPhonon
-from aiida.orm import load_node, load_workflow
+# from aiida.orm import load_node, load_workflow
 
+import numpy as np
 
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
 ArrayData = DataFactory('array')
 
-import numpy as np
 
 def get_path_using_seekpath(structure, band_resolution=30):
     import seekpath
@@ -167,7 +167,6 @@ class WorkflowGruneisen(Workflow):
     def volume_expansions(self):
         self.append_to_report('Volume expansion calculations')
         wf_parameters = self.get_parameters()
-        #   structure = wf_parameters['structure']
 
         structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
 
@@ -175,7 +174,6 @@ class WorkflowGruneisen(Workflow):
                          'volumes': ParameterData(dict={ 'relations': [ 1.01, 0.99]})}  # plus, minus
 
         cells = create_volumes_inline(**inline_params)[1]
-
 
         # list = [441, 442]
         for i, structures in enumerate(cells.iterkeys()):
