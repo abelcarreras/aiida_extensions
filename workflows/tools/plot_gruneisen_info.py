@@ -68,6 +68,7 @@ get_plot(bs.get_array('gruneisen'), bs.get_array('q_path'),
          labels=bs.get_array('labels'))
 
 # Mesh
+plt.figure(4)
 
 mesh = wf.get_result('mesh')
 
