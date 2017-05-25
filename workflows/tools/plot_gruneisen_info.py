@@ -14,10 +14,12 @@ KpointsData = DataFactory('array.kpoints')
 import numpy as np
 
 
-def get_plot(band_data, q_path, title='', ylabel='', labels=None, q_points=None):
+def get_plot(band_data, q_path, title='', ylabel='', labels=None, q_points=None, freq_tolerance=1e-5):
 
-    for i, data in enumerate(band_data):
-        plt.plot(q_path[i], data, color='r')
+    for (data, q) in zip(band_data, q_path):
+        q = np.linalg.norm(q_points, axis=1)
+        indices =  np.where(q > freq_tolerance)[0]
+        plt.plot(q[indices], data[indices], color='r')
 
     plt.axes().get_xaxis().set_ticks([])
     plt.ylabel(ylabel)
