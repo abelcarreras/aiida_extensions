@@ -74,8 +74,16 @@ get_plot(bs.get_array('gruneisen'), bs.get_array('q_path'),
          labels=bs.get_array('labels'),
          q_points=bs.get_array('q_points'))
 
-# Mesh
 plt.figure(4)
+get_plot(bs.get_array('distances'), bs.get_array('q_path'),
+         title='Distances',
+         ylabel='',
+         labels=bs.get_array('labels'),
+         q_points=bs.get_array('q_points'))
+
+
+# Mesh
+plt.figure(5)
 
 mesh = wf.get_result('mesh')
 
