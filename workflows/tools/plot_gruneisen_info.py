@@ -47,7 +47,7 @@ def get_plot(band_data, q_path, title='', ylabel='', labels=None, q_points=None)
 wf = load_workflow(447)
 #######################
 
-# Phonon Band structure
+# Band structure
 
 bs = wf.get_result('band_structure')
 
@@ -62,10 +62,24 @@ get_plot(bs.get_array('eigenvalues'), bs.get_array('q_path'),
          title='Eigenvalues',
          labels=bs.get_array('labels'))
 plt.figure(3)
-get_plot(bs.get_array('gamma'), bs.get_array('q_path'),
+get_plot(bs.get_array('gruneisen'), bs.get_array('q_path'),
          title='Mode Gruneisen parameter',
          ylabel='$\gamma$',
          labels=bs.get_array('labels'))
+
+
+# Mesh
+
+mesh = wf.get_result('mesh')
+
+plt.xlabel('Frequency [THz]')
+plt.ylabel('$\gamma$')
+plt.suptitle('Gruneisen')
+
+for (g, freq) in zip(mesh.get_array('frequencies').T, mesh.get_array('gruneisen').T):
+    plt.plot(g, freq, marker='o', linestyle='None', markeredgecolor='black', color='red')
+
+plt.show()
 
 plt.show()
 exit()

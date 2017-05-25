@@ -82,6 +82,9 @@ def phonopy_gruneisen_inline(**kwargs):
                                  phonon_plus,  # plus
                                  phonon_minus)  # minus
 
+    gruneisen.set_mesh(phonopy_input['mesh'], is_gamma_center=False, is_mesh_symmetry=True)
+
+    # Band structure
     bands = get_path_using_seekpath(structure_origin)
     gruneisen.set_band_structure(bands['ranges'], 51)
     band_structure_gruneisen = gruneisen.get_band_structure()._paths
@@ -95,16 +98,28 @@ def phonopy_gruneisen_inline(**kwargs):
     band_labels = np.array(bands['labels'])
 
     # stores band structure
-    band_structure = ArrayData()
-    band_structure.set_array('q_points', q_points)
-    band_structure.set_array('q_path', q_path)
-    band_structure.set_array('frequencies', frequencies)
-    band_structure.set_array('gamma', gamma)
-    band_structure.set_array('distances', distances)
-    band_structure.set_array('eigenvalues', eigenvalues)
-    band_structure.set_array('labels', band_labels)
+    band_structure_array = ArrayData()
+    band_structure_array.set_array('q_points', q_points)
+    band_structure_array.set_array('q_path', q_path)
+    band_structure_array.set_array('frequencies', frequencies)
+    band_structure_array.set_array('gruneisen', gamma)
+    band_structure_array.set_array('distances', distances)
+    band_structure_array.set_array('eigenvalues', eigenvalues)
+    band_structure_array.set_array('labels', band_labels)
 
-    return {'band_structure': band_structure}
+    # mesh
+    mesh = gruneisen.get_mesh()
+    frequencies_mesh = np.array(mesh.get_frequencies())
+    gruneisen_mesh = np.array(mesh.get_gruneisen())
+
+    # stores mesh
+    mesh_array = ArrayData()
+    mesh_array.set_array('frequencies', frequencies_mesh)
+    mesh_array.set_array('gruneisen', gruneisen_mesh)
+    mesh_array.store()
+
+    print(gruneisen.get_thermal_properties())
+    return {'band_structure': band_structure_array, 'mesh': mesh_array}
 
 
 @make_inline
@@ -206,6 +221,7 @@ class WorkflowGruneisen(Workflow):
         results = phonopy_gruneisen_inline(**inline_params)[1]
 
         self.add_result('band_structure', results['band_structure'])
+        self.add_result('mesh', results['mesh'])
 
         self.append_to_report('Finishing workflow_workflow')
 
