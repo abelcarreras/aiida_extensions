@@ -74,7 +74,7 @@ mesh = wf.get_result('mesh')
 
 plt.xlabel('Frequency [THz]')
 plt.ylabel('$\gamma$')
-plt.suptitle('Gruneisen')
+plt.suptitle('Mode Gruneisen parameter')
 
 for (g, freq) in zip(mesh.get_array('frequencies').T, mesh.get_array('gruneisen').T):
     plt.plot(g, freq, marker='o', linestyle='None', markeredgecolor='black', color='red')

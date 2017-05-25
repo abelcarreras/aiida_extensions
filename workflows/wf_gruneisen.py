@@ -154,12 +154,11 @@ class WorkflowGruneisen(Workflow):
         wf_param_opt = dict(wf_parameters)
 
         wf = WorkflowPhonon(params=wf_param_opt)
-        wf = load_workflow(440)
+        # wf = load_workflow(440)
 
         wf.store()
-
         self.attach_workflow(wf)
-    #    wf.start()
+        wf.start()
 
         self.next(self.volume_expansions)
 
@@ -178,7 +177,7 @@ class WorkflowGruneisen(Workflow):
         cells = create_volumes_inline(**inline_params)[1]
 
 
-        list = [441, 442]
+        # list = [441, 442]
         for i, structures in enumerate(cells.iterkeys()):
             structure_vol = cells['structure_{}'.format(i)]
             self.append_to_report('structure_{}: {}'.format(i, structure_vol.pk))
@@ -188,12 +187,12 @@ class WorkflowGruneisen(Workflow):
             # Submit workflow
 
             wf = WorkflowPhonon(params=wf_parameters_volume, optimize=False)
-            wf = load_workflow(list[i])
+            # wf = load_workflow(list[i])
 
             wf.store()
 
             self.attach_workflow(wf)
-      #      wf.start()
+            wf.start()
 
         self.next(self.collect_data)
 
