@@ -16,9 +16,9 @@ import numpy as np
 
 def get_plot(band_data, q_path, title='', ylabel='', labels=None, q_points=None, freq_tolerance=1e-5):
 
-    for (q, data, p) in zip(q_points, band_data, q_path):
+    for i, (data, p) in enumerate(zip(band_data, q_path)):
         if q_points is not None:
-            q_norm = np.linalg.norm(q, axis=1)
+            q_norm = np.linalg.norm(q_points[i], axis=1)
             indices = np.where(q_norm > freq_tolerance)[0]
             plt.plot(p[indices], data[indices], color='r')
         else:
