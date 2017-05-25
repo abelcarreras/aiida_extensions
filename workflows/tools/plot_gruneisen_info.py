@@ -75,7 +75,7 @@ get_plot(bs.get_array('gruneisen'), bs.get_array('q_path'),
          q_points=bs.get_array('q_points'))
 
 plt.figure(4)
-get_plot(bs.get_array('distances'), bs.get_array('q_path'),
+get_plot(bs.get_array('distances').T, bs.get_array('q_path'),
          title='Distances',
          ylabel='',
          labels=bs.get_array('labels'))
