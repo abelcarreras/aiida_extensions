@@ -97,7 +97,7 @@ def phonopy_gruneisen_inline(**kwargs):
     eigenvalues = np.array([band[3] for band in band_structure_gruneisen])
     band_labels = np.array(bands['labels'])
 
-    # stores band structure
+    # build band structure
     band_structure_array = ArrayData()
     band_structure_array.set_array('q_points', q_points)
     band_structure_array.set_array('q_path', q_path)
@@ -112,11 +112,10 @@ def phonopy_gruneisen_inline(**kwargs):
     frequencies_mesh = np.array(mesh.get_frequencies())
     gruneisen_mesh = np.array(mesh.get_gruneisen())
 
-    # stores mesh
+    # build mesh
     mesh_array = ArrayData()
     mesh_array.set_array('frequencies', frequencies_mesh)
     mesh_array.set_array('gruneisen', gruneisen_mesh)
-    mesh_array.store()
 
     print(gruneisen.get_thermal_properties())
     return {'band_structure': band_structure_array, 'mesh': mesh_array}
