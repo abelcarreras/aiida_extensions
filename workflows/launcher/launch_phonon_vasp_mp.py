@@ -13,7 +13,23 @@ import pymatgen
 structure_id = 'mp-13108'
 ##########################
 
-rester =  pymatgen.MPRester(os.environ['PMG_MAPI_KEY'])
+
+def get_potential_labels(functional, symbol_list, ftype=None):
+    potential_labels =[]
+    for symbol in np.unique(symbol_list):
+        psp_dir = os.environ['VASP_PSP_DIR'] + '/POT_GGA_PAW_' + functional
+        all_labels = [f[7:-3] for f in os.listdir(psp_dir)  if os.path.isfile(os.path.join(psp_dir, f))]
+        candidates = [ s for s in all_labels if symbol == s.split('_')[0]]
+        if ftype is not None:
+            final = [s for s in candidates if '_{}'.format(ftype) == s[-(len(ftype) + 1):]]
+            if len(final) > 0:
+                potential_labels.append(final[0])
+                continue
+        potential_labels.append(candidates[0])
+    return potential_labels
+
+
+rester = pymatgen.MPRester(os.environ['PMG_MAPI_KEY'])
 pmg_structure = rester.get_structure_by_material_id(structure_id)
 spa = pymatgen.symmetry.analyzer.SpacegroupAnalyzer(pmg_structure)
 
@@ -46,7 +62,7 @@ incar_dict = {
 }
 
 pseudo_dict = {'functional': 'PBE',
-               'symbols': np.unique(conventional.symbol_set).tolist()}
+               'symbols': get_potential_labels('PBE', conventional.symbol_set)}
 
 # Monkhorst-pack
 kpoints_dict = {'points': [2, 2, 2],
