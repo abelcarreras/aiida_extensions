@@ -143,8 +143,8 @@ def phonopy_calculation_inline(**kwargs):
     phonon.set_band_structure(bands['ranges'])
 
     phonon.set_mesh(phonopy_input['mesh'], is_eigenvectors=True, is_mesh_symmetry=False)
-    phonon.set_total_DOS()
-    phonon.set_partial_DOS()
+    phonon.set_total_DOS(tetrahedron_method=True)
+    phonon.set_partial_DOS(tetrahedron_method=True)
 
     # get band structure
     band_structure_phonopy = phonon.get_band_structure()
