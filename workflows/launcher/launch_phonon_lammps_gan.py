@@ -95,14 +95,12 @@ lammps_machine = {
 
 
 parameters_opt = {'relaxation': 'tri',  # iso/aniso/tri
-                  'pressure': 0.0,  # bars
-                  'vmax': 0.000001,  # Anstrom^3
+                  # 'pressure': 0.0,  # In phonon workflow this is ignored. Pressure is set in workflow arguments
+                  'vmax': 0.000001,  # Angstrom^3
                   'energy_tolerance': 1.0e-25,  # eV
                   'force_tolerance': 1.0e-25,  # eV angstrom
                   'max_evaluations': 1000000,
                   'max_iterations': 500000}
-
-#structure = load_node(11233)
 
 wf_parameters = {
      'structure': structure,
@@ -116,9 +114,9 @@ wf_parameters = {
                          'resources': lammps_machine},
     }
 
-#Submit workflow
+# Submit workflow
 from aiida.workflows.wf_phonon import WorkflowPhonon
-wf = WorkflowPhonon(params=wf_parameters, optimize=True)
+wf = WorkflowPhonon(params=wf_parameters, optimize=True, pressure=0.0)  # pressure in kb
 
 wf.label = 'lammps_GaN'
 wf.start()

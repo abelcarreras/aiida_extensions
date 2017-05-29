@@ -141,6 +141,20 @@ def create_volumes_inline(**kwargs):
 class WorkflowGruneisen(Workflow):
     def __init__(self, **kwargs):
         super(WorkflowGruneisen, self).__init__(**kwargs)
+        if 'pre_optimize' in kwargs:
+            self._pre_optimize = kwargs['pre_optimize']
+        else:
+            self._pre_optimize = True  # By default pre-optimization is done
+
+        if 'constant_volume' in kwargs:
+            self._constant_volume = kwargs['constant_volume']
+        else:
+            self._constant_volume = False  # By default pre-optimization is done
+
+        if 'pressure' in kwargs:
+            self._pressure = kwargs['pressure']
+        else:
+            self._pressure = 0.0  # By default pre-optimization is done
 
     # Calculates the reference crystal structure (optimize it if requested)
     @Workflow.step
@@ -148,12 +162,17 @@ class WorkflowGruneisen(Workflow):
         self.append_to_report('Starting workflow_workflow')
         self.append_to_report('Phonon calculation of base structure')
 
+        if not self._pre_optimize:
+            self.next(self.volume_expansions_direct)
+            return
+
         wf_parameters = self.get_parameters()
         # self.append_to_report('crystal: ' + wf_parameters['structure'].get_formula())
 
-        wf_param_opt = dict(wf_parameters)
-
-        wf = WorkflowPhonon(params=wf_param_opt)
+        wf = WorkflowPhonon(params=wf_parameters,
+                            optimize=True,
+                            constant_volume=self._constant_volume,
+                            pressure=self._pressure)
         # wf = load_workflow(440)
 
         wf.store()
@@ -194,14 +213,49 @@ class WorkflowGruneisen(Workflow):
 
         self.next(self.collect_data)
 
+    # Generate the volume expanded cells
+    @Workflow.step
+    def volume_expansions_direct(self):
+        self.append_to_report('Volume expansion calculations')
+        wf_parameters = self.get_parameters()
+
+        structure = wf_parameters['structure']
+
+        inline_params = {'structure': structure,
+                         'volumes': ParameterData(dict={'relations': [ 1.01, 1.0, 0.99]})}  # plus, minus
+
+        cells = create_volumes_inline(**inline_params)[1]
+
+        # list = [441, 442]
+        for i, structures in enumerate(cells.iterkeys()):
+            structure_vol = cells['structure_{}'.format(i)]
+            self.append_to_report('structure_{}: {}'.format(i, structure_vol.pk))
+            wf_parameters_volume = dict(wf_parameters)
+            wf_parameters_volume['structure'] = structure_vol
+
+            # Submit workflow
+
+            wf = WorkflowPhonon(params=wf_parameters_volume, optimize=False)
+            # wf = load_workflow(list[i])
+
+            wf.store()
+
+            self.attach_workflow(wf)
+            wf.start()
+
+        self.next(self.collect_data)
+
     # Collects the forces and prepares force constants
     @Workflow.step
     def collect_data(self):
 
         parameters = self.get_parameters()
 
-        wf_origin= self.get_step(self.start).get_sub_workflows()[0]
-        wf_plus, wf_minus = self.get_step(self.volume_expansions).get_sub_workflows()
+        if self._pre_optimize:
+            wf_origin = self.get_step(self.start).get_sub_workflows()[0]
+            wf_plus, wf_minus = self.get_step(self.volume_expansions).get_sub_workflows()
+        else:
+            wf_plus, wf_origin, wf_minus = self.get_step(self.volume_expansions).get_sub_workflows()
 
         self.append_to_report('reading structure')
 

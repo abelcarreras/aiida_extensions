@@ -193,6 +193,16 @@ class WorkflowPhonon(Workflow):
         else:
             self._optimize = True  # By default optimization is done
 
+        if 'constant_volume' in kwargs:
+            self._constant_volume = kwargs['constant_volume']
+        else:
+            self._constant_volume = False  # By default constant pressure optimization is done
+
+        if 'pressure' in kwargs:
+            self._pressure = kwargs['pressure']
+        else:
+            self._pressure = 0.0  # By default pre-optimization is done
+
     # Correct scaled coordinates (not in use now)
     def get_scaled_positions_lines(self, scaled_positions):
 
@@ -204,7 +214,7 @@ class WorkflowPhonon(Workflow):
                     scaled_positions[i][j] -= 1.0
         return
 
-    def generate_calculation_lammps(self, structure, parameters, type='optimize'):
+    def generate_calculation_lammps(self, structure, parameters, type='optimize', pressure=0.0):
 
         codename = parameters['code']
         code = Code.get_from_string(codename)
@@ -212,23 +222,24 @@ class WorkflowPhonon(Workflow):
         calc = code.new_calc(max_wallclock_seconds=3600,
                              resources=parameters['resources'])
 
-
         calc.label = "test lammps calculation"
         calc.description = "A much longer description"
         calc.use_code(code)
         calc.use_structure(structure)
         calc.use_potential(ParameterData(dict=parameters['potential']))
 
+        lammps_parameters = dict(parameters['parameters'])
+        lammps_parameters.update({'pressure': pressure * 1000})  # pressure kb -> bar
+
         #if code.get_input_plugin_name() == 'lammps.optimize':
         if type == 'optimize':
-            calc.use_parameters(ParameterData(dict=parameters['parameters']))
+            calc.use_parameters(ParameterData(dict=lammps_parameters))
 
         calc.store_all()
 
         return calc
 
-
-    def generate_calculation_vasp(self, structure, parameters, type='optimize'):
+    def generate_calculation_vasp(self, structure, parameters, type='optimize', pressure=0.0):
         # import pymatgen as mg
         from pymatgen.io import vasp as vaspio
 
@@ -260,7 +271,7 @@ class WorkflowPhonon(Workflow):
                 'NSW': 100,
                 'LWAVE': '.FALSE.',
                 'LCHARG': '.FALSE.',
-                'EDIFF': 1e-04,
+                'EDIFF': 1e-08,
                 'EDIFFG': -0.01,
                 'ADDGRID': '.TRUE.',
                 'LREAL': '.FALSE.'})
@@ -276,7 +287,7 @@ class WorkflowPhonon(Workflow):
                 'NSW': 100,
                 'LWAVE': '.FALSE.',
                 'LCHARG': '.FALSE.',
-                'EDIFF': 1e-04,
+                'EDIFF': 1e-08,
                 'EDIFFG': -0.01,
                 'ADDGRID': '.TRUE.',
                 'LREAL': '.FALSE.'})
@@ -295,6 +306,8 @@ class WorkflowPhonon(Workflow):
                 'ADDGRID': '.TRUE.',
                 'LREAL': '.FALSE.'})
             incar = vasp_input_forces
+
+        incar.update({'PSTRESS': pressure})  # unit: kb
 
         incar = vaspio.Incar(incar)
         calc.use_incar(ParameterData(dict=incar.as_dict()))
@@ -348,9 +361,9 @@ class WorkflowPhonon(Workflow):
         code = Code.get_from_string(parameters['code'])
         plugin = code.get_attrs()['input_plugin'].split('.')[0]
         if plugin == 'lammps':
-            return self.generate_calculation_lammps(structure, parameters, type=type)
+            return self.generate_calculation_lammps(structure, parameters, type=type, pressure=self._pressure)
         elif plugin == 'vasp':
-            return self.generate_calculation_vasp(structure, parameters, type=type)
+            return self.generate_calculation_vasp(structure, parameters, type=type, pressure=self._pressure)
         else:
             self.append_to_report('The plugin: {}, is not implemented in this workflow'.format(plugin))
             self.next(self.exit)
@@ -391,7 +404,10 @@ class WorkflowPhonon(Workflow):
 
         self.append_to_report('Optimize structure {}/{}'.format(len(optimized) + 1, len(optimized) + counter + 1))
 
-        calc = self.generate_calculation(structure, parameters['input_optimize'], type='optimize')
+        if self._constant_volume:
+            calc = self.generate_calculation(structure, parameters['input_optimize'], type='optimize_constant_volume')
+        else:
+            calc = self.generate_calculation(structure, parameters['input_optimize'], type='optimize')
 
         calc.label = 'optimization'
         print 'created calculation with PK={}'.format(calc.pk)

@@ -44,7 +44,7 @@ lammps_machine = {
 
 
 parameters_opt = {'relaxation': 'tri',  # iso/aniso/tri
-                  'pressure': 0.0,  # bars
+                  # 'pressure': 0.0,  # In Gruneisen workflow this is ignored. Pressure is set in workflow arguments
                   'vmax': 0.000001,  # Angstrom^3
                   'energy_tolerance': 1.0e-25,  # eV
                   'force_tolerance': 1.0e-25,  # eV angstrom
@@ -85,7 +85,7 @@ wf_parameters = {
 
 #Submit workflow
 from aiida.workflows.wf_gruneisen import WorkflowGruneisen
-wf = WorkflowGruneisen(params=wf_parameters)
+wf = WorkflowGruneisen(params=wf_parameters, pressure=0.0)  # pressure in kb
 
 wf.label = 'Gruneisen LJ Na'
 wf.start()
