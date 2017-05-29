@@ -272,6 +272,7 @@ class WorkflowGruneisen(Workflow):
         results = phonopy_gruneisen_inline(**inline_params)[1]
 
         self.add_result('final_structure', wf_origin.get_result('final_structure'))
+        self.add_result('optimized_structure_data', wf_origin.get_result('optimized_structure_data'))
         self.add_result('band_structure', results['band_structure'])
         self.add_result('mesh', results['mesh'])
 
