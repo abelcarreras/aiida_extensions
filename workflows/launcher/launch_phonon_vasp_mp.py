@@ -10,7 +10,7 @@ import os
 import pymatgen
 
 ##########################
-structure_id = 'mp-13108'
+structure_id = 'mp-12668'
 ##########################
 
 
