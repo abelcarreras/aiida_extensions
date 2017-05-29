@@ -257,6 +257,7 @@ class WorkflowGruneisen(Workflow):
         else:
             wf_plus, wf_origin, wf_minus = self.get_step(self.volume_expansions).get_sub_workflows()
 
+
         self.append_to_report('reading structure')
 
         inline_params = {'structure_origin': wf_origin.get_result('final_structure'),
@@ -270,6 +271,7 @@ class WorkflowGruneisen(Workflow):
         # Do the phonopy Gruneisen parameters calculation
         results = phonopy_gruneisen_inline(**inline_params)[1]
 
+        self.add_result('final_structure', wf_origin.get_result('final_structure'))
         self.add_result('band_structure', results['band_structure'])
         self.add_result('mesh', results['mesh'])
 

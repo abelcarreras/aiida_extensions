@@ -5,10 +5,9 @@ from aiida.orm.calculation.inline import make_inline
 
 from aiida.orm.workflow import Workflow
 
-if quasiparticle:
-    from aiida.workflows.wf_quasiparticle import WorkflowQuasiparticle as WorkflowPhonon
-else:
-    from aiida.workflows.wf_phonon import WorkflowPhonon
+
+from aiida.workflows.wf_phonon import WorkflowPhonon
+from aiida.workflows.wf_gruneisen import WorkflowGruneisen
 
 from aiida.orm import load_workflow
 
@@ -159,9 +158,8 @@ class WorkflowQHA(Workflow):
         wf_parameters = self.get_parameters()
         # self.append_to_report('crystal: ' + wf_parameters['structure'].get_formula())
 
-        wf_param_opt = dict(wf_parameters)
 
-        wf = WorkflowPhonon(params=wf_param_opt)
+        wf = WorkflowGruneisen(params=wf_parameters, pre_optimize=True)
         wf.store()
 
         #        wf = load_workflow(30)
@@ -172,21 +170,35 @@ class WorkflowQHA(Workflow):
 
     # Generate the volume expanded cells
     @Workflow.step
+    def pressure_expansions(self):
+        self.append_to_report('Volume expansion calculations')
+        wf_parameters = self.get_parameters()
+        structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
+
+        test_pressures = [-10, -5, 5, 10]  # in kbar
+
+        for pressure in test_pressures:
+
+            # Submit workflow
+            wf = WorkflowGruneisen(params=wf_parameters, pressure=pressure, optimize=True)
+            wf.store()
+
+            # wf = load_workflow(wfs_test[i])
+
+            self.attach_workflow(wf)
+            wf.start()
+
+        self.next(self.collect_data)
+
+    @Workflow.step
     def volume_expansions(self):
         self.append_to_report('Volume expansion calculations')
         wf_parameters = self.get_parameters()
-        #   structure = wf_parameters['structure']
         structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
 
-        #        inline_params = {'structure': structure,
-        #                         'volumes': ParameterData(dict={ 'relations' : [ 0.970, 0.973, 0.976, 0.979, 0.982, 0.985, 0.988, 0.991, 0.994, 0.997, 1.002, 1.004, 1.006, 1.008, 1.010, 1.012, 1.014, 1.016, 1.018, 1.020] })}
-
-        pressure = wf_parameters['pressures']
         inline_params = {'structure': structure,
-                         'volumes': ParameterData(dict={'relations': [1.0] * len(pressure)})}  # to set pressure
+                         'volumes': ParameterData(dict={ 'relations' : [0.9, 0.95, 1.02, 1.05] })}
 
-        #    pressure = [-10000, -5000, 5000, 10000]
-        pressure = wf_parameters['pressures']
         cells = create_volumes_inline(**inline_params)[1]
 
         #        wfs_test = [150, 152, 154, 156]
@@ -196,10 +208,8 @@ class WorkflowQHA(Workflow):
             wf_param_vol = dict(wf_parameters)
             wf_param_vol['structure'] = structure
 
-            wf_param_vol['input_optimize']['parameters']['pressure'] = pressure[i]  # set pressure instead of volume
-
             # Submit workflow
-            wf = WorkflowPhonon(params=wf_param_vol)
+            wf = WorkflowGruneisen(params=wf_parameters, optimize=True, constant_volume=True)
             wf.store()
 
             #           wf = load_workflow(wfs_test[i])
@@ -221,11 +231,8 @@ class WorkflowQHA(Workflow):
         #      wf_list = list(chain(self.get_step(self.volume_expansions).get_sub_workflows(),
         #                self.get_step(self.start).get_sub_workflows()))
 
-        wf_list = self.get_step(self.volume_expansions).get_sub_workflows()
+        wf_list = self.get_steps()[1].get_sub_workflows()
         for wf in wf_list:
-            dos = wf.get_result('dos').get_array('total_dos')
-            #            self.append_to_report('DOS')
-            #            self.append_to_report('{}'.format(dos.tolist()))
             energy = wf.get_result('optimized_structure_data').get_dict()['energy']
             volume = wf.get_result('final_structure').get_cell_volume()
             self.append_to_report('{} {}'.format(volume, energy))
