@@ -383,6 +383,8 @@ class WorkflowPhonon(Workflow):
         else:
             self.next(self.displacements)
 
+        self.append_to_report('pressure phon_ws: {}'.format(self._pressure))
+
     # Optimize the structure
     @Workflow.step
     def optimize(self):
@@ -405,7 +407,6 @@ class WorkflowPhonon(Workflow):
             structure = parameters['structure']
 
         self.append_to_report('Optimize structure {}/{}'.format(len(optimized) + 1, len(optimized) + counter + 1))
-        self.append_to_report('pressure phon_ws: {}'.format(self._pressure))
 
         if self._constant_volume:
             calc = self.generate_calculation(structure, parameters['input_optimize'], type='optimize_constant_volume')
