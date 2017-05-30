@@ -253,7 +253,8 @@ class WorkflowGruneisen(Workflow):
 
         parameters = self.get_parameters()
 
-        if self._pre_optimize:
+        #if self._pre_optimize:
+        if self.get_steps().last().name == 'volume_expansions':
             wf_origin = self.get_step(self.start).get_sub_workflows()[0]
             wf_plus, wf_minus = self.get_step(self.volume_expansions).get_sub_workflows()
         else:

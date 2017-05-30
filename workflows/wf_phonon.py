@@ -360,9 +360,7 @@ class WorkflowPhonon(Workflow):
     def generate_calculation(self, structure, parameters, type='optimize'):
         code = Code.get_from_string(parameters['code'])
         plugin = code.get_attrs()['input_plugin'].split('.')[0]
-
         pressure = self.get_attribute('pressure')
-        self.append_to_report('pressure phon1: {}'.format(pressure))
 
         if plugin == 'lammps':
             return self.generate_calculation_lammps(structure, parameters, type=type, pressure=pressure)
@@ -386,7 +384,7 @@ class WorkflowPhonon(Workflow):
             self.next(self.displacements)
 
         self.add_attribute('pressure', self._pressure)
-        self.append_to_report('pressure phon_start: {}'.format(self._pressure))
+        self.add_attribute('constant_volume', self._constant_volume)
 
     # Optimize the structure
     @Workflow.step
@@ -411,7 +409,7 @@ class WorkflowPhonon(Workflow):
 
         self.append_to_report('Optimize structure {}/{}'.format(len(optimized) + 1, len(optimized) + counter + 1))
 
-        if self._constant_volume:
+        if self.get_attribute('constant_volume'):
             calc = self.generate_calculation(structure, parameters['input_optimize'], type='optimize_constant_volume')
         else:
             calc = self.generate_calculation(structure, parameters['input_optimize'], type='optimize')
