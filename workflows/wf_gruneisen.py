@@ -192,7 +192,7 @@ class WorkflowGruneisen(Workflow):
         structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
 
         inline_params = {'structure': structure,
-                         'volumes': ParameterData(dict={ 'relations': [ 1.01, 0.99]})}  # plus, minus
+                         'volumes': ParameterData(dict={ 'relations': [1.01, 0.99]})}  # plus, minus
 
         cells = create_volumes_inline(**inline_params)[1]
 
@@ -205,7 +205,7 @@ class WorkflowGruneisen(Workflow):
 
             # Submit workflow
 
-            wf = WorkflowPhonon(params=wf_parameters_volume, optimize=False)
+            wf = WorkflowPhonon(params=wf_parameters_volume, optimize=True, constant_volume=True)
             # wf = load_workflow(list[i])
 
             wf.store()
@@ -237,7 +237,7 @@ class WorkflowGruneisen(Workflow):
 
             # Submit workflow
 
-            wf = WorkflowPhonon(params=wf_parameters_volume, optimize=False)
+            wf = WorkflowPhonon(params=wf_parameters_volume, optimize=True, constant_volume=True)
             # wf = load_workflow(list[i])
 
             wf.store()
@@ -258,9 +258,9 @@ class WorkflowGruneisen(Workflow):
         # if self.get_steps().last().get_previous_by_time().name == 'volume_expansions':
         # if self.get_steps().last().name == 'volume_expansions':
             wf_origin = self.get_step(self.start).get_sub_workflows()[0]
-            wf_plus, wf_minus = self.get_step(self.volume_expansions).get_sub_workflows()
+            wf_plus, wf_minus = self.get_step('volume_expansions').get_sub_workflows()
         else:
-            wf_plus, wf_origin, wf_minus = self.get_step(self.volume_expansions_direct).get_sub_workflows()
+            wf_plus, wf_origin, wf_minus = self.get_step('volume_expansions_direct').get_sub_workflows()
 
 
         self.append_to_report('reading structure')
