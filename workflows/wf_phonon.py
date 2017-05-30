@@ -188,10 +188,10 @@ def phonopy_calculation_inline(**kwargs):
 class WorkflowPhonon(Workflow):
     def __init__(self, **kwargs):
         super(WorkflowPhonon, self).__init__(**kwargs)
-        #if 'optimize' in kwargs:
-        self._optimize = kwargs['optimize']
-        #else:
-        #    self._optimize = True  # By default optimization is done
+        if 'optimize' in kwargs:
+            self._optimize = kwargs['optimize']
+        else:
+            self._optimize = True  # By default optimization is done
 
         if 'constant_volume' in kwargs:
             self._constant_volume = kwargs['constant_volume']
