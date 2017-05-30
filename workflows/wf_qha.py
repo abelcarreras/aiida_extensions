@@ -181,7 +181,7 @@ class WorkflowQHA(Workflow):
     # Generate the volume expanded cells
     @Workflow.step
     def pressure_expansions(self):
-        self.append_to_report('Volume expansion calculations')
+        self.append_to_report('Pressure expansion calculations')
         wf_parameters = self.get_parameters()
         structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
 
