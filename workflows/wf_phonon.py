@@ -198,8 +198,8 @@ class WorkflowPhonon(Workflow):
         else:
             self._constant_volume = False  # By default constant pressure optimization is done
 
-        if 'pressure' in kwargs:
-            self._pressure = kwargs['pressure']
+        if 'p' in kwargs:
+            self._pressure = kwargs['p']
         else:
             self._pressure = 0.0  # By default pre-optimization is done
 
