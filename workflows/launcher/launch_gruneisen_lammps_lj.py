@@ -85,7 +85,7 @@ wf_parameters = {
 
 #Submit workflow
 from aiida.workflows.wf_gruneisen import WorkflowGruneisen
-wf = WorkflowGruneisen(params=wf_parameters)  # pressure in kb
+wf = WorkflowGruneisen(params=wf_parameters, pre_optimize=False)  # pressure in kb
 
 wf.label = 'Gruneisen LJ Na'
 wf.start()
