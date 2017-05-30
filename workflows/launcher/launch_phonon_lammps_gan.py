@@ -116,7 +116,7 @@ wf_parameters = {
 
 # Submit workflow
 from aiida.workflows.wf_phonon import WorkflowPhonon
-wf = WorkflowPhonon(params=wf_parameters, optimize=True, p=10.0)  # pressure in kb
+wf = WorkflowPhonon(params=wf_parameters, optimize=True, pressure=10.0)  # pressure in kb
 
 wf.label = 'lammps_GaN'
 wf.start()
