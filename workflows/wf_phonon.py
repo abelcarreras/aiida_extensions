@@ -383,7 +383,7 @@ class WorkflowPhonon(Workflow):
         else:
             self.next(self.displacements)
 
-        self.append_to_report('pressure phon_ws: {}'.format(self._pressure))
+        self.append_to_report('pressure phon_start: {}'.format(self._pressure))
 
     # Optimize the structure
     @Workflow.step
