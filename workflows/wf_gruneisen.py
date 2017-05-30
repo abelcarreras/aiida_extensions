@@ -151,10 +151,10 @@ class WorkflowGruneisen(Workflow):
         else:
             self._constant_volume = False  # By default pre-optimization is done
 
-        if 'pressure' in kwargs:
-            self._pressure = kwargs['pressure']
-        else:
-            self._pressure = 0.0  # By default pre-optimization is done
+        #if 'pressure' in kwargs:
+        self._pressure = kwargs['pressure']
+        #else:
+        #    self._pressure = 0.0  # By default pre-optimization is done
 
     # Calculates the reference crystal structure (optimize it if requested)
     @Workflow.step
