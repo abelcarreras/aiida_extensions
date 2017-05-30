@@ -188,6 +188,7 @@ class WorkflowQHA(Workflow):
         test_pressures = [-10, -5, 5, 10]  # in kbar
 
         for pressure in test_pressures:
+            self.append_to_report('pressure: {}'.format(pressure))
 
             # Submit workflow
             wf = WorkflowGruneisen(params=wf_parameters, pressure=pressure, optimize=True)
