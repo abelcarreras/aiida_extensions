@@ -200,8 +200,8 @@ class WorkflowPhonon(Workflow):
 
         if 'pressure' in kwargs:
             self._pressure = kwargs['pressure']
- #       else:
- #           self._pressure = 0.0  # By default pre-optimization is done
+        else:
+            self._pressure = 0.0  # By default pre-optimization is done
 
     # Correct scaled coordinates (not in use now)
     def get_scaled_positions_lines(self, scaled_positions):
@@ -360,12 +360,14 @@ class WorkflowPhonon(Workflow):
     def generate_calculation(self, structure, parameters, type='optimize'):
         code = Code.get_from_string(parameters['code'])
         plugin = code.get_attrs()['input_plugin'].split('.')[0]
-        self.append_to_report('pressure phon1: {}'.format(self._pressure))
+
+        pressure = self.get_attribute('pressure')
+        self.append_to_report('pressure phon1: {}'.format(pressure))
 
         if plugin == 'lammps':
-            return self.generate_calculation_lammps(structure, parameters, type=type, pressure=self._pressure)
+            return self.generate_calculation_lammps(structure, parameters, type=type, pressure=pressure)
         elif plugin == 'vasp':
-            return self.generate_calculation_vasp(structure, parameters, type=type, pressure=self._pressure)
+            return self.generate_calculation_vasp(structure, parameters, type=type, pressure=pressure)
         else:
             self.append_to_report('The plugin: {}, is not implemented in this workflow'.format(plugin))
             self.next(self.exit)
@@ -383,7 +385,7 @@ class WorkflowPhonon(Workflow):
         else:
             self.next(self.displacements)
 
-        #self.add_attribute('pressure')
+        self.add_attribute('pressure', self._pressure)
         self.append_to_report('pressure phon_start: {}'.format(self._pressure))
 
     # Optimize the structure
