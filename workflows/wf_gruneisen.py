@@ -169,6 +169,8 @@ class WorkflowGruneisen(Workflow):
         wf_parameters = self.get_parameters()
         # self.append_to_report('crystal: ' + wf_parameters['structure'].get_formula())
 
+        self.append_to_report('pressure grune: {}'.format(self._pressure))
+
         wf = WorkflowPhonon(params=wf_parameters,
                             optimize=True,
                             constant_volume=self._constant_volume,

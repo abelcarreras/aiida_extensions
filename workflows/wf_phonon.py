@@ -360,6 +360,8 @@ class WorkflowPhonon(Workflow):
     def generate_calculation(self, structure, parameters, type='optimize'):
         code = Code.get_from_string(parameters['code'])
         plugin = code.get_attrs()['input_plugin'].split('.')[0]
+        self.append_to_report('pressure phon: {}'.format(self._pressure))
+
         if plugin == 'lammps':
             return self.generate_calculation_lammps(structure, parameters, type=type, pressure=self._pressure)
         elif plugin == 'vasp':
