@@ -173,9 +173,10 @@ class WorkflowQHA(Workflow):
 
         if self._expansion_method == 'pressure':
             self.next(self.pressure_expansions)
-
-        if self._expansion_method == 'volume':
+        elif self._expansion_method == 'volume':
             self.next(self.volume_expansions)
+        else:
+            self.next(self.exit)
 
 
     # Generate the volume expanded cells
