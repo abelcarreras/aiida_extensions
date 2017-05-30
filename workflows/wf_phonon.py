@@ -188,20 +188,20 @@ def phonopy_calculation_inline(**kwargs):
 class WorkflowPhonon(Workflow):
     def __init__(self, **kwargs):
         super(WorkflowPhonon, self).__init__(**kwargs)
-        if 'optimize' in kwargs:
-            self._optimize = kwargs['optimize']
-        else:
-            self._optimize = True  # By default optimization is done
+        #if 'optimize' in kwargs:
+        self._optimize = kwargs['optimize']
+        #else:
+        #    self._optimize = True  # By default optimization is done
 
         if 'constant_volume' in kwargs:
             self._constant_volume = kwargs['constant_volume']
         else:
             self._constant_volume = False  # By default constant pressure optimization is done
 
-#        if 'pressure' in kwargs:
-        self._pressure = kwargs['optimize']
-#        else:
- #           self._pressure = 0.0  # By default pre-optimization is done
+        if 'pressure' in kwargs:
+            self._pressure = kwargs['pressure']
+        else:
+            self._pressure = 0.0  # By default pre-optimization is done
 
     # Correct scaled coordinates (not in use now)
     def get_scaled_positions_lines(self, scaled_positions):
