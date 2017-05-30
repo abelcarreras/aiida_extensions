@@ -200,8 +200,8 @@ class WorkflowPhonon(Workflow):
 
         if 'pressure' in kwargs:
             self._pressure = kwargs['pressure']
-        else:
-            self._pressure = 0.0  # By default pre-optimization is done
+ #       else:
+ #           self._pressure = 0.0  # By default pre-optimization is done
 
     # Correct scaled coordinates (not in use now)
     def get_scaled_positions_lines(self, scaled_positions):
@@ -383,6 +383,7 @@ class WorkflowPhonon(Workflow):
         else:
             self.next(self.displacements)
 
+        #self.add_attribute('pressure')
         self.append_to_report('pressure phon_start: {}'.format(self._pressure))
 
     # Optimize the structure
