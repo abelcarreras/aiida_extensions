@@ -214,12 +214,12 @@ class WorkflowQHA(Workflow):
         #        wfs_test = [150, 152, 154, 156]
         for i, structures in enumerate(cells.iterkeys()):
             structure2 = cells['structure_{}'.format(i)]
-            self.append_to_report('structure_{}: {}'.format(i, structure2.pk))
+            self.append_to_report('structure_{}: {} / {}'.format(i, structure2.pk, structure2.get_cell_volume()))
             wf_param_vol = dict(wf_parameters)
             wf_param_vol['structure'] = structure
 
             # Submit workflow
-            wf = WorkflowGruneisen(params=wf_parameters, optimize=True, constant_volume=True)
+            wf = WorkflowGruneisen(params=wf_param_vol, optimize=True, constant_volume=True)
             wf.store()
 
             #           wf = load_workflow(wfs_test[i])
