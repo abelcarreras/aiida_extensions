@@ -87,7 +87,7 @@ wf_parameters = {
 
 
 #Submit workflow
-from aiida.workflows.wf_gruneisen import WorkflowGruneisen
+from aiida.workflows.wf_gruneisen_volume import WorkflowGruneisen
 wf = WorkflowGruneisen(params=wf_parameters, constant_volume=False, pre_optimize=False)
 
 wf.label = 'Gruneisen VASP Si '
