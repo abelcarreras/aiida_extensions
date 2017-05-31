@@ -189,9 +189,9 @@ class WorkflowGruneisen(Workflow):
         structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
         self.append_to_report('optimized structure volume: {}'.format(structure.pk))
 
-        pressure_relations = [0.9, 1.1]
-        for relation in pressure_relations:
-            pressure = self.get_attribute('pressure') * relation
+        pressure_differences = [-5, 5]
+        for p in pressure_differences:
+            pressure = self.get_attribute('pressure') + p
 
             self.append_to_report('pressure: {}'.format(pressure))
 
@@ -212,10 +212,11 @@ class WorkflowGruneisen(Workflow):
         wf_parameters = self.get_parameters()
 
         structure = wf_parameters['structure']
+        self.append_to_report('structure volume: {}'.format(structure.pk))
 
-        pressure_relations = [0.9, 1.0, 1.1]
-        for relation in pressure_relations:
-            pressure = self.get_attribute('pressure') * relation
+        pressure_differences = [-5, 0, 5]
+        for p in pressure_differences:
+            pressure = self.get_attribute('pressure') + p
 
             self.append_to_report('pressure: {}'.format(pressure))
 
