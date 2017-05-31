@@ -1,41 +1,36 @@
 from aiida import load_dbenv
 load_dbenv()
-from aiida.orm import Code, DataFactory
+from aiida.orm import Code, DataFactory, load_node
 
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
 
 import numpy as np
 
-cell = [[ 3.759417, 0.000000, 0.000000],
-        [-1.879709, 3.255751, 0.000000],
-        [ 0.000000, 0.000000, 6.064977]]
+# GaN [-37000 bar  <->  23000 bar]
+cell = [[ 3.1900000572, 0,           0],
+        [-1.5950000286, 2.762621076, 0],
+        [ 0.0,          0,           5.1890001297]]
 
-symbols=['Na'] * 2
-scaled_positions = [(0.33333,  0.66666,  0.25000),
-                    (0.66667,  0.33333,  0.75000)]
+
+
+scaled_positions=[(0.6666669,  0.3333334,  0.0000000),
+                  (0.3333331,  0.6666663,  0.5000000),
+                  (0.6666669,  0.3333334,  0.3750000),
+                  (0.3333331,  0.6666663,  0.8750000)]
+
+symbols=['Ga', 'Ga', 'N', 'N']
 
 structure = StructureData(cell=cell)
+
 positions = np.dot(scaled_positions, cell)
 
 for i, scaled_position in enumerate(scaled_positions):
     structure.append_atom(position=np.dot(scaled_position, cell).tolist(),
                           symbols=symbols[i])
 
+
 structure.store()
-
-# LJ parameters extracted from :
-# Bhansali, A. P., Bayazitoglu, Y., & Maruyama, S. (1999).
-# Molecular dynamics simulation of an evaporating sodium droplet.
-# International Journal of Thermal Sciences, 38(1), 66-74
-
-potential ={'pair_style': 'lennard_jones',
-            #                 epsilon,  sigma, cutoff
-            'data': {'1  1':  '0.0202    3.24    5.0',
-                     #'2  2':   '1.0      1.0    2.5',
-                     #'1  2':   '1.0      1.0    2.5'
-                     }}
-
 
 lammps_machine = {
     'num_machines': 1,
@@ -69,6 +64,19 @@ ph_dict = ParameterData(dict={'supercell': [[3,0,0],
                               'mesh' : [50, 50, 50]}
                        ).store()
 
+# GaN Tersoff
+tersoff_gan = {'Ga Ga Ga': '1.0 0.007874 1.846 1.918000 0.75000 -0.301300 1.0 1.0 1.44970 410.132 2.87 0.15 1.60916 535.199',
+               'N  N  N' : '1.0 0.766120 0.000 0.178493 0.20172 -0.045238 1.0 1.0 2.38426 423.769 2.20 0.20 3.55779 1044.77',
+               'Ga Ga N' : '1.0 0.001632 0.000 65.20700 2.82100 -0.518000 1.0 0.0 0.00000 0.00000 2.90 0.20 0.00000 0.00000',
+               'Ga N  N' : '1.0 0.001632 0.000 65.20700 2.82100 -0.518000 1.0 1.0 2.63906 3864.27 2.90 0.20 2.93516 6136.44',
+               'N  Ga Ga': '1.0 0.001632 0.000 65.20700 2.82100 -0.518000 1.0 1.0 2.63906 3864.27 2.90 0.20 2.93516 6136.44',
+               'N  Ga N ': '1.0 0.766120 0.000 0.178493 0.20172 -0.045238 1.0 0.0 0.00000 0.00000 2.20 0.20 0.00000 0.00000',
+               'N  N  Ga': '1.0 0.001632 0.000 65.20700 2.82100 -0.518000 1.0 0.0 0.00000 0.00000 2.90 0.20 0.00000 0.00000',
+               'Ga N  Ga': '1.0 0.007874 1.846 1.918000 0.75000 -0.301300 1.0 0.0 0.00000 0.00000 2.87 0.15 0.00000 0.00000'}
+
+
+potential ={'pair_style': 'tersoff',
+                          'data': tersoff_gan}
 
 # Collect workflow input data
 wf_parameters = {

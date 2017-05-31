@@ -50,9 +50,9 @@ lammps_machine = {
     'tot_num_mpiprocs': 16}
 
 # Phonopy input parameters
-ph_dict = ParameterData(dict={'supercell': [[2,0,0],
-                                            [0,2,0],
-                                            [0,0,2]],
+ph_dict = ParameterData(dict={'supercell': [[3,0,0],
+                                            [0,3,0],
+                                            [0,0,3]],
                               'primitive': [[1.0, 0.0, 0.0],
                                             [0.0, 1.0, 0.0],
                                             [0.0, 0.0, 1.0]],
