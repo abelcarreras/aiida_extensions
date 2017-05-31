@@ -1,13 +1,8 @@
-
-from aiida import load_dbenv
 from aiida.orm import Code, DataFactory
+from aiida.orm.workflow import Workflow
 from aiida.orm.calculation.inline import make_inline
 
-from aiida.orm.workflow import Workflow
-
-
-from aiida.workflows.wf_phonon import WorkflowPhonon
-from aiida.workflows.wf_gruneisen import WorkflowGruneisen
+from aiida.workflows.wf_gruneisen_pressure import WorkflowGruneisen
 
 from aiida.orm import load_workflow
 
