@@ -176,6 +176,7 @@ class WorkflowQHA(Workflow):
         elif self._expansion_method == 'volume':
             self.next(self.volume_expansions)
         else:
+            self.append_to_report('Error no method defined')
             self.next(self.exit)
 
 
@@ -186,7 +187,7 @@ class WorkflowQHA(Workflow):
         wf_parameters = self.get_parameters()
         structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
 
-        test_pressures = [-10, -5, 5, 10]  # in kbar
+        test_pressures = [-30, -15, 15, 30]  # in kbar
 
         for pressure in test_pressures:
             self.append_to_report('pressure: {}'.format(pressure))
@@ -250,6 +251,12 @@ class WorkflowQHA(Workflow):
             self.append_to_report('{} {}'.format(volume, energy))
             electronic_energies.append(energy)
             volumes.append(volume)
+
+        sort_index = np.argsort(volumes)
+        volumes = np.array(volumes)[sort_index]
+        electronic_energies = np.array(electronic_energies)[sort_index]
+
+        self.append_to_report('Order: {}'.format(sort_index))
 
         data = ArrayData()
         data.set_array('energy', np.array(electronic_energies))
