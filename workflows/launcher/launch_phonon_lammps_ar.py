@@ -78,7 +78,7 @@ wf_parameters = {
 from aiida.workflows.wf_phonon import WorkflowPhonon
 wf = WorkflowPhonon(params=wf_parameters, optimize=True, pressure=0.0)  # pressure in kb
 
-wf.label = 'LAMMPS Lennad-Jones'
+wf.label = 'LAMMPS Lennad-Jones Ar'
 wf.start()
 print ('pk: {}'.format(wf.pk))
 
