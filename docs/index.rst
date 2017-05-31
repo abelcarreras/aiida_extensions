@@ -3,7 +3,7 @@
 Introduction
 ============
 
-This is a collection of plugins and workflows for AiiDA.
+This is a collection of plugins and workflows for AiiDA software.
 
 .. toctree::
     :maxdepth: 2
