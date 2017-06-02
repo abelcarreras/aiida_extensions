@@ -38,7 +38,8 @@ def get_FORCE_SETS_txt_old(data_sets_object):
 
 def get_FORCE_SETS_txt(data_sets_object):
 
-    data_sets = dict(data_sets_object[None][0])
+    data_sets_array = data_sets_object.get_array('data_sets')
+    data_sets = dict(data_sets_array[None][0])
 
 #    data_list = []
 #    for name in names:
