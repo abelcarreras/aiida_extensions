@@ -248,7 +248,8 @@ class WorkflowPhonon(Workflow):
 
         code = Code.get_from_string(parameters['code'])
 
-        calc = code.new_calc(parameters['resources'])
+        calc = code.new_calc(max_wallclock_seconds=3600,
+                             resources=parameters['resources'])
 
         calc.use_code(code)
         calc.use_structure(structure)
