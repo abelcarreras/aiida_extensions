@@ -62,7 +62,8 @@ ph_dict = ParameterData(dict={'supercell': [[3, 0, 0],
                                             [0.0, 1.0, 0.0],
                                             [0.0, 0.0, 1.0]],
                               'distance': 0.01,
-                              'mesh': [40, 40, 40]}
+                              'mesh': [40, 40, 40],
+                              'code': 'phonopy@stern'}
                        ).store()
 
 
