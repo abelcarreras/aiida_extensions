@@ -65,7 +65,7 @@ delete_list = []
 for i, dos_i in enumerate(partial_dos):
     for j, dos_j  in enumerate(partial_dos):
         if i < j:
-            if np.allclose(dos_i, dos_j) and partial_symbols[i] == partial_symbols[j]:
+            if np.allclose(dos_i, dos_j, rtol=1, atol=1e-8) and partial_symbols[i] == partial_symbols[j]:
                 dos_i += dos_j
                 delete_list.append(j)
 
