@@ -534,6 +534,8 @@ class WorkflowPhonon(Workflow):
     @Workflow.step
     def force_constants_calculation_outside(self):
 
+        from aiida.orm.data.simple import Int
+
         parameters = self.get_parameters()
         parameters_phonopy = parameters['phonopy_input']
 
@@ -544,7 +546,8 @@ class WorkflowPhonon(Workflow):
         self.append_to_report('reading structure')
 
         inline_params = {'structure': structure,
-                         'phonopy_input': ParameterData(dict=parameters_phonopy['parameters'])}
+                         'phonopy_input': ParameterData(dict=parameters_phonopy['parameters']),
+                         'calculate_force_constants': Int(False)}
 
         self.append_to_report('created parameters')
 
@@ -558,6 +561,8 @@ class WorkflowPhonon(Workflow):
 
         calc = self.generate_calculation_phonopy(structure, parameters_phonopy, phonopy_data['phonopy_output'])
         self.attach_calculation(calc)
+
+        self.next(self.phonon_calculation_outside)
 
 
     @Workflow.step
