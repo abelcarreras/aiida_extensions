@@ -66,6 +66,9 @@ machine_parameters = {'num_machines': 1,
                       'parallel_env': 'mpi*',
                       'tot_num_mpiprocs': 16}
 
+machine_phonopy = {'num_machines': 1,
+                   'parallel_env': 'localmpi',
+                   'tot_num_mpiprocs': 16}
 
 parameters_opt = {'relaxation': 'tri',  # iso/aniso/tri
                   # 'pressure': 0.0,  # In phonon workflow this is ignored. Pressure is set in workflow arguments
@@ -79,7 +82,7 @@ wf_parameters = {
      'structure': structure,
      'phonopy_input': {'code': 'phonopy@stern',
                        'parameters': phonopy_parameters,
-                       'resources': machine_parameters},
+                       'resources': machine_phonopy},
      'input_force': {'code': 'lammps_force@boston',
                      'potential': potential,
                      'resources': machine_parameters},

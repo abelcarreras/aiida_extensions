@@ -79,10 +79,44 @@ def get_force_constants_inline(**kwargs):
     from phonopy.structure.atoms import Atoms as PhonopyAtoms
     from phonopy import Phonopy
 
-    if 'calculate_force_constants' in kwargs:
-        calculate_force_constants = kwargs['calculate_force_constants']
-    else:
-        calculate_force_constants = True  # By default force constants are calculated
+    structure = kwargs.pop('structure')
+    phonopy_input = kwargs.pop('phonopy_input').get_dict()
+
+    # Generate phonopy phonon object
+    bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
+                        positions=[site.position for site in structure.sites],
+                        cell=structure.cell)
+
+    phonon = Phonopy(bulk,
+                     phonopy_input['supercell'],
+                     primitive_matrix=phonopy_input['primitive'],
+                     distance=phonopy_input['distance'])
+
+    # Build data_sets from forces of supercells with displacments
+    data_sets = phonon.get_displacement_dataset()
+    for i, first_atoms in enumerate(data_sets['first_atoms']):
+        first_atoms['forces'] = kwargs.pop('force_{}'.format(i)).get_array('forces')[0]
+
+
+    # Calculate and get force constants
+    phonon.set_displacement_dataset(data_sets)
+    phonon.produce_force_constants()
+
+    # force_constants = phonon.get_force_constants().tolist()
+    force_constants = phonon.get_force_constants()
+
+    # Set force sets and force constants array to return
+    data = ArrayData()
+    data.set_array('force_sets', np.array(data_sets))
+    data.set_array('force_constants', force_constants)
+
+    return {'phonopy_output': data}
+
+
+@make_inline
+def get_force_sets_inline(**kwargs):
+    from phonopy.structure.atoms import Atoms as PhonopyAtoms
+    from phonopy import Phonopy
 
     structure = kwargs.pop('structure')
     phonopy_input = kwargs.pop('phonopy_input').get_dict()
@@ -104,17 +138,6 @@ def get_force_constants_inline(**kwargs):
 
     data = ArrayData()
     data.set_array('force_sets', np.array(data_sets))
-
-    if calculate_force_constants:
-        # Calculate and get force constants
-        phonon.set_displacement_dataset(data_sets)
-        phonon.produce_force_constants()
-
-        # force_constants = phonon.get_force_constants().tolist()
-        force_constants = phonon.get_force_constants()
-
-        # Set force constants ready to return
-        data.set_array('force_constants', force_constants)
 
     return {'phonopy_output': data}
 
@@ -489,11 +512,11 @@ class WorkflowPhonon(Workflow):
             self.next(self.force_constants_calculation_outside)
         else:
             self.append_to_report('Local phonon calculation')
-            self.next(self.phonon_calculation)
+            self.next(self.force_constants_calculation)
 
     # Collects the forces and prepares force constants
     @Workflow.step
-    def phonon_calculation(self):
+    def force_constants_calculation(self):
 
         parameters = self.get_parameters()
         parameters_phonopy = parameters['phonopy_input']
@@ -519,22 +542,10 @@ class WorkflowPhonon(Workflow):
 
         self.add_result('force_constants', phonopy_data['phonopy_output'])
 
-        inline_params = {'structure': structure,
-                         'phonopy_input': ParameterData(dict=parameters_phonopy['parameters']),
-                         'force_constants': phonopy_data['phonopy_output']}
-
-        results = phonopy_calculation_inline(**inline_params)[1]
-
-        self.add_result('thermal_properties', results['thermal_properties'])
-        self.add_result('dos', results['dos'])
-        self.add_result('band_structure', results['band_structure'])
-
-        self.next(self.exit)
+        self.next(self.phonon_calculation)
 
     @Workflow.step
-    def force_constants_calculation_outside(self):
-
-        from aiida.orm.data.simple import Int
+    def force_constants_calculation_remote(self):
 
         parameters = self.get_parameters()
         parameters_phonopy = parameters['phonopy_input']
@@ -546,8 +557,7 @@ class WorkflowPhonon(Workflow):
         self.append_to_report('reading structure')
 
         inline_params = {'structure': structure,
-                         'phonopy_input': ParameterData(dict=parameters_phonopy['parameters']),
-                         'calculate_force_constants': Int(False)}
+                         'phonopy_input': ParameterData(dict=parameters_phonopy['parameters'])}
 
         self.append_to_report('created parameters')
 
@@ -557,21 +567,27 @@ class WorkflowPhonon(Workflow):
             self.append_to_report('extract force from {}'.format(calc.label))
 
         # Get the force constants and store it in DB as a Workflow result
-        phonopy_data = get_force_constants_inline(**inline_params)[1]
+        phonopy_data = get_force_sets_inline(**inline_params)[1]
 
         calc = self.generate_calculation_phonopy(structure, parameters_phonopy, phonopy_data['phonopy_output'])
         self.attach_calculation(calc)
 
-        self.next(self.phonon_calculation_outside)
+        self.next(self.phonon_calculation)
 
 
     @Workflow.step
-    def phonon_calculation_outside(self):
+    def phonon_calculation(self):
         #        self.add_result('force_constants', phonopy_data['phonopy_output'])
 
         parameters_phonopy = self.get_parameters()['phonopy_input']
-        calc = self.get_step_calculations(self.force_constants_calculation_outside)[0]
-        force_constants = calc.get_outputs_dict()['force_constants']
+
+        remote_phonopy = self.get_step(self.force_constants_calculation_remote)
+
+        if remote_phonopy is None:
+            force_constants = self.get_result('force_constants')
+        else:
+            calc = self.get_step_calculations(self.force_constants_calculation_remote)[0]
+            force_constants = calc.get_outputs_dict()['force_constants']
 
         structure = self.get_result('final_structure')
 
