@@ -253,7 +253,7 @@ class WorkflowPhonon(Workflow):
 
         calc.use_code(code)
         calc.use_structure(structure)
-        calc.use_parameters(parameters['parameters'])
+        calc.use_parameters(ParameterData(dict=parameters['parameters']))
         calc.use_data_sets(data_sets)
 
         return calc
