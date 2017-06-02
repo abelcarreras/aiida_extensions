@@ -588,6 +588,7 @@ class WorkflowPhonon(Workflow):
         else:
             calc = self.get_step_calculations(self.force_constants_calculation_remote)[0]
             force_constants = calc.get_outputs_dict()['array_data']
+            self.add_result('force_constants', force_constants)
 
         structure = self.get_result('final_structure')
 
