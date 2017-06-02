@@ -561,14 +561,14 @@ class WorkflowPhonon(Workflow):
     def phonon_calculation_outside(self):
         #        self.add_result('force_constants', phonopy_data['phonopy_output'])
 
-        parameters = self.get_parameters()
+        parameters_phonopy = self.get_parameters()['phonopy_input']
         calc = self.get_step_calculations(self.force_constants_calculation_outside)[0]
         force_constants = calc.get_outputs_dict()['force_constants']
 
         structure = self.get_result('final_structure')
 
         inline_params = {'structure': structure,
-                         'phonopy_input': parameters['phonopy_input'],
+                         'phonopy_input': parameters_phonopy['parameteres'],
                          'force_constants': force_constants}
 
         results = phonopy_calculation_inline(**inline_params)[1]
