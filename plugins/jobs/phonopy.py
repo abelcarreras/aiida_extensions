@@ -9,7 +9,7 @@ from aiida.common.utils import classproperty
 import numpy as np
 
 
-def get_FORCE_SETS_txt(data_sets_object):
+def get_FORCE_SETS_txt_old(data_sets_object):
     names = data_sets_object.get_arraynames()
     num_atom = len(data_sets_object.get_array(names[0])[3])
 
@@ -34,6 +34,35 @@ def get_FORCE_SETS_txt(data_sets_object):
         for f in forces[count]:
             force_sets_txt += "%15.10f %15.10f %15.10f\n" % (tuple(f))
     return force_sets_txt
+
+
+def get_FORCE_SETS_txt(data_sets_object):
+
+    data_sets = dict(data_sets_object[None][0])
+
+#    data_list = []
+#    for name in names:
+#        data_list.append({'direction': data_sets_object.get_array(name)[0],
+#                          'number': data_sets_object.get_array(name)[1],
+#                          'displacement': data_sets_object.get_array(name)[2],
+#                          'forces': data_sets_object.get_array(name)[3]})
+#    data_sets = {'natom': num_atom, 'first_atoms': data_list}
+
+#    displacements = data_sets['first_atoms']
+
+    forces = [x['forces'] for x in data_sets['first_atoms']]
+
+    # Write FORCE_SETS
+    force_sets_txt = "%-5d\n" % data_sets['natom']
+    force_sets_txt += "%-5d\n" % len(displacements)
+    for count, disp in enumerate(displacements):
+        force_sets_txt += "\n%-5d\n" % (disp['number'] + 1)
+        force_sets_txt += "%20.16f %20.16f %20.16f\n" % (tuple(disp['displacement']))
+
+        for f in forces[count]:
+            force_sets_txt += "%15.10f %15.10f %15.10f\n" % (tuple(f))
+    return force_sets_txt
+
 
 
 def structure_to_poscar(structure):
