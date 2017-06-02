@@ -483,7 +483,7 @@ class WorkflowPhonon(Workflow):
 
         if 'code' in parameters['phonopy_input']:
             self.append_to_report('Remote phonon calculation')
-            self.next(self.phonon_calculation_outside)
+            self.next(self.force_constants_calculation_outside)
         else:
             self.append_to_report('Local phonon calculation')
             self.next(self.phonon_calculation)
