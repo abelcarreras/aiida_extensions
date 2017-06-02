@@ -65,8 +65,8 @@ ph_dict = {'supercell': [[3, 0, 0],
                               'mesh': [40, 40, 40]}
 
 
-dynaphopy_parameters ={'supercell': ph_dict.dict.supercell,
-                       'primitive': ph_dict.dict.primitive,
+dynaphopy_parameters ={'supercell': ph_dict['supercell'],
+                       'primitive': ph_dict['primitive'],
                        'mesh': [40, 40, 40],
                        'md_commensurate': True}
 
