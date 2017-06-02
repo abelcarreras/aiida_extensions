@@ -467,7 +467,7 @@ class WorkflowPhonon(Workflow):
         self.add_result('final_structure', structure)
 
         inline_params = {"structure": structure,
-                         "phonopy_input": ParameterData(dict=parameters_phonopy['parameteres']),
+                         "phonopy_input": ParameterData(dict=parameters_phonopy['parameters']),
                          }
 
         cells_with_disp = create_supercells_with_displacements_inline(**inline_params)[1]
@@ -502,7 +502,7 @@ class WorkflowPhonon(Workflow):
         self.append_to_report('reading structure')
 
         inline_params = {'structure': structure,
-                         'phonopy_input': ParameterData(dict=parameters_phonopy['parameteres'])}
+                         'phonopy_input': ParameterData(dict=parameters_phonopy['parameters'])}
 
         self.append_to_report('created parameters')
 
@@ -568,7 +568,7 @@ class WorkflowPhonon(Workflow):
         structure = self.get_result('final_structure')
 
         inline_params = {'structure': structure,
-                         'phonopy_input': ParameterData(dict=parameters_phonopy['parameteres']),
+                         'phonopy_input': ParameterData(dict=parameters_phonopy['parameters']),
                          'force_constants': force_constants}
 
         results = phonopy_calculation_inline(**inline_params)[1]
