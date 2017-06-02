@@ -55,7 +55,7 @@ for i, scaled_position in enumerate(scaled_positions):
 
 structure.store()
 
-ph_dict = ParameterData(dict={'supercell': [[3, 0, 0],
+ph_dict = {'supercell': [[3, 0, 0],
                                             [0, 3, 0],
                                             [0, 0, 3]],
                               'primitive': [[1.0, 0.0, 0.0],
@@ -63,7 +63,6 @@ ph_dict = ParameterData(dict={'supercell': [[3, 0, 0],
                                             [0.0, 0.0, 1.0]],
                               'distance': 0.01,
                               'mesh': [40, 40, 40]}
-                       ).store()
 
 
 dynaphopy_parameters ={'supercell': ph_dict.dict.supercell,
