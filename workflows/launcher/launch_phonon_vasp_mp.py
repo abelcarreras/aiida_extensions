@@ -74,15 +74,14 @@ machine_dict = {
     'tot_num_mpiprocs': 16}
 
 
-ph_dict = ParameterData(dict={'supercell': supercell,
-                              'primitive': primitive_matrix,
-                              'distance': 0.01,
-                              'mesh': [20, 20, 20]}
-                       ).store()
+phonopy_parameters = {'supercell': supercell,
+                      'primitive': primitive_matrix,
+                      'distance': 0.01,
+                      'mesh': [20, 20, 20]}
 
 wf_parameters = {
      'structure': structure,
-     'phonopy_input': ph_dict,
+     'phonopy_input': {'parameters': phonopy_parameters},
      'input_force': {'code': 'vasp541mpi@stern',
                     'parameters': incar_dict,
                     'resources': machine_dict,

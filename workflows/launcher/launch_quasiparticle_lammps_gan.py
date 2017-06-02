@@ -29,15 +29,14 @@ for i, scaled_position in enumerate(scaled_positions):
 
 structure.store()
 
-ph_dict = ParameterData(dict={'supercell': [[3, 0, 0],
-                                            [0, 3, 0],
-                                            [0, 0, 3]],
-                              'primitive': [[1.0, 0.0, 0.0],
-                                            [0.0, 1.0, 0.0],
-                                            [0.0, 0.0, 1.0]],
-                              'distance': 0.01,
-                              'mesh': [40, 40, 40]}
-                       ).store()
+phonopy_parameters = {'supercell': [[3, 0, 0],
+                                    [0, 3, 0],
+                                    [0, 0, 3]],
+                     'primitive': [[1.0, 0.0, 0.0],
+                                   [0.0, 1.0, 0.0],
+                                   [0.0, 0.0, 1.0]],
+                     'distance': 0.01,
+                     'mesh': [40, 40, 40]}
 
 
 tersoff_gan = {'Ga Ga Ga': '1.0 0.007874 1.846 1.918000 0.75000 -0.301300 1.0 1.0 1.44970 410.132 2.87 0.15 1.60916 535.199',
@@ -76,8 +75,8 @@ parameters_opt = {'relaxation': 'tri',  # iso/aniso/tri
                   'max_evaluations': 1000000,
                   'max_iterations': 500000}
 
-dynaphopy_parameters ={'supercell': ph_dict.dict.supercell,
-                       'primitive': ph_dict.dict.primitive,
+dynaphopy_parameters ={'supercell': phonopy_parameters['supercell'],
+                       'primitive': phonopy_parameters['primitive'],
                        'mesh': [40, 40, 40],
                        'md_commensurate': True,
                        'temperature': temperature}
@@ -87,7 +86,7 @@ dynaphopy_parameters ={'supercell': ph_dict.dict.supercell,
 
 wf_parameters = {
      'structure': structure,
-     'phonopy_input': ph_dict,
+     'phonopy_input': {'parameters': phonopy_parameters},
      'dynaphopy_input': {'code': 'dynaphopy@stern',
                          'parameters': dynaphopy_parameters,
                          'resources': lammps_machine},

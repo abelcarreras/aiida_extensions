@@ -54,15 +54,14 @@ machine_dict = {
 
 
 # Phonopy input parameters
-ph_dict = ParameterData(dict={'supercell': [[3,0,0],
-                                            [0,3,0],
-                                            [0,0,3]],
-                              'primitive': [[1.0, 0.0, 0.0],
-                                            [0.0, 1.0, 0.0],
-                                            [0.0, 0.0, 1.0]],
-                              'distance': 0.01,
-                              'mesh' : [50, 50, 50]}
-                       ).store()
+phonopy_parameters = {'supercell': [[3, 0, 0],
+                                    [0, 3, 0],
+                                    [0, 0, 3]],
+                     'primitive': [[1.0, 0.0, 0.0],
+                                   [0.0, 1.0, 0.0],
+                                   [0.0, 0.0, 1.0]],
+                     'distance': 0.01,
+                     'mesh': [40, 40, 40]}
 
 # GaN Tersoff
 tersoff_gan = {'Ga Ga Ga': '1.0 0.007874 1.846 1.918000 0.75000 -0.301300 1.0 1.0 1.44970 410.132 2.87 0.15 1.60916 535.199',
@@ -81,7 +80,7 @@ potential ={'pair_style': 'tersoff',
 # Collect workflow input data
 wf_parameters = {
      'structure': structure,
-     'phonopy_input': ph_dict,
+     'phonopy_input': {'parameters': phonopy_parameters},
      'input_force': {'code': 'lammps_force@boston',
                       'potential': potential,
                       'resources': lammps_machine},
