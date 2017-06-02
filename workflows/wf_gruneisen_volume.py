@@ -251,7 +251,7 @@ class WorkflowGruneisen(Workflow):
     @Workflow.step
     def collect_data(self):
 
-        parameters = self.get_parameters()
+        parameters_phonopy = self.get_parameters()['phonopy_input']
 
         #if self._pre_optimize:
         if self.get_step('volume_expansions') is not None:
@@ -271,7 +271,7 @@ class WorkflowGruneisen(Workflow):
                          'force_constants_origin': wf_origin.get_result('force_constants'),
                          'force_constants_plus':   wf_plus.get_result('force_constants'),
                          'force_constants_minus':  wf_minus.get_result('force_constants'),
-                         'phonopy_input': parameters['phonopy_input']}
+                         'phonopy_input': ParameterData(dict=parameters_phonopy['parameters'])}
 
         # Do the phonopy Gruneisen parameters calculation
         results = phonopy_gruneisen_inline(**inline_params)[1]
