@@ -62,8 +62,7 @@ ph_dict = ParameterData(dict={'supercell': [[3, 0, 0],
                                             [0.0, 1.0, 0.0],
                                             [0.0, 0.0, 1.0]],
                               'distance': 0.01,
-                              'mesh': [40, 40, 40],
-                              'code': 'phonopy@stern'}
+                              'mesh': [40, 40, 40]}
                        ).store()
 
 
@@ -105,7 +104,9 @@ parameters_opt = {'relaxation': 'tri',  # iso/aniso/tri
 
 wf_parameters = {
      'structure': structure,
-     'phonopy_input': ph_dict,
+     'phonopy_input': {'code': 'phonopy@stern',
+                       'parameteres': ph_dict,
+                       'resources': lammps_machine},
      'input_force': {'code': 'lammps_force@boston',
                       'potential': potential,
                       'resources': lammps_machine},

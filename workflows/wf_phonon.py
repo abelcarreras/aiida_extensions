@@ -246,19 +246,13 @@ class WorkflowPhonon(Workflow):
 
     def generate_calculation_phonopy(self, structure, parameters, data_sets):
 
-        code = Code.get_from_string(parameters.get_dict()['code'])
+        code = Code.get_from_string(parameters['code'])
 
-        calc = code.new_calc(max_wallclock_seconds=3600,
-                             resources={"num_machines": 1,
-                                        "parallel_env": "localmpi",
-                                        "tot_num_mpiprocs": 6})
+        calc = code.new_calc(parameters['resources'])
 
-        calc.label = "test phonopy calculation"
-        calc.description = "A much longer description"
-
-        calc.use_structure(structure)
         calc.use_code(code)
-        calc.use_parameters(parameters)
+        calc.use_structure(structure)
+        calc.use_parameters(parameters['parameters'])
         calc.use_data_sets(data_sets)
 
         return calc
@@ -455,6 +449,7 @@ class WorkflowPhonon(Workflow):
         self.append_to_report('Displacements')
 
         parameters = self.get_parameters()
+        parameters_phonopy = parameters['phonopy_input']
 
         optimized = self.get_step(self.optimize)
 
@@ -472,7 +467,7 @@ class WorkflowPhonon(Workflow):
         self.add_result('final_structure', structure)
 
         inline_params = {"structure": structure,
-                         "phonopy_input": parameters['phonopy_input'],
+                         "phonopy_input": parameters_phonopy['parameteres'],
                          }
 
         cells_with_disp = create_supercells_with_displacements_inline(**inline_params)[1]
@@ -486,9 +481,11 @@ class WorkflowPhonon(Workflow):
             self.append_to_report('created calculation with PK={}'.format(calc.pk))
             self.attach_calculation(calc)
 
-        if 'code' in parameters['phonopy_input'].get_dict():
+        if 'code' in parameters['phonopy_input']:
+            self.append_to_report('Remote phonon calculation')
             self.next(self.phonon_calculation_outside)
         else:
+            self.append_to_report('Local phonon calculation')
             self.next(self.phonon_calculation)
 
     # Collects the forces and prepares force constants
@@ -496,6 +493,8 @@ class WorkflowPhonon(Workflow):
     def phonon_calculation(self):
 
         parameters = self.get_parameters()
+        parameters_phonopy = parameters['phonopy_input']
+
         calcs = self.get_step_calculations(self.displacements)
 
         structure = self.get_result('final_structure')
@@ -503,7 +502,7 @@ class WorkflowPhonon(Workflow):
         self.append_to_report('reading structure')
 
         inline_params = {'structure': structure,
-                         'phonopy_input': parameters['phonopy_input']}
+                         'phonopy_input': parameters_phonopy['parameteres']}
 
         self.append_to_report('created parameters')
 
@@ -518,7 +517,7 @@ class WorkflowPhonon(Workflow):
         self.add_result('force_constants', phonopy_data['phonopy_output'])
 
         inline_params = {'structure': structure,
-                         'phonopy_input': parameters['phonopy_input'],
+                         'phonopy_input': parameters_phonopy['parameters'],
                          'force_constants': phonopy_data['phonopy_output']}
 
         results = phonopy_calculation_inline(**inline_params)[1]
@@ -533,6 +532,8 @@ class WorkflowPhonon(Workflow):
     def force_constants_calculation_outside(self):
 
         parameters = self.get_parameters()
+        parameters_phonopy = parameters['phonopy_input']
+
         calcs = self.get_step_calculations(self.displacements)
 
         structure = self.get_result('final_structure')
@@ -540,7 +541,7 @@ class WorkflowPhonon(Workflow):
         self.append_to_report('reading structure')
 
         inline_params = {'structure': structure,
-                         'phonopy_input': parameters['phonopy_input']}
+                         'phonopy_input': parameters_phonopy['parameters']}
 
         self.append_to_report('created parameters')
 
@@ -552,7 +553,7 @@ class WorkflowPhonon(Workflow):
         # Get the force constants and store it in DB as a Workflow result
         phonopy_data = get_force_constants_inline(**inline_params)[1]
 
-        calc = self.generate_calculation_phonopy(structure, parameters['phonopy_input'], phonopy_data['phonopy_output'])
+        calc = self.generate_calculation_phonopy(structure, parameters_phonopy, phonopy_data['phonopy_output'])
         self.attach_calculation(calc)
 
 
