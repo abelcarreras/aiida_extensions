@@ -49,8 +49,7 @@ def get_FORCE_SETS_txt(data_sets_object):
 #                          'forces': data_sets_object.get_array(name)[3]})
 #    data_sets = {'natom': num_atom, 'first_atoms': data_list}
 
-#    displacements = data_sets['first_atoms']
-
+    displacements = data_sets['first_atoms']
     forces = [x['forces'] for x in data_sets['first_atoms']]
 
     # Write FORCE_SETS
