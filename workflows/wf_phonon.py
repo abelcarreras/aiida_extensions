@@ -256,6 +256,8 @@ class WorkflowPhonon(Workflow):
         calc.use_parameters(ParameterData(dict=parameters['parameters']))
         calc.use_data_sets(data_sets)
 
+        calc.store_all()
+
         return calc
 
     def generate_calculation_vasp(self, structure, parameters, type='optimize', pressure=0.0):
