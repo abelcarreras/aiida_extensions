@@ -49,6 +49,7 @@ lammps_machine = {
     'parallel_env': 'mpi*',
     'tot_num_mpiprocs': 16}
 
+
 # Phonopy input parameters
 phonopy_parameters = {'supercell': [[3, 0, 0],
                                     [0, 3, 0],
@@ -58,12 +59,20 @@ phonopy_parameters = {'supercell': [[3, 0, 0],
                                    [0.0, 0.0, 1.0]],
                      'distance': 0.01,
                      'mesh': [40, 40, 40]}
+# Cluster resources
+phonopy_machine = {
+    'num_machines': 1,
+    'parallel_env': 'mpi*',
+    'tot_num_mpiprocs': 16}
+
 
 
 # Collect workflow input data
 wf_parameters = {
      'structure': structure,
-     'phonopy_input': {'parameters': phonopy_parameters},
+     'phonopy_input': {'code': 'phonopy@stern',
+                       'parameters': phonopy_parameters,
+                       'resources': phonopy_machine},
      'input_force': {'code': 'lammps_force@boston',
                       'potential': potential,
                       'resources': lammps_machine},
