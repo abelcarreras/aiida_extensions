@@ -58,6 +58,31 @@ def get_phonon(structure, force_constants, phonopy_input):
     return phonon
 
 
+def get_commensurate_points(structure, phonopy_input):
+
+    from phonopy.structure.atoms import Atoms as PhonopyAtoms
+    from phonopy.harmonic.dynmat_to_fc import DynmatToForceConstants
+    from phonopy import Phonopy
+
+    # Generate phonopy phonon object
+    bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
+                        positions=[site.position for site in structure.sites],
+                        cell=structure.cell)
+
+    phonon = Phonopy(bulk,
+                     phonopy_input['supercell'],
+                     primitive_matrix=phonopy_input['primitive'],
+                     distance=phonopy_input['distance'])
+
+    primitive = phonon.get_primitive()
+    supercell = phonon.get_supercell()
+
+    dynmat2fc = DynmatToForceConstants(primitive, supercell)
+    com_points = dynmat2fc.get_commensurate_points()
+
+    return com_points
+
+
 @make_inline
 def phonopy_gruneisen_inline(**kwargs):
     from phonopy import PhonopyGruneisen
@@ -261,6 +286,6 @@ class WorkflowGruneisen(Workflow):
         self.add_result('band_structure', results['band_structure'])
         self.add_result('mesh', results['mesh'])
 
-        self.append_to_report('Finishing workflow_workflow')
+        self.append_to_report('Finishing Gruneisen workflow')
 
         self.next(self.exit)
