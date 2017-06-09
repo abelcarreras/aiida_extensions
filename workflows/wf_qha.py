@@ -182,7 +182,7 @@ class WorkflowQHA(Workflow):
         wf_parameters = self.get_parameters()
         structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
 
-        test_pressures = [-45, -30, -15, 15, 30,  45]  # in kbar
+        test_pressures = [-100, -70, -45, -30, -15, 15, 30,  45, 70, 100]  # in kbar
 
         for pressure in test_pressures:
             self.append_to_report('pressure: {}'.format(pressure))
