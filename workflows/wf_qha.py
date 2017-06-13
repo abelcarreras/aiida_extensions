@@ -13,36 +13,6 @@ ArrayData = DataFactory('array')
 import numpy as np
 
 
-def volume_expansion(volumes, energies, gruneisen, t_max=1000, t_step=10):
-    gruneisen.set_thermal_properties(volumes, t_max=t_max, t_step=t_step)
-
-    tp = gruneisen.get_thermal_properties()
-    temperatures = tp.get_thermal_properties()[0].get_temperatures()
-
-    free_energy_array = []
-    entropy_array = []
-    cv_array = []
-
-    for energy, tpi in zip(energies, tp.get_thermal_properties()):
-        t, free_energy, entropy, cv = tpi.get_thermal_properties()
-        free_energy_array.append(free_energy)
-        entropy_array.append(entropy)
-        cv_array.append(cv)
-
-    free_energy_array = np.array(free_energy_array)
-
-    total_free_energy_array = np.array(free_energy_array) + np.array(
-        [energies for i in range(free_energy_array.shape[1])]).T
-
-    fit = np.polyfit(volumes, total_free_energy_array, 2)
-
-    min_volume = []
-    for j in range(len(temperatures)):
-        min_volume.append(-fit.T[j][1] / (2 * fit.T[j][0]))
-
-    return min_volume
-
-
 def check_dos_stable(freq, dos, tol=1e-6):
 
     mask_neg = np.ma.masked_less(freq, 0.0).mask
@@ -241,6 +211,75 @@ class WorkflowQHA(Workflow):
             wf.start()
 
         self.next(self.collect_data)
+
+
+
+    test_range = [-13.2343, 80.5436]
+
+    # n_points_fit = n_points + 1
+    total_range = test_range[1] - test_range[0]
+    interval = total_range
+    max = None
+    min = None
+    while True:
+        # mid_point = test_range[1] - test_range[0]
+
+        ok_inf = ok_point(test_range[0])
+        ok_sup = ok_point(test_range[1])
+
+        if not ok_sup:
+            test_range[1] = test_range[0] + 0.5 * total_range
+            interval = interval * 0.5
+
+        if not ok_inf:
+            test_range[0] = test_range[1] - 0.5 * total_range
+            interval = interval * 0.5
+
+        if ok_inf and ok_sup:
+            if max is None or test_range[1] > max:
+                max = test_range[1]
+
+            if min is None or test_range[0] < min:
+                min = test_range[0]
+
+            if total_range / interval < n_points:
+                # test_range[1] = test_range[0] + 3.0/2.0 * total_range
+                test_range[1] = test_range[0] + np.ceil((1.5 * total_range) / interval) * interval
+
+                # interval = interval * 3/2
+            else:
+                print 'max', max
+                print 'min', min
+                break
+
+        total_range = test_range[1] - test_range[0]
+        #   print total_range
+        #   print interval
+
+    #    total_range = test_range[1] - test_range[0]
+    #    n_points_fit = total_range/interval
+
+    n_points = int((max - min) / interval) + 1
+    print 'npoints', n_points
+    print 'interval', interval
+    print 'test_range', test_range
+
+    print [i[0] for i in calculations.items() if i[1] == True]
+
+    print [min + interval * i for i in range(n_points)]
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @Workflow.step
     def volume_expansions(self):

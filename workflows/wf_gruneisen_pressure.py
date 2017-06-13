@@ -12,6 +12,40 @@ ParameterData = DataFactory('parameter')
 ArrayData = DataFactory('array')
 
 
+def thermal_expansion(volumes, electronic_energies, gruneisen, stresses=None, t_max=1000, t_step=10):
+    gruneisen.set_thermal_properties(volumes, t_max=t_max, t_step=t_step)
+
+    tp = gruneisen.get_thermal_properties()
+    temperatures = tp.get_thermal_properties()[0].get_temperatures()
+
+    free_energy_array = []
+    entropy_array = []
+    cv_array = []
+
+    for energy, tpi in zip(electronic_energies, tp.get_thermal_properties()):
+        t, free_energy, entropy, cv = tpi.get_thermal_properties()
+        free_energy_array.append(free_energy)
+        entropy_array.append(entropy)
+        cv_array.append(cv)
+
+    free_energy_array = np.array(free_energy_array)
+
+    total_free_energy_array = np.array(free_energy_array) + np.array(
+        [electronic_energies for i in range(free_energy_array.shape[1])]).T
+
+    if stresses is None:
+        fit = np.polyfit(volumes, total_free_energy_array, 2)
+    else:
+        fit = np.polyfit(stresses, total_free_energy_array, 2)
+
+    min_volume_stress = []
+    temperature_range = range(len(temperatures))
+    for j in temperature_range:
+        min_volume_stress.append(-fit.T[j][1] / (2 * fit.T[j][0]))
+
+    return min_volume_stress, temperature_range
+
+
 def get_path_using_seekpath(structure, band_resolution=30):
     import seekpath
 
@@ -143,7 +177,18 @@ def phonopy_gruneisen_inline(**kwargs):
     mesh_array.set_array('gruneisen', gruneisen_mesh)
 
     print(gruneisen.get_thermal_properties())
-    return {'band_structure': band_structure_array, 'mesh': mesh_array}
+
+    volumes = [phonon_minus.unitcell.get_volume(),
+               phonon_origin.unitcell.get_volume(),
+               phonon_plus.unitcell.get_volume()]
+
+    energy_pressure = kwargs.pop('energy_pressure')
+    energies = energy_pressure.get_array('energies')
+    stresses = energy_pressure.get_array('stresses')
+
+    min_stresses = thermal_expansion(volumes, energies, gruneisen, stresses=stresses, t_max=1000, t_step=10)
+
+    return {'band_structure': band_structure_array, 'mesh': mesh_array, 'min_stresses': min_stresses}
 
 
 @make_inline
@@ -253,6 +298,8 @@ class WorkflowGruneisen(Workflow):
             self.attach_workflow(wf)
             wf.start()
 
+        self.add_attribute('pressure_differences', pressure_differences)
+
         self.next(self.collect_data)
 
     # Collects the forces and prepares force constants
@@ -267,6 +314,17 @@ class WorkflowGruneisen(Workflow):
         else:
             wf_plus, wf_origin, wf_minus = self.get_step('volume_expansions_direct').get_sub_workflows()
 
+        # Expansion
+        energies = [wf_minus.get_result('optimized_structure_data').energy,
+                    wf_origin.get_result('optimized_structure_data').energy,
+                    wf_plus.get_result('optimized_structure_data').energy]
+
+        pressures = self.get_attribute('pressure_differences')
+
+        vpe_array = ArrayData()
+        vpe_array.set_array('energies', energies)
+        vpe_array.set_array('stresses', pressures)
+        vpe_array.store()
 
         self.append_to_report('reading structure')
 
@@ -276,6 +334,7 @@ class WorkflowGruneisen(Workflow):
                          'force_constants_origin': wf_origin.get_result('force_constants'),
                          'force_constants_plus':   wf_plus.get_result('force_constants'),
                          'force_constants_minus':  wf_minus.get_result('force_constants'),
+                         'energy_pressure': vpe_array,
                          'phonopy_input': ParameterData(dict=parameters_phonopy['parameters'])}
 
         # Do the phonopy Gruneisen parameters calculation
@@ -285,6 +344,7 @@ class WorkflowGruneisen(Workflow):
         self.add_result('optimized_structure_data', wf_origin.get_result('optimized_structure_data'))
         self.add_result('band_structure', results['band_structure'])
         self.add_result('mesh', results['mesh'])
+        self.add_result('stress_temperature', results['stress_temperature'])
 
         self.append_to_report('Finishing Gruneisen workflow')
 
