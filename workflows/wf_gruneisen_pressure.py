@@ -3,7 +3,7 @@ from aiida.orm.workflow import Workflow
 from aiida.orm.calculation.inline import make_inline
 
 from aiida.workflows.wf_phonon import WorkflowPhonon
-# from aiida.orm import load_node, load_workflow
+from aiida.orm import load_node, load_workflow
 
 import numpy as np
 
@@ -289,19 +289,20 @@ class WorkflowGruneisen(Workflow):
         structure = wf_parameters['structure']
         self.append_to_report('structure volume: {}'.format(structure.pk))
 
+        list = [751, 752, 753]
         pressure_differences = [-5, 0, 5]
-        for p in pressure_differences:
+        for i, p in enumerate(pressure_differences):
             pressure = self.get_attribute('pressure') + p
 
             self.append_to_report('pressure: {}'.format(pressure))
 
             wf = WorkflowPhonon(params=wf_parameters, optimize=True, pressure=pressure)
-            # wf = load_workflow(list[i])
+            wf = load_workflow(list[i])
 
-            wf.store()
+            # wf.store()
 
             self.attach_workflow(wf)
-            wf.start()
+            # wf.start()
 
         self.add_attribute('pressure_differences', pressure_differences)
 
@@ -320,9 +321,9 @@ class WorkflowGruneisen(Workflow):
             wf_plus, wf_origin, wf_minus = self.get_step('volume_expansions_direct').get_sub_workflows()
 
         # Expansion
-        energies = [wf_minus.get_result('optimized_structure_data').energy,
-                    wf_origin.get_result('optimized_structure_data').energy,
-                    wf_plus.get_result('optimized_structure_data').energy]
+        energies = [wf_minus.get_result('optimized_structure_data').dict.energy,
+                    wf_origin.get_result('optimized_structure_data').dict.energy,
+                    wf_plus.get_result('optimized_structure_data').dict.energy]
 
         pressures = self.get_attribute('pressure_differences')
 
