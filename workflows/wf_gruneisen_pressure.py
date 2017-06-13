@@ -13,7 +13,8 @@ ArrayData = DataFactory('array')
 
 
 def thermal_expansion(volumes, electronic_energies, gruneisen, stresses=None, t_max=1000, t_step=10):
-    gruneisen.set_thermal_properties(volumes, t_max=t_max, t_step=t_step)
+
+    gruneisen.set_thermal_properties(volumes, t_min=0, t_max=t_max, t_step=t_step)
 
     tp = gruneisen.get_thermal_properties()
 
@@ -22,28 +23,30 @@ def thermal_expansion(volumes, electronic_energies, gruneisen, stresses=None, t_
     cv_array = []
 
     for energy, tpi in zip(electronic_energies, tp.get_thermal_properties()):
-        t, free_energy, entropy, cv = tpi.get_thermal_properties()
+        temperatures, free_energy, entropy, cv = tpi.get_thermal_properties()
         free_energy_array.append(free_energy)
         entropy_array.append(entropy)
         cv_array.append(cv)
-        temperatures = t
 
     free_energy_array = np.array(free_energy_array)
 
     total_free_energy_array = np.array(free_energy_array) + np.array(
         [electronic_energies for i in range(free_energy_array.shape[1])]).T
 
-    if stresses is None:
-        fit = np.polyfit(volumes, total_free_energy_array, 2)
-    else:
-        fit = np.polyfit(stresses, total_free_energy_array, 2)
-
-    min_volume_stress = []
+    fit = np.polyfit(volumes, total_free_energy_array, 2)
+    min_volume = []
     temperature_range = range(len(temperatures))
     for j in temperature_range:
-        min_volume_stress.append(-fit.T[j][1] / (2 * fit.T[j][0]))
+        min_volume.append(-fit.T[j][1] / (2 * fit.T[j][0]))
 
-    return min_volume_stress, temperature_range
+    if stresses is not None:
+        fit = np.polyfit(stresses, total_free_energy_array, 2)
+        min_stress = []
+        temperature_range = range(len(temperatures))
+        for j in temperature_range:
+            min_stress.append(-fit.T[j][1] / (2 * fit.T[j][0]))
+
+    return min_stress, min_stress, temperatures
 
 
 def get_path_using_seekpath(structure, band_resolution=30):
@@ -186,11 +189,12 @@ def phonopy_gruneisen_inline(**kwargs):
     energies = energy_pressure.get_array('energies')
     stresses = energy_pressure.get_array('stresses')
 
-    min_stresses, temperatures = thermal_expansion(volumes, energies, gruneisen, stresses=stresses, t_max=1000, t_step=10)
+    min_stresses, min_volumes, temperatures = thermal_expansion(volumes, energies, gruneisen, stresses=stresses, t_max=1000, t_step=10)
 
     # build mesh
     thermal_expansion_prediction = ArrayData()
     thermal_expansion_prediction.set_array('stresses', np.array(min_stresses))
+    thermal_expansion_prediction.set_array('volumes', np.array(min_volumes))
     thermal_expansion_prediction.set_array('temperatures', np.array(temperatures))
 
     return {'band_structure': band_structure_array, 'mesh': mesh_array, 'thermal_expansion_prediction': thermal_expansion_prediction}
