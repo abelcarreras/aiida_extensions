@@ -16,7 +16,6 @@ def thermal_expansion(volumes, electronic_energies, gruneisen, stresses=None, t_
     gruneisen.set_thermal_properties(volumes, t_max=t_max, t_step=t_step)
 
     tp = gruneisen.get_thermal_properties()
-    temperatures = tp.get_thermal_properties()[0].get_temperatures()
 
     free_energy_array = []
     entropy_array = []
@@ -27,6 +26,7 @@ def thermal_expansion(volumes, electronic_energies, gruneisen, stresses=None, t_
         free_energy_array.append(free_energy)
         entropy_array.append(entropy)
         cv_array.append(cv)
+        temperatures = t
 
     free_energy_array = np.array(free_energy_array)
 
