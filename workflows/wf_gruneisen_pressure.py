@@ -30,8 +30,8 @@ def thermal_expansion(volumes, electronic_energies, gruneisen, stresses=None, t_
 
     free_energy_array = np.array(free_energy_array)
 
-    total_free_energy_array = np.array(free_energy_array) + np.array(
-        [electronic_energies for i in range(free_energy_array.shape[1])]).T
+    total_free_energy_array = np.array(free_energy_array) + np.array([electronic_energies
+                                                                      for i in range(free_energy_array.shape[1])]).T
 
     fit = np.polyfit(volumes, total_free_energy_array, 2)
     min_volume = []
@@ -293,7 +293,7 @@ class WorkflowGruneisen(Workflow):
         structure = wf_parameters['structure']
         self.append_to_report('structure volume: {}'.format(structure.pk))
 
-        list = [751, 752, 753]
+        #list = [751, 752, 753]
         pressure_differences = [-5, 0, 5]
         for i, p in enumerate(pressure_differences):
             pressure = self.get_attribute('pressure') + p
@@ -301,12 +301,12 @@ class WorkflowGruneisen(Workflow):
             self.append_to_report('pressure: {}'.format(pressure))
 
             wf = WorkflowPhonon(params=wf_parameters, optimize=True, pressure=pressure)
-            wf = load_workflow(list[i])
+            # wf = load_workflow(list[i])
 
-            # wf.store()
+            wf.store()
 
             self.attach_workflow(wf)
-            # wf.start()
+            wf.start()
 
         self.add_attribute('pressure_differences', pressure_differences)
 
