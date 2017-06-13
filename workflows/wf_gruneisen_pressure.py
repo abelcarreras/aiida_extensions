@@ -190,8 +190,8 @@ def phonopy_gruneisen_inline(**kwargs):
 
     # build mesh
     thermal_expansion_prediction = ArrayData()
-    thermal_expansion_prediction.set_array('stresses', min_stresses)
-    thermal_expansion_prediction.set_array('temperatures', temperatures)
+    thermal_expansion_prediction.set_array('stresses', np.array(min_stresses))
+    thermal_expansion_prediction.set_array('temperatures', np.array(temperatures))
 
     return {'band_structure': band_structure_array, 'mesh': mesh_array, 'thermal_expansion_prediction': thermal_expansion_prediction}
 
