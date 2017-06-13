@@ -14,7 +14,7 @@ ArrayData = DataFactory('array')
 
 def thermal_expansion(volumes, electronic_energies, gruneisen, stresses=None, t_max=1000, t_step=10):
 
-    gruneisen.set_thermal_properties(volumes, t_min=0, t_max=t_max, t_step=t_step)
+    gruneisen.set_thermal_properties(volumes, t_max=t_max, t_step=t_step)
 
     tp = gruneisen.get_thermal_properties()
 
