@@ -328,8 +328,8 @@ class WorkflowGruneisen(Workflow):
         pressures = self.get_attribute('pressure_differences')
 
         vpe_array = ArrayData()
-        vpe_array.set_array('energies', energies)
-        vpe_array.set_array('stresses', pressures)
+        vpe_array.set_array('energies', np.array(energies))
+        vpe_array.set_array('stresses', np.array(pressures))
         vpe_array.store()
 
         self.append_to_report('reading structure')
