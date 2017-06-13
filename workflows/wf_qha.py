@@ -12,6 +12,50 @@ ArrayData = DataFactory('array')
 
 import numpy as np
 
+
+def volume_expansion(volumes, energies, gruneisen, t_max=1000, t_step=10):
+    gruneisen.set_thermal_properties(volumes, t_max=t_max, t_step=t_step)
+
+    tp = gruneisen.get_thermal_properties()
+    temperatures = tp.get_thermal_properties()[0].get_temperatures()
+
+    free_energy_array = []
+    entropy_array = []
+    cv_array = []
+
+    for energy, tpi in zip(energies, tp.get_thermal_properties()):
+        t, free_energy, entropy, cv = tpi.get_thermal_properties()
+        free_energy_array.append(free_energy)
+        entropy_array.append(entropy)
+        cv_array.append(cv)
+
+    free_energy_array = np.array(free_energy_array)
+
+    total_free_energy_array = np.array(free_energy_array) + np.array(
+        [energies for i in range(free_energy_array.shape[1])]).T
+
+    fit = np.polyfit(volumes, total_free_energy_array, 2)
+
+    min_volume = []
+    for j in range(len(temperatures)):
+        min_volume.append(-fit.T[j][1] / (2 * fit.T[j][0]))
+
+    return min_volume
+
+
+def check_dos_stable(freq, dos, tol=1e-6):
+
+    mask_neg = np.ma.masked_less(freq, 0.0).mask
+    mask_pos = np.ma.masked_greater(freq, 0.0).mask
+    int_neg = -np.trapz(np.multiply(dos[mask_neg], freq[mask_neg]), x=freq[mask_neg])
+    int_pos = np.trapz(np.multiply(dos[mask_pos], freq[mask_pos]), x=freq[mask_pos])
+
+    if int_neg / int_pos > tol:
+        return False
+    else:
+        return True
+
+
 @make_inline
 def calculate_qha_inline(**kwargs):
     from phonopy import PhonopyQHA
