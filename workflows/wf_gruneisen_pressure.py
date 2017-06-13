@@ -176,8 +176,8 @@ def phonopy_gruneisen_inline(**kwargs):
     mesh_array.set_array('frequencies', frequencies_mesh)
     mesh_array.set_array('gruneisen', gruneisen_mesh)
 
-    print(gruneisen.get_thermal_properties())
 
+    # Thermal expansion approximate prediction
     volumes = [phonon_minus.unitcell.get_volume(),
                phonon_origin.unitcell.get_volume(),
                phonon_plus.unitcell.get_volume()]
@@ -186,9 +186,14 @@ def phonopy_gruneisen_inline(**kwargs):
     energies = energy_pressure.get_array('energies')
     stresses = energy_pressure.get_array('stresses')
 
-    min_stresses = thermal_expansion(volumes, energies, gruneisen, stresses=stresses, t_max=1000, t_step=10)
+    min_stresses, temperatures = thermal_expansion(volumes, energies, gruneisen, stresses=stresses, t_max=1000, t_step=10)
 
-    return {'band_structure': band_structure_array, 'mesh': mesh_array, 'min_stresses': min_stresses}
+    # build mesh
+    thermal_expansion_prediction = ArrayData()
+    thermal_expansion_prediction.set_array('stresses', min_stresses)
+    thermal_expansion_prediction.set_array('temperatures', temperatures)
+
+    return {'band_structure': band_structure_array, 'mesh': mesh_array, 'thermal_expansion_prediction': thermal_expansion_prediction}
 
 
 @make_inline
@@ -344,7 +349,7 @@ class WorkflowGruneisen(Workflow):
         self.add_result('optimized_structure_data', wf_origin.get_result('optimized_structure_data'))
         self.add_result('band_structure', results['band_structure'])
         self.add_result('mesh', results['mesh'])
-        self.add_result('stress_temperature', results['stress_temperature'])
+        self.add_result('thermal_expansion_prediction', results['thermal_expansion_prediction'])
 
         self.append_to_report('Finishing Gruneisen workflow')
 
