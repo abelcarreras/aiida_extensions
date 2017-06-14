@@ -272,7 +272,7 @@ class WorkflowGruneisen(Workflow):
         structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
         self.append_to_report('optimized structure volume: {}'.format(structure.pk))
 
-        pressure_differences = [-5, 5]
+        pressure_differences = [-10, 10]
         for p in pressure_differences:
             pressure = self.get_attribute('pressure') + p
 
@@ -299,20 +299,20 @@ class WorkflowGruneisen(Workflow):
         structure = wf_parameters['structure']
         self.append_to_report('structure volume: {}'.format(structure.pk))
 
-        list = [751, 752, 753]
-        pressure_differences = [-5, 0, 5]
+        # list = [751, 752, 753]
+        pressure_differences = [-10, 0, 10]
         for i, p in enumerate(pressure_differences):
             pressure = self.get_attribute('pressure') + p
 
             self.append_to_report('pressure: {}'.format(pressure))
 
             wf = WorkflowPhonon(params=wf_parameters, optimize=True, pressure=pressure)
-            wf = load_workflow(list[i])
+            # wf = load_workflow(list[i])
 
-            #wf.store()
+            wf.store()
 
             self.attach_workflow(wf)
-            #wf.start()
+            wf.start()
 
         self.add_attribute('pressure_differences', pressure_differences)
 
