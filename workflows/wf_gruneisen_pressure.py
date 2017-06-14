@@ -18,6 +18,10 @@ def thermal_expansion(volumes, electronic_energies, gruneisen, stresses=None, t_
 
     tp = gruneisen.get_thermal_properties()
 
+    fit_vs = np.polyfit(volumes, stresses, 1)
+    fit_vs_2 = np.polyfit(volumes, stresses, 2)
+
+
     free_energy_array = []
     entropy_array = []
     cv_array = []
@@ -39,14 +43,16 @@ def thermal_expansion(volumes, electronic_energies, gruneisen, stresses=None, t_
     for j in temperature_range:
         min_volume.append(-fit.T[j][1] / (2 * fit.T[j][0]))
 
-    if stresses is not None:
-        fit = np.polyfit(stresses, total_free_energy_array, 2)
-        min_stress = []
-        temperature_range = range(len(temperatures))
-        for j in temperature_range:
-            min_stress.append(-fit.T[j][1] / (2 * fit.T[j][0]))
+    fit = np.polyfit(stresses, total_free_energy_array, 2)
+    min_stress = []
+    temperature_range = range(len(temperatures))
+    for j in temperature_range:
+        min_stress.append(-fit.T[j][1] / (2 * fit.T[j][0]))
 
-    return min_volume, temperatures, min_stress
+    min_stress_2 = [np.polyval(fit_vs, v) for v in min_volume]
+    min_stress_2b = [np.polyval(fit_vs_2, v) for v in min_volume]
+
+    return min_volume, temperatures, min_stress, min_stress_2, min_stress_2b
 
 
 def get_path_using_seekpath(structure, band_resolution=30):
@@ -189,15 +195,17 @@ def phonopy_gruneisen_inline(**kwargs):
     energies = energy_pressure.get_array('energies')
     stresses = energy_pressure.get_array('stresses')
 
-    min_volumes, temperatures, min_stresses = thermal_expansion(volumes,
+    min_volumes, temperatures, min_stresses, test1, test2 = thermal_expansion(volumes,
                                                                 energies,
                                                                 gruneisen,
                                                                 stresses=stresses,
                                                                 t_max=1000,
-                                                                t_step=10)
+                                                                t_step=1)
     # build mesh
     thermal_expansion_prediction = ArrayData()
     thermal_expansion_prediction.set_array('stresses', np.array(min_stresses))
+    thermal_expansion_prediction.set_array('stresses_t1', np.array(test1))
+    thermal_expansion_prediction.set_array('stresses_t2', np.array(test2))
     thermal_expansion_prediction.set_array('volumes', np.array(min_volumes))
     thermal_expansion_prediction.set_array('temperatures', np.array(temperatures))
 
@@ -300,7 +308,7 @@ class WorkflowGruneisen(Workflow):
         self.append_to_report('structure volume: {}'.format(structure.pk))
 
         # list = [751, 752, 753]
-        pressure_differences = [-10, 0, 10]
+        pressure_differences = [-5, 0, 5]
         for i, p in enumerate(pressure_differences):
             pressure = self.get_attribute('pressure') + p
 
