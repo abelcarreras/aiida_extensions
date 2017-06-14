@@ -8,6 +8,8 @@ from aiida.common.utils import classproperty
 
 import numpy as np
 
+from potentials import LammpsPotential
+
 def get_FORCE_CONSTANTS_txt(force_constants):
 
     force_constants = force_constants.get_array('force_constants')
@@ -120,27 +122,22 @@ def generate_LAMMPS_structure(structure):
     return lammps_data_file
 
 
-
 def generate_LAMMPS_input(parameters,
-                          pair_style,
-                          structure,
-                          structure_file='data.gan',
-                          trajectory_file='trajectory.lammpstrj',
-                          potential_filename = 'GaN.tersoff',
+                          potential_obj,
+                          structure_file='potential.pot',
+                          trajectory_file='trajectory.lammpstr',
                           command=None):
 
-    names = [site.name for site in structure.kinds]
-#    asterisk_str = ' '.join(['*'] * len(names))
-    names_str = ' '.join(names)
 
+    names_str = ' '.join(potential_obj._names)
 
-    lammps_input_file =  'units           metal\n'
+    lammps_input_file = 'units           metal\n'
     lammps_input_file += 'boundary        p p p\n'
     lammps_input_file += 'box tilt large\n'
     lammps_input_file += 'atom_style      atomic\n'
     lammps_input_file += 'read_data       {}\n'.format(structure_file)
-    lammps_input_file += 'pair_style      {}\n'.format(pair_style.dict.pair_style)
-    lammps_input_file += 'pair_coeff      * * {} {}\n'.format( potential_filename, names_str)
+
+    lammps_input_file += potential_obj.get_input_potential_lines()
 
     lammps_input_file += 'neighbor        0.3 bin\n'
     lammps_input_file += 'neigh_modify    every 1 delay 0 check no\n'
@@ -158,8 +155,8 @@ def generate_LAMMPS_input(parameters,
     lammps_input_file += 'run             {}\n'.format(parameters.dict.equilibrium_steps)
     lammps_input_file += 'reset_timestep  0\n'
 
-    lammps_input_file += 'dump            aiida all custom {0} {1} x y z\n'.format(parameters.dict.dump_rate, trajectory_file)
-    lammps_input_file += 'dump_modify     aiida format "%16.10f %16.10f %16.10f"\n'
+    lammps_input_file += 'dump            aiida all custom {0} {1} element x y z\n'.format(parameters.dict.dump_rate, trajectory_file)
+    lammps_input_file += 'dump_modify     aiida format "%4s  %16.10f %16.10f %16.10f"\n'
     lammps_input_file += 'dump_modify     aiida sort id\n'
     lammps_input_file += 'dump_modify     aiida element {}\n'.format(names_str)
 
@@ -167,7 +164,7 @@ def generate_LAMMPS_input(parameters,
 
     if command:
         lammps_input_file += 'shell       {}\n'.format(command)
-
+        lammps_input_file += 'shell       rm {}\n'.format(trajectory_file)
 
     return lammps_input_file
 
@@ -323,7 +320,7 @@ class CombinateCalculation(JobCalculation):
                           self._OUTPUT_TRAJECTORY_FILE_NAME,
                           '-ts', '{}'.format(time_step), '--silent',
                           '-sfc', self._OUTPUT_FORCE_CONSTANTS, '-thm',
-                          '-psm', '2'] # PS algorithm
+                          '-psm', '2']  # PS algorithm
 
         if 'temperature' in parameters_data.get_dict():
             cmdline_params.append('--temperature')
@@ -337,15 +334,16 @@ class CombinateCalculation(JobCalculation):
 
         # =================== prepare the python input files =====================
 
-        structure_txt = generate_LAMMPS_structure(supercell)
+        potential_object = LammpsPotential(potential_data, structure, potential_filename=self._INPUT_POTENTIAL)
+
+        structure_txt = generate_LAMMPS_structure(structure)
         input_txt = generate_LAMMPS_input(parameters_data,
-                                          potential_data, supercell,
+                                          potential_object,
                                           structure_file=self._INPUT_STRUCTURE,
                                           trajectory_file=self._OUTPUT_TRAJECTORY_FILE_NAME,
-                                          potential_filename=self._INPUT_POTENTIAL,
                                           command=' '.join(cmdline_params))
 
-        potential_txt = generate_LAMMPS_potential(potential_data)
+        potential_txt = potential_object.get_potential_file()
 
         # =========================== dump to file =============================
 
@@ -362,7 +360,7 @@ class CombinateCalculation(JobCalculation):
             infile.write(potential_txt)
 
 
-#####  Dynaphopy  #####
+        #####  Dynaphopy  #####
 
         cell_txt = structure_to_poscar(structure)
         input_txt = parameters_to_input_file(parameters_data_dynaphopy)
@@ -381,13 +379,13 @@ class CombinateCalculation(JobCalculation):
             infile.write(force_constants_txt)
 
 
-#########
+        #########
 
         # ============================ calcinfo ================================
 
         local_copy_list = []
         remote_copy_list = []
-    #    additional_retrieve_list = settings_dict.pop("ADDITIONAL_RETRIEVE_LIST",[])
+        # additional_retrieve_list = settings_dict.pop("ADDITIONAL_RETRIEVE_LIST",[])
 
         calcinfo = CalcInfo()
 

@@ -46,7 +46,7 @@ def thermal_expansion(volumes, electronic_energies, gruneisen, stresses=None, t_
         for j in temperature_range:
             min_stress.append(-fit.T[j][1] / (2 * fit.T[j][0]))
 
-    return min_stress, min_stress, temperatures
+    return min_volume, temperatures, min_stress
 
 
 def get_path_using_seekpath(structure, band_resolution=30):
@@ -181,16 +181,20 @@ def phonopy_gruneisen_inline(**kwargs):
 
 
     # Thermal expansion approximate prediction
-    volumes = [phonon_minus.unitcell.get_volume(),
-               phonon_origin.unitcell.get_volume(),
-               phonon_plus.unitcell.get_volume()]
+    volumes = [phonon_origin.unitcell.get_volume(),
+               phonon_plus.unitcell.get_volume(),
+               phonon_minus.unitcell.get_volume()]
 
     energy_pressure = kwargs.pop('energy_pressure')
     energies = energy_pressure.get_array('energies')
     stresses = energy_pressure.get_array('stresses')
 
-    min_stresses, min_volumes, temperatures = thermal_expansion(volumes, energies, gruneisen, stresses=stresses, t_max=1000, t_step=10)
-
+    min_volumes, temperatures, min_stresses = thermal_expansion(volumes,
+                                                                energies,
+                                                                gruneisen,
+                                                                stresses=stresses,
+                                                                t_max=1000,
+                                                                t_step=10)
     # build mesh
     thermal_expansion_prediction = ArrayData()
     thermal_expansion_prediction.set_array('stresses', np.array(min_stresses))
@@ -282,6 +286,8 @@ class WorkflowGruneisen(Workflow):
             self.attach_workflow(wf)
             wf.start()
 
+        self.add_attribute('pressure_differences', pressure_differences)
+
         self.next(self.collect_data)
 
     # Generate the volume expanded cells
@@ -293,7 +299,7 @@ class WorkflowGruneisen(Workflow):
         structure = wf_parameters['structure']
         self.append_to_report('structure volume: {}'.format(structure.pk))
 
-        #list = [751, 752, 753]
+        list = [751, 752, 753]
         pressure_differences = [-5, 0, 5]
         for i, p in enumerate(pressure_differences):
             pressure = self.get_attribute('pressure') + p
@@ -301,12 +307,12 @@ class WorkflowGruneisen(Workflow):
             self.append_to_report('pressure: {}'.format(pressure))
 
             wf = WorkflowPhonon(params=wf_parameters, optimize=True, pressure=pressure)
-            # wf = load_workflow(list[i])
+            wf = load_workflow(list[i])
 
-            wf.store()
+            #wf.store()
 
             self.attach_workflow(wf)
-            wf.start()
+            #wf.start()
 
         self.add_attribute('pressure_differences', pressure_differences)
 
@@ -325,11 +331,13 @@ class WorkflowGruneisen(Workflow):
             wf_plus, wf_origin, wf_minus = self.get_step('volume_expansions_direct').get_sub_workflows()
 
         # Expansion
-        energies = [wf_minus.get_result('optimized_structure_data').dict.energy,
-                    wf_origin.get_result('optimized_structure_data').dict.energy,
-                    wf_plus.get_result('optimized_structure_data').dict.energy]
+        energies = [wf_origin.get_result('optimized_structure_data').dict.energy,
+                    wf_plus.get_result('optimized_structure_data').dict.energy,
+                    wf_minus.get_result('optimized_structure_data').dict.energy]
 
-        pressures = self.get_attribute('pressure_differences')
+        pressures = [wf_origin.get_attribute('pressure'),
+                     wf_plus.get_attribute('pressure'),
+                     wf_minus.get_attribute('pressure')]
 
         vpe_array = ArrayData()
         vpe_array.set_array('energies', np.array(energies))
