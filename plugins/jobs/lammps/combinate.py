@@ -176,8 +176,8 @@ def generate_LAMMPS_input(parameters,
     lammps_input_file += 'run             {}\n'.format(parameters.dict.equilibrium_steps)
     lammps_input_file += 'reset_timestep  0\n'
 
-    lammps_input_file += 'dump            aiida all custom {0} {1} element x y z\n'.format(parameters.dict.dump_rate, trajectory_file)
-    lammps_input_file += 'dump_modify     aiida format "%4s  %16.10f %16.10f %16.10f"\n'
+    lammps_input_file += 'dump            aiida all custom {0} {1} x y z\n'.format(parameters.dict.dump_rate, trajectory_file)
+    lammps_input_file += 'dump_modify     aiida format "%16.10f %16.10f %16.10f"\n'
     lammps_input_file += 'dump_modify     aiida sort id\n'
     lammps_input_file += 'dump_modify     aiida element {}\n'.format(names_str)
 
