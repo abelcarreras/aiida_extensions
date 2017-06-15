@@ -305,6 +305,15 @@ class WorkflowQHA(Workflow):
         test_pressures = [test_range[0], test_range[1]]  # in kbar
 
 
+        # Be efficient
+        good = [wf_test.get_attribute('pressure') for wf_test in self.get_step('pressure_expansions').get_sub_workflows() if
+                check_dos_stable(wf_min.get_result('dos').get_array('frequency'),
+                                 wf_min.get_result('dos').get_array('total_dos'), tol=1e-6)]
+        good = np.sort(good)
+        if len(np.diff(good)) > 0:
+            pressure_additional_list = np.arange(np.min(good), np.max(good),  np.min(np.diff(good)))
+            test_pressures += pressure_additional_list
+
         # Remove duplicates
         for wf_test in self.get_step('pressure_expansions').get_sub_workflows():
             for pressure in test_pressures:
