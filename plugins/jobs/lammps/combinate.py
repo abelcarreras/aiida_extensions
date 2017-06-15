@@ -223,6 +223,8 @@ class CombinateCalculation(JobCalculation):
         self._INPUT_FILE_NAME_DYNA = 'input_dynaphopy'
         self._OUTPUT_FORCE_CONSTANTS = 'FORCE_CONSTANTS_OUT'
         self._OUTPUT_FILE_NAME = 'OUTPUT'
+        self._OUTPUT_QUASIPARTICLES = 'quasiparticles_data.yaml'
+
         self._default_parser = 'dynaphopy'
 
 
@@ -417,6 +419,7 @@ class CombinateCalculation(JobCalculation):
         calcinfo.retrieve_list = []
         calcinfo.retrieve_list.append(self._OUTPUT_FORCE_CONSTANTS)
         calcinfo.retrieve_list.append(self._OUTPUT_FILE_NAME)
+        calcinfo.retrieve_list.append(self.__OUTPUT_QUASIPARTICLES)
 
         codeinfo = CodeInfo()
         codeinfo.cmdline_params = ['-in', self._INPUT_FILE_NAME]
