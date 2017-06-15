@@ -185,7 +185,7 @@ def generate_LAMMPS_input(parameters,
 
     if command:
         lammps_input_file += 'shell       {}\n'.format(command)
-        lammps_input_file += 'shell       rm {}\n'.format(trajectory_file)
+ #       lammps_input_file += 'shell       rm {}\n'.format(trajectory_file)
 
     return lammps_input_file
 
