@@ -121,7 +121,7 @@ class DynaphopyParser(Parser):
 
         # Get file and do the parsing
         outfile = out_folder.get_abs_path( self._calc._OUTPUT_FILE_NAME)
-        force_constants_file = out_folder.get_abs_path( self._calc._OUTPUT_FORCE_CONSTANTS)
+        force_constants_file = out_folder.get_abs_path(self._calc._OUTPUT_FORCE_CONSTANTS)
         try:
             quasiparticle_data, thermal_properties = parse_dynaphopy_output(outfile)
         except ValueError:

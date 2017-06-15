@@ -342,7 +342,7 @@ class CombinateCalculation(JobCalculation):
                           self._OUTPUT_TRAJECTORY_FILE_NAME,
                           '-ts', '{}'.format(time_step), '--silent',
                           '-sfc', self._OUTPUT_FORCE_CONSTANTS, '-thm',
-                          '-psm', '2']  # PS algorithm
+                          '-psm', '2', '---normalize_dos', '-sdata']  # PS algorithm
 
         if 'temperature' in parameters_data.get_dict():
             cmdline_params.append('--temperature')
