@@ -7,7 +7,6 @@ from aiida.orm.calculation.job.lammps.combinate import CombinateCalculation
 
 
 import numpy as np
-import yaml
 
 
 def parse_FORCE_CONSTANTS(filename):
@@ -24,6 +23,15 @@ def parse_FORCE_CONSTANTS(filename):
             force_constants[i, j] = np.array(tensor)
     fcfile.close()
     return force_constants
+
+
+def parse_quasiparticle_data(qp_file):
+    import yaml
+
+    f = open(qp_file, "r")
+    quasiparticle_data = yaml.load(f)
+    f.close()
+    return quasiparticle_data
 
 
 def parse_dynaphopy_output(file):
@@ -124,14 +132,14 @@ class DynaphopyParser(Parser):
         # Get file and do the parsing
         outfile = out_folder.get_abs_path( self._calc._OUTPUT_FILE_NAME)
         force_constants_file = out_folder.get_abs_path(self._calc._OUTPUT_FORCE_CONSTANTS)
+        qp_file = out_folder.get_abs_path(self._calc._OUTPUT_QUASIPARTICLES)
+
         try:
             quasiparticle_data, thermal_properties = parse_dynaphopy_output(outfile)
-            qp_file = open(self._calc._OUTPUT_QUASIPARTICLES, "r")
-            quasiparticle_data = yaml.load(qp_file)
-            qp_file.close()
-
+            quasiparticle_data = parse_quasiparticle_data(qp_file)
         except ValueError:
             pass
+
         try:
             force_constants = parse_FORCE_CONSTANTS(force_constants_file)
         except:
