@@ -357,9 +357,9 @@ class CombinateCalculation(JobCalculation):
         # =================== prepare the python input files =====================
 
         structure_md = get_supercell(structure, supercell_shape)
-        potential_object = LammpsPotential(potential_data, structure, potential_filename=self._INPUT_POTENTIAL)
+        potential_object = LammpsPotential(potential_data, structure_md, potential_filename=self._INPUT_POTENTIAL)
 
-        structure_txt = generate_LAMMPS_structure(structure)
+        structure_txt = generate_LAMMPS_structure(structure_md)
         input_txt = generate_LAMMPS_input(parameters_data,
                                           potential_object,
                                           structure_file=self._INPUT_STRUCTURE,
