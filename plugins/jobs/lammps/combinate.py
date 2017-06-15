@@ -419,7 +419,7 @@ class CombinateCalculation(JobCalculation):
         calcinfo.retrieve_list = []
         calcinfo.retrieve_list.append(self._OUTPUT_FORCE_CONSTANTS)
         calcinfo.retrieve_list.append(self._OUTPUT_FILE_NAME)
-        calcinfo.retrieve_list.append(self.__OUTPUT_QUASIPARTICLES)
+        calcinfo.retrieve_list.append(self._OUTPUT_QUASIPARTICLES)
 
         codeinfo = CodeInfo()
         codeinfo.cmdline_params = ['-in', self._INPUT_FILE_NAME]
