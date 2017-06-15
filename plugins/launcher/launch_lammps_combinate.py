@@ -8,6 +8,35 @@ import numpy as np
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
 
+
+def create_supercell(structure, supercell_shape):
+    import itertools
+
+    symbols = np.array([site.kind_name for site in structure.sites]),
+    positions = np.array([site.position for site in structure.sites]),
+    cell = np.array(structure.cell)
+
+    supercell = np.dot(cell, np.diag(supercell_shape))
+
+    position_supercell = []
+    symbols_suppercell = []
+    for k in range(positions.shape[0]):
+        for r in itertools.product(*[range(i) for i in supercell[::-1]]):
+            position_supercell.append(positions[k, :] + np.dot(np.array(r[::-1]), cell))
+            symbols_suppercell.append(symbols[k]),
+
+    position_supercell = np.array(position_supercell)
+    symbols_suppercell = np.array(symbols_suppercell)
+
+
+    supercell = StructureData(cell=supercell)
+    for symbol, position in zip(symbols_suppercell,
+                                position_supercell):
+        supercell.append_atom(position=position, symbols=symbol)
+
+    return supercell
+
+
 codename = 'lammps_md@boston'
 
 ############################
@@ -37,6 +66,10 @@ for i, scaled_position in enumerate(scaled_positions):
                           symbols=symbols[i])
 
 structure.store()
+
+supercell = create_supercell(structure, [2, 2, 2])
+
+print supercell
 
 # Silicon(C) Tersoff
 tersoff_si = {'Si  Si  Si ': '3.0 1.0 1.7322 1.0039e5 16.218 -0.59826 0.78734 1.0999e-6  1.7322  471.18  2.85  0.15  2.4799  1830.8'}
@@ -87,7 +120,7 @@ calc.use_structure(structure)
 calc.use_potential(ParameterData(dict=potential))
 calc.use_force_constants(force_constants)
 calc.use_parameters_dynaphopy(ParameterData(dict=dynaphopy_parameters))
-calc.use_supercell(structure)
+calc.use_supercell_md(ParameterData(dict={'shape': [2, 2, 2]}))
 
 calc.use_parameters(ParameterData(dict=parameters_md))
 

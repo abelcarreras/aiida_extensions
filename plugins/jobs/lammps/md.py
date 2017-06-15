@@ -6,6 +6,7 @@ from aiida.common.datastructures import CalcInfo, CodeInfo
 from aiida.common.utils import classproperty
 
 from potentials import LammpsPotential
+import numpy as np
 
 def generate_LAMMPS_structure(structure):
     import numpy as np
@@ -71,6 +72,7 @@ def generate_LAMMPS_input(parameters,
                           structure_file='potential.pot',
                           trajectory_file='trajectory.lammpstr'):
 
+    random_number = np.random.randint(10000000)
 
     names_str = ' '.join(potential_obj._names)
 
@@ -90,7 +92,7 @@ def generate_LAMMPS_input(parameters,
     lammps_input_file += 'thermo_style    custom step etotal temp vol press\n'
     lammps_input_file += 'thermo          1000\n'
 
-    lammps_input_file += 'velocity        all create {} 3627941 dist gaussian mom yes\n'.format(parameters.dict.temperature)
+    lammps_input_file += 'velocity        all create {0} {1} dist gaussian mom yes\n'.format(parameters.dict.temperature, random_number)
     lammps_input_file += 'velocity        all scale {}\n'.format(parameters.dict.temperature)
 
     lammps_input_file += 'fix             int all nvt temp {0} {0} {1}\n'.format(parameters.dict.temperature, parameters.dict.thermostat_variable)

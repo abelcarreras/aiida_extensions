@@ -6,9 +6,29 @@ from aiida.common.exceptions import InputValidationError
 from aiida.common.datastructures import CalcInfo, CodeInfo
 from aiida.common.utils import classproperty
 
+from potentials import LammpsPotential
 import numpy as np
 
-from potentials import LammpsPotential
+
+def create_supercell(structure, supercell_shape):
+    import itertools
+
+    symbols = np.array([site.kind_name for site in structure.sites])
+    positions = np.array([site.position for site in structure.sites])
+    cell = np.array(structure.cell)
+    supercell_shape = np.array(supercell_shape.dict.shape)
+
+    supercell_array = np.dot(cell, np.diag(supercell_shape))
+
+    supercell = StructureData(cell=supercell_array)
+    for k in range(positions.shape[0]):
+        for r in itertools.product(*[range(i) for i in supercell_shape[::-1]]):
+            position = positions[k, :] + np.dot(np.array(r[::-1]), cell)
+            symbol = symbols[k]
+            supercell.append_atom(position=position, symbols=symbol)
+
+    return supercell
+
 
 def get_FORCE_CONSTANTS_txt(force_constants):
 
@@ -128,6 +148,7 @@ def generate_LAMMPS_input(parameters,
                           trajectory_file='trajectory.lammpstr',
                           command=None):
 
+    random_number = np.random.randint(10000000)
 
     names_str = ' '.join(potential_obj._names)
 
@@ -147,7 +168,7 @@ def generate_LAMMPS_input(parameters,
     lammps_input_file += 'thermo_style    custom step etotal temp vol press\n'
     lammps_input_file += 'thermo          1000\n'
 
-    lammps_input_file += 'velocity        all create {} 3627941 dist gaussian mom yes\n'.format(parameters.dict.temperature)
+    lammps_input_file += 'velocity        all create {0} {1} dist gaussian mom yes\n'.format(parameters.dict.temperature, random_number)
     lammps_input_file += 'velocity        all scale {}\n'.format(parameters.dict.temperature)
 
     lammps_input_file += 'fix             int all nvt temp {0} {0} {1}\n'.format(parameters.dict.temperature, parameters.dict.thermostat_variable)
@@ -300,7 +321,7 @@ class CombinateCalculation(JobCalculation):
             raise InputValidationError("no structure is specified for this calculation")
 
         try:
-            supercell = inputdict.pop(self.get_linkname('supercell'))
+            supercell_shape = inputdict.pop(self.get_linkname('supercell_md'))
         except KeyError:
             raise InputValidationError("no supercell is specified for this calculation")
 
@@ -313,6 +334,7 @@ class CombinateCalculation(JobCalculation):
         ##############################
         # END OF INITIAL INPUT CHECK #
         ##############################
+
         time_step = parameters_data.dict.timestep
 
         # Dynaphopy command
@@ -334,6 +356,7 @@ class CombinateCalculation(JobCalculation):
 
         # =================== prepare the python input files =====================
 
+        structure_md = create_supercell(structure, supercell_shape)
         potential_object = LammpsPotential(potential_data, structure, potential_filename=self._INPUT_POTENTIAL)
 
         structure_txt = generate_LAMMPS_structure(structure)
@@ -359,8 +382,7 @@ class CombinateCalculation(JobCalculation):
         with open(potential_filename, 'w') as infile:
             infile.write(potential_txt)
 
-
-        #####  Dynaphopy  #####
+        # =+=========================  Dynaphopy =+==============================
 
         cell_txt = structure_to_poscar(structure)
         input_txt = parameters_to_input_file(parameters_data_dynaphopy)
@@ -377,9 +399,6 @@ class CombinateCalculation(JobCalculation):
         force_constants_filename = tempfolder.get_abs_path(self._INPUT_FORCE_CONSTANTS)
         with open(force_constants_filename, 'w') as infile:
             infile.write(force_constants_txt)
-
-
-        #########
 
         # ============================ calcinfo ================================
 
@@ -406,4 +425,3 @@ class CombinateCalculation(JobCalculation):
         codeinfo.withmpi = True
         calcinfo.codes_info = [codeinfo]
         return calcinfo
-
