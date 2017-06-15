@@ -10,7 +10,7 @@ from potentials import LammpsPotential
 import numpy as np
 
 
-def create_supercell(structure, supercell_shape):
+def get_supercell(structure, supercell_shape):
     import itertools
 
     symbols = np.array([site.kind_name for site in structure.sites])
@@ -356,7 +356,7 @@ class CombinateCalculation(JobCalculation):
 
         # =================== prepare the python input files =====================
 
-        structure_md = create_supercell(structure, supercell_shape)
+        structure_md = get_supercell(structure, supercell_shape)
         potential_object = LammpsPotential(potential_data, structure, potential_filename=self._INPUT_POTENTIAL)
 
         structure_txt = generate_LAMMPS_structure(structure)
