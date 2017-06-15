@@ -304,6 +304,15 @@ class WorkflowQHA(Workflow):
 
         test_pressures = [test_range[0], test_range[1]]  # in kbar
 
+        def remain(calculations):
+            good = [i[0] for i in calculations.items() if i[1] == True]
+            good = np.sort(good)
+            print np.min(good)
+            print np.max(good)
+            print good
+            if len(np.diff(good)) > 0:
+                print 'min_interval', np.min(np.diff(good))
+
         # Remove duplicates
         for wf_test in self.get_step('pressure_expansions').get_sub_workflows():
             for pressure in test_pressures:
