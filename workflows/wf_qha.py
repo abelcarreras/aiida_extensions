@@ -3,6 +3,7 @@ from aiida.orm.workflow import Workflow
 from aiida.orm.calculation.inline import make_inline
 
 from aiida.workflows.wf_gruneisen_pressure import WorkflowGruneisen
+from aiida.workflows.wf_phonon import WorkflowPhonon
 
 from aiida.orm import load_workflow
 
@@ -195,37 +196,78 @@ class WorkflowQHA(Workflow):
         self.append_to_report('Pressure expansion calculations')
         wf_parameters = self.get_parameters()
         structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
+        prediction = self.get_step(self.start).get_sub_workflows()[0].get_result('thermal_expansion_prediction')
+        stresses = prediction.get_array('stresses')
 
-        test_pressures = [-200, -150, -100, -50, -25, 25, 50,  100, 150, 200]  # in kbar
+        test_pressures = [stresses[0], stresses[1]]  # in kbar
+
+        total_range = test_pressures[1] - test_pressures[0]
+        interval = total_range
+
+
+        self.add_attribute('npoints', 5)
+
+        self.add_attribute('test_range', test_pressures)
+        self.add_attribute('total_range', total_range)
+        self.add_attribute('max', None)
+        self.add_attribute('min', None)
+        self.add_attribute('interval',interval)
+
 
         for pressure in test_pressures:
             self.append_to_report('pressure: {}'.format(pressure))
 
             # Submit workflow
-            wf = WorkflowGruneisen(params=wf_parameters, pressure=pressure, optimize=True)
+            wf = WorkflowPhonon(params=wf_parameters, pressure=pressure, optimize=True)
             wf.store()
 
             # wf = load_workflow(wfs_test[i])
 
             self.attach_workflow(wf)
             wf.start()
-
         self.next(self.collect_data)
 
+    @Workflow.step
+    def collect_data(self):
 
+        wf_parameters = self.get_parameters()
 
-    test_range = [-13.2343, 80.5436]
+        self.get_step_calculations(self.optimize).latest('id')
 
-    # n_points_fit = n_points + 1
-    total_range = test_range[1] - test_range[0]
-    interval = total_range
-    max = None
-    min = None
-    while True:
-        # mid_point = test_range[1] - test_range[0]
+        n_points = wf_parameters['n_points']
 
-        ok_inf = ok_point(test_range[0])
-        ok_sup = ok_point(test_range[1])
+        test_range = self.get_attribute('test_range')
+        total_range = self.get_attribute('total_range')
+        interval = self.get_attribute('interval')
+
+        max = self.get_attribute('max')
+        min = self.get_attribute('min')
+
+        wf_max = None
+        wf_min = None
+
+        #wf_min, wf_max = list(self.get_step('pressure_expansions').get_sub_workflows())[-2:]
+        for wf_test in self.get_step('pressure_expansions').get_sub_workflows():
+            if wf_test.get_attribute('pressure') == test_range[0]:
+                wf_min = wf_test
+            if wf_test.get_attribute('pressure') == test_range[1]:
+                wf_max = wf_test
+
+        if wf_max is None or wf_min is None:
+            self.append_to_report('Something wrong with volumes: {}'.format(test_range))
+            self.next(self.exit)
+
+        total_dos_min = wf_min.get_result('dos').get_array('total_dos')
+        total_dos_max = wf_max.get_result('dos').get_array('total_dos')
+        frequency_min = wf_min.get_result('dos').get_array('frequency')
+        frequency_max = wf_max.get_result('dos').get_array('frequency')
+        #pressure_min = wf_min.get_attribute('pressure')
+        #pressure_max = wf_max.get_attribute('pressure')
+
+        #a = check_dos_stable(frequency_min, total_dos_min, tol=1e-6)
+
+        ok_inf = check_dos_stable(frequency_min, total_dos_min, tol=1e-6)
+        ok_sup = check_dos_stable(frequency_max, total_dos_max, tol=1e-6)
 
         if not ok_sup:
             test_range[1] = test_range[0] + 0.5 * total_range
@@ -250,24 +292,75 @@ class WorkflowQHA(Workflow):
             else:
                 print 'max', max
                 print 'min', min
-                break
+                self.next(self.complete)
+                return
 
         total_range = test_range[1] - test_range[0]
-        #   print total_range
-        #   print interval
 
-    #    total_range = test_range[1] - test_range[0]
-    #    n_points_fit = total_range/interval
+        self.add_attribute('total_range', total_range)
+        self.add_attribute('max', max)
+        self.add_attribute('min', min)
+        self.add_attribute('interval', interval)
 
-    n_points = int((max - min) / interval) + 1
-    print 'npoints', n_points
-    print 'interval', interval
-    print 'test_range', test_range
+        test_pressures = [test_range[0], test_range[1]]  # in kbar
 
-    print [i[0] for i in calculations.items() if i[1] == True]
+        # Remove duplicates
+        for wf_test in self.get_step('pressure_expansions').get_sub_workflows():
+            for pressure in test_pressures:
 
-    print [min + interval * i for i in range(n_points)]
+                if wf_test.get_attribute('pressure') == pressure:
+                    test_pressures.remove(pressure)
 
+        for pressure in test_pressures:
+            self.append_to_report('pressure: {}'.format(pressure))
+
+            # Submit workflow
+            wf = WorkflowPhonon(params=wf_parameters, pressure=pressure, optimize=True)
+            wf.store()
+
+            # wf = load_workflow(wfs_test[i])
+
+            self.attach_workflow(wf)
+            wf.start()
+
+        self.next(self.collect_data)
+
+    @Workflow.step
+    def complete(self):
+
+        wf_parameters = self.get_parameters()
+
+        self.get_step_calculations(self.optimize).latest('id')
+
+        interval = self.get_attribute('interval')
+
+        max = self.get_attribute('max')
+        min = self.get_attribute('min')
+
+        n_points = int((max - min) / interval) + 1
+
+        test_pressures =  [min + interval * i for i in range(n_points)]
+
+        # Remove duplicates
+        for wf_test in self.get_step('pressure_expansions').get_sub_workflows():
+            for pressure in test_pressures:
+
+                if wf_test.get_attribute('pressure') == pressure:
+                    test_pressures.remove(pressure)
+
+        for pressure in test_pressures:
+            self.append_to_report('pressure: {}'.format(pressure))
+
+            # Submit workflow
+            wf = WorkflowPhonon(params=wf_parameters, pressure=pressure, optimize=True)
+            wf.store()
+
+            # wf = load_workflow(wfs_test[i])
+
+            self.attach_workflow(wf)
+            wf.start()
+
+        self.next(self.exit)
 
 
 
@@ -343,4 +436,5 @@ class WorkflowQHA(Workflow):
         self.add_result('data', data)
 
         self.append_to_report('Finishing workflow_workflow')
+
         self.next(self.exit)

@@ -82,6 +82,7 @@ wf_parameters = {
                        'resources': machine_dict,
                        'pseudo': pseudo_dict,
                        'kpoints': kpoints_dict},
+     'n_points': 10
 }
 
 

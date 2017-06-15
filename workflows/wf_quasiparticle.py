@@ -10,19 +10,6 @@ ArrayData = DataFactory('array')
 import numpy as np
 
 
-# @make_inline
-def generate_supercell2_inline(**kwargs):
-
-    structure = kwargs.pop('structure')
-    supercell = StructureData(cell=structure.cell)
-
-    for site in structure.sites:
-        supercell.append_atom(position=site.position,
-                              symbols=site.kind_name)
-
-    return {"supercell": supercell}
-
-
 @make_inline
 def generate_supercell_inline(**kwargs):
     import itertools
