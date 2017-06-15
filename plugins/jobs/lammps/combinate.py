@@ -268,10 +268,10 @@ class CombinateCalculation(JobCalculation):
                'docstring': "Use a node for the structure",
                },
             "supercell_md": {
-               'valid_types': StructureData,
+               'valid_types': ParameterData,
                'additional_parameter': None,
-               'linkname': 'supercell',
-               'docstring': "Use a node for the supercell",
+               'linkname': 'supercell_md',
+               'docstring': "Use a node for the supercell MD shape",
                },
          })
         return retdict
