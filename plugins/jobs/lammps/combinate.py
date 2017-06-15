@@ -267,7 +267,7 @@ class CombinateCalculation(JobCalculation):
                'linkname': 'structure',
                'docstring': "Use a node for the structure",
                },
-            "supercell": {
+            "supercell_md": {
                'valid_types': StructureData,
                'additional_parameter': None,
                'linkname': 'supercell',
