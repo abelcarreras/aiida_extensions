@@ -416,10 +416,9 @@ class CombinateCalculation(JobCalculation):
         calcinfo.remote_copy_list = remote_copy_list
 
         # Retrieve files
-        calcinfo.retrieve_list = []
-        calcinfo.retrieve_list.append(self._OUTPUT_FORCE_CONSTANTS)
-        calcinfo.retrieve_list.append(self._OUTPUT_FILE_NAME)
-        calcinfo.retrieve_list.append(self._OUTPUT_QUASIPARTICLES)
+        calcinfo.retrieve_list = [self._OUTPUT_FORCE_CONSTANTS,
+                                  self._OUTPUT_FILE_NAME,
+                                  self._OUTPUT_QUASIPARTICLES]
 
         codeinfo = CodeInfo()
         codeinfo.cmdline_params = ['-in', self._INPUT_FILE_NAME]

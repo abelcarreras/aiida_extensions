@@ -121,12 +121,13 @@ class DynaphopyCalculation(JobCalculation):
 
         self._INPUT_FILE_NAME = 'input_dynaphopy'
         self._INPUT_TRAJECTORY = 'trajectory'
-
         self._INPUT_CELL = 'POSCAR'
         self._INPUT_FORCE_CONSTANTS = 'FORCE_CONSTANTS'
 
         self._OUTPUT_FORCE_CONSTANTS = 'FORCE_CONSTANTS_OUT'
         self._OUTPUT_FILE_NAME = 'OUTPUT'
+        self._OUTPUT_QUASIPARTICLES = 'quasiparticles_data.yaml'
+
         self._default_parser = 'dynaphopy'
 
 
@@ -254,13 +255,15 @@ class DynaphopyCalculation(JobCalculation):
         calcinfo.remote_copy_list = remote_copy_list
 
         # Retrieve files
-        calcinfo.retrieve_list = [self._OUTPUT_FILE_NAME, self._OUTPUT_FORCE_CONSTANTS]
+        calcinfo.retrieve_list = [self._OUTPUT_FILE_NAME,
+                                  self._OUTPUT_FORCE_CONSTANTS,
+                                  self._OUTPUT_QUASIPARTICLES]
 
         codeinfo = CodeInfo()
         codeinfo.cmdline_params = [self._INPUT_FILE_NAME, self._INPUT_TRAJECTORY,
                                    '-ts', '{}'.format(time_step), '--silent',
                                    '-sfc', self._OUTPUT_FORCE_CONSTANTS, '-thm',
-                                   '-psm','2', '--normalize_dos']
+                                   '-psm','2', '--normalize_dos', '-sdata']
 
         if 'temperature' in parameters_data.get_dict():
             codeinfo.cmdline_params.append('--temperature')
