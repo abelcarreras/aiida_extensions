@@ -311,6 +311,8 @@ class WorkflowQHA(Workflow):
                 else:
                     test_range[0] = test_range[1] - np.ceil((1.5 * total_range) / interval) * interval
 
+                clock = -clock
+
                     # interval = interval * 3/2
             else:
                 self.append_to_report('Exit: min {}, max {}'.format(min, max))
@@ -326,7 +328,7 @@ class WorkflowQHA(Workflow):
         self.add_attribute('min', min)
         self.add_attribute('interval', interval)
 
-        self.add_attribute('clock', -1 * clock)
+        self.add_attribute('clock', clock)
 
 
         test_pressures = [test_range[0], test_range[1]]  # in kbar
