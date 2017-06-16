@@ -18,7 +18,7 @@ def thermal_expansion(volumes, electronic_energies, gruneisen, stresses=None, t_
 
     tp = gruneisen.get_thermal_properties()
 
-    fit_vs = np.polyfit(volumes, stresses, 1)
+    fit_vs = np.polyfit(volumes, stresses, 2)
 
     free_energy_array = []
     entropy_array = []

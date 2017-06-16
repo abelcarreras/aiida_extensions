@@ -174,11 +174,11 @@ class WorkflowQHA(Workflow):
         # self.append_to_report('crystal: ' + wf_parameters['structure'].get_formula())
 
         wf = WorkflowGruneisen(params=wf_parameters, pre_optimize=True)
-        #wf.store()
+        wf.store()
 
-        wf = load_workflow(789)
+        #wf = load_workflow(789)
         self.attach_workflow(wf)
-        #wf.start()
+        wf.start()
 
         if self._expansion_method == 'pressure':
             self.next(self.pressure_expansions)
@@ -202,7 +202,6 @@ class WorkflowQHA(Workflow):
 
         total_range = test_pressures[1] - test_pressures[0]
         interval = total_range
-
 
         self.add_attribute('npoints', 5)
 
