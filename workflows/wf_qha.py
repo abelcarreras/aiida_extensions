@@ -273,17 +273,19 @@ class WorkflowQHA(Workflow):
             self.append_to_report('Something wrong with volumes: {}'.format(test_range))
             self.next(self.exit)
 
-        total_dos_min = wf_min.get_result('dos').get_array('total_dos')
-        total_dos_max = wf_max.get_result('dos').get_array('total_dos')
-        frequency_min = wf_min.get_result('dos').get_array('frequency')
-        frequency_max = wf_max.get_result('dos').get_array('frequency')
-        #pressure_min = wf_min.get_attribute('pressure')
-        #pressure_max = wf_max.get_attribute('pressure')
+        try:
+            total_dos_min = wf_min.get_result('dos').get_array('total_dos')
+            frequency_min = wf_min.get_result('dos').get_array('frequency')
+            ok_inf = check_dos_stable(frequency_min, total_dos_min, tol=1e-6)
+        except ValueError:
+            ok_inf = False
 
-        #a = check_dos_stable(frequency_min, total_dos_min, tol=1e-6)
-
-        ok_inf = check_dos_stable(frequency_min, total_dos_min, tol=1e-6)
-        ok_sup = check_dos_stable(frequency_max, total_dos_max, tol=1e-6)
+        try:
+            total_dos_max = wf_max.get_result('dos').get_array('total_dos')
+            frequency_max = wf_max.get_result('dos').get_array('frequency')
+            ok_sup = check_dos_stable(frequency_max, total_dos_max, tol=1e-6)
+        except ValueError:
+            ok_sup = False
 
         self.append_to_report('DOS stable | inf:{} sup:{}'.format(ok_inf, ok_sup))
 
