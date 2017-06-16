@@ -205,7 +205,7 @@ class WorkflowQHA(Workflow):
         prediction = self.get_step(self.start).get_sub_workflows()[0].get_result('thermal_expansion_prediction')
         stresses = prediction.get_array('stresses')
 
-        test_pressures = [stresses[0], stresses[-1]]  # in kbar
+        test_pressures = [np.min(stresses), np.max(stresses)]  # in kbar
 
         total_range = test_pressures[1] - test_pressures[0]
         interval = total_range
