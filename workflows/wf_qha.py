@@ -173,13 +173,12 @@ class WorkflowQHA(Workflow):
         wf_parameters = self.get_parameters()
         # self.append_to_report('crystal: ' + wf_parameters['structure'].get_formula())
 
-
         wf = WorkflowGruneisen(params=wf_parameters, pre_optimize=True)
-        wf.store()
+        #wf.store()
 
-        #        wf = load_workflow(30)
+        wf = load_workflow(789)
         self.attach_workflow(wf)
-        wf.start()
+        #wf.start()
 
         if self._expansion_method == 'pressure':
             self.next(self.pressure_expansions)
@@ -230,6 +229,8 @@ class WorkflowQHA(Workflow):
     @Workflow.step
     def collect_data(self):
 
+        self.append_to_report('--- collect step ------')
+
         wf_parameters = self.get_parameters()
 
         self.get_step_calculations(self.optimize).latest('id')
@@ -245,6 +246,9 @@ class WorkflowQHA(Workflow):
 
         wf_max = None
         wf_min = None
+
+        self.append_to_report('test range {}'.format(test_range))
+        self.append_to_report('interval {}'.format(interval))
 
         #wf_min, wf_max = list(self.get_step('pressure_expansions').get_sub_workflows())[-2:]
         for wf_test in self.get_step('pressure_expansions').get_sub_workflows():
@@ -284,14 +288,15 @@ class WorkflowQHA(Workflow):
             if min is None or test_range[0] < min:
                 min = test_range[0]
 
+            self.append_to_report('n_point estimation {}'.format(total_range / interval))
             if total_range / interval < n_points:
                 # test_range[1] = test_range[0] + 3.0/2.0 * total_range
                 test_range[1] = test_range[0] + np.ceil((1.5 * total_range) / interval) * interval
 
                 # interval = interval * 3/2
             else:
-                print 'max', max
-                print 'min', min
+                self.append_to_report('Exit: min {}, max {}'.format(min, max))
+
                 self.next(self.complete)
                 return
 
@@ -313,6 +318,8 @@ class WorkflowQHA(Workflow):
         if len(np.diff(good)) > 0:
             pressure_additional_list = np.arange(np.min(good), np.max(good),  np.min(np.diff(good)))
             test_pressures += pressure_additional_list
+
+        self.append_to_report('pressure list {}'.format(test_pressures))
 
         # Remove duplicates
         for wf_test in self.get_step('pressure_expansions').get_sub_workflows():
@@ -340,7 +347,7 @@ class WorkflowQHA(Workflow):
 
         wf_parameters = self.get_parameters()
 
-        self.get_step_calculations(self.optimize).latest('id')
+        # self.get_step_calculations(self.optimize).latest('id')
 
         interval = self.get_attribute('interval')
 
