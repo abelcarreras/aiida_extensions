@@ -217,6 +217,7 @@ class WorkflowQHA(Workflow):
         self.add_attribute('max', None)
         self.add_attribute('min', None)
         self.add_attribute('interval', interval)
+        self.add_attribute('clock', 1)
 
         wfs_test = [821, 820]
         for i, pressure in enumerate(test_pressures):
@@ -246,6 +247,7 @@ class WorkflowQHA(Workflow):
         test_range = self.get_attribute('test_range')
         total_range = self.get_attribute('total_range')
         interval = self.get_attribute('interval')
+        clock = self.get_attribute('clock')
 
         max = self.get_attribute('max')
         min = self.get_attribute('min')
@@ -283,7 +285,7 @@ class WorkflowQHA(Workflow):
         ok_inf = check_dos_stable(frequency_min, total_dos_min, tol=1e-6)
         ok_sup = check_dos_stable(frequency_max, total_dos_max, tol=1e-6)
 
-        self.append_to_report('OK: inf {} sup{}'.format(ok_inf, ok_sup))
+        self.append_to_report('DOS stable | inf:{} sup:{}'.format(ok_inf, ok_sup))
 
         if not ok_sup:
             test_range[1] = test_range[0] + 0.5 * total_range
@@ -303,9 +305,13 @@ class WorkflowQHA(Workflow):
             self.append_to_report('n_point estimation {}'.format(total_range / interval))
             if total_range / interval < n_points:
                 # test_range[1] = test_range[0] + 3.0/2.0 * total_range
-                test_range[1] = test_range[0] + np.ceil((1.5 * total_range) / interval) * interval
+#                 test_range[1] = test_range[0] + np.ceil((1.5 * total_range) / interval) * interval
+                if clock == 1:
+                    test_range[1] = test_range[0] + np.ceil((1.5 * total_range) / interval) * interval
+                else:
+                    test_range[0] = test_range[1] - np.ceil((1.5 * total_range) / interval) * interval
 
-                # interval = interval * 3/2
+                    # interval = interval * 3/2
             else:
                 self.append_to_report('Exit: min {}, max {}'.format(min, max))
 
@@ -319,6 +325,9 @@ class WorkflowQHA(Workflow):
         self.add_attribute('max', max)
         self.add_attribute('min', min)
         self.add_attribute('interval', interval)
+
+        self.add_attribute('clock', -1 * clock)
+
 
         test_pressures = [test_range[0], test_range[1]]  # in kbar
 
