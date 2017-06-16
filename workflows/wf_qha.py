@@ -218,7 +218,7 @@ class WorkflowQHA(Workflow):
         self.add_attribute('min', None)
         self.add_attribute('interval', interval)
 
-        wfs_test = [820, 821]
+        wfs_test = [821, 820]
         for i, pressure in enumerate(test_pressures):
             self.append_to_report('pressure: {}'.format(pressure))
 
@@ -318,12 +318,15 @@ class WorkflowQHA(Workflow):
 
         # Be efficient
         good = [wf_test.get_attribute('pressure') for wf_test in self.get_step('pressure_expansions').get_sub_workflows() if
-                check_dos_stable(wf_min.get_result('dos').get_array('frequency'),
-                                 wf_min.get_result('dos').get_array('total_dos'), tol=1e-6)]
+                check_dos_stable(wf_test.get_result('dos').get_array('frequency'),
+                                 wf_test.get_result('dos').get_array('total_dos'), tol=1e-6)]
         good = np.sort(good)
+
+        self.append_to_report('GOOD pressure list {}'.format(good))
+
         if len(np.diff(good)) > 0:
             pressure_additional_list = np.arange(np.min(good), np.max(good),  np.min(np.diff(good)))
-        #    test_pressures += pressure_additional_list
+            test_pressures += pressure_additional_list
 
         self.append_to_report('pressure list {}'.format(test_pressures))
 
