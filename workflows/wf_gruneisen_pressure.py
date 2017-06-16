@@ -197,7 +197,7 @@ def phonopy_gruneisen_inline(**kwargs):
                                                                                      energies,
                                                                                      gruneisen,
                                                                                      stresses=stresses,
-                                                                                     t_max=1000,
+                                                                                     t_max=500,
                                                                                      t_step=1)
     # build mesh
     thermal_expansion_prediction = ArrayData()
