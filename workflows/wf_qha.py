@@ -18,6 +18,13 @@ def check_dos_stable(freq, dos, tol=1e-6):
 
     mask_neg = np.ma.masked_less(freq, 0.0).mask
     mask_pos = np.ma.masked_greater(freq, 0.0).mask
+
+    if mask_neg.any() == False:
+        return True
+
+    if mask_pos.any() == False:
+        return False
+
     int_neg = -np.trapz(np.multiply(dos[mask_neg], freq[mask_neg]), x=freq[mask_neg])
     int_pos = np.trapz(np.multiply(dos[mask_pos], freq[mask_pos]), x=freq[mask_pos])
 
@@ -211,18 +218,18 @@ class WorkflowQHA(Workflow):
         self.add_attribute('min', None)
         self.add_attribute('interval', interval)
 
-
-        for pressure in test_pressures:
+        wfs_test = [820, 821]
+        for i, pressure in enumerate(test_pressures):
             self.append_to_report('pressure: {}'.format(pressure))
 
             # Submit workflow
             wf = WorkflowPhonon(params=wf_parameters, pressure=pressure, optimize=True)
-            wf.store()
+            ##wf.store()
 
-            # wf = load_workflow(wfs_test[i])
+            wf = load_workflow(wfs_test[i])
 
             self.attach_workflow(wf)
-            wf.start()
+            ##wf.start()
         self.next(self.collect_data)
 
     @Workflow.step
