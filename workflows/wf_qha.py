@@ -330,7 +330,6 @@ class WorkflowQHA(Workflow):
 
         self.add_attribute('clock', clock)
 
-
         test_pressures = [test_range[0], test_range[1]]  # in kbar
 
         # Be efficient
@@ -342,7 +341,7 @@ class WorkflowQHA(Workflow):
         self.append_to_report('GOOD pressure list {}'.format(good))
 
         if len(np.diff(good)) > 0:
-            pressure_additional_list = np.arange(np.min(good), np.max(good),  np.min(np.diff(good)))
+            pressure_additional_list = np.arange(np.min(good), np.max(good), interval)
             self.append_to_report('GOOD additional list {}'.format(pressure_additional_list))
             test_pressures += pressure_additional_list.tolist()
             test_pressures = np.unique(test_pressures).tolist()
