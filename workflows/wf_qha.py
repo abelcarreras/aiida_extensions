@@ -358,7 +358,9 @@ class WorkflowQHA(Workflow):
 
         n_points = int((max - min) / interval) + 1
 
-        test_pressures =  [min + interval * i for i in range(n_points)]
+        test_pressures = [min + interval * i for i in range(n_points)]
+
+        self.append_to_report('final pressure list: {}'.format(test_pressures))
 
         # Remove duplicates
         for wf_test in self.get_step('pressure_expansions').get_sub_workflows():
