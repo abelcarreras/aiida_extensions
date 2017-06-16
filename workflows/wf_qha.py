@@ -283,6 +283,8 @@ class WorkflowQHA(Workflow):
         ok_inf = check_dos_stable(frequency_min, total_dos_min, tol=1e-6)
         ok_sup = check_dos_stable(frequency_max, total_dos_max, tol=1e-6)
 
+        self.append_to_report('OK: inf {} sup{}'.format(ok_inf, ok_sup))
+
         if not ok_sup:
             test_range[1] = test_range[0] + 0.5 * total_range
             interval = interval * 0.5
@@ -312,6 +314,7 @@ class WorkflowQHA(Workflow):
 
         total_range = test_range[1] - test_range[0]
 
+        self.add_attribute('test_range', test_range)
         self.add_attribute('total_range', total_range)
         self.add_attribute('max', max)
         self.add_attribute('min', min)
