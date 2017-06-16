@@ -256,8 +256,12 @@ class WorkflowQHA(Workflow):
         self.append_to_report('test range {}'.format(test_range))
         self.append_to_report('interval {}'.format(interval))
 
+        wf_complete_list = list(self.get_step('pressure_expansions').get_sub_workflows())
+        if  self.get_step('collect_data') is not None:
+            wf_complete_list += list(self.get_step('collect_data').get_sub_workflows())
+
         #wf_min, wf_max = list(self.get_step('pressure_expansions').get_sub_workflows())[-2:]
-        for wf_test in self.get_step('pressure_expansions').get_sub_workflows():
+        for wf_test in wf_complete_list:
             if wf_test.get_attribute('pressure') == test_range[0]:
                 wf_min = wf_test
             if wf_test.get_attribute('pressure') == test_range[1]:
@@ -317,7 +321,7 @@ class WorkflowQHA(Workflow):
 
 
         # Be efficient
-        good = [wf_test.get_attribute('pressure') for wf_test in self.get_step('pressure_expansions').get_sub_workflows() if
+        good = [wf_test.get_attribute('pressure') for wf_test in wf_complete_list if
                 check_dos_stable(wf_test.get_result('dos').get_array('frequency'),
                                  wf_test.get_result('dos').get_array('total_dos'), tol=1e-6)]
         good = np.sort(good)
@@ -326,12 +330,13 @@ class WorkflowQHA(Workflow):
 
         if len(np.diff(good)) > 0:
             pressure_additional_list = np.arange(np.min(good), np.max(good),  np.min(np.diff(good)))
+            self.append_to_report('GOOD additional list {}'.format(pressure_additional_list))
             test_pressures += pressure_additional_list
 
         self.append_to_report('pressure list {}'.format(test_pressures))
 
         # Remove duplicates
-        for wf_test in self.get_step('pressure_expansions').get_sub_workflows():
+        for wf_test in wf_complete_list:
             for pressure in test_pressures:
 
                 if wf_test.get_attribute('pressure') == pressure:
