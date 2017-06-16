@@ -323,7 +323,7 @@ class WorkflowQHA(Workflow):
         good = np.sort(good)
         if len(np.diff(good)) > 0:
             pressure_additional_list = np.arange(np.min(good), np.max(good),  np.min(np.diff(good)))
-            test_pressures += pressure_additional_list
+        #    test_pressures += pressure_additional_list
 
         self.append_to_report('pressure list {}'.format(test_pressures))
 
