@@ -210,7 +210,7 @@ class WorkflowQHA(Workflow):
         self.add_attribute('total_range', total_range)
         self.add_attribute('max', None)
         self.add_attribute('min', None)
-        self.add_attribute('interval',interval)
+        self.add_attribute('interval', interval)
 
 
         for pressure in test_pressures:
