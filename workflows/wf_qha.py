@@ -328,6 +328,8 @@ class WorkflowQHA(Workflow):
                 if wf_test.get_attribute('pressure') == pressure:
                     test_pressures.remove(pressure)
 
+        self.append_to_report('pressure list (no duplicates){}'.format(test_pressures))
+
         for pressure in test_pressures:
             self.append_to_report('pressure: {}'.format(pressure))
 
