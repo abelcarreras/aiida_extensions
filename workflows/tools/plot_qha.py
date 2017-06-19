@@ -168,9 +168,9 @@ cv = []
 for wf_test in wf_complete_list:
     for pressure in test_pressures:
         if wf_test.get_attribute('pressure') == pressure:
-            thermal_properties = wf_test.get_results('thermal_properties')
-            optimized_data = wf_test.get_results('optimized_structure_data')
-            final_structure = wf_test.get_results('final_structure')
+            thermal_properties = wf_test.get_result('thermal_properties')
+            optimized_data = wf_test.get_result('optimized_structure_data')
+            final_structure = wf_test.get_result('final_structure')
 
             electronic_energies.append(optimized_data.dict.energy)
             volumes.append(final_structure.get_cell_volume())
