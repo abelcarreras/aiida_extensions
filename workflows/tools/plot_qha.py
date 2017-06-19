@@ -226,7 +226,7 @@ qha_output.set_array('volume_temperature', np.array(volume_temperature))
 qha_output.set_array('heat_capacity_P_numerical', np.array(heat_capacity_P_numerical))
 qha_output.set_array('volume_expansion', np.array(volume_expansion))
 qha_output.set_array('gibbs_temperature', np.array(gibbs_temperature))
-qha_output.store()
+#qha_output.store()
 
 # Test to leave something on folder
 #        phonopy_qha.plot_pdf_bulk_modulus_temperature()
