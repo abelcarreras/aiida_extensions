@@ -216,6 +216,7 @@ gibbs_temperature = phonopy_qha.get_gibbs_temperature()
 
 
 phonopy_qha.plot_bulk_modulus()
+plt.show()
 
 
 qha_output = ArrayData()
