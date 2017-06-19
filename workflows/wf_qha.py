@@ -14,7 +14,13 @@ ArrayData = DataFactory('array')
 import numpy as np
 
 
-def check_dos_stable(freq, dos, tol=1e-6):
+def check_dos_stable(wf, tol=1e-6):
+
+    try:
+        dos = wf.get_result('dos').get_array('total_dos')
+        freq = wf.get_result('dos').get_array('frequency')
+    except ValueError:
+        return False
 
     mask_neg = np.ma.masked_less(freq, 0.0).mask
     mask_pos = np.ma.masked_greater(freq, 0.0).mask
@@ -273,19 +279,9 @@ class WorkflowQHA(Workflow):
             self.append_to_report('Something wrong with volumes: {}'.format(test_range))
             self.next(self.exit)
 
-        try:
-            total_dos_min = wf_min.get_result('dos').get_array('total_dos')
-            frequency_min = wf_min.get_result('dos').get_array('frequency')
-            ok_inf = check_dos_stable(frequency_min, total_dos_min, tol=1e-6)
-        except ValueError:
-            ok_inf = False
+        ok_inf = check_dos_stable(wf_min, tol=1e-6)
+        ok_sup = check_dos_stable(wf_max, tol=1e-6)
 
-        try:
-            total_dos_max = wf_max.get_result('dos').get_array('total_dos')
-            frequency_max = wf_max.get_result('dos').get_array('frequency')
-            ok_sup = check_dos_stable(frequency_max, total_dos_max, tol=1e-6)
-        except ValueError:
-            ok_sup = False
 
         self.append_to_report('DOS stable | inf:{} sup:{}'.format(ok_inf, ok_sup))
 
@@ -335,9 +331,8 @@ class WorkflowQHA(Workflow):
         test_pressures = [test_range[0], test_range[1]]  # in kbar
 
         # Be efficient
-        good = [wf_test.get_attribute('pressure') for wf_test in wf_complete_list if
-                check_dos_stable(wf_test.get_result('dos').get_array('frequency'),
-                                 wf_test.get_result('dos').get_array('total_dos'), tol=1e-6)]
+        good = [wf_test.get_attribute('pressure') for wf_test in wf_complete_list
+                if check_dos_stable(wf_test, tol=1e-6)]
         good = np.sort(good)
 
         self.append_to_report('GOOD pressure list {}'.format(good))
