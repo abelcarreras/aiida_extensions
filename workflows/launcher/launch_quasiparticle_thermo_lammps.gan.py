@@ -81,14 +81,12 @@ dynaphopy_parameters ={'supercell': phonopy_parameters['supercell'],
                        'md_commensurate': True,
                        'temperature': temperature}
 
-
 #structure = load_node(11233)
 
 wf_parameters = {
      'structure': structure,
      'phonopy_input': {'parameters': phonopy_parameters},
-     'dynaphopy_input': {'code': 'dynaphopy@stern',
-                         'parameters': dynaphopy_parameters,
+     'dynaphopy_input': {'parameters': dynaphopy_parameters,
                          'resources': lammps_machine},
      'input_force': {'code': 'lammps_force@boston',
                      'potential': potential,
@@ -97,18 +95,18 @@ wf_parameters = {
                         'potential': potential,
                         'parameters': parameters_opt,
                         'resources': lammps_machine},
-     'input_md': {'code': 'lammps_md@boston',
+     'input_md': {'code': 'lammps_comb@boston',
                   'supercell': [3, 3, 3],
                   'potential': potential,
                   'parameters': parameters_md,
                   'resources': lammps_machine}
 }
 
-
-from aiida.workflows.wf_quasiparticle import WorkflowQuasiparticle
+from aiida.workflows.wf_quasiparticle_thermo import WorkflowQuasiparticle
 wf = WorkflowQuasiparticle(params=wf_parameters,
                            optimize=True,
                            use_optimized_structure_for_md=True)
+
 
 wf.label = 'quasiparticle'
 wf.start()
