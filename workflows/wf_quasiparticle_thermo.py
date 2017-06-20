@@ -111,7 +111,7 @@ class WorkflowQuasiparticle(Workflow):
                                               wf_parameters['dynaphopy_input'],
                                               harmonic_force_constants,
                                               temperature=t)
-            calc.label = t
+
             self.append_to_report('created MD calculation with PK={} and temperature={}'.format(calc.pk, t))
             self.attach_calculation(calc)
 
@@ -127,11 +127,43 @@ class WorkflowQuasiparticle(Workflow):
         self.add_result('optimized_structure_data', optimization_data)
 
         # Get the thermal properties at finite temperature from dynaphopy calculation
-        for calc in self.get_step_calculations(self.dynaphopy):
+        free_energy = []
+        entropy = []
+        temperture = []
+        cv = []
+        total_energy = []
 
-            temperature = float(calc.label)
-            self.add_result('thermal_properties_{}'.format(temperature), calc.out.thermal_properties)
-            self.add_result('quasiparticle_data_{}'.format(temperature), calc.out.quasiparticle_data)
-            self.add_result('r_force_constants_{}'.format(temperature), calc.out.array_data)
+        quasiparticle_data = {}
+        for calc in self.get_step_calculations(self.dynaphopy):
+            temperture.append(calc.out.thermal_properties.dict.temperture)
+            free_energy.append(calc.out.thermal_properties.dict.free_energy)
+            entropy.append(calc.out.thermal_properties.dict.entropy)
+            cv.append(calc.out.thermal_properties.dict.cv)
+            total_energy.append(calc.out.thermal_properties.dict.total_energy)
+            quasiparticle_data.update({'{}'.format(calc.out.thermal_properties.dict.temperture):
+                                       calc.out.quasiparticle_data.get_dict()})
+
+        sort_index = np.argsort(temperture)
+
+        temperture = np.array(temperture)[sort_index]
+        free_energy = np.array(free_energy)[sort_index]
+        entropy = np.array(entropy)
+        total_energy = np.array(total_energy).T[:, sort_index]
+        cv = np.array(cv).T[:, sort_index]
+
+
+        # Stores thermal properties (per unit cell) data in DB as a workflow result
+        thermal_properties = ArrayData()
+        thermal_properties.set_array('temperature', temperture)
+        thermal_properties.set_array('free_energy', free_energy)
+        thermal_properties.set_array('entropy', entropy)
+        thermal_properties.set_array('cv', cv)
+        thermal_properties.store()
+
+        quasiparticle_data = ParameterData(dict=quasiparticle_data)
+        quasiparticle_data.store()
+
+        self.add_result('thermal_properties', (thermal_properties))
+        self.add_result('quasiparticle_data'.format(quasiparticle_data))
 
         self.next(self.exit)
