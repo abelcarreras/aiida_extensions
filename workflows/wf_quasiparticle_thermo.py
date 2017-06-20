@@ -52,7 +52,7 @@ class WorkflowQuasiparticle(Workflow):
     def generate_md_dynaphopy(self, structure, parameters_md, parameters_dynaphopy, force_constants, temperature=None):
 
         if temperature is not None:
-            parameters_md = dict(parameters_md['parameters'])
+            parameters_md = dict(parameters_md)
             parameters_md['parameters']['temperature'] = temperature
 
         codename = parameters_md['code']
@@ -102,16 +102,11 @@ class WorkflowQuasiparticle(Workflow):
         structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
         self.add_result('final_structure', structure)
 
-        inline_params = {'structure': structure,
-                         'supercell': ParameterData(dict=wf_parameters['input_md'])}
-
-        supercell = generate_supercell_inline(**inline_params)[1]['supercell']
-
         harmonic_force_constants = self.get_step(self.start).get_sub_workflows()[0].get_result('force_constants')
         self.add_result('force_constants', harmonic_force_constants)
 
         for t in range(100, 200, 50):
-            calc = self.generate_md_dynaphopy(supercell,
+            calc = self.generate_md_dynaphopy(structure,
                                               wf_parameters['input_md'],
                                               wf_parameters['dynaphopy_input'],
                                               harmonic_force_constants,

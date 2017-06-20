@@ -81,7 +81,6 @@ dynaphopy_parameters ={'supercell': phonopy_parameters['supercell'],
                        'md_commensurate': True,
                        'temperature': temperature}
 
-
 #structure = load_node(11233)
 
 wf_parameters = {
@@ -103,7 +102,6 @@ wf_parameters = {
                   'parameters': parameters_md,
                   'resources': lammps_machine}
 }
-
 
 from aiida.workflows.wf_quasiparticle_thermo import WorkflowQuasiparticle
 wf = WorkflowQuasiparticle(params=wf_parameters,
