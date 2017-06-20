@@ -60,7 +60,6 @@ lammps_machine = {
     'tot_num_mpiprocs': 16}
 
 parameters_md = {'timestep': 0.001,
-                 'temperature': temperature,
                  'thermostat_variable': 0.5,
                  'equilibrium_steps': 100,
                  'total_steps': 2000,
@@ -78,8 +77,7 @@ parameters_opt = {'relaxation': 'tri',  # iso/aniso/tri
 dynaphopy_parameters ={'supercell': phonopy_parameters['supercell'],
                        'primitive': phonopy_parameters['primitive'],
                        'mesh': [40, 40, 40],
-                       'md_commensurate': True,
-                       'temperature': temperature}
+                       'md_commensurate': True}
 
 #structure = load_node(11233)
 

@@ -52,8 +52,8 @@ class WorkflowQuasiparticle(Workflow):
     def generate_md_dynaphopy(self, structure, parameters_md, parameters_dynaphopy, force_constants, temperature=None):
 
         if temperature is not None:
-            parameters_md = dict(parameters_md)
             parameters_md['parameters']['temperature'] = temperature
+            parameters_dynaphopy['parameters']['temperature'] = temperature
 
         codename = parameters_md['code']
         code = Code.get_from_string(codename)
