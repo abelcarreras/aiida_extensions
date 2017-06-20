@@ -52,6 +52,8 @@ class WorkflowQuasiparticle(Workflow):
     def generate_md_dynaphopy(self, structure, parameters_md, parameters_dynaphopy, force_constants, temperature=None):
 
         if temperature is not None:
+            parameters_md = dict(parameters_md)
+            parameters_dynaphopy = dict(parameters_dynaphopy)
             parameters_md['parameters']['temperature'] = temperature
             parameters_dynaphopy['parameters']['temperature'] = temperature
 
@@ -135,7 +137,7 @@ class WorkflowQuasiparticle(Workflow):
 
         quasiparticle_data = {}
         for calc in self.get_step_calculations(self.dynaphopy):
-            temperture.append(calc.out.thermal_properties.dict.temperture)
+            temperture.append(calc.out.thermal_properties.dict.temperature)
             free_energy.append(calc.out.thermal_properties.dict.free_energy)
             entropy.append(calc.out.thermal_properties.dict.entropy)
             cv.append(calc.out.thermal_properties.dict.cv)
