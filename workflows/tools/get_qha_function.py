@@ -13,7 +13,7 @@ KpointsData = DataFactory('array.kpoints')
 
 import numpy as np
 
-
+import matplotlib.pyplot as plt
 
 def calculate_qha_inline(**kwargs):
 
@@ -47,6 +47,9 @@ def calculate_qha_inline(**kwargs):
     fe_phonon = np.array(fe_phonon).T[:, sort_index]
     entropy = np.array(entropy).T[:, sort_index]
     cv = np.array(cv).T[:, sort_index]
+
+    plt.plot(volumes, electronic_energies)
+    plt.show()
 
     # Calculate QHA
     phonopy_qha = PhonopyQHA(np.array(volumes),
