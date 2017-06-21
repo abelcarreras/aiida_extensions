@@ -384,13 +384,6 @@ class WorkflowQHA(Workflow):
         wf_complete_list += list(self.get_step('collect_data').get_sub_workflows())
         wf_complete_list += list(self.get_step('complete').get_sub_workflows())
 
-        volumes = []
-        electronic_energies = []
-        temperatures = []
-        fe_phonon = []
-        entropy = []
-        cv = []
-
         inline_params = {}
 
         for wf_test in wf_complete_list:

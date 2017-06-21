@@ -48,6 +48,11 @@ class WorkflowQuasiparticle(Workflow):
         else:
             self._optimize = True  # By default optimization is done
 
+        if 'pressure' in kwargs:
+            self._pressure = kwargs['pressure']
+        else:
+            self._pressure = 0.0  # By default pre-optimization is done
+
 
     def generate_md_dynaphopy(self, structure, parameters_md, parameters_dynaphopy, force_constants, temperature=None):
 
@@ -85,13 +90,12 @@ class WorkflowQuasiparticle(Workflow):
 
         wf_parameters = self.get_parameters()
 
-        wf = WorkflowPhonon(params=wf_parameters, optimize=self._optimize)
+        wf = WorkflowPhonon(params=wf_parameters, optimize=self._optimize, pressure=self._optimize)
         wf.store()
 
         # wf = load_workflow(127)
         self.attach_workflow(wf)
         wf.start()
-
 
         self.next(self.dynaphopy)
 
@@ -104,8 +108,10 @@ class WorkflowQuasiparticle(Workflow):
         structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
         self.add_result('final_structure', structure)
 
+        optimized_structure_data = self.get_step(self.start).get_sub_workflows()[0].get_result('optimized_structure_data')
+        self.add_result('optimized_structure_data', optimized_structure_data)
+
         harmonic_force_constants = self.get_step(self.start).get_sub_workflows()[0].get_result('force_constants')
-        self.add_result('force_constants', harmonic_force_constants)
 
         for t in range(100, 2000, 100):
             calc = self.generate_md_dynaphopy(structure,
@@ -162,10 +168,10 @@ class WorkflowQuasiparticle(Workflow):
         thermal_properties.set_array('cv', cv)
         thermal_properties.store()
 
-        # quasiparticle_data = ParameterData(dict=quasiparticle_data)
-        # quasiparticle_data.store()
+        quasiparticle_data = ParameterData(dict=quasiparticle_data)
+        quasiparticle_data.store()
 
-        self.add_result('thermal_properties', (thermal_properties))
-        # self.add_result('quasiparticle_data'.format(quasiparticle_data))
+        self.add_result('thermal_properties', thermal_properties)
+        self.add_result('quasiparticle_data', quasiparticle_data)
 
         self.next(self.exit)
