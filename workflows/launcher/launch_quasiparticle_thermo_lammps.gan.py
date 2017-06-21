@@ -102,7 +102,7 @@ wf_parameters = {
 
 from aiida.workflows.wf_quasiparticle_thermo import WorkflowQuasiparticle
 wf = WorkflowQuasiparticle(params=wf_parameters,
-                           optimize=True)
+                           optimize=False)
 
 #from aiida.workflows.wf_scan_quasiparticle import WorkflowScanQuasiparticle
 #wf = WorkflowScanQuasiparticle(params=wf_parameters,
