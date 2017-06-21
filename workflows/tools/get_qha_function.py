@@ -65,6 +65,7 @@ def calculate_qha_inline(**kwargs):
                              #                         t_max=options.t_max,
                              verbose=True)
 
+    ArrayData = DataFactory('array')
 
     qha_output = ArrayData()
     qha_output.set_array('temperature', np.array([1, 2, 3, 4]))
