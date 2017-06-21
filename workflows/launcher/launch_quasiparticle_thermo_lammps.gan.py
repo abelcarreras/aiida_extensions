@@ -100,10 +100,15 @@ wf_parameters = {
                   'resources': lammps_machine}
 }
 
-from aiida.workflows.wf_quasiparticle_thermo import WorkflowQuasiparticle
-wf = WorkflowQuasiparticle(params=wf_parameters,
-                           optimize=True,
-                           use_optimized_structure_for_md=True)
+#from aiida.workflows.wf_quasiparticle_thermo import WorkflowQuasiparticle
+
+#wf = WorkflowQuasiparticle(params=wf_parameters,
+#                           optimize=True)
+
+from aiida.workflows.wf_scan_quasiparticle import WorkflowScanQuasiparticle
+wf = WorkflowScanQuasiparticle(params=wf_parameters,
+                               optimize=True)
+
 
 
 wf.label = 'quasiparticle'
