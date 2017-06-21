@@ -149,9 +149,9 @@ class WorkflowQuasiparticle(Workflow):
 
         temperture = np.array(temperture)[sort_index]
         free_energy = np.array(free_energy)[sort_index]
-        entropy = np.array(entropy)
-        total_energy = np.array(total_energy).T[:, sort_index]
-        cv = np.array(cv).T[:, sort_index]
+        entropy = np.array(entropy)[sort_index]
+        total_energy = np.array(total_energy)[sort_index]
+        cv = np.array(cv)[sort_index]
 
 
         # Stores thermal properties (per unit cell) data in DB as a workflow result
