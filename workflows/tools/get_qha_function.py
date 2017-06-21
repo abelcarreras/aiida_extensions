@@ -52,6 +52,13 @@ def calculate_qha_inline(**kwargs):
 
 
 
+    qha_output = ArrayData()
+    qha_output.set_array('temperature', np.array([1, 2, 3, 4]))
+    qha_output.store()
+    print qha_output
+    exit()
+
+
     # Calculate QHA
     phonopy_qha = PhonopyQHA(np.array(volumes),
                              np.array(electronic_energies),
@@ -64,11 +71,6 @@ def calculate_qha_inline(**kwargs):
                              verbose=False)
 
 
-    qha_output = ArrayData()
-    qha_output.set_array('temperature', np.array([1, 2, 3, 4]))
-    qha_output.store()
-    print qha_output
-    exit()
 
     # Get data
     qha_temperatures = phonopy_qha._qha._temperatures[:phonopy_qha._qha._max_t_index]
