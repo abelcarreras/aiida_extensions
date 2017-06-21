@@ -138,6 +138,7 @@ for wf_test in wf_complete_list:
 qha_output = ArrayData()
 qha_output.set_array('temperature', np.array([1,2,3,4]))
 qha_output.store()
+print qha_output
 exit()
 
 qha_result = calculate_qha_inline(**inline_params)
