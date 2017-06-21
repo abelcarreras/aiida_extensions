@@ -44,67 +44,39 @@ def check_dos_stable(wf, tol=1e-6):
 @make_inline
 def calculate_qha_inline(**kwargs):
 
-    #   structures = kwargs.pop('structures')
-    #   optimized_data = kwargs.pop('optimized_data')
-    #   thermodyamic_properties = kwargs.pop('thermodyamic_properties')
+    from phonopy import PhonopyQHA
+    import numpy as np
 
+#    thermal_properties_list = [key for key, value in kwargs.items() if 'thermal_properties' in key.lower()]
+#    optimized_structure_data_list = [key for key, value in kwargs.items() if 'optimized_structure_data' in key.lower()]
+    structure_list = [key for key, value in kwargs.items() if 'final_structure' in key.lower()]
+
+    volumes = []
+    electronic_energies = []
+    fe_phonon = []
     entropy = []
     cv = []
-    #  volumes = []
-    fe_phonon = []
-    temperatures = None
 
-    #   structures = [key for key, value in kwargs.items() if 'structure' in key.lower()]
-    #   for key in structures:
-    #       volumes.append(kwargs.pop(key).get_cell_volume())
+    for i in range(len(structure_list)):
+       # volumes.append(kwargs.pop(key).get_cell_volume())
+       volumes.append(kwargs.pop('final_structure_{}'.format(i)).get_cell_volume())
+       electronic_energies.append(kwargs.pop('optimized_structure_data_{}'.format(i)).dict.energy)
+       thermal_properties = kwargs.pop('thermal_properties_{}'.format(i))
+       temperatures = thermal_properties.get_array('temperature')
+       fe_phonon.append(thermal_properties.get_array('free_energy'))
+       entropy.append(thermal_properties.get_array('entropy'))
+       cv.append(thermal_properties.get_array('cv'))
 
-    volumes = [value.get_cell_volume() for key, value in kwargs.items() if 'structure' in key.lower()]
-    electronic_energies = [value.get_dict()['energy'] for key, value in kwargs.items() if
-                           'optimized_data' in key.lower()]
-
-    thermal_properties_list = [key for key, value in kwargs.items() if 'thermal_properties' in key.lower()]
-
-    for key in thermal_properties_list:
-        thermal_properties = kwargs[key]
-        fe_phonon.append(thermal_properties.get_array('free_energy'))
-        entropy.append(thermal_properties.get_array('entropy'))
-        cv.append(thermal_properties.get_array('cv'))
-        temperatures = thermal_properties.get_array('temperature')
-
-    # Arrange data sorted by volume and transform them to numpy array
     sort_index = np.argsort(volumes)
 
+    temperatures = np.array(temperatures)
     volumes = np.array(volumes)[sort_index]
     electronic_energies = np.array(electronic_energies)[sort_index]
-    temperatures = np.array(temperatures)
     fe_phonon = np.array(fe_phonon).T[:, sort_index]
     entropy = np.array(entropy).T[:, sort_index]
     cv = np.array(cv).T[:, sort_index]
 
-    opt = np.argmin(electronic_energies)
 
-    # Check minimum energy volume is within the data
-    if np.ma.masked_less_equal(volumes, volumes[opt]).mask.all():
-        print ('higher volume structures are necessary to compute')
-        exit()
-    if np.ma.masked_greater_equal(volumes, volumes[opt]).mask.all():
-        print ('Lower volume structures are necessary to compute')
-        exit()
-
-        #   print volumes.shape
-        #   print electronic_energies.shape
-        #   print temperatures.shape
-        #   print fe_phonon.shape
-        #   print cv.shape
-        #   print entropy.shape
-
-    qha_output = ArrayData()
-    qha_output.set_array('volumes', volumes)
-    qha_output.set_array('electronic_energies', electronic_energies)
-    qha_output.set_array('temperatures', temperatures)
-    qha_output.set_array('fe_phonon', fe_phonon)
-    qha_output.set_array('cv', cv)
-    qha_output.set_array('entropy', entropy)
 
     # Calculate QHA
     phonopy_qha = PhonopyQHA(np.array(volumes),
@@ -117,19 +89,8 @@ def calculate_qha_inline(**kwargs):
                              #                         t_max=options.t_max,
                              verbose=False)
 
-    #   print phonopy_qha.get_gibbs_temperature()
-
-    qha_output = ArrayData()
-    qha_output.set_array('volumes', volumes)
-    qha_output.set_array('electronic_energies', electronic_energies)
-    qha_output.set_array('temperatures', temperatures)
-    qha_output.set_array('fe_phonon', fe_phonon)
-    qha_output.set_array('cv', cv)
-    qha_output.set_array('entropy', entropy)
-
-    return {'qha_output': qha_output}
-
     # Get data
+    qha_temperatures = phonopy_qha._qha._temperatures[:phonopy_qha._qha._max_t_index]
     helmholtz_volume = phonopy_qha.get_helmholtz_volume()
     thermal_expansion = phonopy_qha.get_thermal_expansion()
     volume_temperature = phonopy_qha.get_volume_temperature()
@@ -137,15 +98,17 @@ def calculate_qha_inline(**kwargs):
     volume_expansion = phonopy_qha.get_volume_expansion()
     gibbs_temperature = phonopy_qha.get_gibbs_temperature()
 
+
     qha_output = ArrayData()
-    #    qha_output.set_array('temperature', temperatures)
-    #    qha_output.set_array('helmholtz_volume', np.array(helmholtz_volume))
-    #    qha_output.set_array('thermal_expansion', np.array(thermal_expansion))
-    #    qha_output.set_array('volume_temperature', np.array(volume_temperature))
-    #    qha_output.set_array('heat_capacity_P_numerical', np.array(heat_capacity_P_numerical))
-    #    qha_output.set_array('volume_expansion', np.array(volume_expansion))
-    #    qha_output.set_array('gibbs_temperature', np.array(gibbs_temperature))
-    #   qha_output.store()
+
+    qha_output.set_array('temperature', np.array(qha_temperatures))
+    qha_output.set_array('helmholtz_volume', np.array(helmholtz_volume))
+    qha_output.set_array('thermal_expansion', np.array(thermal_expansion))
+    qha_output.set_array('volume_temperature', np.array(volume_temperature))
+    qha_output.set_array('heat_capacity_P_numerical', np.array(heat_capacity_P_numerical))
+    qha_output.set_array('volume_expansion', np.array(volume_expansion))
+    qha_output.set_array('gibbs_temperature', np.array(gibbs_temperature))
+
 
     return {'qha_output': qha_output}
 
@@ -403,10 +366,53 @@ class WorkflowQHA(Workflow):
             self.attach_workflow(wf)
             wf.start()
 
-        self.next(self.exit)
+        self.next(self.qha_calculation)
 
     @Workflow.step
     def qha_calculation(self):
+
+        interval = self.get_attribute('interval')
+
+        max = self.get_attribute('max')
+        min = self.get_attribute('min')
+
+        n_points = int((max - min) / interval) + 1
+        test_pressures = [min + interval * i for i in range(n_points)]
+
+        # Remove duplicates
+        wf_complete_list = list(self.get_step('pressure_expansions').get_sub_workflows())
+        wf_complete_list += list(self.get_step('collect_data').get_sub_workflows())
+        wf_complete_list += list(self.get_step('complete').get_sub_workflows())
+
+        volumes = []
+        electronic_energies = []
+        temperatures = []
+        fe_phonon = []
+        entropy = []
+        cv = []
+
+        inline_params = {}
+
+        for wf_test in wf_complete_list:
+            for i, pressure in enumerate(test_pressures):
+                if wf_test.get_attribute('pressure') == pressure:
+                    thermal_properties = wf_test.get_result('thermal_properties')
+                    optimized_data = wf_test.get_result('optimized_structure_data')
+                    final_structure = wf_test.get_result('final_structure')
+
+                    inline_params.update({'thermal_properties_{}'.format(i): thermal_properties})
+                    inline_params.update({'optimized_structure_data_{}'.format(i): optimized_data})
+                    inline_params.update({'final_structure_{}'.format(i): final_structure})
+
+        qha_result = calculate_qha_inline(**inline_params)
+
+        self.add_result('qha_output', qha_result)
+
+        self.next(self.exit)
+
+
+    @Workflow.step
+    def qha_calculation2(self):
 
         interval = self.get_attribute('interval')
 
