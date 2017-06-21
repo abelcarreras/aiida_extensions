@@ -74,7 +74,7 @@ def calculate_qha_inline(**kwargs):
 
 
     qha_output = ArrayData()
-    qha_output.set_array(np.array([1,2,3]))
+    qha_output.set_array('test', np.array([1,2,3]))
     # qha_output.set_array('temperature', np.array(qha_temperatures))
     # qha_output.set_array('helmholtz_volume', np.array(helmholtz_volume))
     #qha_output.set_array('thermal_expansion', np.array(thermal_expansion))
