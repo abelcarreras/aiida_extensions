@@ -52,6 +52,12 @@ def calculate_qha_inline(**kwargs):
 
 
 
+    print volumes
+    print electronic_energies
+    print temperatures
+    print fe_phonon
+    print cv
+    print entropy
 
 
     # Calculate QHA
@@ -60,8 +66,8 @@ def calculate_qha_inline(**kwargs):
                              eos="vinet",
                              temperatures=temperatures,
                              free_energy=fe_phonon,
-                             #cv=cv,
-                             #entropy=entropy,
+                             cv=cv,
+                             entropy=entropy,
                              #                         t_max=options.t_max,
                              verbose=True)
 
