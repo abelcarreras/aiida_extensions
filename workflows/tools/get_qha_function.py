@@ -74,6 +74,7 @@ def calculate_qha_inline(**kwargs):
 
 
     qha_output = ArrayData()
+    qha_output.set_array(np.array([1,2,3]))
     # qha_output.set_array('temperature', np.array(qha_temperatures))
     # qha_output.set_array('helmholtz_volume', np.array(helmholtz_volume))
     #qha_output.set_array('thermal_expansion', np.array(thermal_expansion))
@@ -81,6 +82,8 @@ def calculate_qha_inline(**kwargs):
     #qha_output.set_array('heat_capacity_P_numerical', np.array(heat_capacity_P_numerical))
     #qha_output.set_array('volume_expansion', np.array(volume_expansion))
     #qha_output.set_array('gibbs_temperature', np.array(gibbs_temperature))
+
+    qha_output.store()
 
     return {'qha_data': qha_output}
 
@@ -135,5 +138,4 @@ for wf_test in wf_complete_list:
 
 qha_result = calculate_qha_inline(**inline_params)
 
-qha_result['qha_data'].store()
 print qha_result['qha_data']
