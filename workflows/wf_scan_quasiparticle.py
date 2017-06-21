@@ -49,7 +49,7 @@ class WorkflowScanQuasiparticle(Workflow):
         structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
 
         inline_params = {'structure': structure,
-                         'volumes': ParameterData(dict={ 'relations': [1.01, 0.99]})}  # plus, minus
+                         'volumes': ParameterData(dict={ 'relations': [1.01, 1.0, 0.99]})}  # plus, minus
 
         cells = create_volumes_inline(**inline_params)[1]
 
