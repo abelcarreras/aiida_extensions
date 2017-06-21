@@ -55,17 +55,16 @@ def calculate_qha_inline(**kwargs):
 
 
     # Calculate QHA
-    phonopy_qha = PhonopyQHA(volumes,
-                             electronic_energies,
+    phonopy_qha = PhonopyQHA(volumes.tolist(),
+                             electronic_energies.tolist(),
                              eos="vinet",
-                             temperatures=temperatures,
-                             free_energy=fe_phonon,
-                             cv=cv,
-                             entropy=entropy,
+                             temperatures=temperatures.tolist(),
+                             free_energy=fe_phonon.tolist(),
+                             cv=cv.tolist(),
+                             entropy=entropy.tolist(),
                              #                         t_max=options.t_max,
                              verbose=True)
 
-    ArrayData = DataFactory('array')
 
     qha_output = ArrayData()
     qha_output.set_array('temperature', np.array([1, 2, 3, 4]))
