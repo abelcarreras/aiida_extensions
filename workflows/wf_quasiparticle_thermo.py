@@ -142,7 +142,7 @@ class WorkflowQuasiparticle(Workflow):
             entropy.append(calc.out.thermal_properties.dict.entropy)
             cv.append(calc.out.thermal_properties.dict.cv)
             total_energy.append(calc.out.thermal_properties.dict.total_energy)
-            quasiparticle_data.update({'{}'.format(calc.out.thermal_properties.dict.temperature):
+            quasiparticle_data.update({'{}'.format(int(calc.out.thermal_properties.dict.temperature)):
                                        calc.out.quasiparticle_data.get_dict()})
 
         sort_index = np.argsort(temperture)
