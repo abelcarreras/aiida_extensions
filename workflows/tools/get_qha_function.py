@@ -133,6 +133,6 @@ for wf_test in wf_complete_list:
             inline_params.update({'optimized_structure_data_{}'.format(i): optimized_data})
             inline_params.update({'final_structure_{}'.format(i): final_structure})
 
-qha_result = calculate_qha_inline(**inline_params)[1]
+qha_result = calculate_qha_inline(**inline_params)
 
 print qha_result['qha_data']
