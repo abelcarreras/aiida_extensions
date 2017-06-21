@@ -30,7 +30,7 @@ def calculate_qha_inline(**kwargs):
     entropy = []
     cv = []
 
-    for i, key in enumerate(structure_list):
+    for i in range(len(structure_list)):
        # volumes.append(kwargs.pop(key).get_cell_volume())
        volumes.append(kwargs.pop('final_structure_{}'.format(i)).get_cell_volume())
        electronic_energies.append(kwargs.pop('optimized_structure_data_{}'.format(i)).dict.energy)
@@ -71,8 +71,6 @@ def calculate_qha_inline(**kwargs):
     volume_expansion = phonopy_qha.get_volume_expansion()
     gibbs_temperature = phonopy_qha.get_gibbs_temperature()
 
-    phonopy_qha.plot_qha()
-    plt.show()
 
 
     qha_output = ArrayData()
@@ -83,7 +81,6 @@ def calculate_qha_inline(**kwargs):
     qha_output.set_array('heat_capacity_P_numerical', np.array(heat_capacity_P_numerical))
     qha_output.set_array('volume_expansion', np.array(volume_expansion))
     qha_output.set_array('gibbs_temperature', np.array(gibbs_temperature))
-    qha_output.store()
 
     return {'phonopy_output': qha_output}
 
