@@ -162,10 +162,10 @@ class WorkflowQuasiparticle(Workflow):
         thermal_properties.set_array('cv', cv)
         thermal_properties.store()
 
-        quasiparticle_data = ParameterData(dict=quasiparticle_data)
-        quasiparticle_data.store()
+        # quasiparticle_data = ParameterData(dict=quasiparticle_data)
+        # quasiparticle_data.store()
 
         self.add_result('thermal_properties', (thermal_properties))
-        self.add_result('quasiparticle_data'.format(quasiparticle_data))
+        # self.add_result('quasiparticle_data'.format(quasiparticle_data))
 
         self.next(self.exit)
