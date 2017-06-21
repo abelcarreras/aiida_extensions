@@ -72,7 +72,6 @@ def calculate_qha_inline(**kwargs):
                              verbose=True)
 
 
-    load_dbenv()
 
     qha_output = ArrayData()
     qha_output.set_array('temperature', np.array([1, 2, 3, 4]))
