@@ -82,7 +82,7 @@ def calculate_qha_inline(**kwargs):
     qha_output.set_array('volume_expansion', np.array(volume_expansion))
     qha_output.set_array('gibbs_temperature', np.array(gibbs_temperature))
 
-    return {'phonopy_output': qha_output}
+    return {'qha_data': qha_output}
 
 
 
