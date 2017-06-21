@@ -135,4 +135,5 @@ for wf_test in wf_complete_list:
 
 qha_result = calculate_qha_inline(**inline_params)
 
+qha_result['qha_data'].store()
 print qha_result['qha_data']
