@@ -59,7 +59,7 @@ class WorkflowScanQuasiparticle(Workflow):
 
             # Submit workflow
 
-            wf = WorkflowQuasiparticle(optimize=False)
+            wf = WorkflowQuasiparticle(params=wf_parameters_volume, optimize=False)
             # wf = load_workflow(list[i])
 
             wf.store()
