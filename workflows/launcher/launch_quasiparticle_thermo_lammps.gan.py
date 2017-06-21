@@ -105,9 +105,7 @@ wf = WorkflowQuasiparticle(params=wf_parameters,
                            optimize=False)
 
 #from aiida.workflows.wf_scan_quasiparticle import WorkflowScanQuasiparticle
-#wf = WorkflowScanQuasiparticle(params=wf_parameters,
-#                               optimize=True)
-
+#wf = WorkflowScanQuasiparticle(params=wf_parameters)
 
 
 wf.label = 'quasiparticle'
