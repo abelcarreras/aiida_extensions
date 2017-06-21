@@ -52,24 +52,25 @@ def calculate_qha_inline(**kwargs):
 
 
 
+
+
+    # Calculate QHA
+    phonopy_qha = PhonopyQHA(volumes,
+                             electronic_energies,
+                             eos="vinet",
+                             temperatures=temperatures,
+                             free_energy=fe_phonon,
+                             cv=cv,
+                             entropy=entropy,
+                             #                         t_max=options.t_max,
+                             verbose=True)
+
+
     qha_output = ArrayData()
     qha_output.set_array('temperature', np.array([1, 2, 3, 4]))
     qha_output.store()
     print qha_output
     exit()
-
-
-    # Calculate QHA
-    phonopy_qha = PhonopyQHA(np.array(volumes),
-                             np.array(electronic_energies),
-                             eos="vinet",
-                             temperatures=np.array(temperatures),
-                             free_energy=np.array(fe_phonon),
-                             cv=np.array(cv),
-                             entropy=np.array(entropy),
-                             #                         t_max=options.t_max,
-                             verbose=False)
-
 
 
     # Get data
