@@ -107,7 +107,7 @@ class WorkflowQuasiparticle(Workflow):
         harmonic_force_constants = self.get_step(self.start).get_sub_workflows()[0].get_result('force_constants')
         self.add_result('force_constants', harmonic_force_constants)
 
-        for t in range(100, 200, 50):
+        for t in range(100, 2000, 100):
             calc = self.generate_md_dynaphopy(structure,
                                               wf_parameters['input_md'],
                                               wf_parameters['dynaphopy_input'],
