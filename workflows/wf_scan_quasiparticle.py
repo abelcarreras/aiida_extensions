@@ -46,9 +46,7 @@ class WorkflowScanQuasiparticle(Workflow):
         self.append_to_report('Volume expansion calculations')
         wf_parameters = self.get_parameters()
 
-        structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
-
-        inline_params = {'structure': structure,
+        inline_params = {'structure': wf_parameters['structure'],
                          'volumes': ParameterData(dict={ 'relations': [1.01, 1.0, 0.99]})}  # plus, minus
 
         cells = create_volumes_inline(**inline_params)[1]
