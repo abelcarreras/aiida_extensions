@@ -20,6 +20,12 @@ def calculate_qha_inline(**kwargs):
     from phonopy import PhonopyQHA
     import numpy as np
 
+    qha_output = ArrayData()
+    qha_output.set_array('temperature', np.array([1, 2, 3, 4]))
+    qha_output.store()
+    print qha_output
+    exit()
+
 #    thermal_properties_list = [key for key, value in kwargs.items() if 'thermal_properties' in key.lower()]
 #    optimized_structure_data_list = [key for key, value in kwargs.items() if 'optimized_structure_data' in key.lower()]
     structure_list = [key for key, value in kwargs.items() if 'final_structure' in key.lower()]
@@ -135,11 +141,6 @@ for wf_test in wf_complete_list:
             inline_params.update({'optimized_structure_data_{}'.format(i): optimized_data})
             inline_params.update({'final_structure_{}'.format(i): final_structure})
 
-qha_output = ArrayData()
-qha_output.set_array('temperature', np.array([1,2,3,4]))
-qha_output.store()
-print qha_output
-exit()
 
 qha_result = calculate_qha_inline(**inline_params)
 
