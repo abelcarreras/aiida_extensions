@@ -68,6 +68,8 @@ def calculate_qha_inline(**kwargs):
     volume_expansion = phonopy_qha.get_volume_expansion()
     gibbs_temperature = phonopy_qha.get_gibbs_temperature()
 
+    phonopy_qha.plot_qha()
+    plt.show()
 
 
     qha_output = ArrayData()
