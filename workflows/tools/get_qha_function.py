@@ -20,11 +20,6 @@ def calculate_qha_inline(**kwargs):
     from phonopy import PhonopyQHA
     import numpy as np
 
-    qha_output = ArrayData()
-    qha_output.set_array('temperature', np.array([1, 2, 3, 4]))
-    qha_output.store()
-    print qha_output
-    exit()
 
 #    thermal_properties_list = [key for key, value in kwargs.items() if 'thermal_properties' in key.lower()]
 #    optimized_structure_data_list = [key for key, value in kwargs.items() if 'optimized_structure_data' in key.lower()]
@@ -67,6 +62,13 @@ def calculate_qha_inline(**kwargs):
                              entropy=np.array(entropy),
                              #                         t_max=options.t_max,
                              verbose=False)
+
+
+    qha_output = ArrayData()
+    qha_output.set_array('temperature', np.array([1, 2, 3, 4]))
+    qha_output.store()
+    print qha_output
+    exit()
 
     # Get data
     qha_temperatures = phonopy_qha._qha._temperatures[:phonopy_qha._qha._max_t_index]
