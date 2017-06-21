@@ -108,9 +108,6 @@ class WorkflowQuasiparticle(Workflow):
         structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
         self.add_result('final_structure', structure)
 
-        optimized_structure_data = self.get_step(self.start).get_sub_workflows()[0].get_result('optimized_structure_data')
-        self.add_result('optimized_structure_data', optimized_structure_data)
-
         harmonic_force_constants = self.get_step(self.start).get_sub_workflows()[0].get_result('force_constants')
 
         for t in range(100, 250, 50):
@@ -131,8 +128,11 @@ class WorkflowQuasiparticle(Workflow):
 
         # Get the thermal properties at 0 K from phonopy calculation
         self.add_result('h_thermal_properties',  self.get_step('start').get_sub_workflows()[0].get_result('thermal_properties'))
-        optimization_data = self.get_step(self.start).get_sub_workflows()[0].get_result('optimized_structure_data')
-        self.add_result('optimized_structure_data', optimization_data)
+        try:
+            optimization_data = self.get_step(self.start).get_sub_workflows()[0].get_result('optimized_structure_data')
+            self.add_result('optimized_structure_data', optimization_data)
+        except ValueError:
+            self.append_to_report('No optimized structure')
 
         # Get the thermal properties at finite temperature from dynaphopy calculation
         free_energy = []
@@ -162,6 +162,7 @@ class WorkflowQuasiparticle(Workflow):
 
         # Stores thermal properties (per unit cell) data in DB as a workflow result
         thermal_properties = ArrayData()
+        thermal_properties.set_array('total_energy', total_energy)
         thermal_properties.set_array('temperature', temperture)
         thermal_properties.set_array('free_energy', free_energy)
         thermal_properties.set_array('entropy', entropy)
