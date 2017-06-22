@@ -70,7 +70,7 @@ primitive_matrix = np.dot(np.linalg.inv(conventional.lattice_vectors()), primiti
 primitive_matrix = np.round(primitive_matrix, decimals=6).tolist()
 
 structure = StructureData(pymatgen=conventional).store()
-
+print structure
 # crystal_system = spa.get_crystal_system()
 # if crystal_system == 'hexagonal':
 #     supercell = [[3, 0, 0],
