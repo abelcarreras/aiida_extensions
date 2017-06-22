@@ -96,7 +96,13 @@ class WorkflowScanQuasiparticle(Workflow):
     def collect_data(self):
 
         # Remove duplicates
-        wf_complete_list = list(self.get_step('volume_expansions').get_sub_workflows())
+        if self.get_step('pressure_expansions') is not None:
+            wf_complete_list = list(self.get_step('pressure_expansions').get_sub_workflows())
+
+        if self.get_step('volume_expansions') is not None:
+            wf_complete_list = list(self.get_step('volume_expansions').get_sub_workflows())
+
+
 
         volumes = []
         electronic_energies = []
