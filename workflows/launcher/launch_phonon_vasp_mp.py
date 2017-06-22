@@ -33,9 +33,9 @@ def get_supercell_size(structure, max_atoms=100):
             atoms_plus = num_atoms * np.prod(supercell_size_test)
 
             if max_atoms - atoms_minus < atoms_plus - max_atoms:
-                return supercell_size, atoms_minus
+                return supercell_size
             else:
-                return supercell_size_test, atoms_plus
+                return supercell_size_test
         else:
             supercell_size = supercell_size_test
 
@@ -85,6 +85,7 @@ supercell_size = get_supercell_size(structure)
 supercell = np.diag(supercell_size)
 
 print ('Supercell shape: {}'.format(supercell_size))
+exit()
 
 incar_dict = {
     'NELMIN' : 5,
