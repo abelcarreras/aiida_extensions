@@ -13,6 +13,35 @@ import pymatgen
 structure_id = 'mp-12668'
 ##########################
 
+def get_supercell_size(structure, max_atoms=100):
+
+    cell = np.array(structure.cell)
+    num_atoms = len(structure.sites)
+
+    supercell_size = [1, 1, 1]
+
+    while True:
+
+        norm = np.linalg.norm(cell, axis=0)
+        index = np.argmin(norm)
+        supercell_size_test = list(supercell_size)
+        supercell_size_test[index] += 1
+
+        anum_atoms_supercell = num_atoms * np.prod(supercell_size_test)
+        if anum_atoms_supercell > max_atoms:
+            atoms_minus =  num_atoms * np.prod(supercell_size)
+            atoms_plus = num_atoms * np.prod(supercell_size_test)
+
+            if max_atoms - atoms_minus < atoms_plus - max_atoms:
+                return supercell_size, atoms_minus
+            else:
+                return supercell_size_test, atoms_plus
+        else:
+            supercell_size = supercell_size_test
+
+        cell = np.dot(cell.T, np.diag(supercell_size)).T
+
+
 
 def get_potential_labels(functional, symbol_list, ftype=None):
     potential_labels =[]
@@ -42,15 +71,20 @@ primitive_matrix = np.round(primitive_matrix, decimals=6).tolist()
 
 structure = StructureData(pymatgen=conventional).store()
 
-crystal_system = spa.get_crystal_system()
-if crystal_system == 'hexagonal':
-    supercell = [[3, 0, 0],
-                 [0, 3, 0],
-                 [0, 0, 3]]
-else:
-    supercell = [[2, 0, 0],
-                 [0, 2, 0],
-                 [0, 0, 2]]
+# crystal_system = spa.get_crystal_system()
+# if crystal_system == 'hexagonal':
+#     supercell = [[3, 0, 0],
+#                  [0, 3, 0],
+#                  [0, 0, 3]]
+# else:
+#     supercell = [[2, 0, 0],
+#                  [0, 2, 0],
+#                  [0, 0, 2]]
+
+supercell_size = get_supercell_size(structure)
+supercell = np.diag(supercell_size)
+
+print ('Supercell shape: {}'.format(supercell_size))
 
 incar_dict = {
     'NELMIN' : 5,
