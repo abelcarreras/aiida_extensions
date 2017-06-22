@@ -38,7 +38,7 @@ class WorkflowScanQuasiparticle(Workflow):
     def start(self):
         self.append_to_report('Starting scan workflow')
 
-        self.next(self.volume_expansions)
+        self.next(self.pressure_expansions)
 
     # Generate the volume expanded cells
     @Workflow.step
@@ -68,6 +68,28 @@ class WorkflowScanQuasiparticle(Workflow):
             wf.start()
 
         self.next(self.collect_data)
+
+
+    @Workflow.step
+    def pressure_expansions(self):
+        self.append_to_report('Volume expansion calculations')
+        wf_parameters = self.get_parameters()
+
+        pressures = [150, 70, 0, 50, 90]
+        for p in pressures:
+
+            # Submit workflow
+
+            wf = WorkflowQuasiparticle(params=wf_parameters, optimize=True, pressure=p)
+            # wf = load_workflow(list[i])
+
+            wf.store()
+
+            self.attach_workflow(wf)
+            wf.start()
+
+        self.next(self.collect_data)
+
 
     # Collects the forces and prepares force constants
     @Workflow.step

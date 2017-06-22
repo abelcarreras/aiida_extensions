@@ -30,6 +30,7 @@ def get_potential_labels(functional, symbol_list, ftype=None):
 
 
 rester = pymatgen.MPRester(os.environ['PMG_MAPI_KEY'])
+
 pmg_structure = rester.get_structure_by_material_id(structure_id)
 spa = pymatgen.symmetry.analyzer.SpacegroupAnalyzer(pmg_structure)
 
