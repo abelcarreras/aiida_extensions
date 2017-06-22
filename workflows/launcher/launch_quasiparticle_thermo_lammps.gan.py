@@ -61,8 +61,8 @@ lammps_machine = {
 
 parameters_md = {'timestep': 0.001,
                  'thermostat_variable': 0.5,
-                 'equilibrium_steps': 100,
-                 'total_steps': 2000,
+                 'equilibrium_steps': 50000,
+                 'total_steps': 200000,
                  'dump_rate': 1}
 
 
