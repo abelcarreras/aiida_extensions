@@ -101,9 +101,9 @@ print 'Crystal system: {}'.format(crystal_system)
 #                  [0, 0, 2]]
 
 supercell_size = get_supercell_size(structure)
-supercell = np.diag(supercell_size)
+supercell = np.diag(supercell_size).tolist()
 print ('Supercell shape: {}'.format(supercell_size))
-
+s
 
 # Criteria for INPUT
 band_gap = pmg_band.get_band_gap()['energy']
