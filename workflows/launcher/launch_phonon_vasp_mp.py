@@ -15,7 +15,7 @@ structure_id = 'mp-12668'
 
 def get_supercell_size(structure, max_atoms=100):
 
-    cell = np.array(structure.cell)
+    cell = np.array(structure.cell).T
     num_atoms = len(structure.sites)
 
     supercell_size = [1, 1, 1]

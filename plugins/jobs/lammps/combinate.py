@@ -343,7 +343,7 @@ class CombinateCalculation(JobCalculation):
         cmdline_params = ['/usr/bin/python', '/home/abel/BIN/dynaphopy', self._INPUT_FILE_NAME_DYNA,
                           self._OUTPUT_TRAJECTORY_FILE_NAME,
                           '-ts', '{}'.format(time_step), '--silent',
-                          '-sfc', self._OUTPUT_FORCE_CONSTANTS, '-thm',
+                          '-sfc', self._OUTPUT_FORCE_CONSTANTS, '-thm', '--resolution 0.01',
                           '-psm', '2', '--normalize_dos', '-sdata']  # PS algorithm
 
         if 'temperature' in parameters_data.get_dict():
