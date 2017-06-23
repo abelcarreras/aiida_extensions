@@ -45,6 +45,7 @@ def get_supercell_size(structure, max_atoms=100):
         else:
             supercell_size = supercell_size_test
 
+        print supercell_size
         cell = np.dot(cell, np.diag(supercell_size))
         print cell
 
