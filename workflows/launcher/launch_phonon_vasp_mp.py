@@ -191,7 +191,6 @@ wf_parameters = {
                        'kpoints': kpoints_dict}
 }
 
-exit()
 
 #Submit workflow
 from aiida.workflows.wf_phonon import WorkflowPhonon
