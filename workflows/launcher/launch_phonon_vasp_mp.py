@@ -28,7 +28,7 @@ def get_supercell_size(structure, max_atoms=100):
 
     while True:
 
-        norm = np.linalg.norm(cell, axis=0)
+        norm = np.linalg.norm(cell, axis=1)
         index = np.argmin(norm)
         supercell_size_test = list(supercell_size)
         supercell_size_test[index] += 1
