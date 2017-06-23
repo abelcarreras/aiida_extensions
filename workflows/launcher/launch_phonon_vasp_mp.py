@@ -28,7 +28,8 @@ def get_supercell_size(structure, max_atoms=100):
 
     while True:
 
-        norm = np.linalg.norm(cell, axis=1)
+        test_cell = np.dot(cell.T, np.diag(supercell_size)).T
+        norm = np.linalg.norm(test_cell, axis=1)
         index = np.argmin(norm)
         supercell_size_test = list(supercell_size)
         supercell_size_test[index] += 1
@@ -46,8 +47,7 @@ def get_supercell_size(structure, max_atoms=100):
             supercell_size = supercell_size_test
 
         print supercell_size
-        cell = np.dot(cell.T, np.diag(supercell_size)).T
-        print cell
+        print test_cell
 
 
 def get_potential_labels(functional, symbol_list, ftype=None):
