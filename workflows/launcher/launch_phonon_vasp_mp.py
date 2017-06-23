@@ -116,7 +116,7 @@ else:
 
 print 'system: {}'.format(system)
 
-exit()
+
 
 if system == 'insulator' or system == 'semiconductor':
     incar_dict = {
@@ -190,6 +190,8 @@ wf_parameters = {
                        'pseudo': pseudo_dict,
                        'kpoints': kpoints_dict}
 }
+
+exit()
 
 #Submit workflow
 from aiida.workflows.wf_phonon import WorkflowPhonon
