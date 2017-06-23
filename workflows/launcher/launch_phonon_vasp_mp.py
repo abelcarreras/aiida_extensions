@@ -13,6 +13,23 @@ import pymatgen
 structure_id = 'mp-12668'
 ##########################
 
+
+def round_up_to_odd(f):
+    return (np.ceil(f) - 0.5 ) // 2 * 2 + 1
+
+def round_up_to_even(f):
+    return np.ceil(f) // 2 * 2
+
+# Large k-meshes use odd number, else even
+def get_kpoint_mesh_shape(kpoint_per_atom):
+    size = np.power(kpoint_per_atom, 1./3)
+    if size > 8:
+        size = round_up_to_odd(size)
+    else:
+        size = round_up_to_even(size)
+
+    return [size, size, size]
+
 def get_supercell_size(structure, max_atoms=100):
 
     cell = np.array(structure.cell)
@@ -58,6 +75,8 @@ def get_potential_labels(functional, symbol_list, ftype=None):
 rester = pymatgen.MPRester(os.environ['PMG_MAPI_KEY'])
 
 pmg_structure = rester.get_structure_by_material_id(structure_id)
+pmg_band = rester.get_bandstructure_by_material_id(structure_id)
+
 spa = pymatgen.symmetry.analyzer.SpacegroupAnalyzer(pmg_structure)
 
 conventional = spa.get_conventional_standard_structure()
@@ -68,7 +87,10 @@ primitive_matrix = np.round(primitive_matrix, decimals=6).tolist()
 
 structure = StructureData(pymatgen=conventional).store()
 print structure
-# crystal_system = spa.get_crystal_system()
+
+crystal_system = spa.get_crystal_system()
+print 'Crystal system: {}'.format(crystal_system)
+
 # if crystal_system == 'hexagonal':
 #     supercell = [[3, 0, 0],
 #                  [0, 3, 0],
@@ -80,26 +102,68 @@ print structure
 
 supercell_size = get_supercell_size(structure)
 supercell = np.diag(supercell_size)
-
 print ('Supercell shape: {}'.format(supercell_size))
+
+
+# Criteria for INPUT
+band_gap = pmg_band.get_band_gap()['energy']
+if band_gap > 3.0:
+    system = 'insulator'
+elif band_gap > 0.01:
+    system = 'semiconductor'
+else:
+    system = 'metal'
+
+print 'system: {}'.format(system)
+
 exit()
 
-incar_dict = {
-    'NELMIN' : 5,
-    'NELM'   : 100,
-    'ENCUT'  : 400,
-    'ALGO'   : 38,
-    'ISMEAR' : 0,
-    'SIGMA'  : 0.01,
-    'GGA'    : 'PS'
-}
+if system == 'insulator' or system == 'semiconductor':
+    incar_dict = {
+        'NELMIN' : 5,
+        'NELM'   : 100,
+        'ALGO'   : 38,
+        'ISMEAR' : -5,
+        'GGA'    : 'PS'
+    }
+
+
+if system == 'metal':
+    incar_dict = {
+        'NELMIN' : 5,
+        'NELM'   : 100,
+        'ALGO'   : 38,
+        'ISMEAR' : 1,
+        'SIGMA'  : 0.2,
+        'GGA'    : 'PS'
+    }
+
 
 pseudo_dict = {'functional': 'PBE',
                'symbols': get_potential_labels('PBE', conventional.symbol_set)}
 
 # Monkhorst-pack
-kpoints_dict = {'points': [2, 2, 2],
-                'shift' : [0.0, 0.0, 0.0]}
+if system == 'insulator' or system == 'semiconductor':
+    # 100 Kpoints/atom
+    kpoints_per_atom = 100
+
+    # 1000 kpoints/atom
+if system == 'metal':
+    kpoints_per_atom = 1000
+
+
+if crystal_system == 'hexagonal':
+    kshift = [0.5, 0.5, 0.5]
+
+else:
+    kshift = [0.0, 0.0, 0.0]
+
+kpoints_shape = get_kpoint_mesh_shape(kpoints_per_atom)
+kpoints_dict = {'points': kpoints_shape,
+                'shift': kshift}
+
+print 'kpoints: {}'.format(kpoints_shape)
+print 'shift {}'.format(kshift)
 
 machine_dict = {
     'num_machines': 1,
