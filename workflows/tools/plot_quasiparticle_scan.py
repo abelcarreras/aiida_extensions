@@ -33,7 +33,8 @@ plt.figure(2)
 
 for i, w in enumerate(wf.get_steps()[1].get_sub_workflows()):
     frequencies = [w.get_result('quasiparticle_data').get_dict()['{}'.format(k)]['q_point_0']['4']['frequency'] for k in range(100,800,100)]
-    plt.plot(frequencies)
+    temperatures = w.get_result('quasiparticle_data').get_dict().keys()
+    plt.plot(temperatures, frequencies)
 
 plt.show()
 
