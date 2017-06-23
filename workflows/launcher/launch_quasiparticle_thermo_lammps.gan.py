@@ -103,6 +103,6 @@ wf_parameters = {
 from aiida.workflows.wf_quasiparticle_thermo import WorkflowQuasiparticle
 wf = WorkflowQuasiparticle(params=wf_parameters, optimize=False)
 
-wf.label = 'quasiparticle'
+wf.label = 'quasiparticle GaN'
 wf.start()
 print ('pk: {}'.format(wf.pk))
