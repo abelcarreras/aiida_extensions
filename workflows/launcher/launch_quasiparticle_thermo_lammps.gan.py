@@ -71,8 +71,8 @@ parameters_opt = {'relaxation': 'tri',  # iso/aniso/tri
                   'vmax': 0.000001,  # Angstrom^3
                   'energy_tolerance': 1.0e-25,  # eV
                   'force_tolerance': 1.0e-25,  # eV angstrom
-                  'max_evaluations': 1000000,
-                  'max_iterations': 500000}
+                  'max_evaluations': 2000000,
+                  'max_iterations': 1000000}
 
 dynaphopy_parameters ={'supercell': phonopy_parameters['supercell'],
                        'primitive': phonopy_parameters['primitive'],

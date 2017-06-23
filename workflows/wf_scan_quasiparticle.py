@@ -102,8 +102,6 @@ class WorkflowScanQuasiparticle(Workflow):
         if self.get_step('volume_expansions') is not None:
             wf_complete_list = list(self.get_step('volume_expansions').get_sub_workflows())
 
-
-
         volumes = []
         electronic_energies = []
         temperatures = []
