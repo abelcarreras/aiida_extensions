@@ -117,7 +117,6 @@ else:
 print 'system: {}'.format(system)
 
 
-
 if system == 'insulator' or system == 'semiconductor':
     incar_dict = {
         'NELMIN' : 5,
@@ -138,6 +137,8 @@ if system == 'metal':
         'GGA'    : 'PS'
     }
 
+
+print incar_dict
 
 pseudo_dict = {'functional': 'PBE',
                'symbols': get_potential_labels('PBE', conventional.symbol_set)}
