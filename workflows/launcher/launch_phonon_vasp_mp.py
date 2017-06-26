@@ -21,8 +21,11 @@ def round_up_to_even(f):
     return np.ceil(f) // 2 * 2
 
 # Large k-meshes use odd number, else even
-def get_kpoint_mesh_shape(kpoint_per_atom):
-    size = np.power(kpoint_per_atom, 1./3)
+def get_kpoint_mesh_shape(kpoint_per_atom, structure, supercell=(1,1,1)):
+    num_atoms = len(structure.sites)
+    supercell_size = np.product(supercell)
+
+    size = np.power(kpoint_per_atom * num_atoms / supercell_size, 1./3)
     if size > 8:
         size = round_up_to_odd(size)
     else:
@@ -58,8 +61,12 @@ def get_supercell_size(structure, max_atoms=100):
 
 
 def get_potential_labels(functional, symbol_list, ftype=None):
+
+    _, index = np.unique(symbol_list, return_index=True)
+    symbol_list_unique = np.array(symbol_list)[np.sort(index)]
+
     potential_labels =[]
-    for symbol in np.unique(symbol_list):
+    for symbol in symbol_list_unique:
         psp_dir = os.environ['VASP_PSP_DIR'] + '/POT_GGA_PAW_' + functional
         all_labels = [f[7:-3] for f in os.listdir(psp_dir)  if os.path.isfile(os.path.join(psp_dir, f))]
         candidates = [ s for s in all_labels if symbol == s.split('_')[0]]
@@ -159,11 +166,18 @@ if crystal_system == 'hexagonal':
 else:
     kshift = [0.0, 0.0, 0.0]
 
-kpoints_shape = get_kpoint_mesh_shape(kpoints_per_atom)
+kpoints_shape = get_kpoint_mesh_shape(kpoints_per_atom, structure)
 kpoints_dict = {'points': kpoints_shape,
                 'shift': kshift}
 
+
+kpoints_shape_supercell = get_kpoint_mesh_shape(kpoints_per_atom, structure, supercell=supercell_size)
+kpoints_dict_supercell = {'points': kpoints_shape_supercell,
+                          'shift': kshift}
+
 print 'kpoints: {}'.format(kpoints_shape)
+print 'kpoints (supercell): {}'.format(kpoints_shape_supercell)
+
 print 'shift {}'.format(kshift)
 
 machine_dict = {
@@ -184,7 +198,7 @@ wf_parameters = {
                     'parameters': incar_dict,
                     'resources': machine_dict,
                     'pseudo': pseudo_dict,
-                    'kpoints': kpoints_dict},
+                    'kpoints': kpoints_dict_supercell},
      'input_optimize': {'code': 'vasp541mpi@stern',
                        'parameters': incar_dict,
                        'resources': machine_dict,
@@ -192,6 +206,8 @@ wf_parameters = {
                        'kpoints': kpoints_dict}
 }
 
+
+exit()
 
 #Submit workflow
 from aiida.workflows.wf_phonon import WorkflowPhonon
