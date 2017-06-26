@@ -22,6 +22,11 @@ def round_up_to_even(f):
 
 # Large k-meshes use odd number, else even
 def get_kpoint_mesh_shape(kpoint_per_atom, structure, supercell=(1,1,1)):
+
+
+    print np.linalg.inv(structure.cell)
+    exit()
+
     num_atoms = len(structure.sites)
     supercell_size = np.product(supercell)
 
@@ -159,21 +164,21 @@ if system == 'insulator' or system == 'semiconductor':
 if system == 'metal':
     kpoints_per_atom = 1000
 
-
 if crystal_system == 'hexagonal':
-    kshift = [0.5, 0.5, 0.5]
-
+    style = 'Gamma'
 else:
-    kshift = [0.0, 0.0, 0.0]
+    style = 'Monkhorst'
 
 kpoints_shape = get_kpoint_mesh_shape(kpoints_per_atom, structure)
-kpoints_dict = {'points': kpoints_shape,
-                'shift': kshift}
+kpoints_dict = {'style': style,
+                'points': kpoints_shape,
+                'shift': [0.0, 0.0, 0.0]}
 
 
 kpoints_shape_supercell = get_kpoint_mesh_shape(kpoints_per_atom, structure, supercell=supercell_size)
-kpoints_dict_supercell = {'points': kpoints_shape_supercell,
-                          'shift': kshift}
+kpoints_dict_supercell = {'style': style,
+                          'points': kpoints_shape_supercell,
+                          'shift': [0.0, 0.0, 0.0]}
 
 print 'kpoints: {}'.format(kpoints_shape)
 print 'kpoints (supercell): {}'.format(kpoints_shape_supercell)
