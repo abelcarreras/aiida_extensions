@@ -75,7 +75,7 @@ class WorkflowScanQuasiparticle(Workflow):
         self.append_to_report('Volume expansion calculations')
         wf_parameters = self.get_parameters()
 
-        pressures = [150, 100, 50, 0, -50, -90]
+        # pressures = [150, 100, 50, 0, -50, -90]
         pressures = wf_parameters['scan_pressures']
         for p in pressures:
 

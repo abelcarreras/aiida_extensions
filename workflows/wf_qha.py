@@ -138,11 +138,22 @@ class WorkflowQHA(Workflow):
         else:
             self._expansion_method = 'pressure'  # By default expansion method is pressure
 
+        if 'manual' in kwargs:
+            self._manual = kwargs['manual']
+        else:
+            self._manual = False  # By default expansion method is pressure
+
+
+
     # Calculates the reference crystal structure (optimize it if requested)
     @Workflow.step
     def start(self):
         self.append_to_report('Starting workflow_workflow')
         self.append_to_report('Phonon calculation of base structure')
+
+        if self._manual:
+            self.next(self.pressure_manual_expansions)
+            return
 
         wf_parameters = self.get_parameters()
         # self.append_to_report('crystal: ' + wf_parameters['structure'].get_formula())
@@ -154,6 +165,7 @@ class WorkflowQHA(Workflow):
         self.attach_workflow(wf)
         wf.start()
 
+
         if self._expansion_method == 'pressure':
             self.next(self.pressure_expansions)
         elif self._expansion_method == 'volume':
@@ -162,8 +174,25 @@ class WorkflowQHA(Workflow):
             self.append_to_report('Error no method defined')
             self.next(self.exit)
 
+    @Workflow.step
+    def pressure_manual_expansions(self):
+        self.append_to_report('Manual pressure expansion calculations')
+        wf_parameters = self.get_parameters()
 
-    # Generate the volume expanded cells
+        test_pressures = wf_parameters['scan_pressures'] # in kbar
+
+        # wfs_test = [821, 820]
+        for i, pressure in enumerate(test_pressures):
+            self.append_to_report('pressure: {}'.format(pressure))
+
+            # Submit workflow
+            wf = WorkflowPhonon(params=wf_parameters, pressure=pressure, optimize=True)
+            wf.store()
+
+            self.attach_workflow(wf)
+            wf.start()
+        self.next(self.exit)
+
     @Workflow.step
     def pressure_expansions(self):
         self.append_to_report('Pressure expansion calculations')
