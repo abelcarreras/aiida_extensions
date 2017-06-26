@@ -76,6 +76,7 @@ class WorkflowScanQuasiparticle(Workflow):
         wf_parameters = self.get_parameters()
 
         pressures = [150, 100, 50, 0, -50, -90]
+        pressures = wf_parameters['scan_pressures']
         for p in pressures:
 
             # Submit workflow
