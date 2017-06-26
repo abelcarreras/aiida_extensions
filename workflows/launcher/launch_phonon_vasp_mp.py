@@ -15,10 +15,10 @@ structure_id = 'mp-12668'
 
 
 def round_up_to_odd(f):
-    return (np.ceil(f) - 0.5 ) // 2 * 2 + 1
+    return int((np.ceil(f) - 0.5 ) // 2 * 2 + 1)
 
 def round_up_to_even(f):
-    return np.ceil(f) // 2 * 2
+    return int(np.ceil(f) // 2 * 2)
 
 # Large k-meshes use odd number, else even
 def get_kpoint_mesh_shape(kpoint_per_atom, structure, supercell=(1,1,1)):
