@@ -24,7 +24,9 @@ def round_up_to_even(f):
 def get_kpoint_mesh_shape(kpoint_per_atom, structure, supercell=(1,1,1)):
 
 
-    print np.linalg.inv(structure.cell)
+    reciprocal =  np.linalg.inv(structure.cell)*2*np.pi
+    print reciprocal
+    print np.linalg.norm(reciprocal, axis=0)
     exit()
 
     num_atoms = len(structure.sites)
