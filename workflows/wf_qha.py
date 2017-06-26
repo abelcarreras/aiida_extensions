@@ -148,11 +148,11 @@ class WorkflowQHA(Workflow):
         # self.append_to_report('crystal: ' + wf_parameters['structure'].get_formula())
 
         wf = WorkflowGruneisen(params=wf_parameters, pre_optimize=True)
-        #wf.store()
+        wf.store()
 
-        wf = load_workflow(802)
+        #wf = load_workflow(802)
         self.attach_workflow(wf)
-        #wf.start()
+        wf.start()
 
         if self._expansion_method == 'pressure':
             self.next(self.pressure_expansions)
@@ -186,18 +186,18 @@ class WorkflowQHA(Workflow):
         self.add_attribute('interval', interval)
         self.add_attribute('clock', 1)
 
-        wfs_test = [821, 820]
+        # wfs_test = [821, 820]
         for i, pressure in enumerate(test_pressures):
             self.append_to_report('pressure: {}'.format(pressure))
 
             # Submit workflow
             wf = WorkflowPhonon(params=wf_parameters, pressure=pressure, optimize=True)
-            ##wf.store()
+            wf.store()
 
-            wf = load_workflow(wfs_test[i])
+            # wf = load_workflow(wfs_test[i])
 
             self.attach_workflow(wf)
-            ##wf.start()
+            wf.start()
         self.next(self.collect_data)
 
     @Workflow.step
@@ -366,7 +366,7 @@ class WorkflowQHA(Workflow):
             self.attach_workflow(wf)
             wf.start()
 
-        self.next(self.qha_calculation)
+        self.next(self.exit)
 
     @Workflow.step
     def qha_calculation(self):
