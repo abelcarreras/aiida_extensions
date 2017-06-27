@@ -143,6 +143,10 @@ class WorkflowQHA(Workflow):
         else:
             self._manual = False  # By default expansion method is pressure
 
+        if 'only_grune' in kwargs:
+            self.only_grune = kwargs['only_grune']
+        else:
+            self.only_grune = False  # By default expansion method is pressure
 
 
     # Calculates the reference crystal structure (optimize it if requested)
@@ -165,6 +169,9 @@ class WorkflowQHA(Workflow):
         self.attach_workflow(wf)
         wf.start()
 
+        if self._only_grune:
+            self.next(self.pressure_gruneisen)
+            return
 
         if self._expansion_method == 'pressure':
             self.next(self.pressure_expansions)
@@ -174,6 +181,7 @@ class WorkflowQHA(Workflow):
             self.append_to_report('Error no method defined')
             self.next(self.exit)
 
+    # Direct manual stresses expanasions
     @Workflow.step
     def pressure_manual_expansions(self):
         self.append_to_report('Manual pressure expansion calculations')
@@ -193,6 +201,32 @@ class WorkflowQHA(Workflow):
             wf.start()
         self.next(self.exit)
 
+    # Auto expansion just using Gruneisen prediction
+    @Workflow.step
+    def pressure_gruneisen(self):
+        self.append_to_report('Trust Gruneisen expansion (For empirical potentials)')
+        wf_parameters = self.get_parameters()
+
+        prediction = self.get_step(self.start).get_sub_workflows()[0].get_result('thermal_expansion_prediction')
+        stresses = prediction.get_array('stresses')
+
+        n_points = wf_parameters['n_points']
+        test_pressures = np.linspace(-1.0*np.max(stresses), np.max(stresses), n_points)  # in kbar
+
+        # wfs_test = [821, 820]
+        for i, pressure in enumerate(test_pressures):
+            self.append_to_report('pressure: {}'.format(pressure))
+
+            # Submit workflow
+            wf = WorkflowPhonon(params=wf_parameters, pressure=pressure, optimize=True)
+            wf.store()
+
+            self.attach_workflow(wf)
+            wf.start()
+        self.next(self.exit)
+
+
+    # Auto expansion by searching real DOS limits (hopping algorithm)
     @Workflow.step
     def pressure_expansions(self):
         self.append_to_report('Pressure expansion calculations')
