@@ -360,6 +360,11 @@ class WorkflowPhonon(Workflow):
         kpoints = parameters['kpoints']
         if 'kpoints_per_atom' in kpoints:
             kpoints = vaspio.Kpoints.automatic_density(structure.get_pymatgen_structure(), kpoints['kpoints_per_atom'])
+            num_kpoints = np.product(kpoints.kpts)
+            if num_kpoints < 4:
+                incar['ISMEAR'] = 0
+                incar['SIGMA'] = 0.05
+
         else:
             if not 'style' in kpoints:
                 kpoints['style'] = 'Monkhorst'
