@@ -23,7 +23,6 @@ def round_up_to_even(f):
 # Large k-meshes use odd number, else even
 def get_kpoint_mesh_shape(kpoint_per_atom, structure, supercell=(1,1,1)):
 
-
     reciprocal_cell =  np.linalg.inv(structure.cell)*2*np.pi
     reciprocal_norm = np.linalg.norm(reciprocal_cell, axis=0)
 
@@ -151,8 +150,6 @@ if system == 'metal':
     }
 
 
-print incar_dict
-
 pseudo_dict = {'functional': 'PBE',
                'symbols': get_potential_labels('PBE', conventional.symbol_set)}
 
@@ -170,21 +167,23 @@ if crystal_system == 'hexagonal':
 else:
     style = 'Monkhorst'
 
-kpoints_shape = get_kpoint_mesh_shape(kpoints_per_atom, structure)
-kpoints_dict = {'style': style,
-                'points': kpoints_shape,
-                'shift': [0.0, 0.0, 0.0]}
+kpoints_dict = {'style': 'Auto',
+                'kpoints_per_atom': kpoints_per_atom}
+
+# kpoints_shape = get_kpoint_mesh_shape(kpoints_per_atom, structure)
+# kpoints_dict = {'style': style,
+#                'points': kpoints_shape,
+#                'shift': [0.0, 0.0, 0.0]}
 
 
-kpoints_shape_supercell = get_kpoint_mesh_shape(kpoints_per_atom, structure, supercell=supercell_size)
-kpoints_dict_supercell = {'style': style,
-                          'points': kpoints_shape_supercell,
-                          'shift': [0.0, 0.0, 0.0]}
+# kpoints_shape_supercell = get_kpoint_mesh_shape(kpoints_per_atom, structure, supercell=supercell_size)
+# kpoints_dict_supercell = {'style': style,
+#                           'points': kpoints_shape_supercell,
+#                           'shift': [0.0, 0.0, 0.0]}
 
-print 'kpoints: {}'.format(kpoints_shape)
-print 'kpoints (supercell): {}'.format(kpoints_shape_supercell)
-
-print 'shift {}'.format(kshift)
+# print 'kpoints: {}'.format(kpoints)
+# print 'kpoints (supercell): {}'.format(kpoints_shape_supercell)
+# print 'shift {}'.format(kshift)
 
 machine_dict = {
     'num_machines': 1,
@@ -204,7 +203,7 @@ wf_parameters = {
                     'parameters': incar_dict,
                     'resources': machine_dict,
                     'pseudo': pseudo_dict,
-                    'kpoints': kpoints_dict_supercell},
+                    'kpoints': kpoints_dict},
      'input_optimize': {'code': 'vasp541mpi@stern',
                        'parameters': incar_dict,
                        'resources': machine_dict,

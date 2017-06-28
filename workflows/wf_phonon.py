@@ -358,12 +358,15 @@ class WorkflowPhonon(Workflow):
 
         # KPOINTS
         kpoints = parameters['kpoints']
-        if not 'style' in kpoints:
-            kpoints['style'] = 'Monkhorst'
-        # supported_modes = Enum(("Gamma", "Monkhorst", "Automatic", "Line_mode", "Cartesian", "Reciprocal"))
-        kpoints = vaspio.Kpoints(comment='aiida generated',
-                                 style=kpoints['style'],
-                                 kpts=(kpoints['points'],), kpts_shift=kpoints['shift'])
+        if 'kpoints_per_atom' in kpoints:
+            kpoints = vaspio.Kpoints.automatic_density(structure.get_pymatgen_structure(), kpoints['kpoints_per_atom'])
+        else:
+            if not 'style' in kpoints:
+                kpoints['style'] = 'Monkhorst'
+            # supported_modes = Enum(("Gamma", "Monkhorst", "Automatic", "Line_mode", "Cartesian", "Reciprocal"))
+            kpoints = vaspio.Kpoints(comment='aiida generated',
+                                     style=kpoints['style'],
+                                     kpts=(kpoints['points'],), kpts_shift=kpoints['shift'])
 
         calc.use_kpoints(ParameterData(dict=kpoints.as_dict()))
 

@@ -228,6 +228,8 @@ phonopy_qha.plot_heat_capacity_P_numerical()
 plt.show()
 
 phonopy_qha.write_gibbs_temperature()
+phonopy_qha.write_heat_capacity_P_numerical()
+
 
 qha_output = ArrayData()
 qha_output.set_array('temperature', np.array(qha_temperatures))
