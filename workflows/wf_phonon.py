@@ -353,9 +353,6 @@ class WorkflowPhonon(Workflow):
 
         incar.update({'PSTRESS': pressure})  # unit: kb
 
-        incar = vaspio.Incar(incar)
-        calc.use_incar(ParameterData(dict=incar.as_dict()))
-
         # KPOINTS
         kpoints = parameters['kpoints']
         if 'kpoints_per_atom' in kpoints:
@@ -374,6 +371,10 @@ class WorkflowPhonon(Workflow):
                                      kpts=(kpoints['points'],), kpts_shift=kpoints['shift'])
 
         calc.use_kpoints(ParameterData(dict=kpoints.as_dict()))
+
+        incar = vaspio.Incar(incar)
+        calc.use_incar(ParameterData(dict=incar.as_dict()))
+
 
         # POTCAR
         pseudo = parameters['pseudo']
