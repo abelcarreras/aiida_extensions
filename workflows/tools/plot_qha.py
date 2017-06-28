@@ -220,7 +220,7 @@ gibbs_temperature = phonopy_qha.get_gibbs_temperature()
 
 phonopy_qha.plot_qha()
 plt.show()
-phonopy_qha.plot_bulk_modulus()
+phonopy_qha.plot_gruneisen_temperature()
 plt.show()
 phonopy_qha.plot_gibbs_temperature()
 plt.show()
