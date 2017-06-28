@@ -217,10 +217,11 @@ gibbs_temperature = phonopy_qha.get_gibbs_temperature()
 
 #phonopy_qha.plot_bulk_modulus()
 #plt.show()
-plt.figure(1)
+
 phonopy_qha.plot_qha()
-plt.figure(2)
-phonopy_qha.plot_bulk_modulus()
+plt.show()
+plot = phonopy_qha.plot_bulk_modulus()
+print plot
 plt.show()
 
 
