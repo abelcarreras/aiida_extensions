@@ -371,7 +371,7 @@ class WorkflowPhonon(Workflow):
                                      kpts=(kpoints['points'],), kpts_shift=kpoints['shift'])
 
         calc.use_kpoints(ParameterData(dict=kpoints.as_dict()))
-
+        # update incar (just in case something changed with kpoints)
         incar = vaspio.Incar(incar)
         calc.use_incar(ParameterData(dict=incar.as_dict()))
 

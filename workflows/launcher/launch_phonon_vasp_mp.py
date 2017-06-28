@@ -167,7 +167,7 @@ if crystal_system == 'hexagonal':
 else:
     style = 'Monkhorst'
 
-kpoints_dict = {'style': 'Auto',
+kpoints_dict = {'style': 'Automatic',
                 'kpoints_per_atom': kpoints_per_atom}
 
 # kpoints_shape = get_kpoint_mesh_shape(kpoints_per_atom, structure)
