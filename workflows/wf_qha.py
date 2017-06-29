@@ -144,9 +144,9 @@ class WorkflowQHA(Workflow):
             self._manual = False  # By default expansion method is pressure
 
         if 'only_grune' in kwargs:
-            self.only_grune = kwargs['only_grune']
+            self._only_grune = kwargs['only_grune']
         else:
-            self.only_grune = False  # By default expansion method is pressure
+            self._only_grune = False  # By default expansion method is pressure
 
 
     # Calculates the reference crystal structure (optimize it if requested)

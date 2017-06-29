@@ -14,7 +14,7 @@ KpointsData = DataFactory('array.kpoints')
 import numpy as np
 
 #######################
-wf = load_workflow(1086)
+wf = load_workflow(1099)
 #######################
 
 thermal_properties = wf.get_result('thermal_properties')
