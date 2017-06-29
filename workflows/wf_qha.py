@@ -199,7 +199,7 @@ class WorkflowQHA(Workflow):
 
             self.attach_workflow(wf)
             wf.start()
-        self.next(self.exit)
+        self.next(self.qha_calculation_write_files)
 
     # Auto expansion just using Gruneisen prediction
     @Workflow.step
@@ -223,7 +223,7 @@ class WorkflowQHA(Workflow):
 
             self.attach_workflow(wf)
             wf.start()
-        self.next(self.exit)
+        self.next(self.qha_calculation_write_files)
 
 
     # Auto expansion by searching real DOS limits (hopping algorithm)
@@ -231,14 +231,14 @@ class WorkflowQHA(Workflow):
     def pressure_expansions(self):
         self.append_to_report('Pressure expansion calculations')
         wf_parameters = self.get_parameters()
-        structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
+        # structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
         prediction = self.get_step(self.start).get_sub_workflows()[0].get_result('thermal_expansion_prediction')
         stresses = prediction.get_array('stresses')
 
-        test_pressures = [np.min(stresses), np.max(stresses)]  # in kbar
+        test_pressures = [np.min([0.0, np.min(stresses)]), np.max([0.0, np.max(stresses)])]  # in kbar
 
         total_range = test_pressures[1] - test_pressures[0]
-        interval = total_range
+        interval = total_range/2.0
 
         self.add_attribute('npoints', 5)
 
@@ -429,7 +429,7 @@ class WorkflowQHA(Workflow):
             self.attach_workflow(wf)
             wf.start()
 
-        self.next(self.exit)
+        self.next(self.qha_calculation_write_files)
 
     @Workflow.step
     def qha_calculation(self):
@@ -468,7 +468,7 @@ class WorkflowQHA(Workflow):
 
 
     @Workflow.step
-    def qha_calculation2(self):
+    def qha_calculation_write_files(self):
 
         interval = self.get_attribute('interval')
 
@@ -529,26 +529,51 @@ class WorkflowQHA(Workflow):
                                  verbose=False)
 
         # Get data
+
         qha_temperatures = phonopy_qha._qha._temperatures[:phonopy_qha._qha._max_t_index]
         helmholtz_volume = phonopy_qha.get_helmholtz_volume()
         thermal_expansion = phonopy_qha.get_thermal_expansion()
-        volume_temperature = phonopy_qha.get_volume_temperature()
         heat_capacity_P_numerical = phonopy_qha.get_heat_capacity_P_numerical()
+        volume_temperature = phonopy_qha.get_volume_temperature()
         volume_expansion = phonopy_qha.get_volume_expansion()
         gibbs_temperature = phonopy_qha.get_gibbs_temperature()
+        bulk_modulus = phonopy_qha.get_bulk_modulus()
+
+        def get_file_from_numpy_array(array):
+            import StringIO
+            output = StringIO.StringIO()
+            for line in array.astype(str):
+                output.write('\t'.join(line)+'\n')
+            output.seek(0)
+            return output
+
+        data_folder = self.current_folder.get_subfolder('DATA_FILES')
+        data_folder.create()
+
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(bulk_modulus), 'bulk_modulus')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(gibbs_temperature), 'gibbs_temperature')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(volume_expansion), 'volume_expansion')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(volume_temperature), 'volume_temperature')
+
+        # Test to leave something on folder
+        #        phonopy_qha.plot_pdf_bulk_modulus_temperature()
+        #        import matplotlib
+        #       matplotlib.use('Agg')
+        repo_path = self._repo_folder.abspath
 
 
-        qha_output = ArrayData()
-        qha_output.set_array('temperature', np.array(qha_temperatures))
-        qha_output.set_array('helmholtz_volume', np.array(helmholtz_volume))
-        qha_output.set_array('thermal_expansion', np.array(thermal_expansion))
-        qha_output.set_array('volume_temperature', np.array(volume_temperature))
-        qha_output.set_array('heat_capacity_P_numerical', np.array(heat_capacity_P_numerical))
-        qha_output.set_array('volume_expansion', np.array(volume_expansion))
-        qha_output.set_array('gibbs_temperature', np.array(gibbs_temperature))
-        qha_output.store()
+        #data_folder = self.current_folder.get_subfolder('DATA_FILES')
+        #data_folder.create()
 
-        self.add_result('qha_output', qha_output)
+        #   phonopy_qha.plot_pdf_bulk_modulus_temperature(filename=repo_path + '/bulk_modulus-temperature.pdf')
+        #phonopy_qha.write_bulk_modulus_temperature(filename='bm')
+        #file = open('bm')
+        #data_folder.create_file_from_filelike(file, 'bulk_modulus-temperature')
+
+        #        qha_results = calculate_qha_inline(**inline_params)[1]
+
+        self.append_to_report('QHA properties calculated and retrieved')
+        #self.add_result('qha', qha_output)
 
         self.next(self.exit)
 
