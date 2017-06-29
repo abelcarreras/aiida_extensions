@@ -529,51 +529,40 @@ class WorkflowQHA(Workflow):
                                  verbose=False)
 
         # Get data
-
         qha_temperatures = phonopy_qha._qha._temperatures[:phonopy_qha._qha._max_t_index]
         helmholtz_volume = phonopy_qha.get_helmholtz_volume()
         thermal_expansion = phonopy_qha.get_thermal_expansion()
-        heat_capacity_P_numerical = phonopy_qha.get_heat_capacity_P_numerical()
         volume_temperature = phonopy_qha.get_volume_temperature()
+        heat_capacity_P_numerical = phonopy_qha.get_heat_capacity_P_numerical()
         volume_expansion = phonopy_qha.get_volume_expansion()
         gibbs_temperature = phonopy_qha.get_gibbs_temperature()
         bulk_modulus = phonopy_qha.get_bulk_modulus()
 
-        def get_file_from_numpy_array(array):
+        def get_file_from_numpy_array(data):
             import StringIO
             output = StringIO.StringIO()
-            for line in array.astype(str):
-                output.write('\t'.join(line)+'\n')
+            for line in np.array(data).astype(str):
+                output.write('       '.join(line) + '\n')
             output.seek(0)
             return output
 
         data_folder = self.current_folder.get_subfolder('DATA_FILES')
         data_folder.create()
 
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(bulk_modulus), 'bulk_modulus')
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(gibbs_temperature), 'gibbs_temperature')
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(volume_expansion), 'volume_expansion')
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(volume_temperature), 'volume_temperature')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, gibbs_temperature)),
+                                              'gibbs_temperature')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, volume_expansion)),
+                                              'volume_expansion')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, volume_temperature)),
+                                              'volume_temperature')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, thermal_expansion)),
+                                              'thermal_expansion')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, heat_capacity_P_numerical)),
+                                              'heat_capacity_P_numerical')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, bulk_modulus)),
+                                              'bulk_modulus')
 
-        # Test to leave something on folder
-        #        phonopy_qha.plot_pdf_bulk_modulus_temperature()
-        #        import matplotlib
-        #       matplotlib.use('Agg')
-        repo_path = self._repo_folder.abspath
-
-
-        #data_folder = self.current_folder.get_subfolder('DATA_FILES')
-        #data_folder.create()
-
-        #   phonopy_qha.plot_pdf_bulk_modulus_temperature(filename=repo_path + '/bulk_modulus-temperature.pdf')
-        #phonopy_qha.write_bulk_modulus_temperature(filename='bm')
-        #file = open('bm')
-        #data_folder.create_file_from_filelike(file, 'bulk_modulus-temperature')
-
-        #        qha_results = calculate_qha_inline(**inline_params)[1]
-
-        self.append_to_report('QHA properties calculated and retrieved')
-        #self.add_result('qha', qha_output)
+        self.append_to_report('QHA properties calculated and written in files')
 
         self.next(self.exit)
 
