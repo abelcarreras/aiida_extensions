@@ -528,7 +528,6 @@ class WorkflowQHA(Workflow):
                                  #                         t_max=options.t_max,
                                  verbose=False)
 
-
         # Get data
         qha_temperatures = phonopy_qha._qha._temperatures[:phonopy_qha._qha._max_t_index]
         helmholtz_volume = phonopy_qha.get_helmholtz_volume()
