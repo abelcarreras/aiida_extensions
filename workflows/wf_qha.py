@@ -187,7 +187,7 @@ class WorkflowQHA(Workflow):
         self.append_to_report('Manual pressure expansion calculations')
         wf_parameters = self.get_parameters()
 
-        test_pressures = wf_parameters['scan_pressures'] # in kbar
+        test_pressures = wf_parameters['scan_pressures']  # in kbar
 
         # wfs_test = [821, 820]
         for i, pressure in enumerate(test_pressures):
@@ -211,7 +211,7 @@ class WorkflowQHA(Workflow):
         stresses = prediction.get_array('stresses')
 
         n_points = wf_parameters['n_points']
-        test_pressures = np.linspace(-1.0*np.max(stresses), np.max(stresses), n_points)  # in kbar
+        test_pressures = np.linspace(-1.0 * np.max(stresses), np.max(stresses), n_points)  # in kbar
 
         # wfs_test = [821, 820]
         for i, pressure in enumerate(test_pressures):
@@ -238,7 +238,7 @@ class WorkflowQHA(Workflow):
         test_pressures = [np.min([0.0, np.min(stresses)]), np.max([0.0, np.max(stresses)])]  # in kbar
 
         total_range = test_pressures[1] - test_pressures[0]
-        interval = total_range/2.0
+        interval = total_range
 
         self.add_attribute('npoints', 5)
 
@@ -414,8 +414,11 @@ class WorkflowQHA(Workflow):
         for wf_test in self.get_step('pressure_expansions').get_sub_workflows():
             for pressure in test_pressures:
 
-                if wf_test.get_attribute('pressure') == pressure:
+                self.append_to_report('compare: {} {}'.format(wf_test.get_attribute('pressure'), pressure))
+                if np.isclose(wf_test.get_attribute('pressure'), pressure):
                     test_pressures.remove(pressure)
+                    self.append_to_report('IS close! -> remove')
+
 
         for pressure in test_pressures:
             self.append_to_report('pressure: {}'.format(pressure))

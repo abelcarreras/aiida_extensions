@@ -89,6 +89,8 @@ rester = pymatgen.MPRester(os.environ['PMG_MAPI_KEY'])
 pmg_structure = rester.get_structure_by_material_id(structure_id)
 pmg_band = rester.get_bandstructure_by_material_id(structure_id)
 
+material_name = pmg_structure.formula.replace('1','').replace(' ','')
+
 spa = pymatgen.symmetry.analyzer.SpacegroupAnalyzer(pmg_structure)
 
 conventional = spa.get_conventional_standard_structure()
@@ -211,13 +213,13 @@ wf_parameters = {
                        'kpoints': kpoints_dict}
 }
 
-
-
 #Submit workflow
 from aiida.workflows.wf_phonon import WorkflowPhonon
 wf = WorkflowPhonon(params=wf_parameters, optimize=True)
 
-wf.label = 'VASP {}'.format(structure.get_formula())
+wf.label = material_name
+wf.description = 'QHA {}'.format(structure.get_formula())
+
 wf.start()
 print ('pk: {}'.format(wf.pk))
 
