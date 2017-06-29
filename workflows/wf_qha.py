@@ -515,8 +515,6 @@ class WorkflowQHA(Workflow):
         cv = np.array(cv).T[:, sort_index]
 
 
-
-
         # Calculate QHA
         phonopy_qha = PhonopyQHA(np.array(volumes),
                                  np.array(electronic_energies),
