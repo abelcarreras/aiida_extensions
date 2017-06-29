@@ -538,6 +538,7 @@ class WorkflowQHA(Workflow):
         gibbs_temperature = phonopy_qha.get_gibbs_temperature()
         bulk_modulus = phonopy_qha.get_bulk_modulus()
 
+
         def get_file_from_numpy_array(data):
             import StringIO
             output = StringIO.StringIO()
