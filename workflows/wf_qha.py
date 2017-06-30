@@ -537,7 +537,6 @@ class WorkflowQHA(Workflow):
         heat_capacity_P_numerical = phonopy_qha.get_heat_capacity_P_numerical()
         volume_expansion = phonopy_qha.get_volume_expansion()
         gibbs_temperature = phonopy_qha.get_gibbs_temperature()
-        bulk_modulus = phonopy_qha.get_bulk_modulus()
 
 
         def get_file_from_numpy_array(data):
@@ -561,8 +560,6 @@ class WorkflowQHA(Workflow):
                                               'thermal_expansion')
         data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, heat_capacity_P_numerical)),
                                               'heat_capacity_P_numerical')
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, bulk_modulus)),
-                                              'bulk_modulus')
 
         self.append_to_report('QHA properties calculated and written in files')
 
