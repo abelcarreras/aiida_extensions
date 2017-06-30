@@ -1,0 +1,3 @@
+.. _aiida: http://www.aiida.net/
+.. _pymatgen: http://pymatgen.org/
+.. _vasp: http://www.vasp.at/

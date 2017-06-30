@@ -1,0 +1,9 @@
+AiiDA VASP Plugin Introduction
+==============================
+
+The AiiDA VASP Plugin aims to provide a full support for running `VASP`_ calculations using the `AiiDA` package.
+We rely heavily on the VASP support already provided by the `matproj`_ through the `pymatgen`_ package.
+
+.. _pymatgen: http://pymatgen.org/
+.. _matproj: 'Materials Project' http://www.materialsproject.org/
+.. _vasp: http://www.vasp.at/

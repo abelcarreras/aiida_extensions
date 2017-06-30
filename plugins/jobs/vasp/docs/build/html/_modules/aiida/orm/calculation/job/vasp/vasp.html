@@ -1,0 +1,672 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>aiida.orm.calculation.job.vasp.vasp &mdash; AiiDA VASP Plugin 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/bizstyle.js"></script>
+    <link rel="top" title="AiiDA VASP Plugin 0.1 documentation" href="../../../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../../../index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">AiiDA VASP Plugin 0.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for aiida.orm.calculation.job.vasp.vasp</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">copyfile</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="c1">#</span>
+<span class="c1">#from aiida import get_file_header</span>
+<span class="kn">from</span> <span class="nn">aiida.common.utils</span> <span class="kn">import</span> <span class="n">classproperty</span>
+<span class="kn">from</span> <span class="nn">aiida.common.datastructures</span> <span class="kn">import</span> <span class="n">CalcInfo</span><span class="p">,</span> <span class="n">CodeInfo</span>
+<span class="kn">from</span> <span class="nn">aiida.common.exceptions</span> <span class="kn">import</span> <span class="n">InputValidationError</span>
+<span class="c1">#</span>
+<span class="kn">from</span> <span class="nn">aiida.orm.calculation.job</span> <span class="kn">import</span> <span class="n">JobCalculation</span>
+<span class="kn">from</span> <span class="nn">aiida.orm.data.structure</span> <span class="kn">import</span> <span class="n">StructureData</span>
+<span class="kn">from</span> <span class="nn">aiida.orm.data.parameter</span> <span class="kn">import</span> <span class="n">ParameterData</span>
+<span class="kn">from</span> <span class="nn">aiida.orm.data.singlefile</span> <span class="kn">import</span> <span class="n">SinglefileData</span>
+<span class="kn">from</span> <span class="nn">aiida.orm.data.array.kpoints</span> <span class="kn">import</span> <span class="n">ArrayData</span>
+<span class="c1">#</span>
+<span class="kn">from</span> <span class="nn">pymatgen.io</span> <span class="kn">import</span> <span class="n">vasp</span> <span class="k">as</span> <span class="n">vaspio</span>
+
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s1">u&#39;Copyright © 2016, Mario Zic. All Rights Reserved.&#39;</span>
+<span class="n">__contact__</span> <span class="o">=</span> <span class="s1">u&#39;mario.zic.st_at_gmail.com&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">errmsg</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns an error message string which can then be easily formated.</span>
+
+<span class="sd">    :key: dictionary key correspnding to the error message we want returned</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;not_specified&#39;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">&quot;No {} parameters specified for this calculation;&quot;</span>
+        <span class="p">),</span>
+        <span class="s1">&#39;wrong_class&#39;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">&quot;{} object is not of type {};&quot;</span>
+        <span class="p">),</span>
+        <span class="s1">&#39;aiida2vasp&#39;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">&quot;Failed to instantiate a pymatgen {} object &quot;</span>
+            <span class="s2">&quot;from the aiida representation; &quot;</span>
+            <span class="s2">&quot;Error message: {}&quot;</span>
+        <span class="p">),</span>
+        <span class="s1">&#39;unexpected&#39;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">&quot;Unespected crash while {}; &quot;</span>
+            <span class="s2">&quot;Error message: {}&quot;</span>
+        <span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+            <span class="s1">&#39;Requested error message key ({}) does not exist.&#39;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">ParserInstructionFactory</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a suitable VASP parser utility function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">aiida.common.pluginloader</span> <span class="kn">import</span> <span class="n">BaseFactory</span>
+    <span class="kn">from</span> <span class="nn">aiida.parsers.plugins.vasp.instruction</span> <span class="kn">import</span> <span class="n">BaseInstruction</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">BaseFactory</span><span class="p">(</span>
+            <span class="n">module</span><span class="p">,</span>
+            <span class="n">BaseInstruction</span><span class="p">,</span>
+            <span class="s1">&#39;aiida.parsers.plugins.vasp.instruction&#39;</span><span class="p">,</span>
+            <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;Instruction&#39;</span>
+        <span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+
+
+<span class="c1"># simple utility functions, should facilitate (de)serialization</span>
+<span class="c1"># of POSCAR</span>
+<span class="k">def</span> <span class="nf">assemble_poscar</span><span class="p">(</span>
+        <span class="n">poscar</span><span class="p">,</span>  <span class="c1"># dict</span>
+        <span class="n">structure</span><span class="p">,</span>
+        <span class="n">structure_extras</span><span class="o">=</span><span class="bp">None</span>
+        <span class="p">):</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">poscar</span> <span class="o">=</span> <span class="n">poscar</span><span class="o">.</span><span class="n">get_dict</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">structure</span> <span class="o">=</span> <span class="n">structure</span><span class="o">.</span><span class="n">get_pymatgen_structure</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;aiida2vasp&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;structure&#39;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">structure_extras</span><span class="p">:</span>
+            <span class="c1"># predictor_corrector</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">predictor_corrector</span> <span class="o">=</span> <span class="n">structure_extras</span><span class="o">.</span><span class="n">get_array</span><span class="p">(</span>
+                    <span class="s1">&#39;predictor_corrector&#39;</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">predictor_corrector</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="c1"># velocities</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">velocities</span> <span class="o">=</span> <span class="n">structure_extras</span><span class="o">.</span><span class="n">get_array</span><span class="p">(</span>
+                    <span class="s1">&#39;velocities&#39;</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">velocities</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="c1"># selective_dynamics</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">selective_dynamics</span> <span class="o">=</span> <span class="n">structure_extras</span><span class="o">.</span><span class="n">get_array</span><span class="p">(</span>
+                    <span class="s1">&#39;selective_dynamics&#39;</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">selective_dynamics</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">predictor_corrector</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">velocities</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">selective_dynamics</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="n">poscar</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">u&#39;structure&#39;</span><span class="p">,</span> <span class="n">structure</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span>
+        <span class="n">poscar</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">u&#39;predictor_corrector&#39;</span><span class="p">,</span> <span class="n">predictor_corrector</span><span class="p">)</span>
+        <span class="n">poscar</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">u&#39;selective_dynamics&#39;</span><span class="p">,</span> <span class="n">selective_dynamics</span><span class="p">)</span>
+        <span class="n">poscar</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">u&#39;velocities&#39;</span><span class="p">,</span> <span class="n">velocities</span><span class="p">)</span>
+
+        <span class="n">poscar</span> <span class="o">=</span> <span class="n">vaspio</span><span class="o">.</span><span class="n">Poscar</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">poscar</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Failed to assemble POSCAR with error message: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">poscar</span>
+
+
+<span class="k">def</span> <span class="nf">disassemble_poscar</span><span class="p">(</span><span class="n">poscar</span><span class="p">):</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="n">poscar</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+    <span class="c1"># isolate bits that require special data types</span>
+    <span class="n">poscar_param</span> <span class="o">=</span> <span class="p">{</span><span class="n">e</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">d</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">e</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="s1">&#39;predictor_corrector&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;selective_dynamics&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;velocities&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;structure&#39;</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">poscar_param</span> <span class="o">=</span> <span class="n">ParameterData</span><span class="p">(</span><span class="nb">dict</span><span class="o">=</span><span class="n">poscar_param</span><span class="p">)</span>
+        <span class="n">poscar_struct</span> <span class="o">=</span> <span class="n">StructureData</span><span class="p">(</span><span class="n">pymatgen_structure</span><span class="o">=</span><span class="n">poscar</span><span class="o">.</span><span class="n">structure</span><span class="p">)</span>
+        <span class="n">structure_extras</span> <span class="o">=</span> <span class="n">ArrayData</span><span class="p">()</span>
+
+        <span class="c1"># optional parameters</span>
+        <span class="k">if</span> <span class="n">poscar</span><span class="o">.</span><span class="n">predictor_corrector</span><span class="p">:</span>
+            <span class="n">structure_extras</span><span class="o">.</span><span class="n">set_array</span><span class="p">(</span>
+                <span class="s1">&#39;predictor_corrector&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">poscar</span><span class="o">.</span><span class="n">predictor_corrector</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">poscar</span><span class="o">.</span><span class="n">selective_dynamics</span><span class="p">:</span>
+            <span class="n">structure_extras</span><span class="o">.</span><span class="n">set_array</span><span class="p">(</span>
+                <span class="s1">&#39;selective_dynamics&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">poscar</span><span class="o">.</span><span class="n">selective_dynamics</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">poscar</span><span class="o">.</span><span class="n">velocities</span><span class="p">:</span>
+            <span class="n">structure_extras</span><span class="o">.</span><span class="n">set_array</span><span class="p">(</span>
+                <span class="s1">&#39;velocities&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">poscar</span><span class="o">.</span><span class="n">velocities</span><span class="p">))</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;Failed to disassemble the POSCAR object &quot;</span>
+            <span class="s2">&quot;with error message: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;poscar&#39;</span><span class="p">:</span> <span class="n">poscar_param</span><span class="p">,</span>
+        <span class="s1">&#39;structure&#39;</span><span class="p">:</span> <span class="n">poscar_struct</span><span class="p">,</span>
+        <span class="s1">&#39;structure_extras&#39;</span><span class="p">:</span> <span class="n">structure_extras</span>
+    <span class="p">}</span>
+
+
+<div class="viewcode-block" id="VaspCalculation"><a class="viewcode-back" href="../../../../../../devel/input_plugin/in_start.html#aiida.orm.calculation.job.vasp.vasp.VaspCalculation">[docs]</a><span class="k">class</span> <span class="nc">VaspCalculation</span><span class="p">(</span><span class="n">JobCalculation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plugin for performing VASP calculations.</span>
+
+<span class="sd">    Requirements: pymatgen, ase</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_init_internal_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">VaspCalculation</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_init_internal_params</span><span class="p">()</span>
+
+        <span class="c1"># input files -- currently supported</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_incar</span> <span class="o">=</span> <span class="s1">&#39;INCAR&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_poscar</span> <span class="o">=</span> <span class="s1">&#39;POSCAR&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_potcar</span> <span class="o">=</span> <span class="s1">&#39;POTCAR&#39;</span>  <span class="c1"># partial -- pot_map not tested</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_potcar</span> <span class="o">=</span> <span class="s1">&#39;KPOINTS&#39;</span>  <span class="c1"># partial -- only autom. generation</span>
+
+        <span class="c1"># output files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_structure</span> <span class="o">=</span> <span class="s2">&quot;CONTCAR&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_default_output</span> <span class="o">=</span> <span class="s1">&#39;vasprun.xml&#39;</span>
+
+        <span class="c1"># parser -- only one parser needed --</span>
+        <span class="c1"># customization of the parsing proccess</span>
+        <span class="c1"># should be done using the output parser instructions,</span>
+        <span class="c1"># specified via the settings node</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_default_parser</span> <span class="o">=</span> <span class="s1">&#39;vasp&#39;</span>
+
+    <span class="nd">@classproperty</span>
+    <span class="k">def</span> <span class="nf">_use_methods</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Additional use_* methods for the namelists class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">retdict</span> <span class="o">=</span> <span class="n">JobCalculation</span><span class="o">.</span><span class="n">_use_methods</span>
+        <span class="n">retdict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+            <span class="s2">&quot;incar&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;valid_types&#39;</span><span class="p">:</span> <span class="n">ParameterData</span><span class="p">,</span>
+                <span class="s1">&#39;additional_parameter&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;linkname&#39;</span><span class="p">:</span> <span class="s1">&#39;incar&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;docstring&#39;</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="s2">&quot;Use a node that specifies the pymatgen incar &quot;</span>
+                    <span class="s2">&quot;file&quot;</span>
+                <span class="p">),</span>
+            <span class="p">},</span>
+            <span class="c1"># TODO: implement custom POSCAR data type</span>
+            <span class="s2">&quot;poscar&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;valid_types&#39;</span><span class="p">:</span> <span class="n">ParameterData</span><span class="p">,</span>
+                <span class="s1">&#39;additional_parameter&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;linkname&#39;</span><span class="p">:</span> <span class="s1">&#39;poscar&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;docstring&#39;</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="s2">&quot;Use a node that specifies the pymatgen poscar &quot;</span>
+                    <span class="s2">&quot;file&quot;</span>
+                <span class="p">),</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;structure&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;valid_types&#39;</span><span class="p">:</span> <span class="n">StructureData</span><span class="p">,</span>
+                <span class="s1">&#39;additional_parameter&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;linkname&#39;</span><span class="p">:</span> <span class="s1">&#39;structure&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;docstring&#39;</span><span class="p">:</span> <span class="s2">&quot;Use a node for the structure.&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;potcar&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;valid_types&#39;</span><span class="p">:</span> <span class="n">ParameterData</span><span class="p">,</span>
+                <span class="s1">&#39;additional_parameter&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;linkname&#39;</span><span class="p">:</span> <span class="s1">&#39;potcar&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;docstring&#39;</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="s2">&quot;Use a node that specifies the pymatgen potcar &quot;</span>
+                    <span class="s2">&quot;file&quot;</span>
+                <span class="p">),</span>
+            <span class="p">},</span>
+            <span class="c1"># NOTE: see what happens in pymatgen when we specify kpoints</span>
+            <span class="c1"># by hand ?!!</span>
+            <span class="c1"># Do we need to forsee an additonal raw_kpoints object ?</span>
+            <span class="s2">&quot;kpoints&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;valid_types&#39;</span><span class="p">:</span> <span class="n">ParameterData</span><span class="p">,</span>
+                <span class="s1">&#39;additional_parameter&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;linkname&#39;</span><span class="p">:</span> <span class="s1">&#39;kpoints&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;docstring&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Use a node that specifies the kpoints&quot;</span><span class="p">),</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;settings&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;valid_types&#39;</span><span class="p">:</span> <span class="n">ParameterData</span><span class="p">,</span>
+                <span class="s1">&#39;additional_parameter&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;linkname&#39;</span><span class="p">:</span> <span class="s1">&#39;settings&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;docstring&#39;</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="s2">&quot;Use a node that specifies the extra information &quot;</span>
+                    <span class="s2">&quot;to be used by the calculation&quot;</span>
+                <span class="p">),</span>
+            <span class="p">},</span>
+            <span class="c1"># optional data</span>
+            <span class="s2">&quot;structure_extras&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;valid_types&#39;</span><span class="p">:</span> <span class="n">ArrayData</span><span class="p">,</span>
+                <span class="s1">&#39;additional_parameter&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;linkname&#39;</span><span class="p">:</span> <span class="s1">&#39;structure_extras&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;docstring&#39;</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="s2">&quot;Node for additional arrays that can be found in &quot;</span>
+                    <span class="s2">&quot;the CONTCAR file.&quot;</span><span class="p">)</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;chgcar&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;valid_types&#39;</span><span class="p">:</span> <span class="n">SinglefileData</span><span class="p">,</span>
+                <span class="s1">&#39;additional_parameter&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;linkname&#39;</span><span class="p">:</span> <span class="s1">&#39;chgcar&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;docstring&#39;</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="s2">&quot;Node for CHGCAR file.&quot;</span><span class="p">)</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;wavecar&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;valid_types&#39;</span><span class="p">:</span> <span class="n">SinglefileData</span><span class="p">,</span>
+                <span class="s1">&#39;additional_parameter&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;linkname&#39;</span><span class="p">:</span> <span class="s1">&#39;wavecar&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;docstring&#39;</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="s2">&quot;Node for WAVECAR file.&quot;</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="p">})</span>
+        <span class="k">return</span> <span class="n">retdict</span>
+
+    <span class="k">def</span> <span class="nf">_prepare_for_submission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tempfolder</span><span class="p">,</span> <span class="n">inputdict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is the routine to be called when you want to create</span>
+<span class="sd">        the input files and related stuff with a plugin.</span>
+
+<span class="sd">        :param tempfolder: a aiida.common.folders.Folder subclass where</span>
+<span class="sd">                           the plugin should put all its files.</span>
+<span class="sd">        :param inputdict: a dictionary with the input nodes, as they would</span>
+<span class="sd">                be returned by get_inputdata_dict (without the Code!)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1">## TODO:</span>
+        <span class="c1"># - still need to see what happens with the kpoints object if</span>
+        <span class="c1">#   specified by hand</span>
+
+        <span class="c1"># === code ===</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">code</span> <span class="o">=</span> <span class="n">inputdict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_linkname</span><span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span><span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;not_specified&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;CODE&#39;</span><span class="p">))</span>
+
+        <span class="c1"># === mandatory input files ===</span>
+        <span class="c1"># INCAR</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">incar</span> <span class="o">=</span> <span class="n">inputdict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_linkname</span><span class="p">(</span><span class="s1">&#39;incar&#39;</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;not_specified&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;INCAR&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">incar</span><span class="p">,</span> <span class="n">ParameterData</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;wrong_class&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;INCAR&#39;</span><span class="p">,</span> <span class="s1">&#39;ParameterData&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">incar</span> <span class="o">=</span> <span class="n">vaspio</span><span class="o">.</span><span class="n">Incar</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">incar</span><span class="o">.</span><span class="n">get_dict</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;aiida2vasp&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;INCAR&#39;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># KPOINTS -- for now just supports automatically genrated mesh</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">kpoints</span> <span class="o">=</span> <span class="n">inputdict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_linkname</span><span class="p">(</span><span class="s1">&#39;kpoints&#39;</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;not_specified&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;KPOINTS&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kpoints</span><span class="p">,</span> <span class="n">ParameterData</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;wrong_class&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;KPOINTS&#39;</span><span class="p">,</span> <span class="s1">&#39;ParameterData&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">kpoints</span> <span class="o">=</span> <span class="n">vaspio</span><span class="o">.</span><span class="n">Kpoints</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">kpoints</span><span class="o">.</span><span class="n">get_dict</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;aiida2vasp&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;KPOINTS&#39;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># POTCAR -- pot_map not tested</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">potcar</span> <span class="o">=</span> <span class="n">inputdict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_linkname</span><span class="p">(</span><span class="s1">&#39;potcar&#39;</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;not_specified&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;POTCAR&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">potcar</span><span class="p">,</span> <span class="n">ParameterData</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;wrong_class&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;POTCAR&#39;</span><span class="p">,</span> <span class="s1">&#39;ParameterData&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">potcar</span> <span class="o">=</span> <span class="n">vaspio</span><span class="o">.</span><span class="n">Potcar</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">potcar</span><span class="o">.</span><span class="n">get_dict</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;aiida2vasp&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;POTCAR&#39;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># SETTINGS</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">settings</span> <span class="o">=</span> <span class="n">inputdict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_linkname</span><span class="p">(</span><span class="s1">&#39;settings&#39;</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;not_specified&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;settings&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">ParameterData</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;wrong_class&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;settings&#39;</span><span class="p">,</span> <span class="s1">&#39;ParameterData&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="c1"># SETTINGS - PARSER INSTRUCTIONS</span>
+        <span class="n">instr_deps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># instructon dependencies</span>
+        <span class="n">instruct</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">get_dict</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">u&#39;PARSER_INSTRUCTIONS&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">instruct</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">instruct</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                        <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;wrong_class&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="s1">u&#39;PARSER_INSTRUCTIONS&#39;</span><span class="p">,</span> <span class="s1">&#39;Dict&#39;</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="c1"># instruction name</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="s1">&#39;instr&#39;</span> <span class="ow">in</span> <span class="n">i</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                        <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;not_specified&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="s2">&quot;instruction name (&#39;instr&#39;)&quot;</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="c1"># instruction type</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">i</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                        <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;not_specified&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="s2">&quot;instruction type (&#39;type&#39;)&quot;</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="n">i</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;structure&#39;</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                        <span class="s1">&#39;Bad instruction type ({}) found!&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">i</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
+                    <span class="p">)</span>
+                <span class="c1"># parameters</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="s1">&#39;params&#39;</span> <span class="ow">in</span> <span class="n">i</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                        <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;not_specified&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="s2">&quot;instruction parameters (&#39;params&#39;)&quot;</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                        <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;wrong_class&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="s2">&quot;Instruction parameters (&#39;params&#39;)&quot;</span><span class="p">,</span> <span class="s1">&#39;Dict&#39;</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="c1"># get the input files list (static instruction dependencies)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">itype</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
+                    <span class="n">iname</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="s1">&#39;instr&#39;</span><span class="p">]</span>
+                    <span class="n">ifull_name</span> <span class="o">=</span> <span class="s2">&quot;{}.{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">itype</span><span class="p">,</span> <span class="n">iname</span><span class="p">)</span>
+                    <span class="n">instr</span> <span class="o">=</span> <span class="n">ParserInstructionFactory</span><span class="p">(</span><span class="n">ifull_name</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">instr</span><span class="o">.</span><span class="n">_dynamic_file_list_</span><span class="p">:</span>  <span class="c1"># is static</span>
+                        <span class="k">for</span> <span class="nb">file</span> <span class="ow">in</span> <span class="n">instr</span><span class="o">.</span><span class="n">_input_file_list_</span><span class="p">:</span>
+                            <span class="n">instr_deps</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">((</span>
+                        <span class="s2">&quot;Failed to get instruction dependencies for {}.&quot;</span>
+                        <span class="s2">&quot;Error: {}.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="s1">&#39;instr&#39;</span><span class="p">],</span> <span class="n">e</span><span class="p">)</span>
+                    <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># output parser default behaviour will be applied</span>
+            <span class="k">pass</span>
+
+        <span class="c1"># POSCAR &amp; STRUCTURE -- needs more elegant implementation</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">poscar</span> <span class="o">=</span> <span class="n">inputdict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_linkname</span><span class="p">(</span><span class="s1">&#39;poscar&#39;</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;not_specified&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;POSCAR&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">poscar</span><span class="p">,</span> <span class="n">ParameterData</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;wrong_class&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;POSCAR&#39;</span><span class="p">,</span> <span class="s1">&#39;ParameterData&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">structure</span> <span class="o">=</span> <span class="n">inputdict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_linkname</span><span class="p">(</span><span class="s1">&#39;structure&#39;</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;not_specified&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;structure&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">StructureData</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;wrong_class&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;structure&#39;</span><span class="p">,</span> <span class="s1">&#39;StructureData&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="c1"># here we look for the optional data associated with the POSCAR</span>
+        <span class="c1"># predictor_corrector, selective_dynamics, velocities</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">structure_extras</span> <span class="o">=</span> <span class="n">inputdict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_linkname</span><span class="p">(</span><span class="s1">&#39;structure_extras&#39;</span><span class="p">),</span> <span class="bp">None</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">structure_extras</span> <span class="o">=</span> <span class="bp">None</span>  <span class="c1"># optional parameters</span>
+        <span class="k">if</span> <span class="n">structure_extras</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">structure_extras</span><span class="p">,</span> <span class="n">ArrayData</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                    <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;wrong_class&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="s1">&#39;structure_extras&#39;</span><span class="p">,</span> <span class="s1">&#39;ArrayData&#39;</span><span class="p">)</span>
+                <span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">poscar</span> <span class="o">=</span> <span class="n">assemble_poscar</span><span class="p">(</span>
+                <span class="n">poscar</span><span class="p">,</span>
+                <span class="n">structure</span><span class="p">,</span>
+                <span class="n">structure_extras</span><span class="o">=</span><span class="n">structure_extras</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;aiida2vasp&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;POSCAR&#39;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="c1"># CHGCAR</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">chgcar</span> <span class="o">=</span> <span class="n">inputdict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_linkname</span><span class="p">(</span><span class="s1">&#39;chgcar&#39;</span><span class="p">),</span> <span class="bp">None</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">chgcar</span> <span class="o">=</span> <span class="bp">None</span>  <span class="c1"># optional parameters</span>
+        <span class="k">if</span> <span class="n">chgcar</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">chgcar</span><span class="p">,</span> <span class="n">SinglefileData</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                    <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;wrong_class&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="s1">&#39;chgcar&#39;</span><span class="p">,</span> <span class="s1">&#39;SinglefileData&#39;</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">chgcar</span> <span class="o">=</span> <span class="n">chgcar</span><span class="o">.</span><span class="n">get_file_abs_path</span><span class="p">()</span>
+                <span class="n">chgcar</span> <span class="o">=</span> <span class="n">vaspio</span><span class="o">.</span><span class="n">Chgcar</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">chgcar</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;aiida2vasp&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;CHGCAR&#39;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="c1"># WAVECAR</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">wavecar</span> <span class="o">=</span> <span class="n">inputdict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_linkname</span><span class="p">(</span><span class="s1">&#39;wavecar&#39;</span><span class="p">),</span> <span class="bp">None</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">wavecar</span> <span class="o">=</span> <span class="bp">None</span>  <span class="c1"># optional parameters</span>
+        <span class="k">if</span> <span class="n">wavecar</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">wavecar</span><span class="p">,</span> <span class="n">SinglefileData</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">InputValidationError</span><span class="p">(</span>
+                    <span class="n">errmsg</span><span class="p">(</span><span class="s1">&#39;wrong_class&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="s1">&#39;wavecar&#39;</span><span class="p">,</span> <span class="s1">&#39;SinglefileData&#39;</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="c1"># wavecar doesn&#39;t have a pymatgen object</span>
+
+        <span class="c1"># === set up calculation dir ===</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">incar</span><span class="o">.</span><span class="n">write_file</span><span class="p">(</span><span class="n">tempfolder</span><span class="o">.</span><span class="n">get_abs_path</span><span class="p">(</span><span class="s1">&#39;INCAR&#39;</span><span class="p">))</span>
+            <span class="n">poscar</span><span class="o">.</span><span class="n">write_file</span><span class="p">(</span><span class="n">tempfolder</span><span class="o">.</span><span class="n">get_abs_path</span><span class="p">(</span><span class="s1">&#39;POSCAR&#39;</span><span class="p">))</span>
+            <span class="n">potcar</span><span class="o">.</span><span class="n">write_file</span><span class="p">(</span><span class="n">tempfolder</span><span class="o">.</span><span class="n">get_abs_path</span><span class="p">(</span><span class="s1">&#39;POTCAR&#39;</span><span class="p">))</span>
+            <span class="n">kpoints</span><span class="o">.</span><span class="n">write_file</span><span class="p">(</span><span class="n">tempfolder</span><span class="o">.</span><span class="n">get_abs_path</span><span class="p">(</span><span class="s1">&#39;KPOINTS&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">chgcar</span><span class="p">:</span>
+                <span class="n">chgcar</span><span class="o">.</span><span class="n">write_file</span><span class="p">(</span><span class="n">tempfolder</span><span class="o">.</span><span class="n">get_abs_path</span><span class="p">(</span><span class="s1">&#39;CHGCAR&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">wavecar</span><span class="p">:</span>
+                <span class="c1"># wavecar is a SinglefileData object</span>
+                <span class="n">dest</span> <span class="o">=</span> <span class="n">tempfolder</span><span class="o">.</span><span class="n">get_abs_path</span><span class="p">(</span><span class="s1">&#39;WAVECAR&#39;</span><span class="p">)</span>
+                <span class="n">src</span> <span class="o">=</span> <span class="n">wavecar</span><span class="o">.</span><span class="n">get_file_abs_path</span><span class="p">()</span>
+                <span class="n">copyfile</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;Failed to write the input files to the sandbox, &quot;</span>
+                <span class="s2">&quot;with error message {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># === calc &amp; code info ===</span>
+        <span class="n">settings_dict</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">get_dict</span><span class="p">()</span> <span class="k">if</span> <span class="n">settings</span> <span class="k">else</span> <span class="p">{}</span>
+
+        <span class="n">local_copy_list</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># see what are these two ?!!</span>
+        <span class="n">remote_copy_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">additional_retrieve_list</span> <span class="o">=</span> <span class="n">settings_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span>
+            <span class="s2">&quot;ADDITIONAL_RETRIEVE_LIST&quot;</span><span class="p">,</span> <span class="p">[]</span>
+        <span class="p">)</span>
+        <span class="c1"># append instruction dependencies</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">instr_deps</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">additional_retrieve_list</span><span class="p">:</span>
+                <span class="n">additional_retrieve_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+        <span class="n">calcinfo</span> <span class="o">=</span> <span class="n">CalcInfo</span><span class="p">()</span>
+
+        <span class="n">calcinfo</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span>
+        <span class="n">calcinfo</span><span class="o">.</span><span class="n">local_copy_list</span> <span class="o">=</span> <span class="n">local_copy_list</span>
+        <span class="n">calcinfo</span><span class="o">.</span><span class="n">remote_copy_list</span> <span class="o">=</span> <span class="n">remote_copy_list</span>
+
+        <span class="n">codeinfo</span> <span class="o">=</span> <span class="n">CodeInfo</span><span class="p">()</span>
+        <span class="c1"># Empty command line by default</span>
+        <span class="n">codeinfo</span><span class="o">.</span><span class="n">cmdline_params</span> <span class="o">=</span> <span class="n">settings_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;CMDLINE&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">codeinfo</span><span class="o">.</span><span class="n">stdout_name</span> <span class="o">=</span> <span class="bp">None</span>  <span class="c1"># self._default_output</span>
+        <span class="n">codeinfo</span><span class="o">.</span><span class="n">code_uuid</span> <span class="o">=</span> <span class="n">code</span><span class="o">.</span><span class="n">uuid</span>
+        <span class="c1">#</span>
+        <span class="n">calcinfo</span><span class="o">.</span><span class="n">codes_info</span> <span class="o">=</span> <span class="p">[</span><span class="n">codeinfo</span><span class="p">]</span>
+
+        <span class="c1"># Retrieve files</span>
+        <span class="n">calcinfo</span><span class="o">.</span><span class="n">retrieve_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">calcinfo</span><span class="o">.</span><span class="n">retrieve_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_default_output</span><span class="p">)</span>
+        <span class="n">calcinfo</span><span class="o">.</span><span class="n">retrieve_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_structure</span><span class="p">)</span>
+        <span class="n">calcinfo</span><span class="o">.</span><span class="n">retrieve_list</span> <span class="o">+=</span> <span class="n">additional_retrieve_list</span>
+
+        <span class="k">return</span> <span class="n">calcinfo</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">AiiDA VASP Plugin 0.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Mario Žic.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+    </div>
+  </body>
+</html>

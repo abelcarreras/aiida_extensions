@@ -1,0 +1,174 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installing the Plugin &mdash; AiiDA VASP Plugin 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="top" title="AiiDA VASP Plugin 0.1 documentation" href="../index.html" />
+    <link rel="next" title="Basic Usage" href="../examples/basic_usage.html" />
+    <link rel="prev" title="List of dependencies" href="dependencies.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../examples/basic_usage.html" title="Basic Usage"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="dependencies.html" title="List of dependencies"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">AiiDA VASP Plugin 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installing the Plugin</a><ul>
+<li><a class="reference internal" href="#method-a-symlink">Method A - Symlink</a></li>
+<li><a class="reference internal" href="#method-b-copy">Method B - Copy</a></li>
+<li><a class="reference internal" href="#check-installation">Check installation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="dependencies.html"
+                        title="previous chapter">List of dependencies</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../examples/basic_usage.html"
+                        title="next chapter">Basic Usage</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/install/plugin.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="installing-the-plugin">
+<h1>Installing the Plugin<a class="headerlink" href="#installing-the-plugin" title="Permalink to this headline">¶</a></h1>
+<p>The plugin consists of two parts: the input and the output plugin. These can be found in correspondingly named directories at the top-level of the AiiDA VASP Plugin distribution directory.</p>
+<p>There are two ways to add the VASP Plugin to AiiDA.
+You can either <em>symlink</em> or <em>copy</em> the plugin directories to the appropriate AiiDA distribution directory. The <strong>directories must be renamed</strong> as explained below. The package imports inside the modules will be broken if this is not done correctly!</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In the following we will assume that the AiiDA VASP Plugin is located inside the <em>~/aiida_vasp_plugin/</em> directory and the AiiDA distribution is located inside the <em>~/aiida_dir/</em>. <strong>Please modify these paths correspondingly!</strong></p>
+</div>
+<p>To proceed with the installation follow method A or method B, according to your preferences.</p>
+<div class="section" id="method-a-symlink">
+<h2>Method A - Symlink<a class="headerlink" href="#method-a-symlink" title="Permalink to this headline">¶</a></h2>
+<p>You need to do the following symlink:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>ln -s ~/aiida_vasp_plugin/input ~/aiida_dir/aiida/orm/calculation/job/vasp
+</pre></div>
+</div>
+<p>for the input plugin, and:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>ln -s ~/aiida_vasp_plugin/output ~/aiida_dir/aiida/parsers/plugins/vasp
+</pre></div>
+</div>
+<p>for the output plugin.</p>
+<p>If everything went ok, now you whould be able to import these modules from your python console.</p>
+</div>
+<div class="section" id="method-b-copy">
+<h2>Method B - Copy<a class="headerlink" href="#method-b-copy" title="Permalink to this headline">¶</a></h2>
+<p>First you need to copy the input plugin:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>cp -r ~/aiida_vasp_plugin/input ~/aiida_dir/aiida/orm/calculation/job/vasp
+</pre></div>
+</div>
+<p>and then the output plugin:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>cp -r ~/aiida_vasp_plugin/output ~/aiida_dir/aiida/parsers/plugins/vasp
+</pre></div>
+</div>
+<p>to the corresponding AiiDA directories.</p>
+<p>If everything went ok you should be able to import these modules from your python console.</p>
+</div>
+<div class="section" id="check-installation">
+<h2>Check installation<a class="headerlink" href="#check-installation" title="Permalink to this headline">¶</a></h2>
+<p>Open your python console and try to import the packages:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">aiida.orm.calculation.job.vasp</span>
+<span class="kn">import</span> <span class="nn">aiida.parsers.plugins.vasp</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you get an error here please check that you have provided the correct paths to the copy/symlink commands above.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../examples/basic_usage.html" title="Basic Usage"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="dependencies.html" title="List of dependencies"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">AiiDA VASP Plugin 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Mario Žic.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,280 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Basic Usage &mdash; AiiDA VASP Plugin 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="top" title="AiiDA VASP Plugin 0.1 documentation" href="../index.html" />
+    <link rel="next" title="Plugin’s Default Behaviour" href="../default_behaviour/defaults.html" />
+    <link rel="prev" title="Installing the Plugin" href="../install/plugin.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../default_behaviour/defaults.html" title="Plugin’s Default Behaviour"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../install/plugin.html" title="Installing the Plugin"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">AiiDA VASP Plugin 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Basic Usage</a></li>
+<li><a class="reference internal" href="#preparing-pymatgen-input">Preparing Pymatgen Input</a></li>
+<li><a class="reference internal" href="#preparing-aiida-calculation">Preparing AiiDA calculation</a><ul>
+<li><a class="reference internal" href="#chgcar-and-wavecar-files">CHGCAR and WAVECAR Files</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../install/plugin.html"
+                        title="previous chapter">Installing the Plugin</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../default_behaviour/defaults.html"
+                        title="next chapter">Plugin&#8217;s Default Behaviour</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/examples/basic_usage.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="basic-usage">
+<h1>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h1>
+<p>In this section we cover the basics of setting up a VASP calculation using the plugin.
+The procedure can be logically split into two steps. The first step is to set up VASP input using the VASP interface provided by the <a class="reference external" href="http://pymatgen.org/">pymatgen</a> package. In the second step these objects, together with a set of user specified <a class="reference internal" href="../advanced/instruct.html#parser-instr"><span>output parser instructions</span></a>, are passed as an input to the AiiDA calculation.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><strong>The pymatgen syntax will not be covered here in great detail!</strong> - just a short use-case example will be provided.
+For more details on pymatgen we refer you to <a class="reference external" href="pymatgen">pymatgen documentation</a>.</p>
+</div>
+</div>
+<div class="section" id="preparing-pymatgen-input">
+<h1>Preparing Pymatgen Input<a class="headerlink" href="#preparing-pymatgen-input" title="Permalink to this headline">¶</a></h1>
+<p>A short example of setting up pymatgen VASP input is given below. The goal is to create: <cite>POSCAR</cite>, <cite>INPUTCAR</cite>, <cite>KPOINTS</cite>, and <cite>POTCAR</cite> files, which represent a minimal input for any VASP calculation.</p>
+<p>An excerpt from the full code is shown below to illustrate the input setup procedure:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="c1">#</span>
+<span class="c1"># Pymatgen imports</span>
+<span class="kn">import</span> <span class="nn">pymatgen</span> <span class="kn">as</span> <span class="nn">mg</span>
+<span class="kn">from</span> <span class="nn">pymatgen.io</span> <span class="kn">import</span> <span class="n">vasp</span> <span class="k">as</span> <span class="n">vaspio</span>
+<span class="c1">#</span>
+<span class="c1"># POSCAR</span>
+<span class="n">lattice_constant</span> <span class="o">=</span> <span class="mf">5.97</span>
+<span class="n">lattice</span> <span class="o">=</span> <span class="n">lattice_constant</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+    <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+<span class="p">])</span>
+<span class="n">lattice</span> <span class="o">=</span> <span class="n">mg</span><span class="o">.</span><span class="n">Lattice</span><span class="p">(</span><span class="n">lattice</span><span class="p">)</span>
+
+<span class="n">struct</span> <span class="o">=</span> <span class="n">mg</span><span class="o">.</span><span class="n">Structure</span><span class="p">(</span>
+    <span class="n">lattice</span><span class="p">,</span>
+    <span class="p">[</span><span class="n">Mn</span><span class="p">,</span> <span class="n">Mn</span><span class="p">,</span> <span class="n">Ga</span><span class="p">],</span>
+    <span class="c1"># site coords</span>
+    <span class="p">[[</span><span class="mf">0.00</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.50</span><span class="p">,</span> <span class="mf">0.50</span><span class="p">,</span> <span class="mf">0.50</span><span class="p">]]</span>
+<span class="p">)</span>
+<span class="n">poscar</span> <span class="o">=</span> <span class="n">vaspio</span><span class="o">.</span><span class="n">Poscar</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;cubic Mn2Ga&#39;</span><span class="p">)</span>
+
+<span class="c1"># KPOINTS</span>
+<span class="n">kpoints</span> <span class="o">=</span> <span class="n">vaspio</span><span class="o">.</span><span class="n">Kpoints</span><span class="o">.</span><span class="n">monkhorst_automatic</span><span class="p">(</span>
+    <span class="n">kpts</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">shift</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Therefore, for each VASP input file we have a pymatgen object representing it, e.g. <cite>KPOINTS</cite> is represented by the <cite>pymatgen.io.vasp.Kpoints</cite> object. Our task here is just to provide basic information needed to construct the VASP input files.</p>
+<p><strong>Full code</strong> used for this example can be found <a class="reference internal" href="pymatgen_input.html#full-pmg-input"><span>here</span></a> .</p>
+</div>
+<div class="section" id="preparing-aiida-calculation">
+<span id="prep-aiida-calc"></span><h1>Preparing AiiDA calculation<a class="headerlink" href="#preparing-aiida-calculation" title="Permalink to this headline">¶</a></h1>
+<p>The aim of this section is to set up a working AiiDA calculation.
+We will assume that all pymatgen objects representing the VASP input have already been created. Our task then is to create a VASP calculation object and pass it the content of the pymatgen input files.</p>
+<p>Before we pass the input files to the AiiDA calculation we need to <strong>split</strong> the <cite>POSCAR</cite> file, since it may contain both dictionary and array data. This is achieved by the <cite>disassemble_poscar</cite> function which returns a dictonary of <cite>POSCAR</cite> parts. It its important to note that each of these parts is already an instance of AiiDA&#8217;s <cite>Data</cite> class and can be directly stored in the AiiDA database. The split is done like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># AiiDA imports</span>
+<span class="kn">from</span> <span class="nn">aiida.orm</span> <span class="kn">import</span> <span class="n">Code</span><span class="p">,</span> <span class="n">DataFactory</span>
+<span class="kn">from</span> <span class="nn">aiida.orm.calculation.job.vasp</span> <span class="kn">import</span> <span class="n">vasp</span> <span class="k">as</span> <span class="n">vplugin</span>
+<span class="kn">from</span> <span class="nn">aiida</span> <span class="kn">import</span> <span class="n">load_dbenv</span>
+<span class="n">load_dbenv</span><span class="p">()</span>
+
+<span class="c1"># split the poscar for AiiDA serialization</span>
+<span class="n">poscar_parts</span> <span class="o">=</span> <span class="n">vplugin</span><span class="o">.</span><span class="n">disassemble_poscar</span><span class="p">(</span><span class="n">poscar</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This intermediate step represents only a transitional solution which will be improved in future versions!</p>
+</div>
+<p>The next step is to create an instance of the AiiDA VASP calculation and pass it the input files. The code to do this is shown below:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># split the poscar for AiiDA serialization</span>
+<span class="n">poscar_parts</span> <span class="o">=</span> <span class="n">vplugin</span><span class="o">.</span><span class="n">disassemble_poscar</span><span class="p">(</span><span class="n">poscar</span><span class="p">)</span>
+
+<span class="c1"># === Prepare Calculation</span>
+<span class="n">ParameterData</span> <span class="o">=</span> <span class="n">DataFactory</span><span class="p">(</span><span class="s1">&#39;parameter&#39;</span><span class="p">)</span>
+<span class="n">StructureData</span> <span class="o">=</span> <span class="n">DataFactory</span><span class="p">(</span><span class="s1">&#39;structure&#39;</span><span class="p">)</span>
+
+<span class="n">codename</span> <span class="o">=</span> <span class="s1">&#39;Vasp&#39;</span>  <span class="c1"># this may be differ from user-to-user</span>
+<span class="n">code</span> <span class="o">=</span> <span class="n">Code</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">codename</span><span class="p">)</span>  <span class="c1"># executable to call, module imports etc</span>
+
+<span class="n">calc</span> <span class="o">=</span> <span class="n">code</span><span class="o">.</span><span class="n">new_calc</span><span class="p">()</span>
+<span class="n">calc</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;VASP plugin development&quot;</span>
+<span class="n">calc</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;Test input plugin&quot;</span>
+<span class="n">calc</span><span class="o">.</span><span class="n">set_max_wallclock_seconds</span><span class="p">(</span><span class="mi">5</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>  <span class="c1"># 5 min</span>
+<span class="n">calc</span><span class="o">.</span><span class="n">set_resources</span><span class="p">({</span>
+    <span class="s2">&quot;num_machines&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;num_mpiprocs_per_machine&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;num_cores_per_machine&#39;</span><span class="p">:</span> <span class="mi">24</span>  <span class="c1"># this will differ from machine-to-machine</span>
+<span class="p">})</span>
+<span class="n">calc</span><span class="o">.</span><span class="n">set_withmpi</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">calc</span><span class="o">.</span><span class="n">use_poscar</span><span class="p">(</span><span class="n">poscar_parts</span><span class="p">[</span><span class="s1">&#39;poscar&#39;</span><span class="p">])</span>
+<span class="n">calc</span><span class="o">.</span><span class="n">use_structure</span><span class="p">(</span><span class="n">poscar_parts</span><span class="p">[</span><span class="s1">&#39;structure&#39;</span><span class="p">])</span>
+<span class="n">calc</span><span class="o">.</span><span class="n">use_incar</span><span class="p">(</span>
+    <span class="n">ParameterData</span><span class="p">(</span><span class="nb">dict</span><span class="o">=</span><span class="n">incar</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span>
+<span class="p">)</span>
+<span class="n">calc</span><span class="o">.</span><span class="n">use_kpoints</span><span class="p">(</span>
+    <span class="n">ParameterData</span><span class="p">(</span><span class="nb">dict</span><span class="o">=</span><span class="n">kpoints</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span>
+<span class="p">)</span>
+<span class="n">calc</span><span class="o">.</span><span class="n">use_potcar</span><span class="p">(</span>
+    <span class="n">ParameterData</span><span class="p">(</span><span class="nb">dict</span><span class="o">=</span><span class="n">potcar</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span>
+<span class="p">)</span>
+
+<span class="c1"># settings</span>
+<span class="n">settings</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;PARSER_INSTRUCTIONS&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+<span class="n">pinstr</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;PARSER_INSTRUCTIONS&#39;</span><span class="p">]</span>
+<span class="n">pinstr</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+    <span class="s1">&#39;instr&#39;</span><span class="p">:</span> <span class="s1">&#39;dummy_data&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="p">{}</span>
+<span class="p">})</span>
+
+<span class="c1"># additional files to return</span>
+<span class="n">settings</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span>
+    <span class="s1">&#39;ADDITIONAL_RETRIEVE_LIST&#39;</span><span class="p">,</span> <span class="p">[</span>
+        <span class="s1">&#39;OSZICAR&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;CONTCAR&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;OUTCAR&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;vasprun.xml&#39;</span>
+        <span class="p">]</span>
+<span class="p">)</span>
+<span class="n">calc</span><span class="o">.</span><span class="n">use_settings</span><span class="p">(</span><span class="n">ParameterData</span><span class="p">(</span><span class="nb">dict</span><span class="o">=</span><span class="n">settings</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The calculation can now be submitted.</p>
+<p>What is <strong>important to notice</strong> are the <cite>calc.use_method</cite>&#8216;s which are specific to the VASP plugin.
+These can be logically divided into four groups:</p>
+<blockquote>
+<div><ul class="simple">
+<li><em>use_incar, use_potcar, use_kpoints</em> - passed as a <cite>ParameterData</cite> object, which store the <cite>dict</cite> representation of the pymatgen object</li>
+<li><em>use_poscar, use_structure, use_structure_extras</em> - passed as correspondingly named objects in the <cite>poscar_parts</cite> dict, which was obtained              by splitting up the <cite>POTCAR</cite> object. <strong>Note:</strong> the <cite>structure_extras</cite> in the example is not shown because this data is optional, i.e. it                may contain array data that can be found in the <cite>CONTCAR</cite> file, e.g. the final velicities of ions, etc.</li>
+<li><em>use_settings</em> - pased as <cite>ParameterData</cite>. Used to specify additional files to retreive and output parser instructions.</li>
+<li><em>use_chgcar</em>, <em>use_wavecar</em> - passed as a <cite>SinglefileData</cite> object. See the next section for more details on using these inputs.</li>
+</ul>
+</div></blockquote>
+<p><strong>Full code</strong> used for this example can be found <a class="reference internal" href="aiida_input.html#full-aiida-input"><span>here</span></a> .</p>
+<div class="section" id="chgcar-and-wavecar-files">
+<h2>CHGCAR and WAVECAR Files<a class="headerlink" href="#chgcar-and-wavecar-files" title="Permalink to this headline">¶</a></h2>
+<p>The <cite>CHGCAR</cite> and <cite>WAVECAR</cite> files are usually used for continuation runs.
+The plugin treats them as an <em>optional input</em>.
+The <cite>SinglefileData</cite> object can be created like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">aiida.orm.data.singlefile</span> <span class="kn">import</span> <span class="n">SinglefileData</span>
+
+<span class="n">input_file</span> <span class="o">=</span> <span class="n">SinglefileData</span><span class="p">()</span>
+<span class="n">input_file</span><span class="o">.</span><span class="n">set_file</span><span class="p">(</span><span class="s1">&#39;path/to/the/file/CHGCAR&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <cite>input_file</cite> now points to the actual file on the disc and will be copied to the AiiDA database when the calculation&#8217;s <cite>store_all</cite> method is called.
+It is important to note here that we <strong>must</strong> have an input <cite>CHACAR/WAVECAR</cite> file written at some location on the disc before we can create a <cite>SinglefileData</cite> object.</p>
+<p>Once we have created a <cite>SinglefileData</cite> representation of the <cite>CHACAR/WAVECAR</cite> file we can pass it to AiiDA as an input like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">chgcar</span> <span class="o">=</span> <span class="n">SinglefileData</span><span class="p">()</span>
+<span class="n">chgcar</span><span class="o">.</span><span class="n">set_file</span><span class="p">(</span><span class="s1">&#39;path/to/the/file/CHGCAR&#39;</span><span class="p">)</span>
+<span class="o">...</span>
+<span class="n">calc</span><span class="o">.</span><span class="n">use_chgcar</span><span class="p">(</span><span class="n">chgcar</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and similarly for the <cite>WAVECAR</cite> file.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../default_behaviour/defaults.html" title="Plugin’s Default Behaviour"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../install/plugin.html" title="Installing the Plugin"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">AiiDA VASP Plugin 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Mario Žic.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>

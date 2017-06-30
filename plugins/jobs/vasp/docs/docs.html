@@ -1,0 +1,237 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to AiiDA VASP Plugin’s Documentation &mdash; AiiDA VASP Plugin 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/bizstyle.js"></script>
+    <link rel="top" title="AiiDA VASP Plugin 0.1 documentation" href="#" />
+    <link rel="next" title="AiiDA VASP Plugin Introduction" href="introduction/intro.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="introduction/intro.html" title="AiiDA VASP Plugin Introduction"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">AiiDA VASP Plugin 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to AiiDA VASP Plugin&#8217;s Documentation</a></li>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#users">Users</a></li>
+<li><a class="reference internal" href="#default-behaviour">Default Behaviour</a></li>
+<li><a class="reference internal" href="#advanced-users">Advanced Users</a></li>
+<li><a class="reference internal" href="#developers">Developers</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="introduction/intro.html"
+                        title="next chapter">AiiDA VASP Plugin Introduction</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-aiida-vasp-plugin-s-documentation">
+<h1>Welcome to AiiDA VASP Plugin&#8217;s Documentation<a class="headerlink" href="#welcome-to-aiida-vasp-plugin-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>AiiDA VASP Plugin is an <a class="reference external" href="http://www.aiida.net/">AiiDA</a> extension, writen in Python, which provides a user friendly and flexible way to run highly automated density functional theory (DFT) calculations using the Viena Ab initio Simulation Package, <a class="reference external" href="http://www.vasp.at/">VASP</a> . The code consists of two main parts, the Input and the Output plugin, which facilitate VASP calculation setup and output postprocessing within the AiiDA framework.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last"><strong>This plugin is still in its early testing phase !!!</strong></p>
+</div>
+</div>
+<div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>Covers a brief overview of the main functionality provided by the plugin.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction/intro.html">AiiDA VASP Plugin Introduction</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>A quick guide to get you running.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install/dependencies.html">List of dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install/plugin.html">Installing the Plugin</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install/plugin.html#method-a-symlink">Method A - Symlink</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install/plugin.html#method-b-copy">Method B - Copy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install/plugin.html#check-installation">Check installation</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="users">
+<h1>Users<a class="headerlink" href="#users" title="Permalink to this headline">¶</a></h1>
+<p>An example based introduction to the code usage. Covers the plugin logic and the basics needed to run the VASP code.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples/basic_usage.html">Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/basic_usage.html#preparing-pymatgen-input">Preparing Pymatgen Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/basic_usage.html#preparing-aiida-calculation">Preparing AiiDA calculation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/basic_usage.html#chgcar-and-wavecar-files">CHGCAR and WAVECAR Files</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="default-behaviour">
+<h1>Default Behaviour<a class="headerlink" href="#default-behaviour" title="Permalink to this headline">¶</a></h1>
+<p>An overview of the features that may confuse you.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="default_behaviour/defaults.html">Plugin&#8217;s Default Behaviour</a></li>
+<li class="toctree-l1"><a class="reference internal" href="default_behaviour/defaults.html#mandatory-optional-input">Mandatory &amp; Optional Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="default_behaviour/defaults.html#parser-instructions">Parser Instructions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="default_behaviour/defaults.html#instruction-specification">Instruction Specification</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="default_behaviour/defaults.html#dummy-instructions">Dummy Instructions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="default_behaviour/defaults.html#static-instructions">Static Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="default_behaviour/defaults.html#instruction-execution">Instruction Execution</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="advanced-users">
+<h1>Advanced Users<a class="headerlink" href="#advanced-users" title="Permalink to this headline">¶</a></h1>
+<p>Extends the topic of Parser Instructions and gives an example of a new parser instruction implementation.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Knowledge of Python programing is assumed.</p>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="advanced/instruct.html">Introduction to Parser Instructions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="advanced/instruct.html#specifying-the-parser-instruction-input">Specifying the Parser Instruction Input</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/instruct.html#defining-new-parser-instructions">Defining New Parser Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/instruct.html#static-parser-instruction">Static Parser Instruction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="advanced/instruct.html#example">Example:</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="advanced/instruct.html#dynamic-parser-instruction">Dynamic Parser Instruction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="advanced/instruct.html#id1">Example:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="developers">
+<h1>Developers<a class="headerlink" href="#developers" title="Permalink to this headline">¶</a></h1>
+<p>An in-depth cover of the plugin implementation.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Advanced Python programing skills and familiarity with the AiiDA internals are assumed.</p>
+</div>
+<p><em>TODO !</em></p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="devel/start.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="devel/start.html#input-plugin">Input Plugin</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="devel/input_plugin/in_start.html">Input Plugin Introduction</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="devel/start.html#output-plugin">Output Plugin</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="devel/output_plugin/out_start.html">Output Plugin Introduction</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span>Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span>Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span>Search Page</span></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="introduction/intro.html" title="AiiDA VASP Plugin Introduction"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">AiiDA VASP Plugin 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Mario Žic.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>

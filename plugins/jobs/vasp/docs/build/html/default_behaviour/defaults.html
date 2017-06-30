@@ -1,0 +1,200 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Plugin’s Default Behaviour &mdash; AiiDA VASP Plugin 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="top" title="AiiDA VASP Plugin 0.1 documentation" href="../index.html" />
+    <link rel="next" title="Introduction to Parser Instructions" href="../advanced/instruct.html" />
+    <link rel="prev" title="Basic Usage" href="../examples/basic_usage.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../advanced/instruct.html" title="Introduction to Parser Instructions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../examples/basic_usage.html" title="Basic Usage"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">AiiDA VASP Plugin 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Plugin&#8217;s Default Behaviour</a></li>
+<li><a class="reference internal" href="#mandatory-optional-input">Mandatory &amp; Optional Input</a></li>
+<li><a class="reference internal" href="#parser-instructions">Parser Instructions</a><ul>
+<li><a class="reference internal" href="#instruction-specification">Instruction Specification</a><ul>
+<li><a class="reference internal" href="#dummy-instructions">Dummy Instructions</a></li>
+<li><a class="reference internal" href="#static-instructions">Static Instructions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#instruction-execution">Instruction Execution</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../examples/basic_usage.html"
+                        title="previous chapter">Basic Usage</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../advanced/instruct.html"
+                        title="next chapter">Introduction to Parser Instructions</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/default_behaviour/defaults.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="plugin-s-default-behaviour">
+<span id="default-behaviour"></span><h1>Plugin&#8217;s Default Behaviour<a class="headerlink" href="#plugin-s-default-behaviour" title="Permalink to this headline">¶</a></h1>
+<p>Plugin&#8217;s default behaviour includes every bit of plugin&#8217;s behaviour which is not obvious to the user.
+These are mostly intended as commodity features, but for a new user it may lead to confusion.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Here we try to document all &#8220;hidden&#8221; features of the plugin which may result with undesired outcome for the user.
+<strong>If a feature is not well documented, then it should be treated as a bug in the documentation!</strong></p>
+</div>
+</div>
+<div class="section" id="mandatory-optional-input">
+<h1>Mandatory &amp; Optional Input<a class="headerlink" href="#mandatory-optional-input" title="Permalink to this headline">¶</a></h1>
+<p>Preparation of the input for an AiiDA calculation was described <a class="reference internal" href="../examples/basic_usage.html#prep-aiida-calc"><span>here</span></a>. The main thing to recall is that we use the <cite>calc.use_method</cite>&#8216;s to pass the input to the AiiDA calculation object.
+It was noted that we did not use the <cite>calc.use_structure_extras</cite> method in that example.
+Therefore, the <cite>structure_extras</cite> is an <em>optional</em> input parameter.
+Currently this is the only optional input !</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><strong>All inputs are mandatory, except the structure_extras !</strong></p>
+</div>
+</div>
+<div class="section" id="parser-instructions">
+<h1>Parser Instructions<a class="headerlink" href="#parser-instructions" title="Permalink to this headline">¶</a></h1>
+<p>A significant fraction of implemented default behaviours is related to parser instructions. The parser instructions are used to specify how the calculation output is to be parsed. It is reasonable to assume that some basic quantities like energy and magnetization, will be of interest to all users. Hence, it is convenient to define <em>default parsers</em>. Since we divide the output into three parts: <em>errors, data, and structure</em>, we have an assigned default parser for each of these data types. More on these output types can be found <a class="reference internal" href="../advanced/instruct.html#parser-instr"><span>here</span></a>.</p>
+<div class="section" id="instruction-specification">
+<h2>Instruction Specification<a class="headerlink" href="#instruction-specification" title="Permalink to this headline">¶</a></h2>
+<p>What may be unusual is that <strong>we require at least one parser to be specified for each of the data types above</strong>. This involves a number of default behaviours:</p>
+<ol class="arabic simple">
+<li>If nothing is specified, the output plugin will load a default parser for each of the data types.</li>
+<li>If only some of the parsers are not provided, the output plugin will load a default parser for the missing data type.</li>
+<li><em>However</em>, if a provided instruction can not be loaded during the calculation submission, e.g. if the calculation does not conform to the specifications or there is a typo in the input, the input plugin will <em>raise an exception</em>.</li>
+</ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The plugin will forgive you if a required instruction is not specified, and load defaults for you, <em>but it will crash</em> if you specify an instruction that can not be loaded.</p>
+</div>
+<div class="section" id="dummy-instructions">
+<h3>Dummy Instructions<a class="headerlink" href="#dummy-instructions" title="Permalink to this headline">¶</a></h3>
+<p><em>There are perfectly legitimate reasons not to parse the whole output, we only require the user to be explicit about it !</em></p>
+<p>The dummy instructins are introduced to allow the user to express that he does not want to parse something, e.g. the user decides not to parse the output structure because he is doing static calculations and he wants to save memory space.</p>
+<p>The output nodes are still created, but they are empty! <em>(This may change in future versions!)</em></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><strong>Dummy instructions allow the user to skip the parsing !</strong></p>
+</div>
+</div>
+<div class="section" id="static-instructions">
+<h3>Static Instructions<a class="headerlink" href="#static-instructions" title="Permalink to this headline">¶</a></h3>
+<p>Static parser instructions require the developer to specify the files which are required for parsing. This is used to automatically fetch the required files for the output parser. <em>The user does not need to provide any additional input !</em></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><strong>Mandatory input files are automatically appended to the retrieve list !</strong></p>
+</div>
+</div>
+</div>
+<div class="section" id="instruction-execution">
+<h2>Instruction Execution<a class="headerlink" href="#instruction-execution" title="Permalink to this headline">¶</a></h2>
+<p>The output parsing is concieved as a loop that iterates over the list of parser instructions and executes them one-by-one, in an arbitrary order.
+What happens if an instruction crashes during the execution ?! There are two possible scenarios:</p>
+<ol class="arabic simple">
+<li>the instruction handled the crash on it&#8217;s own and returned without raising an exception. In this case you should probably expect to see an error message in the error log for that instruction, e.g. in the <cite>errors&#64;TheCrashedInstruction</cite> node, but this depends on the implementation of that particular instruction.</li>
+<li>the instruction didn&#8217;t handle the crash. In this case the error log inside the <cite>errors&#64;TheCrashedInstruction</cite> node will probably not be complete an we will have an additional error inside the <cite>parser_warnings</cite> node, created by the output parser itself, giving extra information about the crash.</li>
+</ol>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last"><strong>Always check for output parsing errors !</strong>
+(If an instruction crashes the output parser will just move to the next instruction.)</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../advanced/instruct.html" title="Introduction to Parser Instructions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../examples/basic_usage.html" title="Basic Usage"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">AiiDA VASP Plugin 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Mario Žic.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>

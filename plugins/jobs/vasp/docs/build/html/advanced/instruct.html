@@ -1,0 +1,278 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction to Parser Instructions &mdash; AiiDA VASP Plugin 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="top" title="AiiDA VASP Plugin 0.1 documentation" href="../index.html" />
+    <link rel="next" title="Input Plugin" href="../devel/start.html" />
+    <link rel="prev" title="Plugin’s Default Behaviour" href="../default_behaviour/defaults.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../devel/start.html" title="Input Plugin"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../default_behaviour/defaults.html" title="Plugin’s Default Behaviour"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">AiiDA VASP Plugin 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction to Parser Instructions</a><ul>
+<li><a class="reference internal" href="#specifying-the-parser-instruction-input">Specifying the Parser Instruction Input</a></li>
+<li><a class="reference internal" href="#defining-new-parser-instructions">Defining New Parser Instructions</a></li>
+<li><a class="reference internal" href="#static-parser-instruction">Static Parser Instruction</a><ul>
+<li><a class="reference internal" href="#example">Example:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dynamic-parser-instruction">Dynamic Parser Instruction</a><ul>
+<li><a class="reference internal" href="#id1">Example:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../default_behaviour/defaults.html"
+                        title="previous chapter">Plugin&#8217;s Default Behaviour</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../devel/start.html"
+                        title="next chapter">Input Plugin</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/advanced/instruct.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="introduction-to-parser-instructions">
+<span id="parser-instr"></span><h1>Introduction to Parser Instructions<a class="headerlink" href="#introduction-to-parser-instructions" title="Permalink to this headline">¶</a></h1>
+<p>Parser instructions are the central concept of the output plugin.
+They provide the output plugin with an easily configurable, and extensible, parsing functionality.
+The role of the output plugin can thus be understood, in simple terms, as a boiler-plate needed to load, execute, and store the results returned by the parser instructions.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><em>Parsing of the output is achieved by executing a sequence of parser instructions!</em></p>
+</div>
+<div class="section" id="specifying-the-parser-instruction-input">
+<h2>Specifying the Parser Instruction Input<a class="headerlink" href="#specifying-the-parser-instruction-input" title="Permalink to this headline">¶</a></h2>
+<p>In order to customize the output parsing process we need to specify which instructions should be used as a part of the input.
+The instructions are specified using a special key <cite>PARSER_INSTRUCTIONS</cite>, within the <cite>settings</cite> input node, as shown below:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">settings</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;PARSER_INSTRUCTIONS&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+<span class="n">instr</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;PARSER_INSTRUCTIONS&#39;</span><span class="p">]</span>  <span class="c1"># for easier access</span>
+<span class="n">instr</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+    <span class="s1">&#39;instr&#39;</span><span class="p">:</span> <span class="s1">&#39;dummy_data_parser&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="p">{}</span>
+<span class="p">})</span>
+
+<span class="o">...</span>
+
+<span class="n">calc</span><span class="o">.</span><span class="n">use_settings</span><span class="p">(</span><span class="n">ParameterData</span><span class="p">(</span><span class="nb">dict</span><span class="o">=</span><span class="n">settings</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Where the <cite>calc</cite> is an instance of the <cite>VaspCalculation</cite> class.</p>
+<p>In the example above we are appending a single <cite>data</cite> parser instruction called <cite>dummy_data_parser</cite>.
+<strong>The parser instructions are supposed to be specified as a dictionary with three keys:</strong> <cite>instr</cite>, <cite>type</cite>, and <cite>params</cite>.</p>
+<p>Currently there are three parser instruction types implemented: <cite>data</cite>, <cite>error</cite>, and <cite>structure</cite>.
+The distinction between these types comes into play during the instruction loading, where the output parser appends different auxiliary parameters to the instruction based on its type.
+For example, to every <cite>error</cite> type instruction a <cite>SCHED_ERROR_FILE</cite> parameter is appended.
+More information about the plugin&#8217;s default behaviour can be found <a class="reference internal" href="../default_behaviour/defaults.html#default-behaviour"><span>here</span></a>.</p>
+</div>
+<div class="section" id="defining-new-parser-instructions">
+<h2>Defining New Parser Instructions<a class="headerlink" href="#defining-new-parser-instructions" title="Permalink to this headline">¶</a></h2>
+<p>All parser instructions inherit from the base class, <cite>BaseInstruction</cite>, which provides the interface towards the output plugin.
+Therefore, the <cite>BaseInstruction</cite> is <em>a template for implementing custom parser instructions</em>.</p>
+<p>In order to implement a new parser instruction one must inherit from the base class and overrride the two following things:</p>
+<ol class="arabic simple">
+<li>list of input files, given by the class property <cite>_input_file_list_</cite>, or by setting the <cite>_dynamic_file_list_ = True</cite>, when the names of the input files are not known in advance.</li>
+<li>override the <cite>BaseInstruction._parser_function(self)</cite>, which is a method that is called when the instruction is executed - it implements the actual parsing of the output.</li>
+</ol>
+<p>Below we give examples on how to implement these two different instruction types.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In future versions we may implement <cite>BaseInstruction</cite> subclasses for each instruction type, i.e. <cite>StaticInstruction</cite> and <cite>DynamicInstruction</cite>, in order to be explicit about our intents.</p>
+</div>
+</div>
+<div class="section" id="static-parser-instruction">
+<h2>Static Parser Instruction<a class="headerlink" href="#static-parser-instruction" title="Permalink to this headline">¶</a></h2>
+<p>Static parser instruction is just an ordinary parser instruction for which we can specify the list of input file names in advance, i.e. the <em>input file names are static</em>.</p>
+<p>The use of this method is advantageous since the input plugin will automatically update the list of files to be retreived, and the instruction itself will automatically check if the required files are present before the parsing starts.</p>
+<p>Since the <strong>static parser instructions</strong> offer both the user commodity and additional safeties against an invalid user input, they should be <strong>prefered</strong> over the dynamic parser instructions!</p>
+<div class="section" id="example">
+<h3>Example:<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
+<p>The <cite>Default_vasprun_parserInstruction</cite> is an example of the static parsing instruction.
+It operates only on the statically named <cite>vasprun.xml</cite> file.</p>
+<p>First thing in defining a static parsing instruction is to override the <cite>_input_file_list_</cite>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Default_vasprun_parserInstruction</span><span class="p">(</span><span class="n">BaseInstruction</span><span class="p">):</span>
+
+    <span class="n">_input_file_list_</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;vasprun.xml&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_parser_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parses the vasprun.xml using the Pymatgen Vasprun function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+</pre></div>
+</div>
+<p>In the case above the only input file is the <cite>vasprun.xml</cite>.</p>
+<p>Next follows the implementation of the <cite>_parser_function</cite>.
+The <cite>_parser_function</cite> implements the output parsing logic. This part depends only on the user preferences and does not depend on the internal working of the AiiDA.</p>
+<p>Finally, <strong>the output</strong> must be returned as a tuple:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>        <span class="k">return</span> <span class="n">nodes_list</span><span class="p">,</span> <span class="n">parser_warnings</span>
+</pre></div>
+</div>
+<p>The <cite>nodes_list</cite> is just an arbitrary <em>list of tuples</em>, e.g. <cite>[(&#8216;velocities&#8217;, ArrayData_type), (&#8216;energies&#8217;, ParameterData_type), ...]</cite>, where the second tuple value needs to be an instance of the AiiDA&#8217;s <cite>Data</cite> type.</p>
+<p>The second item in the return tuple is the <cite>parameter_warnings</cite> object, which is just a dictionary in which we can log useful information, e.g. non-critical errors, during the instruction execution. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">parser_warnings</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;error name&#39;</span><span class="p">,</span> <span class="s1">&#39;details about the error&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>After the instruction returns, the parser warnings are converted to a node, <cite>(&#8216;errors&#64;Default_vasprun_parserInstruction&#8217;, ParameterData(parser_warnings))</cite>, which is stored in the AiiDA database as a part of the output.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In summary, static parser instruction is implemented by overriding the <cite>_input_file_list_</cite> and the <cite>_parser_function</cite>. The parsed output must be returned in a format described above.</p>
+</div>
+</div>
+</div>
+<div class="section" id="dynamic-parser-instruction">
+<h2>Dynamic Parser Instruction<a class="headerlink" href="#dynamic-parser-instruction" title="Permalink to this headline">¶</a></h2>
+<p>Dynamic parser instruction differ from the static parser instructions in that the <em>input file names must be provided by the user</em> as an instruction parameter during the instruction specification, i.e. during the VASP calculation setup. This represents and overhead and allows for a typo to cause an instruction execution crash during the output parsing. For this reason the static parser methods should be used whenever that is possible.</p>
+<div class="section" id="id1">
+<h3>Example:<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>The <cite>Default_error_parserInstruction</cite> is an example of the dynamic parser instruction.</p>
+<p>The whole code is given below:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Default_error_parserInstruction</span><span class="p">(</span><span class="n">BaseInstruction</span><span class="p">):</span>
+
+    <span class="n">_dynamic_file_list_</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="k">def</span> <span class="nf">_parser_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">parser_warnings</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># for compatibility</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">errfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;SCHED_ERROR_FILE&#39;</span><span class="p">]</span>
+            <span class="n">errfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out_folder</span><span class="o">.</span><span class="n">get_abs_path</span><span class="p">(</span><span class="n">errfile</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">OutputParsingError</span><span class="p">(</span>
+                <span class="s2">&quot;{} expects the SCHED_ERROR_FILE to &quot;</span>
+                <span class="s2">&quot;be provided as a parameter.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">OutputParsingError</span><span class="p">(</span>
+                <span class="s2">&quot;SCHED_ERROR_FILE ({}/{}) not found !&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_out_folder</span><span class="o">.</span><span class="n">get_abs_path</span><span class="p">(),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;SCHED_ERROR_FILE&#39;</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># === parse errors &amp; warnings ===</span>
+        <span class="c1"># just a text blob --&gt; no way to parse things more cleanly ?!!</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">errfile</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">errors</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="c1"># use if/else to make things more explicit</span>
+        <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
+            <span class="n">errors</span> <span class="o">=</span> <span class="n">ParameterData</span><span class="p">(</span><span class="nb">dict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;runtime_errors&#39;</span><span class="p">:</span> <span class="n">errors</span><span class="p">})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">errors</span> <span class="o">=</span> <span class="n">ParameterData</span><span class="p">(</span><span class="nb">dict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;runtime_errors&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">})</span>
+
+        <span class="k">return</span> <span class="p">[(</span><span class="s1">&#39;runtime_errors&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="p">)],</span> <span class="n">parser_warnings</span>
+</pre></div>
+</div>
+<p>First the <cite>_dynamic_files_list_</cite> is set to <cite>True</cite>, followed by the <cite>_parser_function</cite> implementation:</p>
+<ol class="arabic simple">
+<li>get the input file name, <cite>self._params[&#8216;SCHED_ERROR_FILE&#8217;]</cite>, to open for parsing. (See the note below.)</li>
+<li>read the whole standard error file. We could be looking for a particular kind of error here instead!</li>
+<li>set up the output node list and return. In this example only one node, <cite>runtime_errors</cite>, is created. The <cite>parser_warnings</cite> is just an empty dictionary.</li>
+</ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <cite>SCHED_ERROR_FILE</cite> parameter is appended automatically by the output parser to every <cite>error</cite> instruction type. This is an example of the <a class="reference internal" href="../default_behaviour/defaults.html#default-behaviour"><span>default behaviour</span></a>.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../devel/start.html" title="Input Plugin"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../default_behaviour/defaults.html" title="Plugin’s Default Behaviour"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">AiiDA VASP Plugin 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Mario Žic.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,3 @@
+This plugin requires pymatgen_ to be installed.
+
+.. include:: ../references.txt
