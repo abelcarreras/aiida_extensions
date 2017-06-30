@@ -153,10 +153,11 @@ test_pressures = [min + interval * i for i in range(n_points)]
 
 
 # Remove duplicates
-wf_complete_list = list(wf.get_step('pressure_expansions').get_sub_workflows())
-wf_complete_list += list(wf.get_step('collect_data').get_sub_workflows())
-wf_complete_list += list(wf.get_step('complete').get_sub_workflows())
-
+wf_complete_list = []
+for step_name in ['pressure_expansions', 'collect_data', 'complete', 'pressure_manual_expansions',
+                  'pressure_gruneisen']:
+    if wf.get_step(step_name):
+        wf_complete_list += list(wf.get_step(step_name).get_sub_workflows())
 
 volumes = []
 electronic_energies = []

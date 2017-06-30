@@ -416,8 +416,12 @@ class WorkflowQHA(Workflow):
 
                 self.append_to_report('compare: {} {}'.format(wf_test.get_attribute('pressure'), pressure))
                 if np.isclose(wf_test.get_attribute('pressure'), pressure):
-                    test_pressures.remove(pressure)
-                    self.append_to_report('IS close! -> remove {}'.format(pressure))
+                    # To make sure that the calculation did not fail and if it is the case give a second chance to finish correctly
+                    if wf_test.get_state() == 'ERROR':
+                        wf_test.add_attribute('pressure', 'error')
+                    else:
+                        test_pressures.remove(pressure)
+                        self.append_to_report('IS close! -> remove {}'.format(pressure))
 
 
         for pressure in test_pressures:
@@ -483,9 +487,18 @@ class WorkflowQHA(Workflow):
 
 
         # Remove duplicates
-        wf_complete_list = list(self.get_step('pressure_expansions').get_sub_workflows())
-        wf_complete_list += list(self.get_step('collect_data').get_sub_workflows())
-        wf_complete_list += list(self.get_step('complete').get_sub_workflows())
+
+        wf_complete_list = []
+        #if self.get_step('pressure_expansions'):
+        #    wf_complete_list += list(self.get_step('pressure_expansions').get_sub_workflows())
+        #if self.get_step('collect_data'):
+        #    wf_complete_list += list(self.get_step('collect_data').get_sub_workflows())
+        #if self.get_step('complete'):
+        #    wf_complete_list += list(self.get_step('complete').get_sub_workflows())
+
+        for step_name in ['pressure_expansions', 'collect_data', 'complete', 'pressure_manual_expansions', 'pressure_gruneisen']:
+            if self.get_step(step_name):
+                wf_complete_list += list(self.get_step(step_name).get_sub_workflows())
 
         volumes = []
         electronic_energies = []
