@@ -136,7 +136,8 @@ if system == 'insulator' or system == 'semiconductor':
         'NELMIN' : 5,
         'NELM'   : 100,
         'ALGO'   : 38,
-        'ISMEAR' : -5,
+        'ISMEAR' : 0,
+        'SIGMA'  : 0.05,
         'GGA'    : 'PS'
     }
 
