@@ -189,6 +189,10 @@ class WorkflowQHA(Workflow):
 
         test_pressures = wf_parameters['scan_pressures']  # in kbar
 
+        self.add_attribute('interval', test_pressures[1] - test_pressures[0])
+        self.add_attribute('max', test_pressures[1])
+        self.add_attribute('min', test_pressures[0])
+
         # wfs_test = [821, 820]
         for i, pressure in enumerate(test_pressures):
             self.append_to_report('pressure: {}'.format(pressure))
@@ -211,7 +215,12 @@ class WorkflowQHA(Workflow):
         stresses = prediction.get_array('stresses')
 
         n_points = wf_parameters['n_points']
+
         test_pressures = np.linspace(-1.0 * np.max(stresses), np.max(stresses), n_points)  # in kbar
+
+        self.add_attribute('interval', test_pressures[1] - test_pressures[0])
+        self.add_attribute('max', test_pressures[1])
+        self.add_attribute('min', test_pressures[0])
 
         # wfs_test = [821, 820]
         for i, pressure in enumerate(test_pressures):
