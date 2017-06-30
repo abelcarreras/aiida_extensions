@@ -412,12 +412,12 @@ class WorkflowQHA(Workflow):
 
         # Remove duplicates
         for wf_test in self.get_step('pressure_expansions').get_sub_workflows():
-            for pressure in test_pressures:
+            for pressure in list(test_pressures):
 
                 self.append_to_report('compare: {} {}'.format(wf_test.get_attribute('pressure'), pressure))
                 if np.isclose(wf_test.get_attribute('pressure'), pressure):
                     test_pressures.remove(pressure)
-                    self.append_to_report('IS close! -> remove')
+                    self.append_to_report('IS close! -> remove {}'.format(pressure))
 
 
         for pressure in test_pressures:
