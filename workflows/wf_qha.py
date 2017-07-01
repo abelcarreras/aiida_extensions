@@ -176,7 +176,8 @@ class WorkflowQHA(Workflow):
         if self._expansion_method == 'pressure':
             self.next(self.pressure_expansions)
         elif self._expansion_method == 'volume':
-            self.next(self.volume_expansions)
+            self.append_to_report('Not yet implemented')
+            self.next(self.exit)
         else:
             self.append_to_report('Error no method defined')
             self.next(self.exit)
