@@ -320,11 +320,13 @@ class WorkflowQHA(Workflow):
 
         if not ok_sup:
             test_range[1] = test_range[0] + 0.5 * total_range
-            interval = interval * 0.5
+            if total_range / interval < n_points * 2:
+                interval = interval * 0.5
 
         if not ok_inf:
             test_range[0] = test_range[1] - 0.5 * total_range
-            interval = interval * 0.5
+            if total_range / interval < n_points * 2:
+                interval = interval * 0.5
 
         if ok_inf and ok_sup:
             if max is None or test_range[1] > max:
@@ -350,6 +352,8 @@ class WorkflowQHA(Workflow):
 
                 self.next(self.complete)
                 return
+
+
 
         total_range = test_range[1] - test_range[0]
 
