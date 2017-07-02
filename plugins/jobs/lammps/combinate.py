@@ -187,6 +187,10 @@ def generate_LAMMPS_input(parameters,
         lammps_input_file += 'shell       {}\n'.format(command)
         lammps_input_file += 'shell       rm {}\n'.format(trajectory_file)
 
+    lammps_input_file += 'print           "end of script" \n'.format(1000)
+    lammps_input_file += 'run             {}\n'.format(1000)
+
+
     return lammps_input_file
 
 
