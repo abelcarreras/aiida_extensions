@@ -98,7 +98,8 @@ wf_parameters = {
                   'potential': potential,
                   'parameters': parameters_md,
                   'resources': lammps_machine},
-     'scan_pressures': [150, 100, 50, 0, -50, -90]
+    'scan_temperatures': range(300, 1500, 100),
+    'scan_pressures': [150, 100, 50, 0, -50, -90]
 }
 
 #from aiida.workflows.wf_quasiparticle_thermo import WorkflowQuasiparticle

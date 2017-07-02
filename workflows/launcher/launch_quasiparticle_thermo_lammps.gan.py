@@ -97,7 +97,8 @@ wf_parameters = {
                   'supercell': [3, 3, 3],
                   'potential': potential,
                   'parameters': parameters_md,
-                  'resources': lammps_machine}
+                  'resources': lammps_machine},
+    'scan_temperatures': range(300, 1500, 100)
 }
 
 from aiida.workflows.wf_quasiparticle_thermo import WorkflowQuasiparticle

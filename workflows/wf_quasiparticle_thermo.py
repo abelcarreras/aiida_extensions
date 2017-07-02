@@ -104,13 +104,14 @@ class WorkflowQuasiparticle(Workflow):
     def dynaphopy(self):
 
         wf_parameters = self.get_parameters()
+        temperatures = wf_parameters['scan_temperatures']
 
         structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
         self.add_result('final_structure', structure)
 
         harmonic_force_constants = self.get_step(self.start).get_sub_workflows()[0].get_result('force_constants')
 
-        for t in range(300, 1500, 100):
+        for t in temperatures:
             calc = self.generate_md_dynaphopy(structure,
                                               wf_parameters['input_md'],
                                               wf_parameters['dynaphopy_input'],
