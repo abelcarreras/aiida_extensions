@@ -426,7 +426,11 @@ class WorkflowQHA(Workflow):
         self.append_to_report('final pressure list: {}'.format(test_pressures))
 
         # Remove duplicates
-        for wf_test in self.get_step('pressure_expansions').get_sub_workflows():
+        wf_complete_list = list(self.get_step('pressure_expansions').get_sub_workflows())
+        wf_complete_list += list(self.get_step('collect_data').get_sub_workflows())
+
+        # Remove duplicates
+        for wf_test in wf_complete_list:
             for pressure in list(test_pressures):
 
                 self.append_to_report('compare: {} {}'.format(wf_test.get_attribute('pressure'), pressure))
