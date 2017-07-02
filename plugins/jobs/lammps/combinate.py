@@ -166,7 +166,7 @@ def generate_LAMMPS_input(parameters,
     lammps_input_file += 'timestep        {}\n'.format(parameters.dict.timestep)
 
     lammps_input_file += 'thermo_style    custom step etotal temp vol press\n'
-    lammps_input_file += 'thermo          1000\n'
+    lammps_input_file += 'thermo          100000\n'
 
     lammps_input_file += 'velocity        all create {0} {1} dist gaussian mom yes\n'.format(parameters.dict.temperature, random_number)
     lammps_input_file += 'velocity        all scale {}\n'.format(parameters.dict.temperature)
