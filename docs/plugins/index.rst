@@ -8,3 +8,4 @@ This is a collection of plugins and workflows for AiiDA.
    lammps
    phonopy
    dynaphopy
+   vasp
