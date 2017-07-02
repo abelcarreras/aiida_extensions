@@ -184,7 +184,7 @@ def generate_LAMMPS_input(parameters,
     lammps_input_file += 'run             {}\n'.format(parameters.dict.total_steps)
 
     if command:
-        lammps_input_file += 'shell       {sleep 60}\n'
+        lammps_input_file += 'shell       sleep 60\n'
         lammps_input_file += 'shell       {}\n'.format(command)
         lammps_input_file += 'shell       rm {}\n'.format(trajectory_file)
 
