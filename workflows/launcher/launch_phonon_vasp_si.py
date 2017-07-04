@@ -66,7 +66,8 @@ phonopy_parameters = {'supercell': [[2, 0, 0],
                                    [0.5, 0.0, 0.5],
                                    [0.5, 0.5, 0.0]],
                      'distance': 0.01,
-                     'mesh': [40, 40, 40]}
+                     'mesh': [40, 40, 40],
+                     'symmetry_precision': 1e-5}
 
 # Collect workflow input data
 wf_parameters = {

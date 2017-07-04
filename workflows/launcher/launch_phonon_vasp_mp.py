@@ -197,7 +197,8 @@ machine_dict = {
 phonopy_parameters = {'supercell': supercell,
                       'primitive': primitive_matrix,
                       'distance': 0.01,
-                      'mesh': [20, 20, 20]}
+                      'mesh': [20, 20, 20],
+                      'symmetry_precision': 1e-5}
 
 wf_parameters = {
      'structure': structure,

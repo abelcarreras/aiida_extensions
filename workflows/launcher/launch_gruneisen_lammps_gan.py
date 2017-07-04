@@ -61,7 +61,8 @@ phonopy_parameters = {'supercell': [[3, 0, 0],
                                    [0.0, 1.0, 0.0],
                                    [0.0, 0.0, 1.0]],
                      'distance': 0.01,
-                     'mesh': [40, 40, 40]}
+                     'mesh': [40, 40, 40],
+                     'symmetry_precision': 1e-5}
 
 # GaN Tersoff
 tersoff_gan = {'Ga Ga Ga': '1.0 0.007874 1.846 1.918000 0.75000 -0.301300 1.0 1.0 1.44970 410.132 2.87 0.15 1.60916 535.199',

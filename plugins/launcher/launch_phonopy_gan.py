@@ -37,7 +37,8 @@ parameters = ParameterData(dict={'supercell': [[3,0,0],
                                                [0.0, 1.0, 0.0],
                                                [0.0, 0.0, 1.0]],
                                  'distance': 0.01,
-                                 'mesh': [40, 40, 40]}
+                                 'mesh': [40, 40, 40],
+                                 'symmetry_precision': 1e-5}
                           )
 
 calc = code.new_calc(max_wallclock_seconds=3600,

@@ -61,7 +61,8 @@ phonopy_parameters = {'supercell': [[2, 0, 0],
                                    [0.5, 0.0, 0.5],
                                    [0.5, 0.5, 0.0]],
                      'distance': 0.01,
-                     'mesh': [40, 40, 40]}
+                     'mesh': [40, 40, 40],
+                     'symmetry_precision': 1e-5}
 
 # Silicon(C) Tersoff
 tersoff_si = {'Si  Si  Si ': '3.0 1.0 1.7322 1.0039e5 16.218 -0.59826 0.78734 1.0999e-6  1.7322  471.18  2.85  0.15  2.4799  1830.8'}

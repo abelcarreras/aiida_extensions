@@ -54,7 +54,8 @@ def create_supercells_with_displacements_inline(**kwargs):
 
     phonon = Phonopy(bulk,
                      phonopy_input['supercell'],
-                     primitive_matrix=phonopy_input['primitive'])
+                     primitive_matrix=phonopy_input['primitive'],
+                     symprec=phonopy_input['symmetry_precision'])
 
     phonon.generate_displacements(distance=phonopy_input['distance'])
 
@@ -90,7 +91,8 @@ def get_force_constants_inline(**kwargs):
     phonon = Phonopy(bulk,
                      phonopy_input['supercell'],
                      primitive_matrix=phonopy_input['primitive'],
-                     distance=phonopy_input['distance'])
+                     distance=phonopy_input['distance'],
+                     symprec=phonopy_input['symmetry_precision'])
 
     # Build data_sets from forces of supercells with displacments
     data_sets = phonon.get_displacement_dataset()
@@ -129,7 +131,8 @@ def get_force_sets_inline(**kwargs):
     phonon = Phonopy(bulk,
                      phonopy_input['supercell'],
                      primitive_matrix=phonopy_input['primitive'],
-                     distance=phonopy_input['distance'])
+                     distance=phonopy_input['distance'],
+                     symprec=phonopy_input['symmetry_precision'])
 
     # Build data_sets from forces of supercells with displacments
     data_sets = phonon.get_displacement_dataset()
@@ -161,7 +164,8 @@ def phonopy_calculation_inline(**kwargs):
     phonon = Phonopy(bulk,
                      phonopy_input['supercell'],
                      primitive_matrix=phonopy_input['primitive'],
-                     distance=phonopy_input['distance'])
+                     distance=phonopy_input['distance'],
+                     symprec=phonopy_input['symmetry_precision'])
 
     phonon.set_force_constants(force_constants)
 

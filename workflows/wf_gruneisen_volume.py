@@ -51,7 +51,8 @@ def get_phonon(structure, force_constants, phonopy_input):
     phonon = Phonopy(bulk,
                      phonopy_input['supercell'],
                      primitive_matrix=phonopy_input['primitive'],
-                     distance=phonopy_input['distance'])
+                     distance=phonopy_input['distance'],
+                     symprec=phonopy_input['symmetry_precision'])
 
     phonon.set_force_constants(force_constants)
 
