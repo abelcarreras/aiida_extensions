@@ -113,7 +113,7 @@ class WorkflowQuasiparticle(Workflow):
         wf_parameters = self.get_parameters()
 
         if self._use_optimized_structure_for_md:
-            structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
+            structure = self.get_step('start').get_sub_workflows()[0].get_result('final_structure')
         else:
             structure = wf_parameters['structure']
 
@@ -135,8 +135,8 @@ class WorkflowQuasiparticle(Workflow):
 
         wf_parameters = self.get_parameters()
 
-        harmonic_force_constants = self.get_step(self.start).get_sub_workflows()[0].get_result('force_constants')
-        structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
+        harmonic_force_constants = self.get_step('start').get_sub_workflows()[0].get_result('force_constants')
+        structure = self.get_step('start').get_sub_workflows()[0].get_result('final_structure')
 
         self.add_result('force_constants', harmonic_force_constants)
 
@@ -166,8 +166,8 @@ class WorkflowQuasiparticle(Workflow):
         self.add_result('quasiparticle_data', calc.out.quasiparticle_data)
         self.add_result('r_force_constants', calc.out.array_data)
 
-        optimization_data = self.get_step(self.start).get_sub_workflows()[0].get_result('optimized_structure_data')
-        final_structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
+        optimization_data = self.get_step('start').get_sub_workflows()[0].get_result('optimized_structure_data')
+        final_structure = self.get_step('start').get_sub_workflows()[0].get_result('final_structure')
 
         self.add_result('optimized_structure_data', optimization_data)
         self.add_result('final_structure', final_structure)

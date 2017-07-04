@@ -276,7 +276,7 @@ class WorkflowGruneisen(Workflow):
         self.append_to_report('Volume expansion calculations')
         wf_parameters = self.get_parameters()
 
-        structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
+        structure = self.get_step('start').get_sub_workflows()[0].get_result('final_structure')
         self.append_to_report('optimized structure volume: {}'.format(structure.pk))
 
         pressure_differences = [-10, 10]
@@ -332,7 +332,7 @@ class WorkflowGruneisen(Workflow):
         parameters_phonopy = self.get_parameters()['phonopy_input']
 
         if self.get_step('volume_expansions') is not None:
-            wf_origin = self.get_step(self.start).get_sub_workflows()[0]
+            wf_origin = self.get_step('start').get_sub_workflows()[0]
             wf_plus, wf_minus = self.get_step('volume_expansions').get_sub_workflows()
         else:
             wf_plus, wf_origin, wf_minus = self.get_step('volume_expansions_direct').get_sub_workflows()

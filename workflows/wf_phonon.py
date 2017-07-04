@@ -490,7 +490,7 @@ class WorkflowPhonon(Workflow):
         parameters = self.get_parameters()
         parameters_phonopy = parameters['phonopy_input']
 
-        optimized = self.get_step(self.optimize)
+        optimized = self.get_step('optimize')
 
         if optimized is not None:
             self.append_to_report('Optimized structure')
@@ -594,7 +594,7 @@ class WorkflowPhonon(Workflow):
 
         parameters_phonopy = self.get_parameters()['phonopy_input']
 
-        remote_phonopy = self.get_step(self.force_constants_calculation_remote)
+        remote_phonopy = self.get_step('force_constants_calculation_remote')
 
         if remote_phonopy is None:
             force_constants = self.get_result('force_constants')

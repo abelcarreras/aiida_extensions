@@ -106,10 +106,10 @@ class WorkflowQuasiparticle(Workflow):
         wf_parameters = self.get_parameters()
         temperatures = wf_parameters['scan_temperatures']
 
-        structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
+        structure = self.get_step('start').get_sub_workflows()[0].get_result('final_structure')
         self.add_result('final_structure', structure)
 
-        harmonic_force_constants = self.get_step(self.start).get_sub_workflows()[0].get_result('force_constants')
+        harmonic_force_constants = self.get_step('start').get_sub_workflows()[0].get_result('force_constants')
 
         for t in temperatures:
             calc = self.generate_md_dynaphopy(structure,
@@ -130,7 +130,7 @@ class WorkflowQuasiparticle(Workflow):
         # Get the thermal properties at 0 K from phonopy calculation
         self.add_result('h_thermal_properties',  self.get_step('start').get_sub_workflows()[0].get_result('thermal_properties'))
         try:
-            optimization_data = self.get_step(self.start).get_sub_workflows()[0].get_result('optimized_structure_data')
+            optimization_data = self.get_step('start').get_sub_workflows()[0].get_result('optimized_structure_data')
             self.add_result('optimized_structure_data', optimization_data)
         except ValueError:
             self.append_to_report('No optimized structure')

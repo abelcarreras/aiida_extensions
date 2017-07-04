@@ -212,7 +212,7 @@ class WorkflowQHA(Workflow):
         self.append_to_report('Trust Gruneisen expansion (For empirical potentials)')
         wf_parameters = self.get_parameters()
 
-        prediction = self.get_step(self.start).get_sub_workflows()[0].get_result('thermal_expansion_prediction')
+        prediction = self.get_step('start').get_sub_workflows()[0].get_result('thermal_expansion_prediction')
         stresses = prediction.get_array('stresses')
 
         n_points = wf_parameters['n_points']
@@ -242,7 +242,7 @@ class WorkflowQHA(Workflow):
         self.append_to_report('Pressure expansion calculations')
         wf_parameters = self.get_parameters()
         # structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
-        prediction = self.get_step(self.start).get_sub_workflows()[0].get_result('thermal_expansion_prediction')
+        prediction = self.get_step('start').get_sub_workflows()[0].get_result('thermal_expansion_prediction')
         stresses = prediction.get_array('stresses')
 
         test_pressures = [np.min([0.0, np.min(stresses)]), np.max([0.0, np.max(stresses)])]  # in kbar

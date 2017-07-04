@@ -190,7 +190,7 @@ class WorkflowGruneisen(Workflow):
         self.append_to_report('Volume expansion calculations')
         wf_parameters = self.get_parameters()
 
-        structure = self.get_step(self.start).get_sub_workflows()[0].get_result('final_structure')
+        structure = self.get_step('start').get_sub_workflows()[0].get_result('final_structure')
 
         inline_params = {'structure': structure,
                          'volumes': ParameterData(dict={ 'relations': [1.01, 0.99]})}  # plus, minus
@@ -258,7 +258,7 @@ class WorkflowGruneisen(Workflow):
         if self.get_step('volume_expansions') is not None:
         # if self.get_steps().last().get_previous_by_time().name == 'volume_expansions':
         # if self.get_steps().last().name == 'volume_expansions':
-            wf_origin = self.get_step(self.start).get_sub_workflows()[0]
+            wf_origin = self.get_step('start').get_sub_workflows()[0]
             wf_plus, wf_minus = self.get_step('volume_expansions').get_sub_workflows()
         else:
             wf_plus, wf_origin, wf_minus = self.get_step('volume_expansions_direct').get_sub_workflows()
