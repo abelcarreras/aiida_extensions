@@ -432,16 +432,17 @@ class WorkflowQHA(Workflow):
         # Remove duplicates
         for wf_test in wf_complete_list:
             for pressure in list(test_pressures):
-
-                # self.append_to_report('compare: {} {}'.format(wf_test.get_attribute('pressure'), pressure))
-                if np.isclose(wf_test.get_attribute('pressure'), pressure):
-                    # To make sure that the calculation did not fail and if it is the case give a second chance to finish correctly
+                try:
                     if wf_test.get_state() == 'ERROR':
                         wf_test.add_attribute('pressure', 'error')
                     else:
-                        test_pressures.remove(pressure)
-                        self.append_to_report('IS close! -> remove {}'.format(pressure))
-
+                        # self.append_to_report('compare: {} {}'.format(wf_test.get_attribute('pressure'), pressure))
+                        if np.isclose(wf_test.get_attribute('pressure'), pressure):
+                            # To make sure that the calculation did not fail and if it is the case give a second chance to finish correctly
+                            test_pressures.remove(pressure)
+                            self.append_to_report('IS close! -> remove {}'.format(pressure))
+                except:
+                    wf_test.add_attribute('pressure', 'error')
 
         for pressure in test_pressures:
             self.append_to_report('pressure: {}'.format(pressure))
