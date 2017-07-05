@@ -20,7 +20,7 @@ def check_dos_stable(wf, tol=1e-6):
     try:
         dos = wf.get_result('dos').get_array('total_dos')
         freq = wf.get_result('dos').get_array('frequency')
-    except ValueError:
+    except:
         return False
 
     mask_neg = np.ma.masked_less(freq, 0.0).mask
