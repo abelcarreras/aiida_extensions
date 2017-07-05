@@ -287,6 +287,35 @@ class WorkflowPhonon(Workflow):
 
         return calc
 
+
+
+    def generate_calculations_qe(self, structure, parameters, type='optimize', pressure=0.0):
+        # On development
+        code = Code.get_from_string(parameters['code'])
+
+        calc = code.new_calc(max_wallclock_seconds=3600,
+                             resources=parameters['resources'])
+
+        parameters_qe = dict(parameters['parameters'])
+
+        if type == 'optimize':
+            parameters_qe['CONTROL'].update({'relax': True})
+
+        parameters_qe['CELL'].update({'press', pressure})
+
+        calc.use_structure(structure)
+        calc.use_code(code)
+        calc.use_parameters(dict=parameters)
+
+        kpoints = KpointsData()
+        kpoints.set_kpoints_mesh(parameters['kpoints'])
+
+        calc.use_kpoints(kpoints)
+
+        calc.store_all()
+
+
+
     def generate_calculation_vasp(self, structure, parameters, type='optimize', pressure=0.0):
         # import pymatgen as mg
         from pymatgen.io import vasp as vaspio
@@ -423,6 +452,8 @@ class WorkflowPhonon(Workflow):
             return self.generate_calculation_lammps(structure, parameters, type=type, pressure=pressure)
         elif plugin == 'vasp':
             return self.generate_calculation_vasp(structure, parameters, type=type, pressure=pressure)
+        elif plugin == 'quantumespresso':
+            return self.generate_calculation_qe(structure, parameters, type=type, pressure=pressure)
         else:
             self.append_to_report('The plugin: {}, is not implemented in this workflow'.format(plugin))
             self.next(self.exit)
