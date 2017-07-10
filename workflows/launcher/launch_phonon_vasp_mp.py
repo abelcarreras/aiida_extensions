@@ -8,7 +8,7 @@ ParameterData = DataFactory('parameter')
 import numpy as np
 import os
 import pymatgen
-import pymatgen.symmetry.analyzer
+from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
 
 ##########################
@@ -94,7 +94,7 @@ pmg_band = rester.get_bandstructure_by_material_id(structure_id)
 material_name = pmg_structure.formula.replace('1','').replace(' ','')
 print (material_name)
 
-spa = pymatgen.symmetry.analyzer.SpacegroupAnalyzer(pmg_structure)
+spa = SpacegroupAnalyzer(pmg_structure)
 
 conventional = spa.get_conventional_standard_structure()
 primitive = spa.get_primitive_standard_structure()
