@@ -92,6 +92,7 @@ pmg_structure = rester.get_structure_by_material_id(structure_id)
 pmg_band = rester.get_bandstructure_by_material_id(structure_id)
 
 material_name = pmg_structure.formula.replace('1','').replace(' ','')
+print (material_name)
 
 spa = pymatgen.symmetry.analyzer.SpacegroupAnalyzer(pmg_structure)
 
@@ -102,10 +103,10 @@ primitive_matrix = np.dot(np.linalg.inv(conventional.lattice.matrix), primitive.
 primitive_matrix = np.round(primitive_matrix, decimals=6).tolist()
 
 structure = StructureData(pymatgen=conventional).store()
-print structure
+print (structure)
 
 crystal_system = spa.get_crystal_system()
-print 'Crystal system: {}'.format(crystal_system)
+print ('Crystal system: {}'.format(crystal_system))
 
 # if crystal_system == 'hexagonal':
 #     supercell = [[3, 0, 0],
@@ -130,7 +131,7 @@ elif band_gap > 0.01:
 else:
     system = 'metal'
 
-print 'system: {}'.format(system)
+print ('system: {}'.format(system))
 
 
 if system == 'insulator' or system == 'semiconductor':
