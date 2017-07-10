@@ -8,6 +8,8 @@ ParameterData = DataFactory('parameter')
 import numpy as np
 import os
 import pymatgen
+import pymatgen.symmetry.analyzer
+
 
 ##########################
 structure_id = 'mp-12668'
@@ -96,7 +98,7 @@ spa = pymatgen.symmetry.analyzer.SpacegroupAnalyzer(pmg_structure)
 conventional = spa.get_conventional_standard_structure()
 primitive = spa.get_primitive_standard_structure()
 
-primitive_matrix = np.dot(np.linalg.inv(conventional.lattice_vectors()), primitive.lattice_vectors())
+primitive_matrix = np.dot(np.linalg.inv(conventional.lattice.matrix), primitive.lattice.matrix)
 primitive_matrix = np.round(primitive_matrix, decimals=6).tolist()
 
 structure = StructureData(pymatgen=conventional).store()
