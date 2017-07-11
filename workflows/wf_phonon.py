@@ -588,6 +588,7 @@ class WorkflowPhonon(Workflow):
 
         self.next(self.phonon_calculation)
 
+
     @Workflow.step
     def force_constants_calculation_remote(self):
 
