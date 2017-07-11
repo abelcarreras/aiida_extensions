@@ -86,6 +86,48 @@ plt.suptitle('Mode Gruneisen parameter')
 for (g, freq) in zip(mesh.get_array('frequencies').T, mesh.get_array('gruneisen').T):
     plt.plot(g, freq, marker='o', linestyle='None', markeredgecolor='black', color='red')
 
+# Prediction
+
+prediction = wf.get_result('thermal_expansion_prediction')
+
+temperatures = prediction.get_array('temperatures')
+stresses = prediction.get_array('stresses')
+volumes = prediction.get_array('volumes')
+stresses_direct = prediction.get_array('stresses_direct')
+
+plt.figure(5)
+plt.xlabel('Temperature [K]')
+plt.ylabel('Stress [Kbar]')
+plt.suptitle('Prediction stress')
+plt.plot(temperatures, stresses)
+
+plt.figure(6)
+plt.xlabel('Temperature [K]')
+plt.ylabel('Volume [A^3]')
+plt.suptitle('Prediction Volume')
+plt.plot(temperatures, stresses)
+
+plt.figure(7)
+plt.xlabel('Temperature [K]')
+plt.ylabel('Stress [kbar]')
+plt.suptitle('Prediction stress direct')
+plt.plot(temperatures, stresses_direct)
+
+plt.figure(8)
+plt.xlabel('Temperature [K]')
+plt.ylabel('Volume [A^3]')
+plt.suptitle('Volume - stress')
+plt.plot(volumes, stresses)
+
+plt.figure(9)
+plt.xlabel('Temperature [K]')
+plt.ylabel('Stress [kbar')
+plt.suptitle('Volume - stress direct')
+plt.plot(volumes, stresses_direct)
+
+
 
 plt.show()
+
+
 
