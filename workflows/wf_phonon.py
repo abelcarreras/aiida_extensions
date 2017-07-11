@@ -474,6 +474,7 @@ class WorkflowPhonon(Workflow):
         self.add_attribute('pressure', self._pressure)
         self.add_attribute('constant_volume', self._constant_volume)
 
+
     # Optimize the structure
     @Workflow.step
     def optimize(self):
@@ -511,6 +512,7 @@ class WorkflowPhonon(Workflow):
         else:
             self.add_attribute('counter', counter - 1)
             self.next(self.optimize)
+
 
     # Prepare supercells with displacements
     @Workflow.step
@@ -557,6 +559,7 @@ class WorkflowPhonon(Workflow):
         else:
             self.append_to_report('Local phonon calculation')
             self.next(self.force_constants_calculation)
+
 
     # Collects the forces and prepares force constants
     @Workflow.step
