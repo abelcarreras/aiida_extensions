@@ -241,6 +241,12 @@ class WorkflowGruneisen(Workflow):
         else:
             self._pressure = 0.0  # By default pre-optimization is done
 
+        if 'p_displacement' in kwargs:
+            self._p_displacement = kwargs['pressure']
+        else:
+            self._p_displacement = 1e-5  # By default
+
+
     # Calculates the reference crystal structure (optimize it if requested)
     @Workflow.step
     def start(self):
@@ -248,6 +254,7 @@ class WorkflowGruneisen(Workflow):
         self.append_to_report('Phonon calculation of base structure')
 
         self.add_attribute('pressure', self._pressure)
+        self.add_attribute('p_displacement', self._p_displacement)
 
         if not self._pre_optimize:
             self.next(self.volume_expansions_direct)
@@ -279,7 +286,8 @@ class WorkflowGruneisen(Workflow):
         structure = self.get_step('start').get_sub_workflows()[0].get_result('final_structure')
         self.append_to_report('optimized structure volume: {}'.format(structure.pk))
 
-        pressure_differences = [-1e-5, 1e-5]
+        p_displacement = self.get_attribute('p_displacement')
+        pressure_differences = [-p_displacement, p_displacement]
         for p in pressure_differences:
             pressure = self.get_attribute('pressure') + p
 
@@ -308,7 +316,8 @@ class WorkflowGruneisen(Workflow):
         self.append_to_report('structure volume: {}'.format(structure.pk))
 
         # list = [751, 752, 753]
-        pressure_differences = [-1e-5, 0, 1e-5]
+        p_displacement = self.get_attribute('p_displacement')
+        pressure_differences = [-p_displacement, 0, p_displacement]
         for i, p in enumerate(pressure_differences):
             pressure = self.get_attribute('pressure') + p
 
