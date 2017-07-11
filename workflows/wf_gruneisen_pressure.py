@@ -242,7 +242,7 @@ class WorkflowGruneisen(Workflow):
             self._pressure = 0.0  # By default pre-optimization is done
 
         if 'p_displacement' in kwargs:
-            self._p_displacement = kwargs['pressure']
+            self._p_displacement = kwargs['p_displacement']
         else:
             self._p_displacement = 1e-5  # By default
 
