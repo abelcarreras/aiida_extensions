@@ -279,7 +279,7 @@ class WorkflowGruneisen(Workflow):
         structure = self.get_step('start').get_sub_workflows()[0].get_result('final_structure')
         self.append_to_report('optimized structure volume: {}'.format(structure.pk))
 
-        pressure_differences = [-10, 10]
+        pressure_differences = [-1e-5, 1e-5]
         for p in pressure_differences:
             pressure = self.get_attribute('pressure') + p
 
@@ -307,7 +307,7 @@ class WorkflowGruneisen(Workflow):
         self.append_to_report('structure volume: {}'.format(structure.pk))
 
         # list = [751, 752, 753]
-        pressure_differences = [-5, 0, 5]
+        pressure_differences = [-1e-5, 0, 1e-5]
         for i, p in enumerate(pressure_differences):
             pressure = self.get_attribute('pressure') + p
 
@@ -336,6 +336,10 @@ class WorkflowGruneisen(Workflow):
             wf_plus, wf_minus = self.get_step('volume_expansions').get_sub_workflows()
         else:
             wf_plus, wf_origin, wf_minus = self.get_step('volume_expansions_direct').get_sub_workflows()
+
+        self.append_to_report('WF_PLUS: {}'.format(wf_plus.pk))
+        self.append_to_report('WF_MINUS: {}'.format(wf_minus.pk))
+        self.append_to_report('WF_ORIGIN: {}'.format(wf_origin.pk))
 
         # Expansion
         energies = [wf_origin.get_result('optimized_structure_data').dict.energy,
