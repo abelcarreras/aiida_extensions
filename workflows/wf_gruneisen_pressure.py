@@ -286,6 +286,7 @@ class WorkflowGruneisen(Workflow):
         structure = self.get_step('start').get_sub_workflows()[0].get_result('final_structure')
         self.append_to_report('optimized structure volume: {}'.format(structure.pk))
 
+
         p_displacement = self.get_attribute('p_displacement')
         pressure_differences = [-p_displacement, p_displacement]
         for p in pressure_differences:
