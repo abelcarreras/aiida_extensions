@@ -337,7 +337,7 @@ class WorkflowGruneisen(Workflow):
         else:
             wf_plus, wf_origin, wf_minus = self.get_step('volume_expansions_direct').get_sub_workflows()
 
-        self.append_to_report('WF_PLUS: {}'.format(wf_plus.pk))
+        self.append_to_report('WF_PLUS-: {}'.format(wf_plus.pk))
         self.append_to_report('WF_MINUS: {}'.format(wf_minus.pk))
         self.append_to_report('WF_ORIGIN: {}'.format(wf_origin.pk))
 
