@@ -297,6 +297,7 @@ class WorkflowGruneisen(Workflow):
 
         self.next(self.collect_data)
 
+
     # Generate the volume expanded cells
     @Workflow.step
     def volume_expansions_direct(self):
