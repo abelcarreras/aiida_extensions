@@ -384,7 +384,7 @@ class WorkflowPhonon(Workflow):
                 'LREAL': '.FALSE.'})
             incar = vasp_input_forces
 
-        incar.update({'PSTRESS': pressure * 1.0E6})  # unit: kb -> kB
+        incar.update({'PSTRESS': pressure})  # unit: kb -> kB
 
         # KPOINTS
         kpoints = parameters['kpoints']

@@ -244,7 +244,7 @@ class WorkflowGruneisen(Workflow):
         if 'p_displacement' in kwargs:
             self._p_displacement = kwargs['p_displacement']
         else:
-            self._p_displacement = 1e-5  # By default
+            self._p_displacement = 10  # in Kbar
 
 
     # Calculates the reference crystal structure (optimize it if requested)
