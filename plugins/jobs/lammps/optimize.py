@@ -90,6 +90,12 @@ def generate_LAMMPS_input(potential_obj,
                                                                                     parameters['pressure'],
                                                                                     parameters['vmax'])
 
+    lammps_input_file += 'compute         stpa all stress/atom NULL'
+                                                              #  xx,       yy,        zz,       xy,       xz,       yz
+    lammps_input_file += 'compute         stgb all reduce sum c_stpa[1] c_stpa[2] c_stpa[3] c_stpa[4] c_stpa[5] c_stpa[6]'
+    lammps_input_file += 'variable        pr equal -(c_stgb[1]+c_stgb[2]+c_stgb[3])/(3*vol)'
+    lammps_input_file += 'thermo_style    custom step temp press v_pr c_stgb[1] c_stgb[2] c_stgb[3] c_stgb[4] c_stgb[5] c_stgb[6]'
+
     lammps_input_file += 'dump            aiida all custom 1 {0} element x y z  fx fy fz\n'.format(optimize_path_file)
     lammps_input_file += 'dump_modify     aiida format "%4s  %16.10f %16.10f %16.10f  %16.10f %16.10f %16.10f"\n'
     lammps_input_file += 'dump_modify     aiida sort id\n'

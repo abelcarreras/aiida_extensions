@@ -17,6 +17,11 @@ def read_log_file(logfile):
         if 'Loop time' in line:
             energy = float(data[i-1].split()[4])
             data_dict['energy'] = energy
+            xx, yy, zz, xy, xz, yz = data[i-1].split()[5:11]
+            stress = np.array([[xx, xy, xz],
+                                            [xy, yy, yz],
+                                            [xz, yz, zz]], dtype=float)
+
 
         if '$(xlo)' in line:
             a = data[i+1].split()
@@ -54,7 +59,7 @@ def read_log_file(logfile):
     if np.linalg.det(cell) < 0:
         cell = -1.0*cell
 
-    return data_dict, cell
+    return data_dict, cell, stress
 
 def read_lammps_positions_and_forces(file_name):
 
@@ -187,7 +192,7 @@ class OptimizeParser(Parser):
         outfile = out_folder.get_abs_path( self._calc._OUTPUT_FILE_NAME)
         ouput_trajectory = out_folder.get_abs_path( self._calc._OUTPUT_TRAJECTORY_FILE_NAME)
 
-        output_data, cell = read_log_file(outfile)
+        output_data, cell, stress_tensor = read_log_file(outfile)
         positions, forces, symbols, cell2 = read_lammps_positions_and_forces(ouput_trajectory)
 
         # look at warnings
@@ -214,6 +219,8 @@ class OptimizeParser(Parser):
         # save forces into node
         array_data = ArrayData()
         array_data.set_array('forces', forces)
+        array_data.set_array('stress', stress_tensor)
+
         new_nodes_list.append(('output_array', array_data))
 
         # add the dictionary with warnings
