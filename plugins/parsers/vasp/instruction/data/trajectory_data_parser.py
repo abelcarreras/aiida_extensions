@@ -94,8 +94,7 @@ def read_VASP_XDATCAR(file_name, time_step,
 
 class Trajectory_parametersInstruction(BaseInstruction):
 
-    print ('INCLASS')
-    _input_file_list_ = ['POSCAR', 'XDATCAR']
+    _input_file_list_ = ['XDATCAR']
 
     def _parser_function(self):
         """
