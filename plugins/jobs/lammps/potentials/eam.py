@@ -4,7 +4,7 @@ def generate_LAMMPS_potential(data):
 
     potential_file = ''
     for line in data['file_contents']:
-        potential_file += '{}\n'.format(line)
+        potential_file += '{}'.format(line)
 
     return potential_file
 
