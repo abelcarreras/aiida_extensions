@@ -18,7 +18,7 @@ def thermal_expansion(volumes, electronic_energies, gruneisen, stresses=None, t_
 
     tp = gruneisen.get_thermal_properties()
 
-    fit_vs = np.polyfit(volumes, stresses, 2)
+    fit_vs = np.polyfit(volumes[2,0,1], stresses[2,0,1], 2)
 
     free_energy_array = []
     entropy_array = []
@@ -187,9 +187,9 @@ def phonopy_gruneisen_inline(**kwargs):
 
 
     # Thermal expansion approximate prediction
-    volumes = [phonon_origin.unitcell.get_volume(),
-               phonon_plus.unitcell.get_volume(),
-               phonon_minus.unitcell.get_volume()]
+    volumes = np.array([phonon_origin.unitcell.get_volume(),
+                        phonon_plus.unitcell.get_volume(),
+                        phonon_minus.unitcell.get_volume()])
 
     energy_pressure = kwargs.pop('energy_pressure')
     energies = energy_pressure.get_array('energies')
