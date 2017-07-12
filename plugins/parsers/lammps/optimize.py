@@ -60,7 +60,7 @@ def read_log_file(logfile):
         cell = -1.0*cell
 
     volume = np.linalg.det(cell)
-    stress = -stress/volume
+    stress = -stress/volume * 1.e-3  # bar*A^3 -> kbar
 
     return data_dict, cell, stress
 
