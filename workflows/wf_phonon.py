@@ -264,7 +264,7 @@ class WorkflowPhonon(Workflow):
         #if code.get_input_plugin_name() == 'lammps.optimize':
         if type == 'optimize':
             lammps_parameters = dict(parameters['parameters'])
-            lammps_parameters.update({'pressure': pressure * 1000})  # pressure kb -> bar
+            lammps_parameters.update({'pressure': pressure})  # pressure kb
             calc.use_parameters(ParameterData(dict=lammps_parameters))
 
         calc.store_all()

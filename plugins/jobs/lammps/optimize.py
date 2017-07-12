@@ -87,7 +87,7 @@ def generate_LAMMPS_input(potential_obj,
     lammps_input_file += potential_obj.get_input_potential_lines()
 
     lammps_input_file += 'fix             int all box/relax {} {} vmax {}\n'.format(parameters['relaxation'],
-                                                                                    parameters['pressure'],
+                                                                                    parameters['pressure'] * 1000,  # pressure kb -> bar
                                                                                     parameters['vmax'])
 
     lammps_input_file += 'compute         stpa all stress/atom NULL\n'

@@ -45,7 +45,7 @@ lammps_machine = {
     'tot_num_mpiprocs': 16}
 
 parameters_opt = {'relaxation': 'tri',  # iso/aniso/tri
-                  'pressure': 0.0,  # bars
+                  'pressure': 0.0,  # kbars
                   'vmax': 0.000001,  # Angstrom^3
                   'energy_tolerance': 1.0e-25,  # eV
                   'force_tolerance': 1.0e-25,  # eV angstrom

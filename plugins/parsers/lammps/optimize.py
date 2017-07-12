@@ -19,8 +19,8 @@ def read_log_file(logfile):
             data_dict['energy'] = energy
             xx, yy, zz, xy, xz, yz = data[i-1].split()[5:11]
             stress = np.array([[xx, xy, xz],
-                                            [xy, yy, yz],
-                                            [xz, yz, zz]], dtype=float)
+                               [xy, yy, yz],
+                               [xz, yz, zz]], dtype=float)
 
 
         if '$(xlo)' in line:
@@ -58,6 +58,9 @@ def read_log_file(logfile):
  #   cell = np.array([a, b, c], dtype=float).T
     if np.linalg.det(cell) < 0:
         cell = -1.0*cell
+
+    volume = np.linalg.det(cell)
+    stress = -stress/volume
 
     return data_dict, cell, stress
 
