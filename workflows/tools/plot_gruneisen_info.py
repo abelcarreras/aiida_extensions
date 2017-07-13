@@ -50,7 +50,7 @@ def get_plot(band_data, q_path, title='', ylabel='', labels=None, q_points=None,
 
 
 #######################
-wf = load_workflow(262)
+wf = load_workflow(264)
 #######################
 
 # Band structure
