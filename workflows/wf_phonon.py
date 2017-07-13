@@ -486,7 +486,7 @@ class WorkflowPhonon(Workflow):
 
         counter = self.get_attribute('counter')
 
-        optimized = self.get_step_calculations('optimize')
+        optimized = self.get_step_calculations(self.optimize)
         if len(optimized):
             last_calc = self.get_step_calculations(self.optimize).latest('id')
             structure = last_calc.get_outputs_dict()['structure']
