@@ -483,7 +483,7 @@ class WorkflowPhonon(Workflow):
         parameters = self.get_parameters()
         pressure = self.get_attribute('pressure')
         tolerance_forces = 1e-06
-        tolerance_stress = 1e-05
+        tolerance_stress = 1e-04
 
         counter = self.get_attribute('counter')
 
