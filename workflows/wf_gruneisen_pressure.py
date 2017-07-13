@@ -45,8 +45,23 @@ def thermal_expansion(volumes, electronic_energies, gruneisen, stresses=None, t_
         min_volume.append(min_v)
 
     if stresses is not None:
-        fit_vs = np.polyfit(volumes, stresses, 2)
-        min_stress = np.array([np.polyval(fit_vs, v) for v in min_volume])
+
+        from scipy.optimize import curve_fit
+
+        # Fit to an exponential equation
+        def fitting_function(x, a, b, c):
+            return np.exp(-b * (x + a)) + c
+
+        p_b = 0.1
+        p_c = -200
+        p_a = -np.log(-p_c) / p_b - volumes[0]
+
+        popt, pcov = curve_fit(fitting_function, volumes, stresses, p0=[p_a, p_b, p_c], maxfev=100000)
+        min_stress = fitting_function(min_volume, *popt)
+
+        # Fit to a quadratic equation
+        # fit_vs = np.polyfit(volumes, stresses, 2)
+        # min_stress = np.array([np.polyval(fit_vs, v) for v in min_volume])
     else:
         min_stress = None
 
