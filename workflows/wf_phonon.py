@@ -482,7 +482,7 @@ class WorkflowPhonon(Workflow):
         parameters = self.get_parameters()
         pressure = self.get_attribute('pressure')
         tolerance_forces = 0.01
-        tolerance_stress = 0.1
+        tolerance_stress = 0.01
 
         counter = self.get_attribute('counter')
 
@@ -495,7 +495,8 @@ class WorkflowPhonon(Workflow):
 
             stresses = last_calc.out.output_array.get_array('stress')
             not_converged_stress = len(np.where(abs(np.diag(stresses)-pressure) > tolerance_stress)[0])
-            # not_converged_stress += len(np.where(abs(np.fill_diagonal(stresses, 0.0)) > tolerance_stress)[0])
+            np.fill_diagonal(stresses, 0.0)
+            not_converged_stress += len(np.where(abs(stresses) > tolerance_stress)[0])
 
             not_converged = not_converged_forces + not_converged_stress
 
