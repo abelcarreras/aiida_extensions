@@ -488,7 +488,7 @@ class WorkflowPhonon(Workflow):
 
         optimized = self.get_step_calculations('optimize')
         if len(optimized):
-            last_calc = self.get_step_calculations('optimize').latest('id')
+            last_calc = self.get_step_calculations(self.optimize).latest('id')
             structure = last_calc.get_outputs_dict()['structure']
             forces = last_calc.out.output_array.get_array('forces')
             not_converged_forces = len(np.where(abs(forces) > tolerance_forces)[0])
@@ -540,7 +540,7 @@ class WorkflowPhonon(Workflow):
 
         if optimized is not None:
             self.append_to_report('Optimized structure')
-            opt_calc = self.get_step_calculations('optimize').latest('id')
+            opt_calc = self.get_step_calculations(self.optimize).latest('id')
             structure = opt_calc.get_outputs_dict()['structure']
             optimized_data = opt_calc.out.output_parameters
             self.add_result('optimized_structure_data', optimized_data)
