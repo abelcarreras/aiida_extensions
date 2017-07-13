@@ -93,7 +93,6 @@ prediction = wf.get_result('thermal_expansion_prediction')
 temperatures = prediction.get_array('temperatures')
 stresses = prediction.get_array('stresses')
 volumes = prediction.get_array('volumes')
-stresses_direct = prediction.get_array('stresses_direct')
 
 plt.figure(5)
 plt.xlabel('Temperature [K]')
@@ -107,24 +106,12 @@ plt.ylabel('Volume [A^3]')
 plt.suptitle('Prediction Volume')
 plt.plot(temperatures, volumes)
 
-plt.figure(7)
-plt.xlabel('Temperature [K]')
-plt.ylabel('Stress [kbar]')
-plt.suptitle('Prediction stress direct')
-plt.plot(temperatures, stresses_direct)
 
-plt.figure(8)
+plt.figure(7)
 plt.xlabel('Volume [A^3]')
 plt.ylabel('Stress [Kbar]')
 plt.suptitle('Volume - stress')
 plt.plot(volumes, stresses)
-
-plt.figure(9)
-plt.xlabel('Volume [A^3]')
-plt.ylabel('Stress [kbar')
-plt.suptitle('Volume - stress direct')
-plt.plot(volumes, stresses_direct)
-
 
 
 plt.show()
