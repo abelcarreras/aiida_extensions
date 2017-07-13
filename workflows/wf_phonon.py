@@ -349,7 +349,7 @@ class WorkflowPhonon(Workflow):
                 'LWAVE': '.FALSE.',
                 'LCHARG': '.FALSE.',
                 'EDIFF': 1e-08,
-                'EDIFFG': -0.01,
+                #'EDIFFG': -0.01,
                 'ADDGRID': '.TRUE.',
                 'LREAL': '.FALSE.'})
             incar = vasp_input_optimize
@@ -365,7 +365,7 @@ class WorkflowPhonon(Workflow):
                 'LWAVE': '.FALSE.',
                 'LCHARG': '.FALSE.',
                 'EDIFF': 1e-08,
-                'EDIFFG': -0.01,
+                #'EDIFFG': -0.01,
                 'ADDGRID': '.TRUE.',
                 'LREAL': '.FALSE.'})
             incar = vasp_input_optimize
