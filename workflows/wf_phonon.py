@@ -480,7 +480,10 @@ class WorkflowPhonon(Workflow):
     def optimize(self):
 
         parameters = self.get_parameters()
-        tolerance = 0.01
+        pressure = self.get_attribute('pressure')
+        tolerance_forces = 0.01
+        tolerance_stress = 0.1
+
         counter = self.get_attribute('counter')
 
         optimized = self.get_step_calculations(self.optimize)
@@ -488,9 +491,18 @@ class WorkflowPhonon(Workflow):
             last_calc = self.get_step_calculations(self.optimize).latest('id')
             structure = last_calc.get_outputs_dict()['structure']
             forces = last_calc.out.output_array.get_array('forces')
-            not_converged_forces = len(np.where(abs(forces) > tolerance)[0])
+            not_converged_forces = len(np.where(abs(forces) > tolerance_forces)[0])
+
+            stresses = last_calc.out.output_array.get_array('stress')
+            not_converged_stress = len(np.where(abs(np.diag(stresses)-pressure) > tolerance_stress)[0])
+            not_converged_stress += len(np.where(abs(np.fill_diagonal(stresses,0.0)) > tolerance_stress)[0])
+
+            not_converged = not_converged_forces + not_converged_stress
+
             self.append_to_report('Not converged forces: {}'.format(not_converged_forces))
-            if not_converged_forces == 0:
+            self.append_to_report('Not converged stresses: {}'.format(not_converged_stress))
+
+            if not_converged == 0:
                 self.next(self.displacements)
                 return
         else:
