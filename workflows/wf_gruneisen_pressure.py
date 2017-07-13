@@ -39,7 +39,7 @@ def thermal_expansion(volumes, electronic_energies, gruneisen, stresses=None, t_
 
     min_volume = []
     e_min = []
-    for j, t in temperatures:
+    for j, t in enumerate(temperatures):
         min_v = -fit.T[j][1] / (2 * fit.T[j][0])
         e_min.append(np.polyval(fit.T[j], min_v))
         min_volume.append(min_v)
