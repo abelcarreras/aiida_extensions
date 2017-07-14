@@ -224,12 +224,12 @@ class WorkflowQHA(Workflow):
         wf_parameters = self.get_parameters()
         # self.append_to_report('crystal: ' + wf_parameters['structure'].get_formula())
 
-        ##wf = WorkflowGruneisen(params=wf_parameters, pre_optimize=True)
-        ##wf.store()
+        wf = WorkflowGruneisen(params=wf_parameters, pre_optimize=True)
+        wf.store()
 
-        wf = load_workflow(332)
+        #wf = load_workflow(332)
         self.attach_workflow(wf)
-        ##wf.start()
+        wf.start()
 
         if self._only_grune:
             self.next(self.pressure_gruneisen)
@@ -327,12 +327,12 @@ class WorkflowQHA(Workflow):
 
             # Submit workflow
             wf = WorkflowPhonon(params=wf_parameters, pressure=pressure, optimize=True)
-            #wf.store()
+            wf.store()
 
-            wf = load_workflow(wfs_test[i])
+            #wf = load_workflow(wfs_test[i])
 
             self.attach_workflow(wf)
-            #wf.start()
+            wf.start()
         self.next(self.collect_data)
 
     @Workflow.step
