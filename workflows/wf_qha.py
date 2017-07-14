@@ -224,12 +224,12 @@ class WorkflowQHA(Workflow):
         wf_parameters = self.get_parameters()
         # self.append_to_report('crystal: ' + wf_parameters['structure'].get_formula())
 
-        wf = WorkflowGruneisen(params=wf_parameters, pre_optimize=True)
-        wf.store()
+        ##wf = WorkflowGruneisen(params=wf_parameters, pre_optimize=True)
+        ##wf.store()
 
-        #wf = load_workflow(802)
+        wf = load_workflow(332)
         self.attach_workflow(wf)
-        wf.start()
+        ##wf.start()
 
         if self._only_grune:
             self.next(self.pressure_gruneisen)
@@ -360,7 +360,7 @@ class WorkflowQHA(Workflow):
         self.append_to_report('test range {}'.format(test_range))
         self.append_to_report('interval {}'.format(interval))
 
-        wf_origin = self.get_step('start').get_sub_workflows()[0].self.get_step('start').get_sub_workflows()[0]
+        wf_origin = self.get_step('start').get_sub_workflows()[0].get_step('start').get_sub_workflows()[0]
         wf_complete_list = list(self.get_step('pressure_expansions').get_sub_workflows())
         if self.get_step('collect_data') is not None:
             wf_complete_list += list(self.get_step('collect_data').get_sub_workflows())
