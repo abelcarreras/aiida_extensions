@@ -621,7 +621,7 @@ class WorkflowQHA(Workflow):
                                  free_energy=np.array(fe_phonon),
                                  cv=np.array(cv),
                                  entropy=np.array(entropy),
-                                 #                         t_max=options.t_max,
+                                 # t_max=options.t_max,
                                  verbose=False)
 
         # Get data
@@ -658,7 +658,7 @@ class WorkflowQHA(Workflow):
 
         self.append_to_report('QHA properties calculated and written in files')
 
-        # Store harmonic data
+        # Get harmonic data at P = 0
         wf_zero = None
         for wf_i in wf_complete_list:
             if wf_i.get_attribute('pressure') == 0.0:
@@ -669,6 +669,7 @@ class WorkflowQHA(Workflow):
             self.next(self.exit)
             return
 
+        # Get data and write the files
         thermal_properties = wf_zero.get_result('thermal_properties')
         dos = wf_zero.get_result('dos')
 
