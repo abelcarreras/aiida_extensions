@@ -55,9 +55,9 @@ def phonopy_predict(wf_origin, wf_plus, wf_minus):
                get_data_from_wf_phonon(wf_minus)['volume']]
 
 
-    phonon_plus = get_data_from_wf_phonon(wf_plus)
-    phonon_minus = get_data_from_wf_phonon(wf_minus)
-    phonon_origin = get_data_from_wf_phonon(wf_origin)
+    phonon_plus = get_data_from_wf_phonon(wf_plus)['phonon']
+    phonon_minus = get_data_from_wf_phonon(wf_minus)['phonon']
+    phonon_origin = get_data_from_wf_phonon(wf_origin)['phonon']
 
     gruneisen = PhonopyGruneisen(phonon_origin,  # equilibrium
                                  phonon_plus,  # plus
@@ -321,18 +321,18 @@ class WorkflowQHA(Workflow):
         self.add_attribute('interval', interval)
         self.add_attribute('clock', 1)
 
-        # wfs_test = [821, 820]
+        wfs_test = [344, 345]
         for i, pressure in enumerate(test_pressures):
             self.append_to_report('pressure: {}'.format(pressure))
 
             # Submit workflow
             wf = WorkflowPhonon(params=wf_parameters, pressure=pressure, optimize=True)
-            wf.store()
+            #wf.store()
 
-            # wf = load_workflow(wfs_test[i])
+            wf = load_workflow(wfs_test[i])
 
             self.attach_workflow(wf)
-            wf.start()
+            #wf.start()
         self.next(self.collect_data)
 
     @Workflow.step
