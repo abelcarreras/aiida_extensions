@@ -578,17 +578,7 @@ class WorkflowQHA(Workflow):
         n_points = int((max - min) / interval) + 1
         test_pressures = [min + interval * i for i in range(n_points)]
 
-
-        # Remove duplicates
-
         wf_complete_list = []
-        #if self.get_step('pressure_expansions'):
-        #    wf_complete_list += list(self.get_step('pressure_expansions').get_sub_workflows())
-        #if self.get_step('collect_data'):
-        #    wf_complete_list += list(self.get_step('collect_data').get_sub_workflows())
-        #if self.get_step('complete'):
-        #    wf_complete_list += list(self.get_step('complete').get_sub_workflows())
-
         for step_name in ['pressure_expansions', 'collect_data', 'complete', 'pressure_manual_expansions', 'pressure_gruneisen']:
             if self.get_step(step_name):
                 wf_complete_list += list(self.get_step(step_name).get_sub_workflows())
@@ -623,8 +613,7 @@ class WorkflowQHA(Workflow):
         entropy = np.array(entropy).T[:, sort_index]
         cv = np.array(cv).T[:, sort_index]
 
-
-        # Calculate QHA
+        # Calculate QHA properties
         phonopy_qha = PhonopyQHA(np.array(volumes),
                                  np.array(electronic_energies),
                                  eos="vinet",
@@ -668,6 +657,41 @@ class WorkflowQHA(Workflow):
                                               'heat_capacity_P_numerical')
 
         self.append_to_report('QHA properties calculated and written in files')
+
+        # Store harmonic data
+        wf_zero = None
+        for wf_i in wf_complete_list:
+            if wf_i.get_attribute('pressure') == 0.0:
+                wf_zero = wf_i
+
+        if wf_zero is None:
+            self.append_to_report('No harmonic information found at P=0')
+            self.next(self.exit)
+            return
+
+        thermal_properties = wf_zero.get_result('thermal_properties')
+        dos = wf_zero.get_result('dos')
+
+        entropy = thermal_properties.get_array('entropy')
+        free_energy = thermal_properties.get_array('free_energy')
+        temperatures = thermal_properties.get_array('temperature')
+        cv = thermal_properties.get_array('cv')
+
+        freq_dos = dos.get_array('frequency')
+        total_dos = dos.get_array('total_dos')
+        partial_symbols = dos.get_array('partial_symbols')
+        partial_dos = dos.get_array('partial_dos').T
+
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(freq_dos, total_dos)),
+                                              'total_dos')
+
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(np.column_stack((freq_dos, partial_dos)),
+                                                                        text_list=['T'] + partial_symbols.tolist()),
+                                              'partial_dos')
+        data_folder.create_file_from_filelike(
+            get_file_from_numpy_array(np.column_stack((temperatures, entropy, free_energy, cv))), 'thermal_properties')
+
+        self.append_to_report('Harmonic data written in files')
 
         self.next(self.exit)
 
