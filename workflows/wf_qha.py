@@ -23,7 +23,7 @@ def get_data_from_wf_phonon(wf):
     structure = wf.get_result('final_structure')
     volume = structure.get_cell_volume()
 
-    phonopy_input = wf.get_parameter('phonopy_input')
+    phonopy_input = wf.get_parameter('phonopy_input')['parameters']
     force_constants = wf.get_result('force_constants').get_array('force_constants')
 
     phonon = get_phonon(structure, force_constants, phonopy_input)
