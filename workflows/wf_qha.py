@@ -399,6 +399,8 @@ class WorkflowQHA(Workflow):
                 min = test_range[0]
 
             min_stress, max_stress = phonopy_predict(wf_origin, wf_min, wf_max)
+            self.append_to_report('stresses prediction     min:{} max:{}'.format(min_stress, max_stress))
+
 
             if max_stress > test_range[1]:
                 test_range[1] += np.ceil(abs(max_stress - test_range[1]) / interval) * interval
@@ -582,6 +584,12 @@ class WorkflowQHA(Workflow):
         for step_name in ['pressure_expansions', 'collect_data', 'complete', 'pressure_manual_expansions', 'pressure_gruneisen']:
             if self.get_step(step_name):
                 wf_complete_list += list(self.get_step(step_name).get_sub_workflows())
+
+        # Add phonon workflow at 0 pressure from gruneisen workflow if exists
+        try:
+            wf_complete_list += list(self.get_step('start').get_sub_workflows()[0].get_step('start').get_sub_workflows())
+        except:
+            pass
 
         volumes = []
         electronic_energies = []
