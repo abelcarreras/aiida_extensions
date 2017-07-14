@@ -15,6 +15,68 @@ import numpy as np
 from phonopy import PhonopyQHA
 
 
+def get_data_from_wf_phonon(wf):
+    from phonon_common import get_phonon
+
+    energy = wf.get_result('optimized_structure_data').dict.energy
+    pressure = wf.get_attribute('pressure')
+    structure = wf.get_result('final_structure')
+    volume = structure.get_cell_volume()
+
+    phonopy_input = wf.get_parameter('phonopy_input')
+    force_constants = wf.get_result('force_constants').get_array('force_constants')
+
+    phonon = get_phonon(structure, force_constants, phonopy_input)
+
+    return {'energy': energy,
+            'pressure': pressure,
+            'structure': structure,
+            'volume': volume,
+            'force_constants': force_constants,
+            'phonopy_input': phonopy_input,
+            'phonon': phonon}
+
+
+def phonopy_predict(wf_origin, wf_plus, wf_minus):
+
+    from phonopy import PhonopyGruneisen
+    from phonon_common import thermal_expansion as check_expansion
+
+    energies = [get_data_from_wf_phonon(wf_origin)['energy'],
+                get_data_from_wf_phonon(wf_plus)['energy'],
+                get_data_from_wf_phonon(wf_minus)['energy']]
+
+    stresses = [get_data_from_wf_phonon(wf_origin)['pressure'],
+                 get_data_from_wf_phonon(wf_plus)['pressure'],
+                 get_data_from_wf_phonon(wf_minus)['pressure']]
+
+    volumes = [get_data_from_wf_phonon(wf_origin)['volume'],
+               get_data_from_wf_phonon(wf_plus)['volume'],
+               get_data_from_wf_phonon(wf_minus)['volume']]
+
+
+    phonon_plus = get_data_from_wf_phonon(wf_plus)
+    phonon_minus = get_data_from_wf_phonon(wf_minus)
+    phonon_origin = get_data_from_wf_phonon(wf_origin)
+
+    gruneisen = PhonopyGruneisen(phonon_origin,  # equilibrium
+                                 phonon_plus,  # plus
+                                 phonon_minus)  # minus
+
+    phonopy_input = get_data_from_wf_phonon(wf_origin)['phonopy_input']
+    gruneisen.set_mesh(phonopy_input['mesh'], is_gamma_center=False, is_mesh_symmetry=True)
+
+    # Thermal expansion approximate prediction
+    temperatures, min_volumes, min_stresses = check_expansion(volumes,
+                                                              energies,
+                                                              gruneisen,
+                                                              stresses=stresses,
+                                                              t_max=1000,
+                                                              t_step=5)
+
+    return np.min(min_stresses), np.max(min_stresses)
+
+
 def check_dos_stable(wf, tol=1e-6):
 
     try:
@@ -245,10 +307,10 @@ class WorkflowQHA(Workflow):
         prediction = self.get_step('start').get_sub_workflows()[0].get_result('thermal_expansion_prediction')
         stresses = prediction.get_array('stresses')
 
-        test_pressures = [np.min([0.0, np.min(stresses)]), np.max([0.0, np.max(stresses)])]  # in kbar
+        test_pressures = [np.min(stresses), np.max(stresses)]  # in kbar
 
         total_range = test_pressures[1] - test_pressures[0]
-        interval = total_range
+        interval = total_range/2
 
         self.add_attribute('npoints', 5)
 
@@ -298,11 +360,12 @@ class WorkflowQHA(Workflow):
         self.append_to_report('test range {}'.format(test_range))
         self.append_to_report('interval {}'.format(interval))
 
+        wf_origin = self.get_step('start').get_sub_workflows()[0].self.get_step('start').get_sub_workflows()[0]
         wf_complete_list = list(self.get_step('pressure_expansions').get_sub_workflows())
         if self.get_step('collect_data') is not None:
             wf_complete_list += list(self.get_step('collect_data').get_sub_workflows())
 
-        #wf_min, wf_max = list(self.get_step('pressure_expansions').get_sub_workflows())[-2:]
+        # wf_min, wf_max = list(self.get_step('pressure_expansions').get_sub_workflows())[-2:]
         for wf_test in wf_complete_list:
             if wf_test.get_attribute('pressure') == test_range[0]:
                 wf_min = wf_test
@@ -316,18 +379,17 @@ class WorkflowQHA(Workflow):
         ok_inf = check_dos_stable(wf_min, tol=1e-6)
         ok_sup = check_dos_stable(wf_max, tol=1e-6)
 
-
         self.append_to_report('DOS stable | inf:{} sup:{}'.format(ok_inf, ok_sup))
 
-        if not ok_sup:
-            test_range[1] = test_range[0] + 0.5 * total_range
+        if not ok_sup or not ok_inf:
             if total_range / interval < n_points * 2:
-                interval = interval * 0.5
+                interval *= 0.5
 
-        if not ok_inf:
-            test_range[0] = test_range[1] - 0.5 * total_range
-            if total_range / interval < n_points * 2:
-                interval = interval * 0.5
+            if not ok_sup:
+                test_range[1] -= interval
+
+            if not ok_inf:
+                test_range[0] += interval
 
         if ok_inf and ok_sup:
             if max is None or test_range[1] > max:
@@ -336,27 +398,35 @@ class WorkflowQHA(Workflow):
             if min is None or test_range[0] < min:
                 min = test_range[0]
 
+            min_stress, max_stress = phonopy_predict(wf_origin, wf_min, wf_max)
+
+            if max_stress > test_range[1]:
+                test_range[1] += np.ceil(abs(max_stress - test_range[1]) / interval) * interval
+            if min_stress < test_range[0]:
+                test_range[0] -= np.ceil(abs(test_range[0] - min_stress) / interval) * interval
+
+            if max_stress < test_range[1] or min_stress > test_range[0]:
+                interval *= 0.5
+            if max_stress < test_range[1]:
+                test_range[1] -= np.ceil(abs(max_stress - test_range[1]) / interval) * interval
+            if min_stress > test_range[0]:
+                test_range[0] += np.ceil(abs(test_range[0] - min_stress) / interval) * interval
+
             self.append_to_report('n_point estimation {}'.format(total_range / interval))
-            if total_range / interval < n_points:
-                # test_range[1] = test_range[0] + 3.0/2.0 * total_range
-#                 test_range[1] = test_range[0] + np.ceil((1.5 * total_range) / interval) * interval
-                if clock == 1:
-                    test_range[1] = test_range[0] + np.ceil((1.5 * total_range) / interval) * interval
-                else:
-                    test_range[0] = test_range[1] - np.ceil((1.5 * total_range) / interval) * interval
 
-                clock = -clock
+            if test_range[1] > max and test_range[1] < max_stress + total_range * 1.2:
+                max = test_range[1]
 
-                    # interval = interval * 3/2
-            else:
+            if test_range[0] < min and test_range[0] > min_stress - total_range * 1.2:
+                min = test_range[0]
+
+            if total_range / interval > n_points:
                 self.append_to_report('Exit: min {}, max {}'.format(min, max))
 
                 self.next(self.complete)
                 return
 
-
-
-        total_range = test_range[1] - test_range[0]
+        total_range = abs(test_range[1] - test_range[0])
 
         self.add_attribute('test_range', test_range)
         self.add_attribute('total_range', total_range)
@@ -369,29 +439,32 @@ class WorkflowQHA(Workflow):
         test_pressures = [test_range[0], test_range[1]]  # in kbar
 
         # Be efficient
-        good = [wf_test.get_attribute('pressure') for wf_test in wf_complete_list
-                if check_dos_stable(wf_test, tol=1e-6)]
-        good = np.sort(good)
+        if min is not None and max is not None:
+            good = [wf_test.get_attribute('pressure') for wf_test in wf_complete_list
+                    if check_dos_stable(wf_test, tol=1e-6)]
+            good = np.sort(good)
 
-        self.append_to_report('GOOD pressure list {}'.format(good))
+            self.append_to_report('GOOD pressure list {}'.format(good))
 
-        if len(np.diff(good)) > 0:
-            pressure_additional_list = np.arange(np.min(good), np.max(good), interval)
-            self.append_to_report('GOOD additional list {}'.format(pressure_additional_list))
-            test_pressures += pressure_additional_list.tolist()
+            if len(np.diff(good)) > 0:
+                pressure_additional_list = np.arange(min, max, interval)
+                self.append_to_report('GOOD additional list {}'.format(pressure_additional_list))
+                test_pressures += pressure_additional_list.tolist()
+
             test_pressures = np.unique(test_pressures).tolist()
 
-        self.append_to_report('pressure list {}'.format(test_pressures))
+            self.append_to_report('pressure list {}'.format(test_pressures))
 
-        # Remove duplicates
-        for wf_test in wf_complete_list:
-            for pressure in list(test_pressures):
-                #self.append_to_report('compare: {} {}'.format(wf_test.get_attribute('pressure'), pressure))
-                if np.isclose(wf_test.get_attribute('pressure'), pressure):
-                    test_pressures.remove(pressure)
-                    self.append_to_report('IS close! -> remove {}'.format(pressure))
+            # Remove duplicates
+            for wf_test in wf_complete_list:
+                for pressure in list(test_pressures):
+                    #self.append_to_report('compare: {} {}'.format(wf_test.get_attribute('pressure'), pressure))
+                    if np.isclose(wf_test.get_attribute('pressure'), pressure):
+                        test_pressures.remove(pressure)
+                        self.append_to_report('IS close! -> remove {}'.format(pressure))
 
-        self.append_to_report('pressure list (no duplicates){}'.format(test_pressures))
+            self.append_to_report('pressure list (no duplicates){}'.format(test_pressures))
+
 
         for pressure in test_pressures:
             self.append_to_report('pressure: {}'.format(pressure))

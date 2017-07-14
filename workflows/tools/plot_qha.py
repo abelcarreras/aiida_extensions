@@ -14,6 +14,25 @@ KpointsData = DataFactory('array.kpoints')
 import numpy as np
 
 
+def get_phonon(structure, force_constants, phonopy_input):
+    from phonopy.structure.atoms import Atoms as PhonopyAtoms
+    from phonopy import Phonopy
+
+    # Generate phonopy phonon object
+    bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
+                        positions=[site.position for site in structure.sites],
+                        cell=structure.cell)
+
+    phonon = Phonopy(bulk,
+                     phonopy_input['supercell'],
+                     primitive_matrix=phonopy_input['primitive'],
+                     distance=phonopy_input['distance'],
+                     symprec=phonopy_input['symmetry_precision'])
+
+    phonon.set_force_constants(force_constants)
+
+    return phonon
+
 
 def calculate_qha_inline(**kwargs):
 
