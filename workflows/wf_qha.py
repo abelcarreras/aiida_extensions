@@ -459,7 +459,7 @@ class WorkflowQHA(Workflow):
             for wf_test in wf_complete_list:
                 for pressure in list(test_pressures):
                     #self.append_to_report('compare: {} {}'.format(wf_test.get_attribute('pressure'), pressure))
-                    if np.isclose(wf_test.get_attribute('pressure'), pressure):
+                    if np.isclose(wf_test.get_attribute('pressure'), pressure, rtol=1e-3, atol=0):
                         test_pressures.remove(pressure)
                         self.append_to_report('IS close! -> remove {}'.format(pressure))
 
@@ -510,7 +510,7 @@ class WorkflowQHA(Workflow):
                         wf_test.add_attribute('pressure', 'error')
                     else:
                         # self.append_to_report('compare: {} {}'.format(wf_test.get_attribute('pressure'), pressure))
-                        if np.isclose(wf_test.get_attribute('pressure'), pressure):
+                        if np.isclose(wf_test.get_attribute('pressure'), pressure, rtol=1e-3, atol=0):
                             # To make sure that the calculation did not fail and if it is the case give a second chance to finish correctly
                             test_pressures.remove(pressure)
                             self.append_to_report('IS close! -> remove {}'.format(pressure))
