@@ -557,12 +557,12 @@ class WorkflowQHA(Workflow):
                     final_structure = wf_test.get_result('final_structure')
 
                     inline_params.update({'thermal_properties_{}'.format(i): thermal_properties})
-                    inline_params.update({'optimized_structure_data_{}'.format(i): optimized_data})
+                    inline_params.update({'optimized_data_{}'.format(i): optimized_data})
                     inline_params.update({'final_structure_{}'.format(i): final_structure})
 
-        qha_result = calculate_qha_inline(**inline_params)
+        qha_result = calculate_qha_inline(**inline_params)[1]
 
-        self.add_result('qha_output', qha_result)
+        self.add_result('qha_output', qha_result['qha_output'])
 
         self.next(self.exit)
 
