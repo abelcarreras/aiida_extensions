@@ -641,10 +641,14 @@ class WorkflowQHA(Workflow):
         volume_expansion = phonopy_qha.get_volume_expansion()
         gibbs_temperature = phonopy_qha.get_gibbs_temperature()
 
-
-        def get_file_from_numpy_array(data):
+        def get_file_from_numpy_array(data, text_list=None):
             import StringIO
             output = StringIO.StringIO()
+            if text_list is None:
+                output.write('No caption\n')
+            else:
+                output.write('       '.join(text_list) + '\n')
+
             for line in np.array(data).astype(str):
                 output.write('       '.join(line) + '\n')
             output.seek(0)

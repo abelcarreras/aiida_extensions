@@ -36,6 +36,7 @@ def thermal_expansion(volumes, electronic_energies, gruneisen, stresses=None, t_
     gruneisen.set_thermal_properties(test_volumes, t_min=0, t_max=t_max, t_step=t_step)
     tp = gruneisen.get_thermal_properties()
 
+    normalize = gruneisen.get_phonon().unitcell.get_number_of_atoms() / gruneisen.get_phonon().primitive.get_number_of_atoms()
     free_energy_array = []
     cv_array = []
     entropy_array = []
@@ -45,7 +46,7 @@ def thermal_expansion(volumes, electronic_energies, gruneisen, stresses=None, t_
         free_energy_array.append(free_energy)
         entropy_array.append(entropy)
         cv_array.append(cv)
-        total_free_energy_array.append(free_energy + energy)
+        total_free_energy_array.append(free_energy/normalize + energy)
 
     total_free_energy_array = np.array(total_free_energy_array)
 
