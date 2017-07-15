@@ -429,6 +429,10 @@ class WorkflowQHA(Workflow):
             if min > test_range[0] > min_stress - total_range * 1.5:
                 min = test_range[0]
 
+            self.add_attribute('max', max)
+            self.add_attribute('min', min)
+            self.add_attribute('interval', interval)
+
             if (max - min) / interval > n_points:
                 self.append_to_report('Exit: min {}, max {}'.format(min, max))
                 self.next(self.complete)
@@ -438,8 +442,6 @@ class WorkflowQHA(Workflow):
 
         self.add_attribute('test_range', test_range)
         self.add_attribute('total_range', total_range)
-        self.add_attribute('max', max)
-        self.add_attribute('min', min)
         self.add_attribute('interval', interval)
 
         self.add_attribute('clock', clock)
