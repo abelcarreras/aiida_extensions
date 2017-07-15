@@ -420,13 +420,13 @@ class WorkflowQHA(Workflow):
             if max > test_range[1] > max_stress + total_range * 1.2:
                 max = test_range[1]
 
-            if min < test_range[0] < min_stress - total_range * 1.2:
+            if min < test_range[0] < min_stress - total_range * 1.5:
                 min = test_range[0]
 
             if max < test_range[1] < max_stress + total_range * 1.2:
                 max = test_range[1]
 
-            if min > test_range[0] > min_stress - total_range * 1.2:
+            if min > test_range[0] > min_stress - total_range * 1.5:
                 min = test_range[0]
 
             if (max - min) / interval > n_points:
