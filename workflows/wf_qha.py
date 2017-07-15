@@ -401,7 +401,6 @@ class WorkflowQHA(Workflow):
             min_stress, max_stress = phonopy_predict(wf_origin, wf_min, wf_max)
             self.append_to_report('stresses prediction     min:{} max:{}'.format(min_stress, max_stress))
 
-
             if max_stress > test_range[1]:
                 test_range[1] += np.ceil(abs(max_stress - test_range[1]) / interval) * interval
             if min_stress < test_range[0]:
@@ -418,10 +417,10 @@ class WorkflowQHA(Workflow):
 
             self.append_to_report('n_point estimation {}'.format(total_range / interval))
 
-            if test_range[1] > max and test_range[1] < max_stress + total_range * 1.2:
+            if max < test_range[1] < max_stress + total_range * 1.2:
                 max = test_range[1]
 
-            if test_range[0] < min and test_range[0] > min_stress - total_range * 1.2:
+            if min > test_range[0] > min_stress - total_range * 1.2:
                 min = test_range[0]
 
             if total_range / interval > n_points:
