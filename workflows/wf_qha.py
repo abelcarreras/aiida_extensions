@@ -423,7 +423,7 @@ class WorkflowQHA(Workflow):
             if min > test_range[0] > min_stress - total_range * 1.2:
                 min = test_range[0]
 
-            if total_range / interval > n_points:
+            if (max - min) / interval > n_points:
                 self.append_to_report('Exit: min {}, max {}'.format(min, max))
 
                 self.next(self.complete)
@@ -602,7 +602,7 @@ class WorkflowQHA(Workflow):
 
         for wf_test in wf_complete_list:
             for pressure in test_pressures:
-                if wf_test.get_attribute('pressure') == pressure:
+                if np.isclose(wf_test.get_attribute('pressure'), pressure, atol=interval / 4, rtol=0):
                     thermal_properties = wf_test.get_result('thermal_properties')
                     optimized_data = wf_test.get_result('optimized_structure_data')
                     final_structure = wf_test.get_result('final_structure')
