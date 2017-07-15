@@ -417,13 +417,13 @@ class WorkflowQHA(Workflow):
 
             self.append_to_report('n_point estimation {}'.format(total_range / interval))
 
-            if max > test_range[1] > max_stress + total_range * 1.2:
+            if max > test_range[1] > max_stress + total_range * 1.5:
                 max = test_range[1]
 
             if min < test_range[0] < min_stress - total_range * 1.5:
                 min = test_range[0]
 
-            if max < test_range[1] < max_stress + total_range * 1.2:
+            if max < test_range[1] < max_stress + total_range * 1.5:
                 max = test_range[1]
 
             if min > test_range[0] > min_stress - total_range * 1.5:
