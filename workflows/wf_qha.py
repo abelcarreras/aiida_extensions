@@ -367,9 +367,11 @@ class WorkflowQHA(Workflow):
 
         # wf_min, wf_max = list(self.get_step('pressure_expansions').get_sub_workflows())[-2:]
         for wf_test in wf_complete_list:
-            if wf_test.get_attribute('pressure') == test_range[0]:
+            if np.isclose(wf_test.get_attribute('pressure'), test_range[0], atol=interval / 4, rtol=0):
+            # if wf_test.get_attribute('pressure') == test_range[0]:
                 wf_min = wf_test
-            if wf_test.get_attribute('pressure') == test_range[1]:
+            if np.isclose(wf_test.get_attribute('pressure'), test_range[1], atol=interval / 4, rtol=0):
+            #if wf_test.get_attribute('pressure') == test_range[1]:
                 wf_max = wf_test
 
         if wf_max is None or wf_min is None:
