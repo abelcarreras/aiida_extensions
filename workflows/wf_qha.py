@@ -375,6 +375,7 @@ class WorkflowQHA(Workflow):
         if wf_max is None or wf_min is None:
             self.append_to_report('Something wrong with volumes: {}'.format(test_range))
             self.next(self.exit)
+            return
 
         ok_inf = check_dos_stable(wf_min, tol=1e-6)
         ok_sup = check_dos_stable(wf_max, tol=1e-6)
@@ -398,6 +399,12 @@ class WorkflowQHA(Workflow):
             if min is None:
                 min = test_range[0]
 
+            if abs(test_range[1] - test_range[0]) / interval > n_points:
+                self.append_to_report('Exit: min {}, max {}'.format(min, max))
+                self.next(self.complete)
+                return
+
+
             min_stress, max_stress = phonopy_predict(wf_origin, wf_min, wf_max)
             self.append_to_report('stresses prediction     min:{} max:{}'.format(min_stress, max_stress))
 
@@ -417,26 +424,23 @@ class WorkflowQHA(Workflow):
 
             self.append_to_report('n_point estimation {}'.format(total_range / interval))
 
-            if max > test_range[1] > max_stress + total_range * 1.5:
-                max = test_range[1]
+            # if max > test_range[1] > max_stress + total_range * 1.5:
+            #    max = test_range[1]
 
-            if min < test_range[0] < min_stress - total_range * 1.5:
-                min = test_range[0]
+            #if min < test_range[0] < min_stress - total_range * 1.5:
+            #    min = test_range[0]
 
-            if max < test_range[1] < max_stress + total_range * 1.5:
-                max = test_range[1]
+            #if max < test_range[1] < max_stress + total_range * 1.5:
+            #    max = test_range[1]
 
-            if min > test_range[0] > min_stress - total_range * 1.5:
-                min = test_range[0]
+            #if min > test_range[0] > min_stress - total_range * 1.5:
+            #    min = test_range[0]
 
             self.add_attribute('max', max)
             self.add_attribute('min', min)
             self.add_attribute('interval', interval)
 
-            if (max - min) / interval > n_points:
-                self.append_to_report('Exit: min {}, max {}'.format(min, max))
-                self.next(self.complete)
-                return
+
 
         total_range = abs(test_range[1] - test_range[0])
         self.add_attribute('max', max)
@@ -496,6 +500,7 @@ class WorkflowQHA(Workflow):
     def complete(self):
 
         wf_parameters = self.get_parameters()
+        test_range = self.get_attribute('test_range')
 
         # self.get_step_calculations(self.optimize).latest('id')
 
@@ -504,7 +509,7 @@ class WorkflowQHA(Workflow):
         max = self.get_attribute('max')
         min = self.get_attribute('min')
 
-        n_points = int((max - min) / interval) + 1
+        n_points = int((test_range[1] - test_range[0]) / interval) + 1
 
         test_pressures = [min + interval * i for i in range(n_points)]
 
