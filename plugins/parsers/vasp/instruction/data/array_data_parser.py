@@ -32,14 +32,13 @@ class Array_data_parserInstruction(BaseInstruction):
         except:
             print ('Error opening')   
 
-        try:
-            vspr = Vasprun(self._out_folder.get_abs_path('vasprun.xml'))
-        except Exception, e:
-            msg = (
-                "Parsing vasprun file in pymatgen failed, "
-                "with error message:\n>> {}".format(e)
-            )
-            raise OutputParsingError(msg)
+        vspr = Vasprun(self._out_folder.get_abs_path('vasprun.xml'))
+        #except Exception, e:
+        #    msg = (
+        #        "Parsing vasprun file in pymatgen failed, "
+        #        "with error message:\n>> {}".format(e)
+        #    )
+        #    raise OutputParsingError(msg)
 
         # Get forces using pymatgen
         try:

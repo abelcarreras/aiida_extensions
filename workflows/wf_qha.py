@@ -54,7 +54,6 @@ def phonopy_predict(wf_origin, wf_plus, wf_minus):
                get_data_from_wf_phonon(wf_plus)['volume'],
                get_data_from_wf_phonon(wf_minus)['volume']]
 
-
     phonon_plus = get_data_from_wf_phonon(wf_plus)['phonon']
     phonon_minus = get_data_from_wf_phonon(wf_minus)['phonon']
     phonon_origin = get_data_from_wf_phonon(wf_origin)['phonon']
@@ -406,7 +405,6 @@ class WorkflowQHA(Workflow):
                 self.append_to_report('Exit: min {}, max {}'.format(min, max))
                 self.next(self.complete)
                 return
-
 
             min_stress, max_stress = phonopy_predict(wf_origin, wf_min, wf_max)
             self.append_to_report('stresses prediction     min:{} max:{}'.format(min_stress, max_stress))

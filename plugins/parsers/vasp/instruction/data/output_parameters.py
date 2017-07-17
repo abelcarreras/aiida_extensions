@@ -45,19 +45,18 @@ class Output_parametersInstruction(BaseInstruction):
         except:
             print ('Error opening')   
 
-        try:
-            vspr = vasp.Vasprun(self._out_folder.get_abs_path('vasprun.xml'))
-            # vasp_param['final_energy'] = vspr.final_energy  # This includes PV
-            # vasp_param['energy'] = vspr.ionic_steps[-1]['e_fr_energy'] #Not quite the energy
-            vasp_param['energy'] = vspr.ionic_steps[-1]['electronic_steps'][-1]['e_wo_entrp']
+        vspr = vasp.Vasprun(self._out_folder.get_abs_path('vasprun.xml'))
+        # vasp_param['final_energy'] = vspr.final_energy  # This includes PV
+        # vasp_param['energy'] = vspr.ionic_steps[-1]['e_fr_energy'] #Not quite the energy
+        vasp_param['energy'] = vspr.ionic_steps[-1]['electronic_steps'][-1]['e_wo_entrp']
 #            vasp_param['volume'] = vspr.final_structure.lattice.volume  #Not here!, not necessary
 
-        except Exception, e:
-            msg = (
-                "Parsing vasprun file in pymatgen failed, "
-                "with error message:\n>> {}".format(e)
-            )
-            raise OutputParsingError(msg)
+#        except Exception, e:
+#            msg = (
+#                "Parsing vasprun file in pymatgen failed, "
+#                "with error message:\n>> {}".format(e)
+#            )
+#            raise OutputParsingError(msg)
 
 
         # construct proper output format
