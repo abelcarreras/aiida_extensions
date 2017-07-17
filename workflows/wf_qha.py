@@ -518,7 +518,7 @@ class WorkflowQHA(Workflow):
         max = self.get_attribute('max')
         min = self.get_attribute('min')
 
-        n_points = int((test_range[1] - test_range[0]) / interval) + 1
+        n_points = int((max - min) / interval) + 1
 
         test_pressures = [min + interval * i for i in range(n_points)]
 
