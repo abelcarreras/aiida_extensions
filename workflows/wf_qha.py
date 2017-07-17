@@ -399,6 +399,7 @@ class WorkflowQHA(Workflow):
             if min is None:
                 min = test_range[0]
 
+
             if abs(test_range[1] - test_range[0]) / interval > n_points:
                 self.append_to_report('Exit: min {}, max {}'.format(min, max))
                 self.next(self.complete)
@@ -407,6 +408,12 @@ class WorkflowQHA(Workflow):
 
             min_stress, max_stress = phonopy_predict(wf_origin, wf_min, wf_max)
             self.append_to_report('stresses prediction     min:{} max:{}'.format(min_stress, max_stress))
+
+            if max > test_range[1] > max_stress + total_range * 1.5:
+                max = test_range[1]
+
+            if min < test_range[0] < min_stress - total_range * 1.5:
+                min = test_range[0]
 
             if max_stress > test_range[1]:
                 test_range[1] += np.ceil(abs(max_stress - test_range[1]) / interval) * interval
@@ -465,6 +472,8 @@ class WorkflowQHA(Workflow):
                 pressure_additional_list = np.arange(min, max, interval)
                 self.append_to_report('GOOD additional list {}'.format(pressure_additional_list))
                 test_pressures += pressure_additional_list.tolist()
+
+            self.append_to_report('pressure list before unique {}'.format(test_pressures))
 
             test_pressures = np.array(test_pressures)
             test_pressures = test_pressures[np.unique(np.round(test_pressures, decimals=4),
