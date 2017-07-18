@@ -15,7 +15,7 @@ import numpy as np
 from phonopy import PhonopyQHA
 
 
-def qha_temp(wf):
+def qha_prediction(wf):
 
     wf_complete_list = []
     for step_name in ['pressure_expansions', 'collect_data']:
@@ -23,6 +23,9 @@ def qha_temp(wf):
             wf_complete_list += list(wf.get_step(step_name).get_sub_workflows())
 
     wf_complete_list += list(wf.get_step('start').get_sub_workflows()[0].get_step('start').get_sub_workflows())
+
+    if len(wf_complete_list) < 5:
+        raise Exception('Not enought points for QHA prediction')
 
     volumes = []
     electronic_energies = []
@@ -481,7 +484,8 @@ class WorkflowQHA(Workflow):
                 return
 
             try:
-                min_stress, max_stress = qha_temp(self)
+                min_stress, max_stress = qha_prediction(self)
+                self.append_to_report('Using QHA prediction')
             except:
                 min_stress, max_stress = phonopy_predict(wf_origin, wf_min, wf_max)
 
