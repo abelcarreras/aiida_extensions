@@ -55,7 +55,8 @@ def qha_prediction(wf, interval):
                 cv.append(thermal_properties.get_array('cv'))
 
     if len(test_pressures) < 5:
-        raise Exception('Not enought points for QHA prediction')
+        # raise Exception('Not enough points for QHA prediction')
+        return None
 
     sort_index = np.argsort(volumes)
 
@@ -393,7 +394,7 @@ class WorkflowQHA(Workflow):
         test_pressures = [np.min(stresses), np.max(stresses)]  # in kbar
 
         total_range = test_pressures[1] - test_pressures[0]
-        interval = total_range/2
+        interval = total_range/4.0
 
         self.add_attribute('npoints', 5)
 
@@ -498,7 +499,7 @@ class WorkflowQHA(Workflow):
                 self.append_to_report('Using Gruneisen prediction')
 
 
-            self.append_to_report('stresses prediction     min:{} max:{}'.format(min_stress, max_stress))
+            self.append_to_report('stresses prediction    min:{} max:{}'.format(min_stress, max_stress))
 
             if max > test_range[1] > max_stress + total_range * 1.2:
                 max = test_range[1]
@@ -507,18 +508,18 @@ class WorkflowQHA(Workflow):
                 min = test_range[0]
 
             if max_stress > test_range[1]:
-                test_range[1] += np.ceil(np.min([interval*0.75, abs(max_stress - test_range[1])]) / interval) * interval
+                test_range[1] += np.ceil(np.min([interval, abs(max_stress - test_range[1])]) / interval) * interval
             if min_stress < test_range[0]:
-                test_range[0] -= np.ceil(np.min([interval*0.75, abs(test_range[0] - min_stress)]) / interval) * interval
+                test_range[0] -= np.ceil(np.min([interval, abs(test_range[0] - min_stress)]) / interval) * interval
 
             if max_stress < test_range[1] or min_stress > test_range[0]:
                 interval *= 0.5
 
             if max_stress < test_range[1]:
-                test_range[1] -= np.ceil(np.min([interval*0.5, abs(max_stress - test_range[1])]) / interval) * interval
+                test_range[1] -= np.ceil(np.min([interval, abs(max_stress - test_range[1])]) / interval) * interval
                 # max = test_range[1]
             if min_stress > test_range[0]:
-                test_range[0] += np.ceil(np.min([interval*0.5, abs(test_range[0] - min_stress)]) / interval) * interval
+                test_range[0] += np.ceil(np.min([interval, abs(test_range[0] - min_stress)]) / interval) * interval
                 # min = test_range[0]
 
             self.append_to_report('n_point estimation {}'.format(total_range / interval))
