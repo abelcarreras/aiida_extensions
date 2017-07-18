@@ -31,12 +31,10 @@ class Custom_vasprun_parserInstruction(BaseInstruction):
         """
         Parses the vasprun.xml using the Pymatgen Vasprun function.
         """
-        print ('INFUNCTION')
         vasp_param = {}  # ParameterData
 
         parser_warnings = {}  # return non-critical errors
 
-        print ('Opening')
         # extract data
         try: 
             with open(self._out_folder.get_abs_path('OUTCAR'), 'r') as f:

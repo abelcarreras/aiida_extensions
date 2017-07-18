@@ -25,7 +25,6 @@ __contact__ = u'zicm_at_tcd.ie'
 
 class Output_parametersInstruction(BaseInstruction):
 
-    print ('INCLASS')
     _input_file_list_ = ['vasprun.xml', 'OUTCAR']
 
     def _parser_function(self):

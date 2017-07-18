@@ -72,6 +72,8 @@ def phonopy_predict(wf_origin, wf_plus, wf_minus):
                                                               stresses=stresses,
                                                               t_max=1000,
                                                               t_step=5)
+    # Stupid test (Must be changed)
+    return 0.0, (np.max(min_stresses) - np.min(min_stresses))
 
     return np.min(min_stresses), np.max(min_stresses)
 
