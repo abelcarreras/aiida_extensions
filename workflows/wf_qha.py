@@ -15,6 +15,73 @@ import numpy as np
 from phonopy import PhonopyQHA
 
 
+def qha_temp(wf_complete_list, test_pressures, interval):
+
+
+    volumes = []
+    electronic_energies = []
+    temperatures = []
+    fe_phonon = []
+    entropy = []
+    cv = []
+
+    for wf_test in wf_complete_list:
+        for pressure in test_pressures:
+            if np.isclose(wf_test.get_attribute('pressure'), pressure, atol=interval / 4, rtol=0):
+                thermal_properties = wf_test.get_result('thermal_properties')
+                optimized_data = wf_test.get_result('optimized_structure_data')
+                final_structure = wf_test.get_result('final_structure')
+
+                electronic_energies.append(optimized_data.dict.energy)
+                volumes.append(final_structure.get_cell_volume())
+                temperatures = thermal_properties.get_array('temperature')
+                fe_phonon.append(thermal_properties.get_array('free_energy'))
+                entropy.append(thermal_properties.get_array('entropy'))
+                cv.append(thermal_properties.get_array('cv'))
+
+    sort_index = np.argsort(volumes)
+
+    volumes = np.array(volumes)[sort_index]
+    electronic_energies = np.array(electronic_energies)[sort_index]
+    temperatures = np.array(temperatures)
+    fe_phonon = np.array(fe_phonon).T[:, sort_index]
+    entropy = np.array(entropy).T[:, sort_index]
+    cv = np.array(cv).T[:, sort_index]
+
+    # Calculate QHA properties
+    phonopy_qha = PhonopyQHA(np.array(volumes),
+                             np.array(electronic_energies),
+                             eos="vinet",
+                             temperatures=np.array(temperatures),
+                             free_energy=np.array(fe_phonon),
+                             cv=np.array(cv),
+                             entropy=np.array(entropy),
+                             # t_max=options.t_max,
+                             verbose=False)
+
+    # Get data
+    volume_temperature = phonopy_qha.get_volume_temperature()
+
+
+    from scipy.optimize import curve_fit
+
+
+    # Fit to an exponential equation
+    def fitting_function(x, a, b, c):
+        return np.exp(-b * (x + a)) + c
+
+
+    p_b = 0.1
+    p_c = -200
+    p_a = -np.log(-p_c) / p_b - volumes[0]
+
+    popt, pcov = curve_fit(fitting_function, volumes, test_pressures, p0=[p_a, p_b, p_c], maxfev=100000)
+    min_stresses = fitting_function(volume_temperature, *popt)
+
+    return np.min(min_stresses), np.max(min_stresses)
+
+
+
 def get_data_from_wf_phonon(wf):
     from phonon_common import get_phonon
 
