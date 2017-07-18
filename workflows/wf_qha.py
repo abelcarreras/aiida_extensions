@@ -580,7 +580,7 @@ class WorkflowQHA(Workflow):
                     #self.append_to_report('compare: {} {}'.format(wf_test.get_attribute('pressure'), pressure))
                     if np.isclose(wf_test.get_attribute('pressure'), pressure, atol=interval/4, rtol=0):
                         test_pressures.remove(pressure)
-                        self.append_to_report('IS close! -> remove {}'.format(pressure))
+                        # self.append_to_report('IS close! -> remove {}'.format(pressure))
 
             self.append_to_report('pressure list (no duplicates){}'.format(test_pressures))
 
@@ -637,9 +637,12 @@ class WorkflowQHA(Workflow):
                         if np.isclose(wf_test.get_attribute('pressure'), pressure, atol=interval/4., rtol=0):
                             # To make sure that the calculation did not fail and if it is the case give a second chance to finish correctly
                             test_pressures.remove(pressure)
-                            self.append_to_report('IS close! -> remove {}'.format(pressure))
+                            # self.append_to_report('IS close! -> remove {}'.format(pressure))
                 except:
                     wf_test.add_attribute('pressure', 'error')
+
+        min_stress, max_stress = qha_prediction(self, interval)
+        self.append_to_report('Semi QHA prediction {} {}'.format(min_stress, max_stress))
 
         for pressure in test_pressures:
             self.append_to_report('pressure: {}'.format(pressure))
@@ -670,6 +673,10 @@ class WorkflowQHA(Workflow):
         wf_complete_list = list(self.get_step('pressure_expansions').get_sub_workflows())
         wf_complete_list += list(self.get_step('collect_data').get_sub_workflows())
         wf_complete_list += list(self.get_step('complete').get_sub_workflows())
+
+
+        min_stress, max_stress = qha_prediction(self, interval)
+        self.append_to_report('Final QHA prediction {} {}'.format(min_stress, max_stress))
 
         inline_params = {}
 
