@@ -345,7 +345,7 @@ class WorkflowQHA(Workflow):
 
         n_points = wf_parameters['n_points']
 
-        test_range = self.get_attribute('test_range')
+        test_range = np.sort(self.get_attribute('test_range'))
         total_range = self.get_attribute('total_range')
         interval = self.get_attribute('interval')
         clock = self.get_attribute('clock')
@@ -416,17 +416,17 @@ class WorkflowQHA(Workflow):
                 min = test_range[0]
 
             if max_stress > test_range[1]:
-                test_range[1] += np.ceil(abs(max_stress - test_range[1]) / interval) * interval
+                test_range[1] += np.ceil(np.min([interval*0.5, abs(max_stress - test_range[1])]) / interval) * interval
             if min_stress < test_range[0]:
-                test_range[0] -= np.ceil(abs(test_range[0] - min_stress) / interval) * interval
+                test_range[0] -= np.ceil(np.min([interval*0.5, abs(test_range[0] - min_stress)]) / interval) * interval
 
             if max_stress < test_range[1] or min_stress > test_range[0]:
                 interval *= 0.5
             if max_stress < test_range[1]:
-                test_range[1] -= np.ceil(abs(max_stress - test_range[1]) / interval) * interval
+                test_range[1] -= np.ceil(np.min([interval*0.25, abs(max_stress - test_range[1])]) / interval) * interval
                 # max = test_range[1]
             if min_stress > test_range[0]:
-                test_range[0] += np.ceil(abs(test_range[0] - min_stress) / interval) * interval
+                test_range[0] += np.ceil(np.min([interval*0.25, abs(test_range[0] - min_stress)]) / interval) * interval
                 # min = test_range[0]
 
             self.append_to_report('n_point estimation {}'.format(total_range / interval))
@@ -502,6 +502,11 @@ class WorkflowQHA(Workflow):
 
             self.attach_workflow(wf)
             wf.start()
+
+        if abs(test_range[1] - test_range[0]) / interval > n_points:
+            self.append_to_report('Safety exit (not converged): min {}, max {}'.format(min, max))
+            self.next(self.complete)
+            return
 
         self.next(self.collect_data)
 
