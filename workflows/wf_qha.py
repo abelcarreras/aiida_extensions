@@ -15,7 +15,7 @@ import numpy as np
 from phonopy import PhonopyQHA
 
 
-def qha_prediction(wf):
+def qha_prediction(wf, interval):
 
     wf_complete_list = []
     for step_name in ['pressure_expansions', 'collect_data']:
@@ -24,8 +24,6 @@ def qha_prediction(wf):
 
     wf_complete_list += list(wf.get_step('start').get_sub_workflows()[0].get_step('start').get_sub_workflows())
 
-    if len(wf_complete_list) < 5:
-        raise Exception('Not enought points for QHA prediction')
 
     volumes = []
     electronic_energies = []
@@ -37,18 +35,27 @@ def qha_prediction(wf):
     test_pressures = []
     for wf_test in wf_complete_list:
         if wf_test.get_state() != 'ERROR':
-            test_pressures.append(wf_test.get_attribute('pressure'))
+            repeated = False
+            for p in test_pressures:
+                if np.isclose(wf_test.get_attribute('pressure'), p, atol=interval / 4, rtol=0):
+                    repeated = True
 
-            thermal_properties = wf_test.get_result('thermal_properties')
-            optimized_data = wf_test.get_result('optimized_structure_data')
-            final_structure = wf_test.get_result('final_structure')
+            if not repeated:
+                test_pressures.append(wf_test.get_attribute('pressure'))
 
-            electronic_energies.append(optimized_data.dict.energy)
-            volumes.append(final_structure.get_cell_volume())
-            temperatures = thermal_properties.get_array('temperature')
-            fe_phonon.append(thermal_properties.get_array('free_energy'))
-            entropy.append(thermal_properties.get_array('entropy'))
-            cv.append(thermal_properties.get_array('cv'))
+                thermal_properties = wf_test.get_result('thermal_properties')
+                optimized_data = wf_test.get_result('optimized_structure_data')
+                final_structure = wf_test.get_result('final_structure')
+
+                electronic_energies.append(optimized_data.dict.energy)
+                volumes.append(final_structure.get_cell_volume())
+                temperatures = thermal_properties.get_array('temperature')
+                fe_phonon.append(thermal_properties.get_array('free_energy'))
+                entropy.append(thermal_properties.get_array('entropy'))
+                cv.append(thermal_properties.get_array('cv'))
+
+    if len(test_pressures) < 5:
+        raise Exception('Not enought points for QHA prediction')
 
     sort_index = np.argsort(volumes)
 
@@ -484,10 +491,12 @@ class WorkflowQHA(Workflow):
                 return
 
             try:
-                min_stress, max_stress = qha_prediction(self)
+                min_stress, max_stress = qha_prediction(self, interval)
                 self.append_to_report('Using QHA prediction')
             except:
                 min_stress, max_stress = phonopy_predict(wf_origin, wf_min, wf_max)
+                self.append_to_report('Using Gruneisen prediction')
+
 
             self.append_to_report('stresses prediction     min:{} max:{}'.format(min_stress, max_stress))
 
@@ -498,17 +507,18 @@ class WorkflowQHA(Workflow):
                 min = test_range[0]
 
             if max_stress > test_range[1]:
-                test_range[1] += np.ceil(np.min([interval*0.5, abs(max_stress - test_range[1])]) / interval) * interval
+                test_range[1] += np.ceil(np.min([interval*0.75, abs(max_stress - test_range[1])]) / interval) * interval
             if min_stress < test_range[0]:
-                test_range[0] -= np.ceil(np.min([interval*0.5, abs(test_range[0] - min_stress)]) / interval) * interval
+                test_range[0] -= np.ceil(np.min([interval*0.75, abs(test_range[0] - min_stress)]) / interval) * interval
 
             if max_stress < test_range[1] or min_stress > test_range[0]:
                 interval *= 0.5
+
             if max_stress < test_range[1]:
-                test_range[1] -= np.ceil(np.min([interval*0.25, abs(max_stress - test_range[1])]) / interval) * interval
+                test_range[1] -= np.ceil(np.min([interval*0.5, abs(max_stress - test_range[1])]) / interval) * interval
                 # max = test_range[1]
             if min_stress > test_range[0]:
-                test_range[0] += np.ceil(np.min([interval*0.25, abs(test_range[0] - min_stress)]) / interval) * interval
+                test_range[0] += np.ceil(np.min([interval*0.5, abs(test_range[0] - min_stress)]) / interval) * interval
                 # min = test_range[0]
 
             self.append_to_report('n_point estimation {}'.format(total_range / interval))
