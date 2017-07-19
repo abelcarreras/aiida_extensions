@@ -564,16 +564,20 @@ class WorkflowQHA(Workflow):
 
         # Be efficient
         if min is not None and max is not None:
-            good = [wf_test.get_attribute('pressure') for wf_test in wf_complete_list
-                    if check_dos_stable(wf_test, tol=1e-6)]
-            good = np.sort(good)
 
-            self.append_to_report('GOOD pressure list {}'.format(good))
 
-            if len(np.diff(good)) > 0:
-                pressure_additional_list = np.arange(min, max, interval)
-                self.append_to_report('GOOD additional list {}'.format(pressure_additional_list))
-                test_pressures += pressure_additional_list.tolist()
+            #good = [wf_test.get_attribute('pressure') for wf_test in wf_complete_list
+            #        if check_dos_stable(wf_test, tol=1e-6)]
+            #good = np.sort(good)
+
+            #self.append_to_report('GOOD pressure list {}'.format(good))
+
+            #if len(np.diff(good)) > 0:
+            #    pressure_additional_list = np.arange(min, max, interval)
+            #    self.append_to_report('GOOD additional list {}'.format(pressure_additional_list))
+            #    test_pressures += pressure_additional_list.tolist()
+
+            test_pressures += np.arange(min, max, interval).tolist()
 
             self.append_to_report('pressure list before unique {}'.format(test_pressures))
 
