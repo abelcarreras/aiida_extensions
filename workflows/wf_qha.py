@@ -521,6 +521,15 @@ class WorkflowQHA(Workflow):
 
             self.append_to_report('n_point estimation {}'.format(total_range / interval))
 
+            if (abs(min - max) / interval > n_points * 0.9 and
+                            max_stress < max < max_stress + total_range * 1.5 and
+                            min_stress > min > min_stress + total_range * 1.5):
+
+                self.append_to_report('Exit perfect: min {}, max {}'.format(min, max))
+                self.next(self.complete)
+                return
+
+
             # if max > test_range[1] > max_stress + total_range * 1.5:
             #    max = test_range[1]
 
