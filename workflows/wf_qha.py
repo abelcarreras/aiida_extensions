@@ -579,13 +579,13 @@ class WorkflowQHA(Workflow):
 
             test_pressures += np.arange(min, max, interval).tolist()
 
-            self.append_to_report('pressure list before unique {}'.format(test_pressures))
+            # self.append_to_report('pressure list before unique {}'.format(test_pressures))
 
             test_pressures = np.array(test_pressures)
             test_pressures = test_pressures[np.unique(np.round(test_pressures, decimals=4),
                                                       return_index=True)[1]].tolist()
 
-            self.append_to_report('pressure list {}'.format(test_pressures))
+            # self.append_to_report('pressure list {}'.format(test_pressures))
 
             # Remove duplicates
             for wf_test in wf_complete_list:
@@ -598,7 +598,7 @@ class WorkflowQHA(Workflow):
             self.append_to_report('pressure list (no duplicates){}'.format(test_pressures))
 
         for pressure in test_pressures:
-            self.append_to_report('pressure: {}'.format(pressure))
+            # self.append_to_report('pressure: {}'.format(pressure))
 
             # Submit workflow
             wf = WorkflowPhonon(params=wf_parameters, pressure=pressure, optimize=True)
@@ -609,6 +609,7 @@ class WorkflowQHA(Workflow):
             self.attach_workflow(wf)
             wf.start()
 
+        self.append_to_report('Info   min {}, max {}, n_points {} interval {}'.format(min, max, n_points, interval))
         if abs(test_range[1] - test_range[0]) / interval > n_points:
             self.append_to_report('Safety exit (not converged): min {}, max {}'.format(min, max))
             self.next(self.complete)
