@@ -495,12 +495,12 @@ class WorkflowQHA(Workflow):
 
             self.append_to_report('stresses prediction    min:{} max:{}'.format(min_stress, max_stress))
 
-            if (max > test_range[1] > max_stress + total_range * 1.5 or
-                max < test_range[1] < max_stress) or max is None:
+            if (max > test_range[1] > max_stress or
+                max < test_range[1] < max_stress + total_range * 1.5) or max is None:
                 max = test_range[1]
 
-            if (min < test_range[0] < min_stress - total_range * 1.5 or
-                min > test_range[0] > min_stress) or min is None:
+            if (min < test_range[0] < min_stress or
+                min > test_range[0] > min_stress - total_range * 1.5) or min is None:
                 min = test_range[0]
 
             if max_stress > test_range[1]:
@@ -532,24 +532,21 @@ class WorkflowQHA(Workflow):
                 self.next(self.complete)
                 return
 
-
             # if max > test_range[1] > max_stress + total_range * 1.5:
             #    max = test_range[1]
 
-            #if min < test_range[0] < min_stress - total_range * 1.5:
+            # if min < test_range[0] < min_stress - total_range * 1.5:
             #    min = test_range[0]
 
-            #if max < test_range[1] < max_stress + total_range * 1.5:
+            # if max < test_range[1] < max_stress + total_range * 1.5:
             #    max = test_range[1]
 
-            #if min > test_range[0] > min_stress - total_range * 1.5:
+            # if min > test_range[0] > min_stress - total_range * 1.5:
             #    min = test_range[0]
 
             self.add_attribute('max', max)
             self.add_attribute('min', min)
             self.add_attribute('interval', interval)
-
-
 
         total_range = abs(test_range[1] - test_range[0])
         self.add_attribute('max', max)
