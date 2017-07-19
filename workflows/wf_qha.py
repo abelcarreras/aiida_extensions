@@ -155,8 +155,6 @@ def phonopy_predict(wf_origin, wf_plus, wf_minus):
                                                               stresses=stresses,
                                                               t_max=1000,
                                                               t_step=5)
-    # Stupid test (Must be changed)
-    return 0.0, (np.max(min_stresses) - np.min(min_stresses))
 
     return np.min(min_stresses), np.max(min_stresses)
 
@@ -485,7 +483,6 @@ class WorkflowQHA(Workflow):
             if min is None:
                 min = test_range[0]
 
-
             if abs(test_range[1] - test_range[0]) / interval > n_points:
                 self.append_to_report('Exit: min {}, max {}'.format(min, max))
                 self.next(self.complete)
@@ -498,7 +495,6 @@ class WorkflowQHA(Workflow):
                 min_stress, max_stress = phonopy_predict(wf_origin, wf_min, wf_max)
                 self.append_to_report('Using Gruneisen prediction')
 
-
             self.append_to_report('stresses prediction    min:{} max:{}'.format(min_stress, max_stress))
 
             if max > test_range[1] > max_stress + total_range * 1.2:
@@ -508,9 +504,12 @@ class WorkflowQHA(Workflow):
                 min = test_range[0]
 
             if max_stress > test_range[1]:
-                test_range[1] += np.ceil(np.min([interval, abs(max_stress - test_range[1])]) / interval) * interval
+ #               test_range[1] += np.ceil(np.min([interval, abs(max_stress - test_range[1])]) / interval) * interval
+                test_range[1] += np.ceil(abs(max_stress - test_range[1]) / interval) * interval
+
             if min_stress < test_range[0]:
-                test_range[0] -= np.ceil(np.min([interval, abs(test_range[0] - min_stress)]) / interval) * interval
+#                test_range[0] -= np.ceil(np.min([interval, abs(test_range[0] - min_stress)]) / interval) * interval
+                test_range[0] -= np.ceil(abs(test_range[0] - min_stress) / interval) * interval
 
             if max_stress < test_range[1] or min_stress > test_range[0]:
                 interval *= 0.5
@@ -719,6 +718,9 @@ class WorkflowQHA(Workflow):
             wf_complete_list += list(self.get_step('start').get_sub_workflows()[0].get_step('start').get_sub_workflows())
         except:
             pass
+
+        min_stress, max_stress = qha_prediction(self, interval)
+        self.append_to_report('Final QHA prediction {} {}'.format(min_stress, max_stress))
 
         volumes = []
         electronic_energies = []
