@@ -515,10 +515,10 @@ class WorkflowQHA(Workflow):
                 interval *= 0.5
 
             if max_stress < test_range[1]:
-                test_range[1] -= np.ceil(np.min([interval, abs(max_stress - test_range[1])]) / interval) * interval
+                test_range[1] -= np.ceil(np.min([total_range/2, abs(max_stress - test_range[1])]) / interval) * interval
                 # max = test_range[1]
             if min_stress > test_range[0]:
-                test_range[0] += np.ceil(np.min([interval, abs(test_range[0] - min_stress)]) / interval) * interval
+                test_range[0] += np.ceil(np.min([total_range/2, abs(test_range[0] - min_stress)]) / interval) * interval
                 # min = test_range[0]
 
             self.append_to_report('n_point estimation {}'.format(total_range / interval))
