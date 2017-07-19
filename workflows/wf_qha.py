@@ -477,8 +477,8 @@ class WorkflowQHA(Workflow):
                 test_range[0] += interval
 
         if ok_inf and ok_sup:
-            max = test_range[1]
-            min = test_range[0]
+            #max = test_range[1]
+            #min = test_range[0]
 
             if abs(test_range[1] - test_range[0]) / interval > n_points:
                 self.append_to_report('Exit: min {}, max {}'.format(min, max))
@@ -494,10 +494,12 @@ class WorkflowQHA(Workflow):
 
             self.append_to_report('stresses prediction    min:{} max:{}'.format(min_stress, max_stress))
 
-            if max > test_range[1] > max_stress + total_range * 1.5:
+            if (max > test_range[1] > max_stress + total_range * 1.5 or
+                max < test_range[1] < max_stress):
                 max = test_range[1]
 
-            if min < test_range[0] < min_stress - total_range * 1.5:
+            if (min < test_range[0] < min_stress - total_range * 1.5 or
+                min > test_range[0] > min_stress):
                 min = test_range[0]
 
             if max_stress > test_range[1]:
