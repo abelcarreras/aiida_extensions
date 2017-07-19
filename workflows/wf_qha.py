@@ -504,12 +504,12 @@ class WorkflowQHA(Workflow):
                 min = test_range[0]
 
             if max_stress > test_range[1]:
- #               test_range[1] += np.ceil(np.min([interval, abs(max_stress - test_range[1])]) / interval) * interval
-                test_range[1] += np.ceil(abs(max_stress - test_range[1]) / interval) * interval
+                test_range[1] += np.ceil(np.min([total_range/2, abs(max_stress - test_range[1])]) / interval) * interval
+ #               test_range[1] += np.ceil(abs(max_stress - test_range[1]) / interval) * interval
 
             if min_stress < test_range[0]:
-#                test_range[0] -= np.ceil(np.min([interval, abs(test_range[0] - min_stress)]) / interval) * interval
-                test_range[0] -= np.ceil(abs(test_range[0] - min_stress) / interval) * interval
+                test_range[0] -= np.ceil(np.min([total_range/2, abs(test_range[0] - min_stress)]) / interval) * interval
+#                test_range[0] -= np.ceil(abs(test_range[0] - min_stress) / interval) * interval
 
             if max_stress < test_range[1] or min_stress > test_range[0]:
                 interval *= 0.5
