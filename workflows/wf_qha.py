@@ -606,8 +606,8 @@ class WorkflowQHA(Workflow):
             self.attach_workflow(wf)
             wf.start()
 
-        self.append_to_report('Info   min {}, max {}, n_points {} interval {}'.format(min, max, n_points, interval))
-        if abs(test_range[1] - test_range[0]) / interval > n_points:
+        self.append_to_report('Info   min {}, max {}, n_points {} interval {}'.format(min, max, abs(test_range[1] - test_range[0]) / interval, interval))
+        if len(test_pressures) > int(n_points * 1.0):
             self.append_to_report('Safety exit (not converged): min {}, max {}'.format(min, max))
             self.next(self.complete)
             return
