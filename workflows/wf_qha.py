@@ -15,7 +15,9 @@ import numpy as np
 from phonopy import PhonopyQHA
 
 
-def qha_prediction(wf, interval):
+def qha_prediction(wf, interval, min, max):
+
+    test_pressures = np.arange(min, max, interval).tolist()
 
     wf_complete_list = []
     for step_name in ['pressure_expansions', 'collect_data']:
@@ -32,6 +34,22 @@ def qha_prediction(wf, interval):
     entropy = []
     cv = []
 
+    for wf_test in wf_complete_list:
+        for pressure in test_pressures:
+            if wf_test.get_state() == 'FINISHED':
+                if np.isclose(wf_test.get_attribute('pressure'), pressure, atol=interval / 4, rtol=0):
+                    thermal_properties = wf_test.get_result('thermal_properties')
+                    optimized_data = wf_test.get_result('optimized_structure_data')
+                    final_structure = wf_test.get_result('final_structure')
+
+                    electronic_energies.append(optimized_data.dict.energy)
+                    volumes.append(final_structure.get_cell_volume())
+                    temperatures = thermal_properties.get_array('temperature')
+                    fe_phonon.append(thermal_properties.get_array('free_energy'))
+                    entropy.append(thermal_properties.get_array('entropy'))
+                    cv.append(thermal_properties.get_array('cv'))
+
+    """
     test_pressures = []
     for wf_test in wf_complete_list:
         if wf_test.get_state() != 'ERROR':
@@ -53,6 +71,8 @@ def qha_prediction(wf, interval):
                 fe_phonon.append(thermal_properties.get_array('free_energy'))
                 entropy.append(thermal_properties.get_array('entropy'))
                 cv.append(thermal_properties.get_array('cv'))
+
+    """
 
     if len(test_pressures) < 5:
         # raise Exception('Not enough points for QHA prediction')
@@ -93,6 +113,9 @@ def qha_prediction(wf, interval):
 
     popt, pcov = curve_fit(fitting_function, volumes, test_pressures, p0=[p_a, p_b, p_c], maxfev=100000)
     min_stresses = fitting_function(volume_temperature, *popt)
+
+    if (np.max(min_stresses) - np.min(min_stresses)) < 1:
+        return None
 
     return np.min(min_stresses), np.max(min_stresses)
 
@@ -487,7 +510,7 @@ class WorkflowQHA(Workflow):
                 return
 
             try:
-                min_stress, max_stress = qha_prediction(self, interval)
+                min_stress, max_stress = qha_prediction(self, interval, min, max)
                 self.append_to_report('Using QHA prediction')
             except:
                 min_stress, max_stress = phonopy_predict(wf_origin, wf_min, wf_max)
@@ -652,7 +675,7 @@ class WorkflowQHA(Workflow):
                 except:
                     wf_test.add_attribute('pressure', 'error')
 
-        min_stress, max_stress = qha_prediction(self, interval)
+        min_stress, max_stress = qha_prediction(self, interval, min, max)
         self.append_to_report('Semi QHA prediction {} {}'.format(min_stress, max_stress))
 
         for pressure in test_pressures:
@@ -686,7 +709,7 @@ class WorkflowQHA(Workflow):
         wf_complete_list += list(self.get_step('complete').get_sub_workflows())
 
 
-        min_stress, max_stress = qha_prediction(self, interval)
+        min_stress, max_stress = qha_prediction(self, interval, min, max)
         self.append_to_report('Final QHA prediction {} {}'.format(min_stress, max_stress))
 
         inline_params = {}
@@ -731,7 +754,7 @@ class WorkflowQHA(Workflow):
         except:
             pass
 
-        min_stress, max_stress = qha_prediction(self, interval)
+        min_stress, max_stress = qha_prediction(self, interval, min, max)
         self.append_to_report('Final QHA prediction {} {}'.format(min_stress, max_stress))
 
         volumes = []
@@ -743,17 +766,18 @@ class WorkflowQHA(Workflow):
 
         for wf_test in wf_complete_list:
             for pressure in test_pressures:
-                if np.isclose(wf_test.get_attribute('pressure'), pressure, atol=interval / 4, rtol=0):
-                    thermal_properties = wf_test.get_result('thermal_properties')
-                    optimized_data = wf_test.get_result('optimized_structure_data')
-                    final_structure = wf_test.get_result('final_structure')
+                if wf_test.get_state() == 'FINISHED':
+                    if np.isclose(wf_test.get_attribute('pressure'), pressure, atol=interval / 4, rtol=0):
+                        thermal_properties = wf_test.get_result('thermal_properties')
+                        optimized_data = wf_test.get_result('optimized_structure_data')
+                        final_structure = wf_test.get_result('final_structure')
 
-                    electronic_energies.append(optimized_data.dict.energy)
-                    volumes.append(final_structure.get_cell_volume())
-                    temperatures = thermal_properties.get_array('temperature')
-                    fe_phonon.append(thermal_properties.get_array('free_energy'))
-                    entropy.append(thermal_properties.get_array('entropy'))
-                    cv.append(thermal_properties.get_array('cv'))
+                        electronic_energies.append(optimized_data.dict.energy)
+                        volumes.append(final_structure.get_cell_volume())
+                        temperatures = thermal_properties.get_array('temperature')
+                        fe_phonon.append(thermal_properties.get_array('free_energy'))
+                        entropy.append(thermal_properties.get_array('entropy'))
+                        cv.append(thermal_properties.get_array('cv'))
 
         sort_index = np.argsort(volumes)
 
