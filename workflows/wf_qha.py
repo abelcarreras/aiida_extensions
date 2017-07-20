@@ -28,18 +28,40 @@ def qha_prediction(wf, interval, min, max):
 
     wf_complete_list += list(wf.get_step('start').get_sub_workflows()[0].get_step('start').get_sub_workflows())
 
-
     volumes = []
     electronic_energies = []
     temperatures = []
     fe_phonon = []
     entropy = []
     cv = []
+    if True:
+        for wf_test in wf_complete_list:
+            for pressure in test_pressures:
+                if wf_test.get_state() == 'FINISHED':
+                    if np.isclose(wf_test.get_attribute('pressure'), pressure, atol=interval / 4, rtol=0):
+                        thermal_properties = wf_test.get_result('thermal_properties')
+                        optimized_data = wf_test.get_result('optimized_structure_data')
+                        final_structure = wf_test.get_result('final_structure')
 
-    for wf_test in wf_complete_list:
-        for pressure in test_pressures:
-            if wf_test.get_state() == 'FINISHED':
-                if np.isclose(wf_test.get_attribute('pressure'), pressure, atol=interval / 4, rtol=0):
+                        electronic_energies.append(optimized_data.dict.energy)
+                        volumes.append(final_structure.get_cell_volume())
+                        temperatures = thermal_properties.get_array('temperature')
+                        fe_phonon.append(thermal_properties.get_array('free_energy'))
+                        entropy.append(thermal_properties.get_array('entropy'))
+                        cv.append(thermal_properties.get_array('cv'))
+
+    if False:
+        test_pressures = []
+        for wf_test in wf_complete_list:
+            if wf_test.get_state() != 'ERROR':
+                repeated = False
+                for p in test_pressures:
+                    if np.isclose(wf_test.get_attribute('pressure'), p, atol=interval / 4, rtol=0):
+                        repeated = True
+
+                if not repeated:
+                    test_pressures.append(wf_test.get_attribute('pressure'))
+
                     thermal_properties = wf_test.get_result('thermal_properties')
                     optimized_data = wf_test.get_result('optimized_structure_data')
                     final_structure = wf_test.get_result('final_structure')
@@ -51,30 +73,6 @@ def qha_prediction(wf, interval, min, max):
                     entropy.append(thermal_properties.get_array('entropy'))
                     cv.append(thermal_properties.get_array('cv'))
 
-    """
-    test_pressures = []
-    for wf_test in wf_complete_list:
-        if wf_test.get_state() != 'ERROR':
-            repeated = False
-            for p in test_pressures:
-                if np.isclose(wf_test.get_attribute('pressure'), p, atol=interval / 4, rtol=0):
-                    repeated = True
-
-            if not repeated:
-                test_pressures.append(wf_test.get_attribute('pressure'))
-
-                thermal_properties = wf_test.get_result('thermal_properties')
-                optimized_data = wf_test.get_result('optimized_structure_data')
-                final_structure = wf_test.get_result('final_structure')
-
-                electronic_energies.append(optimized_data.dict.energy)
-                volumes.append(final_structure.get_cell_volume())
-                temperatures = thermal_properties.get_array('temperature')
-                fe_phonon.append(thermal_properties.get_array('free_energy'))
-                entropy.append(thermal_properties.get_array('entropy'))
-                cv.append(thermal_properties.get_array('cv'))
-
-    """
 
     if len(test_pressures) < 5:
         # raise Exception('Not enough points for QHA prediction')
