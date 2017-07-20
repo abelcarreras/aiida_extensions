@@ -16,6 +16,8 @@ from phonopy import PhonopyQHA
 
 
 def qha_prediction(wf, interval, min, max):
+    # max = wf.get_attribute('max')
+    # min = wf.get_attribute('min')
 
     test_pressures = np.arange(min, max, interval).tolist()
 
