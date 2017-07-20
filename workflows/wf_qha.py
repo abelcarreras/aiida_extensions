@@ -29,6 +29,7 @@ def qha_prediction(wf, interval, min, max):
     wf_complete_list += list(wf.get_step('start').get_sub_workflows()[0].get_step('start').get_sub_workflows())
 
     volumes = []
+    stresses = []
     electronic_energies = []
     temperatures = []
     fe_phonon = []
@@ -45,6 +46,7 @@ def qha_prediction(wf, interval, min, max):
 
                         electronic_energies.append(optimized_data.dict.energy)
                         volumes.append(final_structure.get_cell_volume())
+                        stresses.append(pressure)
                         temperatures = thermal_properties.get_array('temperature')
                         fe_phonon.append(thermal_properties.get_array('free_energy'))
                         entropy.append(thermal_properties.get_array('entropy'))
@@ -74,12 +76,13 @@ def qha_prediction(wf, interval, min, max):
                     cv.append(thermal_properties.get_array('cv'))
 
 
-    if len(test_pressures) < 5:
+    if len(stresses) < 5:
         # raise Exception('Not enough points for QHA prediction')
         return None
 
     sort_index = np.argsort(volumes)
 
+    stresses = np.array(stresses)[sort_index]
     volumes = np.array(volumes)[sort_index]
     electronic_energies = np.array(electronic_energies)[sort_index]
     temperatures = np.array(temperatures)
@@ -111,7 +114,7 @@ def qha_prediction(wf, interval, min, max):
     p_c = -200
     p_a = -np.log(-p_c) / p_b - volumes[0]
 
-    popt, pcov = curve_fit(fitting_function, volumes, test_pressures, p0=[p_a, p_b, p_c], maxfev=100000)
+    popt, pcov = curve_fit(fitting_function, volumes, stresses, p0=[p_a, p_b, p_c], maxfev=100000)
     min_stresses = fitting_function(volume_temperature, *popt)
 
     if (np.max(min_stresses) - np.min(min_stresses)) < 1:
