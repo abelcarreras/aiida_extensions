@@ -598,14 +598,16 @@ class WorkflowQHA(Workflow):
             #    pressure_additional_list = np.arange(min, max, interval)
             #    self.append_to_report('GOOD additional list {}'.format(pressure_additional_list))
             #    test_pressures += pressure_additional_list.tolist()
+            self.append_to_report('Info   min {}, max {}, interval {}'.format(min, max, interval))
 
             test_pressures += np.arange(min, max, interval).tolist()
+            self.append_to_report('test_pressures {}'.format(test_pressures))
 
             # self.append_to_report('pressure list before unique {}'.format(test_pressures))
 
-            test_pressures = np.array(test_pressures)
-            test_pressures = test_pressures[np.unique(np.round(test_pressures, decimals=4),
-                                                      return_index=True)[1]].tolist()
+            #test_pressures = np.array(test_pressures)
+            #test_pressures = test_pressures[np.unique(np.round(test_pressures, decimals=4),
+            #                                          return_index=True)[1]].tolist()
 
             # self.append_to_report('pressure list {}'.format(test_pressures))
 
