@@ -104,24 +104,28 @@ def qha_prediction(wf, interval, min, max):
     # Get data
     volume_temperature = phonopy_qha.get_volume_temperature()
 
-    from scipy.optimize import curve_fit
+    from scipy.optimize import curve_fit, OptimizeWarning
+    try:
 
-    # Fit to an exponential equation
-    def fitting_function(x, a, b, c):
-        return np.exp(-b * (x + a)) + c
+        # Fit to an exponential equation
+        def fitting_function(x, a, b, c):
+            return np.exp(-b * (x + a)) + c
 
-    p_b = 0.1
-    p_c = -200
-    p_a = -np.log(-p_c) / p_b - volumes[0]
+        p_b = 0.1
+        p_c = -200
+        p_a = -np.log(-p_c) / p_b - volumes[0]
 
-    popt, pcov = curve_fit(fitting_function, volumes, stresses, p0=[p_a, p_b, p_c], maxfev=100000)
-    min_stresses = fitting_function(volume_temperature, *popt)
+        popt, pcov = curve_fit(fitting_function, volumes, stresses, p0=[p_a, p_b, p_c], maxfev=100000)
+        min_stresses = fitting_function(volume_temperature, *popt)
+
+    except OptimizeWarning:
+        fit_vs = np.polyfit(volumes, stresses, 2)
+        min_stresses = np.array([np.polyval(fit_vs, i) for i in volume_temperature])
 
     if (np.max(min_stresses) - np.min(min_stresses)) < 1:
         return None
 
     return np.min(min_stresses), np.max(min_stresses)
-
 
 
 def get_data_from_wf_phonon(wf):
