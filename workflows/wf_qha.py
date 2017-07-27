@@ -417,7 +417,7 @@ class WorkflowQHA(Workflow):
         test_pressures = [np.min(stresses), np.max(stresses)]  # in kbar
 
         total_range = test_pressures[1] - test_pressures[0]
-        interval = total_range/4.0
+        interval = total_range
 
         self.add_attribute('npoints', 5)
 
