@@ -507,7 +507,7 @@ class WorkflowQHA(Workflow):
             #    max = test_range[1]
             #    min = test_range[0]
 
-            if abs(test_range[1] - test_range[0]) / interval > n_points:
+            if abs(test_range[1] - test_range[0]) / interval > n_points * 1.2:
                 self.append_to_report('Exit: min {}, max {}'.format(min, max))
                 self.next(self.complete)
                 return
@@ -529,6 +529,16 @@ class WorkflowQHA(Workflow):
                 min > test_range[0] > min_stress or min is None):
                 min = test_range[0]
 
+            self.append_to_report('n_point estimation {}'.format(total_range / interval))
+
+            if (abs(min - max) / interval > n_points * 0.9 and
+                            max_stress < max < max_stress + total_range * 1.5 and
+                            min_stress > min > min_stress + total_range * 1.5):
+
+                self.append_to_report('Exit perfect: min {}, max {}'.format(min, max))
+                self.next(self.complete)
+                return
+
             if max_stress > test_range[1]:
                 test_range[1] += np.ceil(np.min([total_range/2, abs(max_stress - test_range[1])]) / interval) * interval
  #               test_range[1] += np.ceil(abs(max_stress - test_range[1]) / interval) * interval
@@ -548,15 +558,7 @@ class WorkflowQHA(Workflow):
                 test_range[0] += np.ceil(np.min([total_range/2, abs(test_range[0] - min_stress)]) / interval) * interval
                 # min = test_range[0]
 
-            self.append_to_report('n_point estimation {}'.format(total_range / interval))
 
-            if (abs(min - max) / interval > n_points * 0.9 and
-                            max_stress < max < max_stress + total_range * 1.5 and
-                            min_stress > min > min_stress + total_range * 1.5):
-
-                self.append_to_report('Exit perfect: min {}, max {}'.format(min, max))
-                self.next(self.complete)
-                return
 
             # if max > test_range[1] > max_stress + total_range * 1.5:
             #    max = test_range[1]
