@@ -7,12 +7,39 @@ from aiida.workflows.wf_phonon import WorkflowPhonon
 
 from aiida.orm import load_workflow
 
+import numpy as np
+from phonopy import PhonopyQHA
+
+
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
 ArrayData = DataFactory('array')
 
-import numpy as np
-from phonopy import PhonopyQHA
+
+def check_dos_stable(wf, tol=1e-6):
+
+    try:
+        dos = wf.get_result('dos').get_array('total_dos')
+        freq = wf.get_result('dos').get_array('frequency')
+    except:
+        return False
+
+    mask_neg = np.ma.masked_less(freq, 0.0).mask
+    mask_pos = np.ma.masked_greater(freq, 0.0).mask
+
+    if mask_neg.any() == False:
+        return True
+
+    if mask_pos.any() == False:
+        return False
+
+    int_neg = -np.trapz(np.multiply(dos[mask_neg], freq[mask_neg]), x=freq[mask_neg])
+    int_pos = np.trapz(np.multiply(dos[mask_pos], freq[mask_pos]), x=freq[mask_pos])
+
+    if int_neg / int_pos > tol:
+        return False
+    else:
+        return True
 
 
 def qha_prediction(wf, interval, min, max, use_all_data=True):
@@ -27,6 +54,7 @@ def qha_prediction(wf, interval, min, max, use_all_data=True):
     wf_complete_list += list(wf.get_step('start').get_sub_workflows()[0].get_step('start').get_sub_workflows())
 
     if use_all_data:
+        # check data is stable
         good = [wf_test.get_attribute('pressure') for wf_test in wf_complete_list
                 if check_dos_stable(wf_test, tol=1e-6)]
         good = np.sort(good)
@@ -196,32 +224,6 @@ def phonopy_predict(wf_origin, wf_plus, wf_minus):
                                                               t_step=5)
 
     return np.min(min_stresses), np.max(min_stresses)
-
-
-def check_dos_stable(wf, tol=1e-6):
-
-    try:
-        dos = wf.get_result('dos').get_array('total_dos')
-        freq = wf.get_result('dos').get_array('frequency')
-    except:
-        return False
-
-    mask_neg = np.ma.masked_less(freq, 0.0).mask
-    mask_pos = np.ma.masked_greater(freq, 0.0).mask
-
-    if mask_neg.any() == False:
-        return True
-
-    if mask_pos.any() == False:
-        return False
-
-    int_neg = -np.trapz(np.multiply(dos[mask_neg], freq[mask_neg]), x=freq[mask_neg])
-    int_pos = np.trapz(np.multiply(dos[mask_pos], freq[mask_pos]), x=freq[mask_pos])
-
-    if int_neg / int_pos > tol:
-        return False
-    else:
-        return True
 
 
 @make_inline
