@@ -594,7 +594,9 @@ class WorkflowQHA(Workflow):
  #           self.add_attribute('min', min)
  #           self.add_attribute('interval', interval)
 
-        total_range = abs(test_range[1] - test_range[0])
+        #total_range = abs(test_range[1] - test_range[0])
+        total_range = abs(max - min)
+
         self.add_attribute('max', max)
         self.add_attribute('min', min)
         self.add_attribute('test_range', test_range.tolist())
