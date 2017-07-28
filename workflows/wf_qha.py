@@ -15,11 +15,9 @@ import numpy as np
 from phonopy import PhonopyQHA
 
 
-def qha_prediction(wf, interval, min, max):
+def qha_prediction(wf, interval, min, max, use_all_data=True):
     # max = wf.get_attribute('max')
     # min = wf.get_attribute('min')
-
-    test_pressures = np.arange(min, max, interval).tolist()
 
     wf_complete_list = []
     for step_name in ['pressure_expansions', 'collect_data']:
@@ -27,6 +25,17 @@ def qha_prediction(wf, interval, min, max):
             wf_complete_list += list(wf.get_step(step_name).get_sub_workflows())
 
     wf_complete_list += list(wf.get_step('start').get_sub_workflows()[0].get_step('start').get_sub_workflows())
+
+    if use_all_data:
+        good = [wf_test.get_attribute('pressure') for wf_test in wf_complete_list
+                if check_dos_stable(wf_test, tol=1e-6)]
+        good = np.sort(good)
+
+        test_pressures = np.array(good)
+        test_pressures = test_pressures[np.unique(np.round(test_pressures, decimals=4),
+                                                  return_index=True)[1]].tolist()
+    else:
+        test_pressures = np.arange(min, max, interval).tolist()
 
     volumes = []
     stresses = []
