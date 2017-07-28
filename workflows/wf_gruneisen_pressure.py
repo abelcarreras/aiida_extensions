@@ -49,22 +49,24 @@ def thermal_expansion(volumes, electronic_energies, gruneisen, stresses=None, t_
 
     if stresses is not None:
 
-        from scipy.optimize import curve_fit
+        from scipy.optimize import curve_fit, OptimizeWarning
 
-        # Fit to an exponential equation
-        def fitting_function(x, a, b, c):
-            return np.exp(-b * (x + a)) + c
+        try:
+            # Fit to an exponential equation
+            def fitting_function(x, a, b, c):
+                return np.exp(-b * (x + a)) + c
 
-        p_b = 0.1
-        p_c = -200
-        p_a = -np.log(-p_c) / p_b - volumes[0]
+            p_b = 0.1
+            p_c = -200
+            p_a = -np.log(-p_c) / p_b - volumes[0]
 
-        popt, pcov = curve_fit(fitting_function, volumes, stresses, p0=[p_a, p_b, p_c], maxfev=100000)
-        min_stress = fitting_function(min_volume, *popt)
+            popt, pcov = curve_fit(fitting_function, volumes, stresses, p0=[p_a, p_b, p_c], maxfev=100000)
+            min_stress = fitting_function(min_volume, *popt)
 
-        # Fit to a quadratic equation
-        # fit_vs = np.polyfit(volumes, stresses, 2)
-        # min_stress = np.array([np.polyval(fit_vs, v) for v in min_volume])
+        except OptimizeWarning:
+            # Fit to a quadratic equation
+            fit_vs = np.polyfit(volumes, stresses, 2)
+            min_stress = np.array([np.polyval(fit_vs, v) for v in min_volume])
     else:
         min_stress = None
 
@@ -295,7 +297,7 @@ class WorkflowGruneisen(Workflow):
 
         self.next(self.volume_expansions)
 
-    # Generate the volume expanded cells
+    # Generate the volume expanded cells optimizing at different external pressures
     @Workflow.step
     def volume_expansions(self):
         self.append_to_report('Volume expansion calculations')
@@ -303,7 +305,6 @@ class WorkflowGruneisen(Workflow):
 
         structure = self.get_step('start').get_sub_workflows()[0].get_result('final_structure')
         self.append_to_report('optimized structure volume: {}'.format(structure.pk))
-
 
         p_displacement = self.get_attribute('p_displacement')
         pressure_differences = [-p_displacement, p_displacement]
@@ -324,8 +325,7 @@ class WorkflowGruneisen(Workflow):
 
         self.next(self.collect_data)
 
-
-    # Generate the volume expanded cells
+    # Generate the volume expanded cells optimizing at constant volume
     @Workflow.step
     def volume_expansions_direct(self):
         self.append_to_report('Volume expansion calculations')
