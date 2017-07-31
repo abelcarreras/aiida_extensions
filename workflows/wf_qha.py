@@ -533,14 +533,13 @@ class WorkflowQHA(Workflow):
 
             self.append_to_report('stresses prediction    min:{} max:{}'.format(min_stress, max_stress))
 
-            safety_expansion_range = abs(max - min) * 0.1
             if (max is None or
-                max > test_range[1] > max_stress + safety_expansion_range or
+                max > test_range[1] > max_stress + abs(max - min) * 0.1 or
                 max < test_range[1] < max_stress):
                 max = test_range[1]
 
             if (min is None or
-                min < test_range[0] < min_stress - safety_expansion_range or
+                min < test_range[0] < min_stress - abs(max - min) * 0.1 or
                 min > test_range[0] > min_stress):
                 min = test_range[0]
 
