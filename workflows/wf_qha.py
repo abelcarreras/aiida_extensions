@@ -533,13 +533,14 @@ class WorkflowQHA(Workflow):
 
             self.append_to_report('stresses prediction    min:{} max:{}'.format(min_stress, max_stress))
 
+            safety_expansion_range = abs(max - min) * 0.1
             if (max is None or
-                max > test_range[1] > max_stress + abs(max - min) * 0.1 or
+                max > test_range[1] > max_stress + safety_expansion_range or
                 max < test_range[1] < max_stress):
                 max = test_range[1]
 
             if (min is None or
-                min < test_range[0] < min_stress - abs(max - min) * 0.1 or
+                min < test_range[0] < min_stress - safety_expansion_range or
                 min > test_range[0] > min_stress):
                 min = test_range[0]
 
@@ -550,19 +551,23 @@ class WorkflowQHA(Workflow):
                 self.next(self.complete)
                 return
 
+            # Adjust factor
+            acceptable_expansion_range = abs(max - min) * 1.5
             if (abs(max - min) / interval > n_points * 0.9 and
-                            max_stress < max < max_stress + abs(max - min) * 1.5 and
-                            min_stress > min > min_stress + abs(max - min) * 1.5):
+                            max_stress < max < max_stress + acceptable_expansion_range and
+                            min_stress > min > min_stress + acceptable_expansion_range):
 
                 self.append_to_report('Exit perfect: min {}, max {}'.format(min, max))
                 self.next(self.complete)
                 return
 
-            if max_stress > test_range[1]:
+            # Adjust factor
+            safety_expansion_range = abs(max - min) * 0.1
+            if max_stress + safety_expansion_range > test_range[1]:
                 test_range[1] += np.ceil(np.min([total_range/2, abs(max_stress - test_range[1])]) / interval) * interval
  #               test_range[1] += np.ceil(abs(max_stress - test_range[1]) / interval) * interval
 
-            if min_stress < test_range[0]:
+            if min_stress - safety_expansion_range < test_range[0]:
                 test_range[0] -= np.ceil(np.min([total_range/2, abs(test_range[0] - min_stress)]) / interval) * interval
 #                test_range[0] -= np.ceil(abs(test_range[0] - min_stress) / interval) * interval
 
@@ -581,7 +586,6 @@ class WorkflowQHA(Workflow):
                 # min = test_range[0]
 
 
-
             # if max > test_range[1] > max_stress + total_range * 1.5:
             #    max = test_range[1]
 
@@ -593,10 +597,6 @@ class WorkflowQHA(Workflow):
 
             # if min > test_range[0] > min_stress - total_range * 1.5:
             #    min = test_range[0]
-
- #           self.add_attribute('max', max)
- #           self.add_attribute('min', min)
- #           self.add_attribute('interval', interval)
 
         total_range = abs(test_range[1] - test_range[0])
         #total_range = abs(max - min)
