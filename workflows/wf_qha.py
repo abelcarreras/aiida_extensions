@@ -475,6 +475,9 @@ class WorkflowQHA(Workflow):
         interval = self.get_attribute('interval')
         clock = self.get_attribute('clock')
 
+        total_range = abs(test_range[1] - test_range[0])
+
+
         max = self.get_attribute('max')
         min = self.get_attribute('min')
 
@@ -509,7 +512,12 @@ class WorkflowQHA(Workflow):
         self.append_to_report('DOS stable | inf:{} sup:{}'.format(ok_inf, ok_sup))
 
         if not ok_sup or not ok_inf:
-            if total_range / interval < n_points * 2:
+            self.append_to_report('No-OK  total_range {}, interval {}, e_points {}, n_points {}'.format(total_range,
+                                                                                                        interval,
+                                                                                                        total_range / interval,
+                                                                                                        n_points * 1.5))
+
+            if total_range / interval < n_points * 1.5:
                 interval *= 0.5
 
             if not ok_sup:
