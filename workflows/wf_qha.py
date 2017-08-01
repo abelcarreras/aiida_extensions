@@ -560,7 +560,7 @@ class WorkflowQHA(Workflow):
                 self.next(self.complete)
                 return
 
-            freedom = abs(max - min) * 0.1
+            freedom = abs(max - min) * 0.2
             if max_stress - freedom > test_range[1]:
                 test_range[1] += np.ceil(np.min([total_range/2, abs(max_stress - test_range[1])]) / interval) * interval
  #               test_range[1] += np.ceil(abs(max_stress - test_range[1]) / interval) * interval
