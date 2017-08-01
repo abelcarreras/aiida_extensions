@@ -554,7 +554,7 @@ class WorkflowQHA(Workflow):
                 return
 
             # Adjust factor
-            acceptable_expansion_range = abs(max - min) * 0.2
+            acceptable_expansion_range = abs(max - min) * 0.5
             if (abs(max - min) / interval > n_points and
                             max_stress < max < max_stress + acceptable_expansion_range and
                             min_stress > min > min_stress - acceptable_expansion_range):
@@ -677,7 +677,7 @@ class WorkflowQHA(Workflow):
             wf.start()
 
         self.append_to_report('Info   min {}, max {}, n_points {} interval {}'.format(min, max, abs(max - min) / interval, interval))
-        if len(test_pressures) > int(n_points * 1.0):
+        if len(test_pressures) > int(n_points * 2.0):
             self.append_to_report('Safety exit (not converged): min {}, max {}'.format(min, max))
             self.next(self.complete)
             return
