@@ -515,9 +515,9 @@ class WorkflowQHA(Workflow):
             self.append_to_report('No-OK  total_range {}, interval {}, e_points {}, n_points {}'.format(total_range,
                                                                                                         interval,
                                                                                                         total_range / interval,
-                                                                                                        n_points * 1.5))
+                                                                                                        n_points))
 
-            if total_range / interval < n_points * 1.5:
+            if total_range / interval < n_points:
                 interval *= 0.5
 
             if not ok_sup:
