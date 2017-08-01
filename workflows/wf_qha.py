@@ -551,22 +551,20 @@ class WorkflowQHA(Workflow):
                 return
 
             # Adjust factor
-            acceptable_expansion_range = abs(max - min) * 1.5
+            acceptable_expansion_range = abs(max - min) * 0.2
             if (abs(max - min) / interval > n_points * 0.9 and
                             max_stress < max < max_stress + acceptable_expansion_range and
-                            min_stress > min > min_stress + acceptable_expansion_range):
+                            min_stress > min > min_stress - acceptable_expansion_range):
 
                 self.append_to_report('Exit perfect: min {}, max {}'.format(min, max))
                 self.next(self.complete)
                 return
 
-            # Adjust factor
-            safety_expansion_range = abs(max - min) * 0.1
-            if max_stress + safety_expansion_range > test_range[1]:
+            if max_stress > test_range[1]:
                 test_range[1] += np.ceil(np.min([total_range/2, abs(max_stress - test_range[1])]) / interval) * interval
  #               test_range[1] += np.ceil(abs(max_stress - test_range[1]) / interval) * interval
 
-            if min_stress - safety_expansion_range < test_range[0]:
+            if min_stress < test_range[0]:
                 test_range[0] -= np.ceil(np.min([total_range/2, abs(test_range[0] - min_stress)]) / interval) * interval
 #                test_range[0] -= np.ceil(abs(test_range[0] - min_stress) / interval) * interval
 
