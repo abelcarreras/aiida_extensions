@@ -571,7 +571,7 @@ class WorkflowQHA(Workflow):
                 self.next(self.complete)
                 return
 
-            if abs(max_stress - test_range[1]) < interval*1.5 and abs(test_range[0] - min_stress) < interval*1.5:
+            if abs(max_stress - test_range[1]) < interval and abs(test_range[0] - min_stress) < interval:
                 interval *= 0.5
 
             if max_stress > test_range[1]:
@@ -583,7 +583,6 @@ class WorkflowQHA(Workflow):
                                                                     np.ceil(np.min([total_range / 2, abs(max_stress - test_range[1])]) / interval) * interval))
                 test_range[1] -= np.ceil(
                     np.min([total_range / 2, abs(max_stress - test_range[1])]) / interval) * interval
-
 
             if min_stress < test_range[0]:
                 self.append_to_report('Increase min {} - {}'.format(test_range[0],
@@ -637,7 +636,6 @@ class WorkflowQHA(Workflow):
 
         # Be efficient
         if min is not None and max is not None:
-
 
             #good = [wf_test.get_attribute('pressure') for wf_test in wf_complete_list
             #        if check_dos_stable(wf_test, tol=1e-6)]
