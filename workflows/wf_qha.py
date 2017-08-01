@@ -536,12 +536,14 @@ class WorkflowQHA(Workflow):
 
             if (max is None or
                 max > test_range[1] > max_stress or
-                max < test_range[1] < max_stress):
+                #max < test_range[1] < max_stress or
+                max < max_stress and max < test_range[1]):
                 max = test_range[1]
 
             if (min is None or
                 min < test_range[0] < min_stress or
-                min > test_range[0] > min_stress):
+                # min > test_range[0] > min_stress
+                min > min_stress and min > test_range[0]):
                 min = test_range[0]
 
             self.append_to_report('n_point estimation {}'.format(abs(max - min) / interval))
