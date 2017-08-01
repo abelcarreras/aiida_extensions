@@ -562,26 +562,28 @@ class WorkflowQHA(Workflow):
                 return
 
             if max_stress > test_range[1]:
+                self.append_to_report('Increase max {} + {}'.format(test_range[1],
+                                                                    np.ceil(np.min([total_range/2, abs(max_stress - test_range[1])]) / interval) * interval))
                 test_range[1] += np.ceil(np.min([total_range/2, abs(max_stress - test_range[1])]) / interval) * interval
- #               test_range[1] += np.ceil(abs(max_stress - test_range[1]) / interval) * interval
 
             if min_stress < test_range[0]:
+                self.append_to_report('Increase min {} - {}'.format(test_range[0],
+                                                                    np.ceil(np.min([total_range / 2, abs(test_range[0] - min_stress)]) / interval) * interval))
                 test_range[0] -= np.ceil(np.min([total_range/2, abs(test_range[0] - min_stress)]) / interval) * interval
-#                test_range[0] -= np.ceil(abs(test_range[0] - min_stress) / interval) * interval
 
+            #  ----------------------------------------------------------------------------
             if abs(max_stress - test_range[1]) < interval*1.5 and abs(test_range[0] - min_stress) < interval*1.5:
                 interval *= 0.5
 
-            #if max_stress < test_range[1] and min_stress > test_range[0]:
-            #    if abs(max_stress - test_range[1]) < interval * 2 or abs(test_range[0] - min_stress) < interval * 2:
-            #        interval *= 0.5
-
             if max_stress < test_range[1]:
+                self.append_to_report('Decrease max {} - {}'.format(test_range[1],
+                                                                    np.ceil(np.min([total_range/2, abs(max_stress - test_range[1])]) / interval) * interval))
                 test_range[1] -= np.ceil(np.min([total_range/2, abs(max_stress - test_range[1])]) / interval) * interval
-                # max = test_range[1]
+
             if min_stress > test_range[0]:
+                self.append_to_report('Decrease min {} + {}'.format(test_range[0],
+                                                                    np.ceil(np.min([total_range/2, abs(test_range[0] - min_stress)]) / interval) * interval))
                 test_range[0] += np.ceil(np.min([total_range/2, abs(test_range[0] - min_stress)]) / interval) * interval
-                # min = test_range[0]
 
 
             # if max > test_range[1] > max_stress + total_range * 1.5:
