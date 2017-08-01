@@ -162,7 +162,8 @@ def qha_prediction(wf, interval, min, max, use_all_data=True):
     if (np.max(min_stresses) - np.min(min_stresses)) < 1:
         return None
 
-    return np.min(min_stresses), np.max(min_stresses)
+    full_range = np.max(min_stresses) - np.min(min_stresses)
+    return np.min(min_stresses) - full_range * 0.1, np.max(min_stresses) + full_range * 0.1
 
 
 def get_data_from_wf_phonon(wf):
@@ -534,12 +535,12 @@ class WorkflowQHA(Workflow):
             self.append_to_report('stresses prediction    min:{} max:{}'.format(min_stress, max_stress))
 
             if (max is None or
-                max > test_range[1] > max_stress + abs(max - min) * 0.1 or
+                max > test_range[1] > max_stress or
                 max < test_range[1] < max_stress):
                 max = test_range[1]
 
             if (min is None or
-                min < test_range[0] < min_stress - abs(max - min) * 0.1 or
+                min < test_range[0] < min_stress or
                 min > test_range[0] > min_stress):
                 min = test_range[0]
 
@@ -658,7 +659,7 @@ class WorkflowQHA(Workflow):
             self.attach_workflow(wf)
             wf.start()
 
-        self.append_to_report('Info   min {}, max {}, n_points {} interval {}'.format(min, max, abs(test_range[1] - test_range[0]) / interval, interval))
+        self.append_to_report('Info   min {}, max {}, n_points {} interval {}'.format(min, max, abs(max - min) / interval, interval))
         if len(test_pressures) > int(n_points * 1.0):
             self.append_to_report('Safety exit (not converged): min {}, max {}'.format(min, max))
             self.next(self.complete)
