@@ -224,7 +224,15 @@ def phonopy_predict(wf_origin, wf_plus, wf_minus):
                                                               t_max=1000,
                                                               t_step=5)
 
+    # Safety control
+    if 0 < np.min(min_stresses):
+        min_stresses =- np.min(min_stresses)
+
+    if 0 > np.max(min_stresses):
+        min_stresses =- np.max(min_stresses)
+
     return np.min(min_stresses), np.max(min_stresses)
+
 
 
 @make_inline
@@ -713,6 +721,11 @@ class WorkflowQHA(Workflow):
         wf_complete_list = list(self.get_step('pressure_expansions').get_sub_workflows())
         wf_complete_list += list(self.get_step('collect_data').get_sub_workflows())
 
+        try:
+            wf_complete_list += list(self.get_step('complete').get_sub_workflows())
+        except:
+            self.append_to_report('First completion step, it is OK!')
+
         # Remove duplicates
         for wf_test in wf_complete_list:
             for pressure in list(test_pressures):
@@ -743,7 +756,11 @@ class WorkflowQHA(Workflow):
             self.attach_workflow(wf)
             wf.start()
 
-        self.next(self.qha_calculation_write_files)
+        if len(test_pressures):
+            self.append_to_report('Not yet completed, {} left'.format(len(test_pressures)))
+            self.next(self.complete)
+        else:
+            self.next(self.qha_calculation_write_files)
 
     @Workflow.step
     def qha_calculation(self):
