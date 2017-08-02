@@ -15,32 +15,21 @@ from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 structure_id = 'mp-12668'
 ##########################
 
-
-def round_up_to_odd(f):
-    return int((np.ceil(f) - 0.5) // 2 * 2 + 1)
-
-def round_up_to_even(f):
-    return int(np.ceil(f) // 2 * 2)
-
-# Large k-meshes use odd number, else even
-def get_kpoint_mesh_shape(kpoint_per_atom, structure, supercell=(1,1,1)):
-
-    reciprocal_cell = np.linalg.inv(structure.cell)*2*np.pi
-    reciprocal_norm = np.linalg.norm(reciprocal_cell, axis=0)
-
-
-    num_atoms = len(structure.sites)
-    supercell_size = np.product(supercell)
-
-    size = np.power(kpoint_per_atom * num_atoms / supercell_size, 1./3)
-    if size > 8:
-        size = round_up_to_odd(size)
-    else:
-        size = round_up_to_even(size)
-
-    return [size, size, size]
-
+# Define the supercell size to use to calculate the forces in phonopy
 def get_supercell_size(structure, max_atoms=100, crystal_system=None):
+
+    def axis_symmetry(axis, crystal_system):
+        symmetry_dict = {'cubic':      [1, 1, 1],
+                         'hexagonal':  [1, 1, 2],
+                         'tetragonal': [1, 1, 2],
+                         'monoclinic': [1, 1, 2],
+                         'trigonal':   [1, 1, 2]}
+
+        try:
+            return np.where(np.array(symmetry_dict[crystal_system]) == symmetry_dict[crystal_system][axis])[0]
+        except KeyError:
+            # If symmetry not defined in symmetry_dict or is None
+            return np.array([0, 1, 2])
 
     cell = np.array(structure.cell)
     num_atoms = len(structure.sites)
@@ -52,7 +41,9 @@ def get_supercell_size(structure, max_atoms=100, crystal_system=None):
         norm = np.linalg.norm(test_cell, axis=1)
         index = np.argmin(norm)
         supercell_size_test = list(supercell_size)
-        supercell_size_test[index] += 1
+
+        for i in axis_symmetry(index, crystal_system):
+            supercell_size_test[i] += 1
 
         anum_atoms_supercell = num_atoms * np.prod(supercell_size_test)
         if anum_atoms_supercell > max_atoms:
@@ -67,7 +58,8 @@ def get_supercell_size(structure, max_atoms=100, crystal_system=None):
             supercell_size = supercell_size_test
 
 
-def get_potential_labels(functional, symbol_list, ftype=None):
+# Decide the pseudopotential file to use for each atom according to request and availability
+def get_pseudopotential_labels(functional, symbol_list, ftype=None):
 
     _, index = np.unique(symbol_list, return_index=True)
     symbol_list_unique = np.array(symbol_list)[np.sort(index)]
@@ -86,6 +78,7 @@ def get_potential_labels(functional, symbol_list, ftype=None):
     return potential_labels
 
 
+# Get the crystal structure and other info. from Materials Project (using pymatgen)
 rester = pymatgen.MPRester(os.environ['PMG_MAPI_KEY'])
 
 pmg_structure = rester.get_structure_by_material_id(structure_id)
@@ -103,26 +96,19 @@ primitive_matrix = np.dot(np.linalg.inv(conventional.lattice.matrix), primitive.
 primitive_matrix = np.round(primitive_matrix, decimals=6).tolist()
 
 structure = StructureData(pymatgen=conventional).store()
+
+print (conventional)
 print (structure)
 
 crystal_system = spa.get_crystal_system()
 print ('Crystal system: {}'.format(crystal_system))
-
-# if crystal_system == 'hexagonal':
-#     supercell = [[3, 0, 0],
-#                  [0, 3, 0],
-#                  [0, 0, 3]]
-# else:
-#     supercell = [[2, 0, 0],
-#                  [0, 2, 0],
-#                  [0, 0, 2]]
 
 supercell_size = get_supercell_size(structure, crystal_system=crystal_system)
 supercell = np.diag(supercell_size).tolist()
 print ('Supercell shape: {}'.format(supercell_size))
 
 
-# Criteria for INPUT
+# Criteria to decide VASP input according to band gap
 band_gap = pmg_band.get_band_gap()['energy']
 if band_gap > 3.0:
     system = 'insulator'
@@ -157,9 +143,12 @@ if system == 'metal':
 
 
 pseudo_dict = {'functional': 'PBE',
-               'symbols': get_potential_labels('PBE', conventional.symbol_set)}
+               'symbols': get_pseudopotential_labels('PBE', conventional.symbol_set)}
 
-# Monkhorst-pack
+print pseudo_dict
+
+# Decide the size of the k-points mesh for electrons according to atom number and crystal structure
+# This is implemented in pymatgen which is called in phonon_workflow using 'Automatic' style
 if system == 'insulator' or system == 'semiconductor':
     # 100 Kpoints/atom
     kpoints_per_atom = 100
@@ -168,41 +157,23 @@ if system == 'insulator' or system == 'semiconductor':
 if system == 'metal':
     kpoints_per_atom = 1000
 
-if crystal_system == 'hexagonal':
-    style = 'Gamma'
-else:
-    style = 'Monkhorst'
-
 kpoints_dict = {'style': 'Automatic',
                 'kpoints_per_atom': kpoints_per_atom}
 
-# kpoints_shape = get_kpoint_mesh_shape(kpoints_per_atom, structure)
-# kpoints_dict = {'style': style,
-#                'points': kpoints_shape,
-#                'shift': [0.0, 0.0, 0.0]}
-
-
-# kpoints_shape_supercell = get_kpoint_mesh_shape(kpoints_per_atom, structure, supercell=supercell_size)
-# kpoints_dict_supercell = {'style': style,
-#                           'points': kpoints_shape_supercell,
-#                           'shift': [0.0, 0.0, 0.0]}
-
-# print 'kpoints: {}'.format(kpoints)
-# print 'kpoints (supercell): {}'.format(kpoints_shape_supercell)
-# print 'shift {}'.format(kshift)
-
+# Cluster machine parameters
 machine_dict = {
     'num_machines': 1,
     'parallel_env':'mpi*',
     'tot_num_mpiprocs': 16}
 
-
+# Phonopy parameteres
 phonopy_parameters = {'supercell': supercell,
                       'primitive': primitive_matrix,
                       'distance': 0.01,
                       'mesh': [20, 20, 20],
                       'symmetry_precision': 1e-5}
 
+# Global parameters dictionary that contains all the parameters defined before
 wf_parameters = {
      'structure': structure,
      'phonopy_input': {'parameters': phonopy_parameters},
@@ -218,7 +189,7 @@ wf_parameters = {
                        'kpoints': kpoints_dict}
 }
 
-#Submit workflow
+#Define calculation to perform and lauch
 from aiida.workflows.wf_phonon import WorkflowPhonon
 wf = WorkflowPhonon(params=wf_parameters, optimize=True)
 
@@ -226,5 +197,6 @@ wf.label = material_name
 wf.description = 'QHA {}'.format(structure.get_formula())
 
 wf.start()
+
 print ('pk: {}'.format(wf.pk))
 
