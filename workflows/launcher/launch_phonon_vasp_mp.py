@@ -17,7 +17,7 @@ structure_id = 'mp-12668'
 
 
 def round_up_to_odd(f):
-    return int((np.ceil(f) - 0.5 ) // 2 * 2 + 1)
+    return int((np.ceil(f) - 0.5) // 2 * 2 + 1)
 
 def round_up_to_even(f):
     return int(np.ceil(f) // 2 * 2)
@@ -25,7 +25,7 @@ def round_up_to_even(f):
 # Large k-meshes use odd number, else even
 def get_kpoint_mesh_shape(kpoint_per_atom, structure, supercell=(1,1,1)):
 
-    reciprocal_cell =  np.linalg.inv(structure.cell)*2*np.pi
+    reciprocal_cell = np.linalg.inv(structure.cell)*2*np.pi
     reciprocal_norm = np.linalg.norm(reciprocal_cell, axis=0)
 
 
@@ -40,7 +40,7 @@ def get_kpoint_mesh_shape(kpoint_per_atom, structure, supercell=(1,1,1)):
 
     return [size, size, size]
 
-def get_supercell_size(structure, max_atoms=100):
+def get_supercell_size(structure, max_atoms=100, crystal_system=None):
 
     cell = np.array(structure.cell)
     num_atoms = len(structure.sites)
@@ -117,7 +117,7 @@ print ('Crystal system: {}'.format(crystal_system))
 #                  [0, 2, 0],
 #                  [0, 0, 2]]
 
-supercell_size = get_supercell_size(structure)
+supercell_size = get_supercell_size(structure, crystal_system=crystal_system)
 supercell = np.diag(supercell_size).tolist()
 print ('Supercell shape: {}'.format(supercell_size))
 

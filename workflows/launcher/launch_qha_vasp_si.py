@@ -91,6 +91,6 @@ wf_parameters = {
 from aiida.workflows.wf_qha import WorkflowQHA
 wf = WorkflowQHA(params=wf_parameters)
 
-wf.label = 'Gruneisen VASP Si '
+wf.label = 'QHA VASP Si '
 wf.start()
 print ('pk: {}'.format(wf.pk))
