@@ -226,10 +226,10 @@ def phonopy_predict(wf_origin, wf_plus, wf_minus):
 
     # Safety control
     if 0 < np.min(min_stresses):
-        min_stresses -= np.min(min_stresses)
+        min_stresses -= abs(np.min(min_stresses))
 
     if 0 > np.max(min_stresses):
-        min_stresses -= np.max(min_stresses)
+        min_stresses += abs(np.max(min_stresses))
 
     return np.min(min_stresses), np.max(min_stresses)
 
@@ -695,9 +695,9 @@ class WorkflowQHA(Workflow):
             self.attach_workflow(wf)
             wf.start()
 
-        self.append_to_report('Info   min {}, max {}, n_points {} interval {}'.format(min, max, abs(max - min) / interval, interval))
-        if len(test_pressures) > int(n_points * 2.0):
-            self.append_to_report('Safety exit (not converged): min {}, max {}'.format(min, max))
+        # self.append_to_report('Info   min {}, max {}, n_points {} interval {}'.format(min, max, abs(max - min) / interval, interval))
+        if len(test_pressures) > n_points * 2:
+            self.append_to_report('Safety exit (not converged), n_points: {}'.format(len(test_pressures)))
             self.next(self.complete)
             return
 
