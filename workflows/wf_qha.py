@@ -226,10 +226,10 @@ def phonopy_predict(wf_origin, wf_plus, wf_minus):
 
     # Safety control
     if 0 < np.min(min_stresses):
-        min_stresses =- np.min(min_stresses)
+        min_stresses -= np.min(min_stresses)
 
     if 0 > np.max(min_stresses):
-        min_stresses =- np.max(min_stresses)
+        min_stresses -= np.max(min_stresses)
 
     return np.min(min_stresses), np.max(min_stresses)
 
@@ -659,6 +659,11 @@ class WorkflowQHA(Workflow):
 
             test_pressures += np.arange(min, max, interval).tolist()
             self.append_to_report('test_pressures {}'.format(test_pressures))
+
+            if len(test_pressures) > n_points * 2:
+                self.append_to_report('Safety exit (not converged): n_press {}'.format(len(test_pressures)))
+                self.next(self.complete)
+                return
 
             # self.append_to_report('pressure list before unique {}'.format(test_pressures))
 
