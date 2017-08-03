@@ -763,7 +763,8 @@ class WorkflowQHA(Workflow):
 
         if len(test_pressures):
             self.append_to_report('Not yet completed, {} left'.format(len(test_pressures)))
-            self.next(self.complete)
+            # self.next(self.complete)
+            self.next(self.qha_calculation_write_files)
         else:
             self.next(self.qha_calculation_write_files)
 
