@@ -15,7 +15,7 @@ import numpy as np
 
 class Array_data_parserInstruction(BaseInstruction):
 
-    _input_file_list_ = ['vasprun.xml', 'OUTCAR']
+    _input_file_list_ = ['vasprun.xml']
 
     def _parser_function(self):
         """
@@ -24,21 +24,7 @@ class Array_data_parserInstruction(BaseInstruction):
 
         parser_warnings = {}  # return non-critical errors
 
-        print ('Opening')
-        # extract data
-        try: 
-            with open(self._out_folder.get_abs_path('OUTCAR'), 'r') as f:
-                text = f.readlines()
-        except:
-            print ('Error opening')   
-
         vspr = Vasprun(self._out_folder.get_abs_path('vasprun.xml'))
-        #except Exception, e:
-        #    msg = (
-        #        "Parsing vasprun file in pymatgen failed, "
-        #        "with error message:\n>> {}".format(e)
-        #    )
-        #    raise OutputParsingError(msg)
 
         # Get forces using pymatgen
         try:
