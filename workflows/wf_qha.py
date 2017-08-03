@@ -657,7 +657,10 @@ class WorkflowQHA(Workflow):
             #    test_pressures += pressure_additional_list.tolist()
             self.append_to_report('Info   min {}, max {}, interval {}'.format(min, max, interval))
 
-            test_pressures += np.arange(min, max, interval).tolist()
+            test_pressures += np.arange(min, max, interval)
+            test_pressures = test_pressures[np.unique(np.round(test_pressures, decimals=4),
+                                                      return_index=True)[1]].tolist()
+
             self.append_to_report('test_pressures {}'.format(test_pressures))
 
             if len(test_pressures) > n_points * 2:
