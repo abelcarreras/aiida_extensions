@@ -356,7 +356,7 @@ class WorkflowQHA(Workflow):
         wf_parameters = self.get_parameters()
         # self.append_to_report('crystal: ' + wf_parameters['structure'].get_formula())
 
-        wf = WorkflowGruneisen(params=wf_parameters, pre_optimize=True)
+        wf = WorkflowGruneisen(params=wf_parameters, constant_volume=False, pre_optimize=True, p_displacement=2, pressure=0)
         wf.store()
 
         #wf = load_workflow(332)
