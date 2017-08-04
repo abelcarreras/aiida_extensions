@@ -552,7 +552,7 @@ class WorkflowQHA(Workflow):
 
             if (max is None or
                 max > test_range[1] > max_stress or
-                #max < test_range[1] < max_stress or
+                # max < test_range[1] < max_stress or
                 max < max_stress and max < test_range[1]):
                 max = test_range[1]
 
@@ -645,19 +645,10 @@ class WorkflowQHA(Workflow):
         # Be efficient
         if min is not None and max is not None:
 
-            #good = [wf_test.get_attribute('pressure') for wf_test in wf_complete_list
-            #        if check_dos_stable(wf_test, tol=1e-6)]
-            #good = np.sort(good)
-
-            #self.append_to_report('GOOD pressure list {}'.format(good))
-
-            #if len(np.diff(good)) > 0:
-            #    pressure_additional_list = np.arange(min, max, interval)
-            #    self.append_to_report('GOOD additional list {}'.format(pressure_additional_list))
-            #    test_pressures += pressure_additional_list.tolist()
             self.append_to_report('Info   min {}, max {}, interval {}'.format(min, max, interval))
 
-            test_pressures += np.arange(min, max, interval)
+            test_pressures += np.arange(min, max, interval).tolist()
+            # Remove self duplicates
             test_pressures = test_pressures[np.unique(np.round(test_pressures, decimals=4),
                                                       return_index=True)[1]].tolist()
 
