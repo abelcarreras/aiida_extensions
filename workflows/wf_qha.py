@@ -582,6 +582,12 @@ class WorkflowQHA(Workflow):
             if abs(max_stress - test_range[1]) < interval and abs(test_range[0] - min_stress) < interval:
                 interval *= 0.5
 
+            ## Safely measure if the test pressures becomes too close (prevents inactive loop, can be ommited)
+            if min_stress > test_range[0] and max_stress < test_range[1] and total_range / interval < 3:
+                interval *= 0.5
+            ##
+
+
             if max_stress > test_range[1]:
                 self.append_to_report('Increase max {} + {}'.format(test_range[1],
                                                                     np.ceil(np.min([total_range/2, abs(max_stress - test_range[1])]) / interval) * interval))
@@ -589,8 +595,7 @@ class WorkflowQHA(Workflow):
             else:
                 self.append_to_report('Decrease max {} - {}'.format(test_range[1],
                                                                     np.ceil(np.min([total_range / 2, abs(max_stress - test_range[1])]) / interval) * interval))
-                test_range[1] -= np.ceil(
-                    np.min([total_range / 2, abs(max_stress - test_range[1])]) / interval) * interval
+                test_range[1] -= np.ceil(np.min([total_range / 2, abs(max_stress - test_range[1])]) / interval) * interval
 
             if min_stress < test_range[0]:
                 self.append_to_report('Increase min {} - {}'.format(test_range[0],
