@@ -649,8 +649,9 @@ class WorkflowQHA(Workflow):
 
             test_pressures += np.arange(min, max, interval).tolist()
             # Remove self duplicates
-            test_pressures = test_pressures[np.unique(np.round(test_pressures, decimals=4),
-                                                      return_index=True)[1]].tolist()
+            test_pressures = np.array(test_pressures)
+            indexes = np.unique(np.round(test_pressures, decimals=4), return_index=True)[1]
+            test_pressures = test_pressures[indexes].tolist()
 
             self.append_to_report('test_pressures {}'.format(test_pressures))
 
