@@ -306,7 +306,7 @@ class WorkflowPhonon(Workflow):
         parameters_qe['CONTROL'].update({'tstress': True,
                                          'tprnfor': True,
                                          'etot_conv_thr': 1.e-8,
-                                         'forc_conv_thr': 1.e-6})
+                                         'forc_conv_thr': 1.e-8})
 
 
         calc.use_structure(structure)
