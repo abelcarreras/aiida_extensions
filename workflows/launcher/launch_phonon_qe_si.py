@@ -33,8 +33,7 @@ for i, scaled_position in enumerate(scaled_positions):
 structure.store()
 
 # QE input parameters
-qe_dict = ParameterData(dict={
-          'CONTROL': {
+qe_dict = {'CONTROL': {
               'calculation': 'scf',
               'restart_mode': 'from_scratch',
               'wf_collect': True,
@@ -45,7 +44,7 @@ qe_dict = ParameterData(dict={
               },
           'ELECTRONS': {
               'conv_thr': 1.e-6,
-              }})
+              }}
 
 pseudo_dict = {'family': 'test_pbe'}
 
