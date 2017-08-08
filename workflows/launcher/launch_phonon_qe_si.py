@@ -47,7 +47,7 @@ qe_dict = ParameterData(dict={
               'conv_thr': 1.e-6,
               }})
 
-pseudo_dict = {'family': 'sigec_pbe'}
+pseudo_dict = {'family': 'test_pbe'}
 
 # Monkhorst-pack
 kpoints_dict = {'points' :[2, 2, 2],
@@ -74,12 +74,12 @@ phonopy_parameters = {'supercell': [[2, 0, 0],
 wf_parameters = {
      'structure': structure,
      'phonopy_input': {'parameters': phonopy_parameters},
-     'input_force': {'code': 'pw@stern',
+     'input_force': {'code': 'pw@boston',
                     'parameters': qe_dict,
                     'resources': machine_dict,
                     'pseudo': pseudo_dict,
                     'kpoints': kpoints_dict},
-     'input_optimize': {'code': 'pw@stern',
+     'input_optimize': {'code': 'pw@boston',
                        'parameters': qe_dict,
                        'resources': machine_dict,
                        'pseudo': pseudo_dict,
