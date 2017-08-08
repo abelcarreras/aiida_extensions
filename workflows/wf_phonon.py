@@ -299,6 +299,9 @@ class WorkflowPhonon(Workflow):
         if type == 'optimize':
             parameters_qe['CONTROL'].update({'relax': True})
 
+        parameters_qe['CONTROL'].update({'tstress': True,
+                                         'tprnfor': True})
+
         parameters_qe['CELL'].update({'press', pressure})
 
         calc.use_structure(structure)
@@ -494,7 +497,12 @@ class WorkflowPhonon(Workflow):
             forces = last_calc.out.output_array.get_array('forces')
             not_converged_forces = len(np.where(abs(forces) > tolerance_forces)[0])
 
-            stresses = last_calc.out.output_array.get_array('stress')
+            try:
+                stresses = last_calc.out.output_array.get_array('stress')
+            except:
+                stresses = last_calc.out.output_parameters.stress
+                stresses = np.array(stresses) * 0.1
+
             not_converged_stress = len(np.where(abs(np.diag(stresses)-pressure) > tolerance_stress)[0])
             np.fill_diagonal(stresses, 0.0)
             not_converged_stress += len(np.where(abs(stresses) > tolerance_stress)[0])
