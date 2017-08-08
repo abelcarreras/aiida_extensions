@@ -298,8 +298,11 @@ class WorkflowPhonon(Workflow):
         parameters_qe = dict(parameters['parameters'])
 
         if type == 'optimize':
-            parameters_qe['CONTROL'].update({'vc-relax': True})
-            parameters_qe['CELL'] = {'press': pressure}
+            parameters_qe['CONTROL'].update({'relax': True,
+                                             'calculation': 'vc-relax'})
+            parameters_qe['CELL'] = {'press': pressure,
+                                     'cell_dynamics': 'damp-pr',
+                                     'cell_dofree': 'all'}
 
 
         parameters_qe['CONTROL'].update({'tstress': True,
