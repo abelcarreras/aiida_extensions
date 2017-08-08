@@ -46,7 +46,7 @@ qe_dict = {'CONTROL': {
               'conv_thr': 1.e-6,
               }}
 
-pseudo_dict = {'family': 'test_pbe'}
+pseudo_dict = {'family': 'pbe_test'}
 
 # Monkhorst-pack
 kpoints_dict = {'points' :[2, 2, 2],
