@@ -97,7 +97,7 @@ def get_force_constants_inline(**kwargs):
     # Build data_sets from forces of supercells with displacments
     data_sets = phonon.get_displacement_dataset()
     for i, first_atoms in enumerate(data_sets['first_atoms']):
-        first_atoms['forces'] = kwargs.pop('force_{}'.format(i)).get_array('forces')[0]
+        first_atoms['forces'] = kwargs.pop('force_{}'.format(i)).get_array('forces')[-1]
 
 
     # Calculate and get force constants
@@ -137,7 +137,7 @@ def get_force_sets_inline(**kwargs):
     # Build data_sets from forces of supercells with displacments
     data_sets = phonon.get_displacement_dataset()
     for i, first_atoms in enumerate(data_sets['first_atoms']):
-        first_atoms['forces'] = kwargs.pop('force_{}'.format(i)).get_array('forces')[0]
+        first_atoms['forces'] = kwargs.pop('force_{}'.format(i)).get_array('forces')[-1]
 
     data = ArrayData()
     data.set_array('force_sets', np.array(data_sets))
@@ -504,7 +504,7 @@ class WorkflowPhonon(Workflow):
             except KeyError:
                 structure = last_calc.get_outputs_dict()['output_structure']
 
-            forces = last_calc.out.output_array.get_array('forces')
+            forces = last_calc.out.output_array.get_array('forces')[-1]
             not_converged_forces = len(np.where(abs(forces) > tolerance_forces)[0])
 
 
