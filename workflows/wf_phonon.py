@@ -303,7 +303,7 @@ class WorkflowPhonon(Workflow):
         parameters_qe['CONTROL'].update({'tstress': True,
                                          'tprnfor': True})
 
-        parameters_qe['CELL'].update({'press', pressure})
+        parameters_qe['CELL'] = {'press', pressure}
 
         calc.use_structure(structure)
         calc.use_code(code)
