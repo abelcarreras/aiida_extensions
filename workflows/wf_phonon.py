@@ -307,7 +307,7 @@ class WorkflowPhonon(Workflow):
 
         calc.use_structure(structure)
         calc.use_code(code)
-        calc.use_parameters(dict=parameters)
+        calc.use_parameters(ParameterData(dict=parameters))
 
         kpoints = KpointsData()
         kpoints.set_kpoints_mesh(parameters['kpoints'])
