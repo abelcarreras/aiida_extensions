@@ -310,7 +310,7 @@ class WorkflowPhonon(Workflow):
         calc.use_parameters(ParameterData(dict=parameters))
 
         kpoints = KpointsData()
-        kpoints.set_kpoints_mesh(parameters['kpoints'])
+        kpoints.set_kpoints_mesh(parameters['kpoints']['points'])
         calc.use_kpoints(kpoints)
 
         if 'family' in parameters['pseudo']:
