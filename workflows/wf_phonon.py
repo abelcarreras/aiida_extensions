@@ -561,7 +561,11 @@ class WorkflowPhonon(Workflow):
         if optimized is not None:
             self.append_to_report('Optimized structure')
             opt_calc = self.get_step_calculations(self.optimize).latest('id')
-            structure = opt_calc.get_outputs_dict()['structure']
+            try:
+                structure = opt_calc.get_outputs_dict()['structure']
+            except KeyError:
+                structure = opt_calc.get_outputs_dict()['output_structure']
+
             optimized_data = opt_calc.out.output_parameters
             self.add_result('optimized_structure_data', optimized_data)
 
