@@ -498,7 +498,12 @@ class WorkflowPhonon(Workflow):
         optimized = self.get_step_calculations(self.optimize)
         if len(optimized):
             last_calc = self.get_step_calculations(self.optimize).latest('id')
-            structure = last_calc.get_outputs_dict()['structure']
+
+            try:
+                structure = last_calc.get_outputs_dict()['structure']
+            except KeyError:
+                structure = last_calc.get_outputs_dict()['output_structure']
+
             forces = last_calc.out.output_array.get_array('forces')
             not_converged_forces = len(np.where(abs(forces) > tolerance_forces)[0])
 
