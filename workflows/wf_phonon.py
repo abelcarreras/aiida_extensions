@@ -287,8 +287,6 @@ class WorkflowPhonon(Workflow):
 
         return calc
 
-
-
     def generate_calculations_qe(self, structure, parameters, type='optimize', pressure=0.0):
         # On development
         code = Code.get_from_string(parameters['code'])
@@ -309,8 +307,10 @@ class WorkflowPhonon(Workflow):
 
         kpoints = KpointsData()
         kpoints.set_kpoints_mesh(parameters['kpoints'])
-
         calc.use_kpoints(kpoints)
+
+        if 'family' in parameters['pseudo']:
+            calc.use_pseudos_from_family(parameters['pseudo']['family'])
 
         calc.store_all()
 
