@@ -287,7 +287,8 @@ class WorkflowPhonon(Workflow):
 
         return calc
 
-    def generate_calculations_qe(self, structure, parameters, type='optimize', pressure=0.0):
+
+    def generate_calculation_qe(self, structure, parameters, type='optimize', pressure=0.0):
         # On development
         code = Code.get_from_string(parameters['code'])
 
