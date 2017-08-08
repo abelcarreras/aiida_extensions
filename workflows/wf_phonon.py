@@ -507,11 +507,10 @@ class WorkflowPhonon(Workflow):
             forces = last_calc.out.output_array.get_array('forces')
             not_converged_forces = len(np.where(abs(forces) > tolerance_forces)[0])
 
-            try:
-                stresses = last_calc.out.output_array.get_array('stress')
-            except:
-                stresses = last_calc.out.output_parameters.stress
-                stresses = np.array(stresses) * 0.1
+
+            stresses = last_calc.out.output_array.get_array('stress')
+            if len(stresses.shape) > 2:
+                stresses = stresses[-1] * 0.1
 
             not_converged_stress = len(np.where(abs(np.diag(stresses)-pressure) > tolerance_stress)[0])
             np.fill_diagonal(stresses, 0.0)
