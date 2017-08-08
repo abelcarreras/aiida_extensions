@@ -306,7 +306,7 @@ class WorkflowPhonon(Workflow):
         parameters_qe['CONTROL'].update({'tstress': True,
                                          'tprnfor': True,
                                          'etot_conv_thr': 1.e-8,
-                                         'forc_conv_thr': 1.e-8})
+                                         'forc_conv_thr': 1.e-6})
 
 
         calc.use_structure(structure)
@@ -492,7 +492,7 @@ class WorkflowPhonon(Workflow):
 
         parameters = self.get_parameters()
         pressure = self.get_attribute('pressure')
-        tolerance_forces = 1e-06
+        tolerance_forces = 1e-04
         tolerance_stress = 1e-02
 
         counter = self.get_attribute('counter')
