@@ -318,6 +318,8 @@ class WorkflowPhonon(Workflow):
 
         calc.store_all()
 
+        return calc
+
 
 
     def generate_calculation_vasp(self, structure, parameters, type='optimize', pressure=0.0):
