@@ -287,7 +287,6 @@ class WorkflowPhonon(Workflow):
 
         return calc
 
-
     def generate_calculation_qe(self, structure, parameters, type='optimize', pressure=0.0):
         # On development
         code = Code.get_from_string(parameters['code'])
@@ -300,8 +299,9 @@ class WorkflowPhonon(Workflow):
         if type == 'optimize':
             parameters_qe['CONTROL'].update({'calculation': 'vc-relax'})
             parameters_qe['CELL'] = {'press': pressure,
+                                     'press_conv_thr': 1.e-2,
                                      'cell_dynamics': 'damp-pr',
-                                     'cell_dofree': 'all'}
+                                     'cell_dofree': 'volume'}
 
         parameters_qe['CONTROL'].update({'tstress': True,
                                          'tprnfor': True,

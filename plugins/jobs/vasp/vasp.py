@@ -162,7 +162,7 @@ def disassemble_poscar(poscar):
         raise ValueError(msg)
 
     return {
-        'structure': poscar_struct,
+        'output_structure': poscar_struct,
         'structure_extras': structure_extras if opt else None
     }
 

@@ -49,14 +49,14 @@ qe_dict = {'CONTROL': {
 pseudo_dict = {'family': 'pbe_test'}
 
 # Monkhorst-pack
-kpoints_dict = {'points' :[2, 2, 2],
-                'shift'  :[0.0, 0.0, 0.0]}
+kpoints_dict = {'points': [2, 2, 2],
+                'shift':  [0.0, 0.0, 0.0]}
 
 # Cluster information
 machine_dict = {
     'num_machines': 1,
     'parallel_env':'mpi*',
-    'tot_num_mpiprocs' : 16}
+    'tot_num_mpiprocs': 16}
 
 # Phonopy input parameters
 phonopy_parameters = {'supercell': [[2, 0, 0],
