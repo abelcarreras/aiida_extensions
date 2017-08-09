@@ -14,7 +14,6 @@ from pymatgen.io import vasp
 #
 import phonopy.interface.vasp as vasp_phonopy 
 
-# This file has been modified from the original code by Mario Zic
 
 __copyright__ = u'Copyright © 2016, Mario Zic, Trinity College Dublin. All Rights Reserved.'
 __license__ = "Apache, Version 2.0, see LICENSE.txt file"
@@ -22,6 +21,7 @@ __version__ = "0.0.1"
 __contributors__ = "Mario Zic"
 __contact__ = u'zicm_at_tcd.ie'
 
+# This file has been modified respect to the original code by Mario Zic
 
 class Custom_vasprun_parserInstruction(BaseInstruction):
 
@@ -54,8 +54,7 @@ class Custom_vasprun_parserInstruction(BaseInstruction):
             )
             raise OutputParsingError(msg)
 
-
-        #Get forces using phonopy functions        
+        # Get forces using phonopy functions
         try:
             force = vasp_phonopy._get_forces_vasprun_xml(
                                  vasp_phonopy._iterparse(self._out_folder.get_abs_path('vasprun.xml'), tag='varray')
@@ -70,7 +69,6 @@ class Custom_vasprun_parserInstruction(BaseInstruction):
                 "with error Message:\n>> {}".format(e)
             )
             raise OutputParsingError(msg)
-
 
 
         # construct proper output format

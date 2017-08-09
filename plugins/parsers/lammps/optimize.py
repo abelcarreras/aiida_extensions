@@ -217,7 +217,7 @@ class OptimizeParser(Parser):
             structure.append_atom(position=position.tolist(),
                                   symbols=symbols[i])
 
-        new_nodes_list.append(('structure', structure))
+        new_nodes_list.append(('output_structure', structure))
 
         # save forces into node
         array_data = ArrayData()

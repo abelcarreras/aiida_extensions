@@ -20,6 +20,7 @@ __version__ = "0.0.1"
 __contributors__ = "Mario Zic"
 __contact__ = u'zicm_at_tcd.ie'
 
+# This file has been modified respect to the original code by Mario Zic
 
 # main body below
 # this class name intentionally breaks the CamelCaseConvention
@@ -60,6 +61,8 @@ class Default_structure_parserInstruction(BaseInstruction):
                 "Error: {}".format(e)
             )
 
+        # Small hack to change name of output structure node to be consistent with QE plugin
+        out_structure['output_structure'] = out_structure.pop('structure')
         for item in out_structure:
             nodes_list.append((item, out_structure[item]))
 
