@@ -300,8 +300,8 @@ class WorkflowPhonon(Workflow):
             parameters_qe['CONTROL'].update({'calculation': 'vc-relax'})
             parameters_qe['CELL'] = {'press': pressure,
                                      'press_conv_thr': 1.e-2,
-                                     'cell_dynamics': 'damp-pr',
-                                     'cell_dofree': 'xyz'}
+                                     'cell_dynamics': 'bfgs',  # Quasi-Newton algorithm
+                                     'cell_dofree': 'all'}     # Degrees of movement
 
         parameters_qe['CONTROL'].update({'tstress': True,
                                          'tprnfor': True,
@@ -493,7 +493,7 @@ class WorkflowPhonon(Workflow):
         parameters = self.get_parameters()
         pressure = self.get_attribute('pressure')
         tolerance_forces = 1e-02
-        tolerance_stress = 1e-02
+        tolerance_stress = 1e-05
 
         counter = self.get_attribute('counter')
 
