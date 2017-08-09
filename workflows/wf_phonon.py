@@ -301,7 +301,7 @@ class WorkflowPhonon(Workflow):
             parameters_qe['CELL'] = {'press': pressure,
                                      'press_conv_thr': 1.e-2,
                                      'cell_dynamics': 'damp-pr',
-                                     'cell_dofree': 'volume'}
+                                     'cell_dofree': 'xyz'}
 
         parameters_qe['CONTROL'].update({'tstress': True,
                                          'tprnfor': True,
