@@ -89,7 +89,7 @@ wf_parameters = {
 
 #Submit workflow
 from aiida.workflows.wf_phonon import WorkflowPhonon
-wf = WorkflowPhonon(params=wf_parameters, optimize=False)
+wf = WorkflowPhonon(params=wf_parameters, optimize=True)
 
 wf.label = 'QE Si'
 wf.start()
