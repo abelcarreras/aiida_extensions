@@ -302,6 +302,9 @@ class WorkflowPhonon(Workflow):
                                      'press_conv_thr': 1.e-2,
                                      'cell_dynamics': 'bfgs',  # Quasi-Newton algorithm
                                      'cell_dofree': 'all'}     # Degrees of movement
+            parameters_qe['IONS'] = {'ion_dynamics': 'bfgs'}
+
+
 
         parameters_qe['CONTROL'].update({'tstress': True,
                                          'tprnfor': True,
