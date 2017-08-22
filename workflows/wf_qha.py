@@ -525,7 +525,7 @@ class WorkflowQHA(Workflow):
                                                                                                         total_range / interval,
                                                                                                         n_points))
 
-            if total_range / interval < n_points:
+            if total_range / interval < n_points*:
                 interval *= 0.5
 
             if not ok_sup:
@@ -533,6 +533,11 @@ class WorkflowQHA(Workflow):
 
             if not ok_inf:
                 test_range[0] += interval
+
+            if np.isclose(test_range[0], test_range[1], atol=interval/4, rtol=0):
+                self.next(self.exit)
+                self.append_to_report('Stable range not found')
+                return
 
         if ok_inf and ok_sup:
             # if max is None:
