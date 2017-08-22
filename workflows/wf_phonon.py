@@ -655,7 +655,7 @@ class WorkflowPhonon(Workflow):
         parameters_phonopy = parameters['phonopy_input']
 
         calcs = list(self.get_step_calculations(self.displacements))
-        calcs += list(self.get_step_calculations(self.check_successful_calculations))
+        #calcs += list(self.get_step_calculations(self.check_successful_calculations))
 
         structure = self.get_result('final_structure')
 
@@ -686,7 +686,7 @@ class WorkflowPhonon(Workflow):
         parameters_phonopy = parameters['phonopy_input']
 
         calcs = list(self.get_step_calculations(self.displacements))
-        calcs += list(self.get_step_calculations(self.check_successful_calculations))
+        #calcs += list(self.get_step_calculations(self.check_successful_calculations))
 
         structure = self.get_result('final_structure')
 
@@ -698,7 +698,7 @@ class WorkflowPhonon(Workflow):
         self.append_to_report('created parameters')
 
         for calc in calcs:
-            if calc.get_state() == 'FINISHED':
+            if 'output_array' in calc.get_outputs_dict():
                 data = calc.get_outputs_dict()['output_array']
                 inline_params[calc.label] = data
                 self.append_to_report('extract force from {}'.format(calc.label))
