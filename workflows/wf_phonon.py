@@ -480,7 +480,7 @@ class WorkflowPhonon(Workflow):
         self.append_to_report('Workflow starting')
 
         if self._optimize:
-            self.add_attribute('counter', 10)  # define max number of optimization iterations
+            self.add_attribute('counter', 20)  # define max number of optimization iterations
             self.next(self.optimize)
         else:
             self.next(self.displacements)
@@ -503,7 +503,11 @@ class WorkflowPhonon(Workflow):
         optimized = self.get_step_calculations(self.optimize)
         if len(optimized):
             last_calc = self.get_step_calculations(self.optimize).latest('id')
-            if last_calc.get_state() == 'FAILED':
+            try:
+                structure = last_calc.get_outputs_dict()['output_structure']
+                forces = last_calc.out.output_array.get_array('forces')[-1]
+                stresses = last_calc.out.output_array.get_array('stress')
+            except AttributeError:
                 if counter < 1:
                     self.append_to_report('Error optimization: communication failed?')
                     self.next(self.exit)
@@ -511,9 +515,7 @@ class WorkflowPhonon(Workflow):
                     self.add_attribute('counter', counter - 1)
                     self.next(self.optimize)
 
-            structure = last_calc.get_outputs_dict()['output_structure']
-            forces = last_calc.out.output_array.get_array('forces')[-1]
-            stresses = last_calc.out.output_array.get_array('stress')
+
 
             not_converged_forces = len(np.where(abs(forces) > tolerance_forces)[0])
             if len(stresses.shape) > 2:
