@@ -354,7 +354,7 @@ class WorkflowPhonon(Workflow):
         if type == 'optimize':
             vasp_input_optimize = dict(incar)
             vasp_input_optimize.update({
-                'PREC': 'Normal',
+                'PREC': 'Accurate',
                 'ISTART': 0,
                 'IBRION': 2,
                 'ISIF': 3,
@@ -370,7 +370,7 @@ class WorkflowPhonon(Workflow):
         if type == 'optimize_constant_volume':
             vasp_input_optimize = dict(incar)
             vasp_input_optimize.update({
-                'PREC': 'Normal',
+                'PREC': 'Accurate',
                 'ISTART': 0,
                 'IBRION': 2,
                 'ISIF': 4,
@@ -496,7 +496,7 @@ class WorkflowPhonon(Workflow):
         parameters = self.get_parameters()
         pressure = self.get_attribute('pressure')
         tolerance_forces = 1e-06
-        tolerance_stress = 1e-03
+        tolerance_stress = 1e-02
 
         counter = self.get_attribute('counter')
 
