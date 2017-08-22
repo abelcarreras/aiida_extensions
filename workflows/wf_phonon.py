@@ -667,7 +667,7 @@ class WorkflowPhonon(Workflow):
         self.append_to_report('created parameters')
 
         for calc in calcs:
-            if 'output_array' in calc.get_outputs_dict():
+            if calc.label != 'FAILED':
                 inline_params[calc.label] = calc.out.output_array
                 self.append_to_report('extract force from {}'.format(calc.label))
 
@@ -698,7 +698,7 @@ class WorkflowPhonon(Workflow):
         self.append_to_report('created parameters')
 
         for calc in calcs:
-            if 'output_array' in calc.get_outputs_dict():
+            if calc.label != 'FAILED':
                 data = calc.get_outputs_dict()['output_array']
                 inline_params[calc.label] = data
                 self.append_to_report('extract force from {}'.format(calc.label))
