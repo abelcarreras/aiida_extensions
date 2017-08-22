@@ -610,7 +610,7 @@ class WorkflowPhonon(Workflow):
         calcs = self.get_step_calculations(self.displacements)
 
         for calc in calcs:
-            if calc.get_state() == 'FAILED':
+            if not 'output_array' in calc.get_outputs_dict():
                 self.append_to_report('calc {} FAILED, repeating..'.format(calc.label))
                 repeat_calc = self.generate_calculation(calc.inp.structure,
                                                         parameters['input_force'],
@@ -646,9 +646,8 @@ class WorkflowPhonon(Workflow):
         self.append_to_report('created parameters')
 
         for calc in calcs:
-            if calc.get_state() == 'FINISHED':
-                data = calc.get_outputs_dict()['output_array']
-                inline_params[calc.label] = data
+            if 'output_array' in calc.get_outputs_dict():
+                inline_params[calc.label] = calc.out.output_array
                 self.append_to_report('extract force from {}'.format(calc.label))
 
         # Get the force constants and store it in DB as a Workflow result

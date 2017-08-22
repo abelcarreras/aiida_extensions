@@ -15,7 +15,7 @@ import numpy as np
 
 class Array_data_parserInstruction(BaseInstruction):
 
-    _input_file_list_ = ['vasprun.xml']
+    _input_file_list_ = ['vasprun.xml', 'POTCAR']
 
     def _parser_function(self):
         """
@@ -42,7 +42,7 @@ class Array_data_parserInstruction(BaseInstruction):
 
         except Exception, e:
             msg = (
-                "Processing forces, "
+                "Processing stress, "
                 "with error Message:\n>> {}".format(e)
             )
             raise OutputParsingError(msg)

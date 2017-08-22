@@ -70,8 +70,7 @@ class VaspParser(Parser):
 
 ##########   Abel Modification to test custom parsers
 
-
-            if not(isinstance(custom_instruct, type(None))):
+            if custom_instruct is not None:
                 instruct = custom_instruct 
  
 ##########
