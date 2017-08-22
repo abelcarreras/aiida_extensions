@@ -516,7 +516,6 @@ class WorkflowPhonon(Workflow):
                     self.next(self.optimize)
 
 
-
             not_converged_forces = len(np.where(abs(forces) > tolerance_forces)[0])
             if len(stresses.shape) > 2:
                 stresses = stresses[-1] * 10
@@ -563,44 +562,66 @@ class WorkflowPhonon(Workflow):
         parameters = self.get_parameters()
         parameters_phonopy = parameters['phonopy_input']
 
-        optimized = self.get_step('optimize')
-
-        if optimized is not None:
-            self.append_to_report('Optimized structure')
-            opt_calc = self.get_step_calculations(self.optimize).latest('id')
-            structure = opt_calc.get_outputs_dict()['output_structure']
-            optimized_data = opt_calc.out.output_parameters
-            self.add_result('optimized_structure_data', optimized_data)
-
+        if len(self.get_step_calculations(self.displacements)):
+            calcs = self.get_step_calculations(self.displacements)
+            all_calc_ok = True
+            for calc in calcs:
+                if calc.label != 'FAILED' and not 'output_array' in calc.get_outputs_dict():
+                    self.append_to_report('calc {} FAILED, repeating..'.format(calc.label))
+                    repeat_calc = self.generate_calculation(calc.inp.structure,
+                                                            parameters['input_force'],
+                                                            type='forces')
+                    repeat_calc.label = calc.label
+                    self.attach_calculation(repeat_calc)
+                    calc.label = 'FAILED'
+                    all_calc_ok = False
+            if all_calc_ok:
+                if 'code' in parameters['phonopy_input']:
+                    self.append_to_report('Remote phonon calculation')
+                    self.next(self.force_constants_calculation_remote)
+                else:
+                    self.append_to_report('Local phonon calculation')
+                    self.next(self.force_constants_calculation)
+                return
         else:
-            self.append_to_report('Initial structure')
-            structure = parameters['structure']
+            optimized = self.get_step('optimize')
 
-        self.add_result('final_structure', structure)
+            if optimized is not None:
+                self.append_to_report('Optimized structure')
+                opt_calc = self.get_step_calculations(self.optimize).latest('id')
+                structure = opt_calc.get_outputs_dict()['output_structure']
+                optimized_data = opt_calc.out.output_parameters
+                self.add_result('optimized_structure_data', optimized_data)
 
-        inline_params = {"structure": structure,
-                         "phonopy_input": ParameterData(dict=parameters_phonopy['parameters']),
-                         }
+            else:
+                self.append_to_report('Initial structure')
+                structure = parameters['structure']
 
-        cells_with_disp = create_supercells_with_displacements_inline(**inline_params)[1]
+            self.add_result('final_structure', structure)
 
-        # nodes = [ 762, 767, 772, 777]  #for debuging
-        for i, cell in enumerate(cells_with_disp.iterkeys()):
-            calc = self.generate_calculation(cells_with_disp['structure_{}'.format(i)],
-                                             parameters['input_force'], type='forces')
+            inline_params = {"structure": structure,
+                             "phonopy_input": ParameterData(dict=parameters_phonopy['parameters']),
+                             }
 
-            calc.label = 'force_{}'.format(i)
-            self.append_to_report('created calculation with PK={}'.format(calc.pk))
-            self.attach_calculation(calc)
+            cells_with_disp = create_supercells_with_displacements_inline(**inline_params)[1]
 
-        self.next(self.check_successful_calculations)
+            # nodes = [ 762, 767, 772, 777]  #for debuging
+            for i, cell in enumerate(cells_with_disp.iterkeys()):
+                calc = self.generate_calculation(cells_with_disp['structure_{}'.format(i)],
+                                                 parameters['input_force'], type='forces')
 
-#        if 'code' in parameters['phonopy_input']:
-#            self.append_to_report('Remote phonon calculation')
-#            self.next(self.force_constants_calculation_remote)
-#        else:
-#            self.append_to_report('Local phonon calculation')
-#            self.next(self.force_constants_calculation)
+                calc.label = 'force_{}'.format(i)
+                self.append_to_report('created calculation with PK={}'.format(calc.pk))
+                self.attach_calculation(calc)
+
+        self.next(self.displacements)
+
+    #        if 'code' in parameters['phonopy_input']:
+    #            self.append_to_report('Remote phonon calculation')
+    #            self.next(self.force_constants_calculation_remote)
+    #        else:
+    #            self.append_to_report('Local phonon calculation')
+    #            self.next(self.force_constants_calculation)
 
         # Collects the forces and prepares force constants
     @Workflow.step
