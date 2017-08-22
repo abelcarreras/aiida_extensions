@@ -504,15 +504,21 @@ class WorkflowPhonon(Workflow):
         if len(optimized):
             last_calc = self.get_step_calculations(self.optimize).latest('id')
 
-            structure = last_calc.get_outputs_dict()['output_structure']
+            try:
+                structure = last_calc.get_outputs_dict()['output_structure']
+                forces = last_calc.out.output_array.get_array('forces')[-1]
+                stresses = last_calc.out.output_array.get_array('stress')
+            except AttributeError:
+                if counter < 1:
+                    self.append_to_report('Error optimization: communication failed?')
+                    self.next(self.exit)
+                else:
+                    self.add_attribute('counter', counter - 1)
+                    self.next(self.optimize)
 
-            forces = last_calc.out.output_array.get_array('forces')[-1]
             not_converged_forces = len(np.where(abs(forces) > tolerance_forces)[0])
-
-
-            stresses = last_calc.out.output_array.get_array('stress')
             if len(stresses.shape) > 2:
-                stresses = stresses[-1] * 0.1
+                stresses = stresses[-1] * 10
 
             not_converged_stress = len(np.where(abs(np.diag(stresses)-pressure) > tolerance_stress)[0])
             np.fill_diagonal(stresses, 0.0)
@@ -586,6 +592,31 @@ class WorkflowPhonon(Workflow):
             self.append_to_report('created calculation with PK={}'.format(calc.pk))
             self.attach_calculation(calc)
 
+        self.next(self.check_successful_calculations)
+
+#        if 'code' in parameters['phonopy_input']:
+#            self.append_to_report('Remote phonon calculation')
+#            self.next(self.force_constants_calculation_remote)
+#        else:
+#            self.append_to_report('Local phonon calculation')
+#            self.next(self.force_constants_calculation)
+
+        # Collects the forces and prepares force constants
+    @Workflow.step
+    def check_successful_calculations(self):
+
+        parameters = self.get_parameters()
+        calcs = self.get_step_calculations(self.displacements)
+
+        for calc in calcs:
+            if calc.get_state() == 'FAILED':
+                self.append_to_report('calc {} FAILED, repeating..'.format(calc.label))
+                repeat_calc = self.generate_calculation(calc.inp.structure,
+                                                        parameters['input_force'],
+                                                        type='forces')
+                repeat_calc.label = calc.label
+                self.attach_calculation(repeat_calc)
+
         if 'code' in parameters['phonopy_input']:
             self.append_to_report('Remote phonon calculation')
             self.next(self.force_constants_calculation_remote)
@@ -601,7 +632,8 @@ class WorkflowPhonon(Workflow):
         parameters = self.get_parameters()
         parameters_phonopy = parameters['phonopy_input']
 
-        calcs = self.get_step_calculations(self.displacements)
+        calcs = list(self.get_step_calculations(self.displacements))
+        calcs += list(self.get_step_calculations(self.check_successful_calculations))
 
         structure = self.get_result('final_structure')
 
@@ -613,9 +645,10 @@ class WorkflowPhonon(Workflow):
         self.append_to_report('created parameters')
 
         for calc in calcs:
-            data = calc.get_outputs_dict()['output_array']
-            inline_params[calc.label] = data
-            self.append_to_report('extract force from {}'.format(calc.label))
+            if calc.get_state() == 'FINISHED':
+                data = calc.get_outputs_dict()['output_array']
+                inline_params[calc.label] = data
+                self.append_to_report('extract force from {}'.format(calc.label))
 
         # Get the force constants and store it in DB as a Workflow result
         phonopy_data = get_force_constants_inline(**inline_params)[1]
@@ -631,7 +664,8 @@ class WorkflowPhonon(Workflow):
         parameters = self.get_parameters()
         parameters_phonopy = parameters['phonopy_input']
 
-        calcs = self.get_step_calculations(self.displacements)
+        calcs = list(self.get_step_calculations(self.displacements))
+        calcs += list(self.get_step_calculations(self.check_successful_calculations))
 
         structure = self.get_result('final_structure')
 
@@ -643,9 +677,10 @@ class WorkflowPhonon(Workflow):
         self.append_to_report('created parameters')
 
         for calc in calcs:
-            data = calc.get_outputs_dict()['output_array']
-            inline_params[calc.label] = data
-            self.append_to_report('extract force from {}'.format(calc.label))
+            if calc.get_state() == 'FINISHED':
+                data = calc.get_outputs_dict()['output_array']
+                inline_params[calc.label] = data
+                self.append_to_report('extract force from {}'.format(calc.label))
 
         # Get the force constants and store it in DB as a Workflow result
         phonopy_data = get_force_sets_inline(**inline_params)[1]
