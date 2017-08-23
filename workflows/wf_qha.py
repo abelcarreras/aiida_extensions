@@ -188,7 +188,7 @@ def get_data_from_wf_phonon(wf):
             'phonon': phonon}
 
 
-def phonopy_predict(wf_origin, wf_plus, wf_minus):
+def gruneisen_predict(wf_origin, wf_plus, wf_minus):
 
     from phonopy import PhonopyGruneisen
     from phonon_common import thermal_expansion as check_expansion
@@ -550,7 +550,7 @@ class WorkflowQHA(Workflow):
                 min_stress, max_stress = qha_prediction(self, interval, min, max)
                 self.append_to_report('Using QHA prediction')
             except:
-                min_stress, max_stress = phonopy_predict(wf_origin, wf_min, wf_max)
+                min_stress, max_stress = gruneisen_predict(wf_origin, wf_min, wf_max)
                 self.append_to_report('Using Gruneisen prediction')
 
             self.append_to_report('stresses prediction    min:{} max:{}'.format(min_stress, max_stress))

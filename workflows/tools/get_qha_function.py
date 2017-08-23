@@ -77,8 +77,8 @@ def calculate_qha_inline(**kwargs):
         qha_output.set_array('temperature', np.array([1, 2, 3, 4]))
         qha_output.store()
     except:
-    print qha_output
-    exit()
+        print qha_output
+        exit()
 
 
     # Get data

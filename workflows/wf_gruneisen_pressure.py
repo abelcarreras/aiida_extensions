@@ -277,7 +277,7 @@ class WorkflowGruneisen(Workflow):
         self.add_attribute('p_displacement', self._p_displacement)
 
         if not self._pre_optimize:
-            self.next(self.volume_expansions_direct)
+            self.next(self.pressure_expansions_direct)
             return
 
         wf_parameters = self.get_parameters()
@@ -295,12 +295,12 @@ class WorkflowGruneisen(Workflow):
         self.attach_workflow(wf)
         wf.start()
 
-        self.next(self.volume_expansions)
+        self.next(self.pressure_expansions)
 
     # Generate the volume expanded cells optimizing at different external pressures
     @Workflow.step
-    def volume_expansions(self):
-        self.append_to_report('Volume expansion calculations')
+    def pressure_expansions(self):
+        self.append_to_report('Pressure expansion calculations')
         wf_parameters = self.get_parameters()
 
         structure = self.get_step('start').get_sub_workflows()[0].get_result('final_structure')
@@ -327,8 +327,8 @@ class WorkflowGruneisen(Workflow):
 
     # Generate the volume expanded cells optimizing at constant volume
     @Workflow.step
-    def volume_expansions_direct(self):
-        self.append_to_report('Volume expansion calculations')
+    def pressure_expansions_direct(self):
+        self.append_to_report('Pressure expansion direct calculations')
         wf_parameters = self.get_parameters()
 
         structure = wf_parameters['structure']
@@ -360,17 +360,17 @@ class WorkflowGruneisen(Workflow):
 
         parameters_phonopy = self.get_parameters()['phonopy_input']
 
-        if self.get_step('volume_expansions') is not None:
+        if self.get_step('pressure_expansions') is not None:
             wf_origin = self.get_step('start').get_sub_workflows()[0]
-            wf_plus, wf_minus = self.get_step('volume_expansions').get_sub_workflows()
+            wf_plus, wf_minus = self.get_step('pressure_expansions').get_sub_workflows()
         else:
-            wf_plus, wf_origin, wf_minus = self.get_step('volume_expansions_direct').get_sub_workflows()
+            wf_plus, wf_origin, wf_minus = self.get_step('pressure_expansions_direct').get_sub_workflows()
 
         self.append_to_report('WF_PLUS: {}'.format(wf_plus.pk))
         self.append_to_report('WF_MINUS: {}'.format(wf_minus.pk))
         self.append_to_report('WF_ORIGIN: {}'.format(wf_origin.pk))
 
-        # Expansion
+        # ExpansionExpansion
         energies = [wf_origin.get_result('optimized_structure_data').dict.energy,
                     wf_plus.get_result('optimized_structure_data').dict.energy,
                     wf_minus.get_result('optimized_structure_data').dict.energy]
