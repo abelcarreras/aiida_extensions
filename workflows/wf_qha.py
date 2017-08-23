@@ -525,7 +525,7 @@ class WorkflowQHA(Workflow):
                                                                                                         total_range / interval,
                                                                                                         n_points))
 
-            if total_range / interval < n_points*:
+            if total_range / interval < n_points:
                 interval *= 0.5
 
             if not ok_sup:
