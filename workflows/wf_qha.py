@@ -592,8 +592,8 @@ class WorkflowQHA(Workflow):
                 interval *= 0.5
             ##
 
-
-            if max_stress > test_range[1]:
+            tolerance = total_range * 0.1
+            if max_stress + tolerance > test_range[1]:
                 self.append_to_report('Increase max {} + {}'.format(test_range[1],
                                                                     np.ceil(np.min([total_range/2, abs(max_stress - test_range[1])]) / interval) * interval))
                 test_range[1] += np.ceil(np.min([total_range/2, abs(max_stress - test_range[1])]) / interval) * interval
@@ -602,7 +602,7 @@ class WorkflowQHA(Workflow):
                                                                     np.ceil(np.min([total_range / 2, abs(max_stress - test_range[1])]) / interval) * interval))
                 test_range[1] -= np.ceil(np.min([total_range / 2, abs(max_stress - test_range[1])]) / interval) * interval
 
-            if min_stress < test_range[0]:
+            if min_stress - tolerance < test_range[0]:
                 self.append_to_report('Increase min {} - {}'.format(test_range[0],
                                                                     np.ceil(np.min([total_range / 2, abs(test_range[0] - min_stress)]) / interval) * interval))
                 test_range[0] -= np.ceil(np.min([total_range/2, abs(test_range[0] - min_stress)]) / interval) * interval
