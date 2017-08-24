@@ -362,7 +362,7 @@ class WorkflowPhonon(Workflow):
                 'LWAVE': '.FALSE.',
                 'LCHARG': '.FALSE.',
                 'EDIFF': 1e-08,
-                'EDIFFG': -1e-07,
+                'EDIFFG': -1e-06,
                 'ADDGRID': '.TRUE.',
                 'LREAL': '.FALSE.'})
             incar = vasp_input_optimize
@@ -378,7 +378,7 @@ class WorkflowPhonon(Workflow):
                 'LWAVE': '.FALSE.',
                 'LCHARG': '.FALSE.',
                 'EDIFF': 1e-08,
-                'EDIFFG': -1e-07,
+                'EDIFFG': -1e-06,
                 'ADDGRID': '.TRUE.',
                 'LREAL': '.FALSE.'})
             incar = vasp_input_optimize
@@ -393,7 +393,7 @@ class WorkflowPhonon(Workflow):
                 'LWAVE': '.FALSE.',
                 'LCHARG': '.FALSE.',
                 'EDIFF': 1e-08,
-                'EDIFFG': -1e-07,
+                'EDIFFG': -1e-06,
                 'ADDGRID': '.TRUE.',
                 'LREAL': '.FALSE.'})
             incar = vasp_input_forces
@@ -514,7 +514,7 @@ class WorkflowPhonon(Workflow):
                 else:
                     self.add_attribute('counter', counter - 1)
                     self.next(self.optimize)
-
+                return
 
             not_converged_forces = len(np.where(abs(forces) > tolerance_forces)[0])
             if len(stresses.shape) > 2:
