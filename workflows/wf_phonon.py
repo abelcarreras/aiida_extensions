@@ -503,34 +503,30 @@ class WorkflowPhonon(Workflow):
         if len(optimized):
             last_calc = self.get_step_calculations(self.optimize).latest('id')
             try:
-                structure = last_calc.get_outputs_dict()['output_structure']
+                structure = last_calc.out.output_structure
                 forces = last_calc.out.output_array.get_array('forces')[-1]
                 stresses = last_calc.out.output_array.get_array('stress')
+
+                not_converged_forces = len(np.where(abs(forces) > tolerance_forces)[0])
+                if len(stresses.shape) > 2:
+                    stresses = stresses[-1] * 10
+
+                not_converged_stress = len(np.where(abs(np.diag(stresses)-pressure) > tolerance_stress)[0])
+                np.fill_diagonal(stresses, 0.0)
+                not_converged_stress += len(np.where(abs(stresses) > tolerance_stress)[0])
+
+                not_converged = not_converged_forces + not_converged_stress
+
+                self.append_to_report('Not converged forces: {}'.format(not_converged_forces))
+                self.append_to_report('Not converged stresses: {}'.format(not_converged_stress))
+
+                if not_converged == 0:
+                    self.next(self.displacements)
+                    return
+
             except AttributeError:
-                if counter < 1:
-                    self.append_to_report('Error optimization: communication failed?')
-                    self.next(self.exit)
-                else:
-                    self.add_attribute('counter', counter - 1)
-                    self.next(self.optimize)
-                return
+                structure = last_calc.inp.structure
 
-            not_converged_forces = len(np.where(abs(forces) > tolerance_forces)[0])
-            if len(stresses.shape) > 2:
-                stresses = stresses[-1] * 10
-
-            not_converged_stress = len(np.where(abs(np.diag(stresses)-pressure) > tolerance_stress)[0])
-            np.fill_diagonal(stresses, 0.0)
-            not_converged_stress += len(np.where(abs(stresses) > tolerance_stress)[0])
-
-            not_converged = not_converged_forces + not_converged_stress
-
-            self.append_to_report('Not converged forces: {}'.format(not_converged_forces))
-            self.append_to_report('Not converged stresses: {}'.format(not_converged_stress))
-
-            if not_converged == 0:
-                self.next(self.displacements)
-                return
         else:
             structure = parameters['structure']
 
