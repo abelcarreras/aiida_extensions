@@ -44,7 +44,7 @@ class Output_parametersInstruction(BaseInstruction):
         except:
             print ('Error opening')   
 
-        vspr = vasp.Vasprun(self._out_folder.get_abs_path('vasprun.xml'))
+        vspr = vasp.Vasprun(self._out_folder.get_abs_path('vasprun.xml'), exception_on_bad_xml=False)
         # vasp_param['final_energy'] = vspr.final_energy  # This includes PV
         # vasp_param['energy'] = vspr.ionic_steps[-1]['e_fr_energy'] #Not quite the energy
         vasp_param['energy'] = vspr.ionic_steps[-1]['electronic_steps'][-1]['e_wo_entrp']

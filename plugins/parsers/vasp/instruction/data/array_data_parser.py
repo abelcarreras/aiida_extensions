@@ -24,7 +24,7 @@ class Array_data_parserInstruction(BaseInstruction):
 
         parser_warnings = {}  # return non-critical errors
 
-        vspr = Vasprun(self._out_folder.get_abs_path('vasprun.xml'))
+        vspr = Vasprun(self._out_folder.get_abs_path('vasprun.xml'), exception_on_bad_xml=False)
 
         # Get forces using pymatgen
         try:
