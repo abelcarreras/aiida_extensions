@@ -162,8 +162,9 @@ def qha_prediction(wf, interval, min, max, use_all_data=True):
     if (np.max(min_stresses) - np.min(min_stresses)) < 1:
         return None
 
-    full_range = np.max(min_stresses) - np.min(min_stresses)
-    return np.min(min_stresses) - full_range * 0.1, np.max(min_stresses) + full_range * 0.1
+    tolerance = 1.0
+    addition = (np.max(min_stresses) - np.min(min_stresses)) * tolerance
+    return np.min(min_stresses) - addition , np.max(min_stresses) + addition
 
 
 def get_data_from_wf_phonon(wf):
@@ -592,8 +593,7 @@ class WorkflowQHA(Workflow):
                 interval *= 0.5
             ##
 
-            tolerance = total_range * 0.5
-            if max_stress + tolerance > test_range[1]:
+            if max_stress > test_range[1]:
                 self.append_to_report('Increase max {} + {}'.format(test_range[1],
                                                                     np.ceil(np.min([total_range/2, abs(max_stress - test_range[1])]) / interval) * interval))
                 test_range[1] += np.ceil(np.min([total_range/2, abs(max_stress - test_range[1])]) / interval) * interval
@@ -602,7 +602,7 @@ class WorkflowQHA(Workflow):
                                                                     np.ceil(np.min([total_range / 2, abs(max_stress - test_range[1])]) / interval) * interval))
                 test_range[1] -= np.ceil(np.min([total_range / 2, abs(max_stress - test_range[1])]) / interval) * interval
 
-            if min_stress - tolerance < test_range[0]:
+            if min_stress < test_range[0]:
                 self.append_to_report('Increase min {} - {}'.format(test_range[0],
                                                                     np.ceil(np.min([total_range / 2, abs(test_range[0] - min_stress)]) / interval) * interval))
                 test_range[0] -= np.ceil(np.min([total_range/2, abs(test_range[0] - min_stress)]) / interval) * interval
