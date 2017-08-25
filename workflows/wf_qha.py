@@ -869,6 +869,18 @@ class WorkflowQHA(Workflow):
         entropy = np.array(entropy).T[:, sort_index]
         cv = np.array(cv).T[:, sort_index]
 
+        # Normalize to from unitformula to unitcell
+        def gcd(L):
+            import fractions
+            L = np.unique(L, return_counts=True)[1]
+            return reduce(fractions.gcd, L)
+
+        unit_formula_to_unitcell = gcd([site.kind_name for site in final_structure.sites])
+        self.append_to_report('Thermal data is normalized to unit cell')
+        fe_phonon *= unit_formula_to_unitcell
+        entropy *= unit_formula_to_unitcell
+        cv *= unit_formula_to_unitcell
+
         # Calculate QHA properties
         phonopy_qha = PhonopyQHA(np.array(volumes),
                                  np.array(electronic_energies),
@@ -885,7 +897,7 @@ class WorkflowQHA(Workflow):
         helmholtz_volume = phonopy_qha.get_helmholtz_volume()
         thermal_expansion = phonopy_qha.get_thermal_expansion()
         volume_temperature = phonopy_qha.get_volume_temperature()
-        heat_capacity_P_numerical = phonopy_qha.get_heat_capacity_P_numerical()
+        heat_capacity_P_numerical = phonopy_qha.get_heat_capacity_P_numerical()/unit_formula_to_unitcell
         volume_expansion = phonopy_qha.get_volume_expansion()
         gibbs_temperature = phonopy_qha.get_gibbs_temperature()
 
