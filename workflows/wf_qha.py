@@ -159,12 +159,12 @@ def qha_prediction(wf, interval, min, max, use_all_data=True):
         fit_vs = np.polyfit(volumes, stresses, 2)
         min_stresses = np.array([np.polyval(fit_vs, i) for i in volume_temperature])
 
-    if (np.max(min_stresses) - np.min(min_stresses)) < 1:
-        return None
+#    if (np.max(min_stresses) - np.min(min_stresses)) < 1:
+#        return None
 
     tolerance = 1.0
     addition = (np.max(min_stresses) - np.min(min_stresses)) * tolerance
-    return np.min(min_stresses) - addition , np.max(min_stresses) + addition
+    return np.min(min_stresses) - addition, np.max(min_stresses) + addition
 
 
 def get_data_from_wf_phonon(wf):
