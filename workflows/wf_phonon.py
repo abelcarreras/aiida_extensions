@@ -170,7 +170,14 @@ def phonopy_calculation_inline(**kwargs):
     phonon.set_force_constants(force_constants)
 
     # Normalization factor primitive to unit cell
-    normalization_factor = phonon.unitcell.get_number_of_atoms() / phonon.primitive.get_number_of_atoms()
+    norm_primitive_to_unitcell = phonon.unitcell.get_number_of_atoms() / phonon.primitive.get_number_of_atoms()
+
+    # Normalization factor from mole to unitcell
+    def gcd(L):
+        import fractions
+        L = np.unique(L, return_counts=True)[1]
+        return reduce(fractions.gcd, L)
+    norm_mole_to_unitcell = gcd(bulk.get_chemical_symbols())
 
     phonon.set_band_structure(bands['ranges'])
 
@@ -193,8 +200,8 @@ def phonopy_calculation_inline(**kwargs):
     band_structure.set_array('labels', band_labels)
 
     # get DOS (normalized to unit cell)
-    total_dos = phonon.get_total_DOS() * normalization_factor
-    partial_dos = phonon.get_partial_DOS() * normalization_factor
+    total_dos = phonon.get_total_DOS() * norm_primitive_to_unitcell
+    partial_dos = phonon.get_partial_DOS() * norm_primitive_to_unitcell
 
     # Stores DOS data in DB as a workflow result
     dos = ArrayData()
@@ -207,12 +214,12 @@ def phonopy_calculation_inline(**kwargs):
     phonon.set_thermal_properties()
     t, free_energy, entropy, cv = phonon.get_thermal_properties()
 
-    # Stores thermal properties (per unit cell) data in DB as a workflow result
+    # Stores thermal properties (per mol) data in DB as a workflow result
     thermal_properties = ArrayData()
     thermal_properties.set_array('temperature', t)
-    thermal_properties.set_array('free_energy', free_energy * normalization_factor)
-    thermal_properties.set_array('entropy', entropy * normalization_factor)
-    thermal_properties.set_array('cv', cv * normalization_factor)
+    thermal_properties.set_array('free_energy', free_energy * norm_primitive_to_unitcell / norm_mole_to_unitcell)
+    thermal_properties.set_array('entropy', entropy * norm_primitive_to_unitcell / norm_mole_to_unitcell)
+    thermal_properties.set_array('cv', cv * norm_primitive_to_unitcell / norm_mole_to_unitcell)
 
     return {'thermal_properties': thermal_properties, 'dos': dos, 'band_structure': band_structure}
 
@@ -552,6 +559,7 @@ class WorkflowPhonon(Workflow):
     @Workflow.step
     def displacements(self):
 
+        counter = self.get_attribute('counter')
         self.append_to_report('Displacements')
 
         parameters = self.get_parameters()
@@ -562,6 +570,12 @@ class WorkflowPhonon(Workflow):
             all_calc_ok = True
             for calc in calcs:
                 if calc.label != 'FAILED' and not 'output_array' in calc.get_outputs_dict():
+
+                    if counter < 1:
+                        self.append_to_report('calc {}: Force calculation failed!')
+                        self.next(self.exit)
+                        return
+
                     self.append_to_report('calc {} FAILED, repeating..'.format(calc.label))
                     repeat_calc = self.generate_calculation(calc.inp.structure,
                                                             parameters['input_force'],
@@ -570,6 +584,8 @@ class WorkflowPhonon(Workflow):
                     self.attach_calculation(repeat_calc)
                     calc.label = 'FAILED'
                     all_calc_ok = False
+                    self.add_attribute('counter', counter - 1)
+
             if all_calc_ok:
                 if 'code' in parameters['phonopy_input']:
                     self.append_to_report('Remote phonon calculation')
@@ -618,28 +634,7 @@ class WorkflowPhonon(Workflow):
     #            self.append_to_report('Local phonon calculation')
     #            self.next(self.force_constants_calculation)
 
-        # Collects the forces and prepares force constants
-    @Workflow.step
-    def check_successful_calculations(self):
 
-        parameters = self.get_parameters()
-        calcs = self.get_step_calculations(self.displacements)
-
-        for calc in calcs:
-            if not 'output_array' in calc.get_outputs_dict():
-                self.append_to_report('calc {} FAILED, repeating..'.format(calc.label))
-                repeat_calc = self.generate_calculation(calc.inp.structure,
-                                                        parameters['input_force'],
-                                                        type='forces')
-                repeat_calc.label = calc.label
-                self.attach_calculation(repeat_calc)
-
-        if 'code' in parameters['phonopy_input']:
-            self.append_to_report('Remote phonon calculation')
-            self.next(self.force_constants_calculation_remote)
-        else:
-            self.append_to_report('Local phonon calculation')
-            self.next(self.force_constants_calculation)
 
 
     # Collects the forces and prepares force constants
@@ -650,7 +645,6 @@ class WorkflowPhonon(Workflow):
         parameters_phonopy = parameters['phonopy_input']
 
         calcs = list(self.get_step_calculations(self.displacements))
-        #calcs += list(self.get_step_calculations(self.check_successful_calculations))
 
         structure = self.get_result('final_structure')
 
@@ -681,7 +675,6 @@ class WorkflowPhonon(Workflow):
         parameters_phonopy = parameters['phonopy_input']
 
         calcs = list(self.get_step_calculations(self.displacements))
-        #calcs += list(self.get_step_calculations(self.check_successful_calculations))
 
         structure = self.get_result('final_structure')
 

@@ -14,9 +14,9 @@ KpointsData = DataFactory('array.kpoints')
 import numpy as np
 
 # Set WorkflowPhonon PK number
-#######################
-wf = load_workflow(9905) # load_workflow(437)
-#######################
+########################
+wf = load_workflow(9905)
+########################
 
 # Phonon Band structure
 bs = wf.get_result('band_structure')
@@ -49,7 +49,7 @@ if 'labels' in bs.get_arraynames():
 
     plt.xticks(x_labels, labels_e, rotation='horizontal')
 
-#plt.show()
+# plt.show()
 
 # Phonon density of states
 dos = wf.get_result('dos')
