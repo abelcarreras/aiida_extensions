@@ -172,13 +172,6 @@ def phonopy_calculation_inline(**kwargs):
     # Normalization factor primitive to unit cell
     norm_primitive_to_unitcell = phonon.unitcell.get_number_of_atoms() / phonon.primitive.get_number_of_atoms()
 
-    # Normalization factor from mole to unitcell
-    def gcd(L):
-        import fractions
-        L = np.unique(L, return_counts=True)[1]
-        return reduce(fractions.gcd, L)
-    norm_unitformula_to_unitcell = gcd(bulk.get_chemical_symbols())
-
     phonon.set_band_structure(bands['ranges'])
 
     phonon.set_mesh(phonopy_input['mesh'], is_eigenvectors=True, is_mesh_symmetry=False)
@@ -217,9 +210,9 @@ def phonopy_calculation_inline(**kwargs):
     # Stores thermal properties (per mol) data in DB as a workflow result
     thermal_properties = ArrayData()
     thermal_properties.set_array('temperature', t)
-    thermal_properties.set_array('free_energy', free_energy * norm_primitive_to_unitcell / norm_unitformula_to_unitcell)
-    thermal_properties.set_array('entropy', entropy * norm_primitive_to_unitcell / norm_unitformula_to_unitcell)
-    thermal_properties.set_array('cv', cv * norm_primitive_to_unitcell / norm_unitformula_to_unitcell)
+    thermal_properties.set_array('free_energy', free_energy * norm_primitive_to_unitcell)
+    thermal_properties.set_array('entropy', entropy * norm_primitive_to_unitcell)
+    thermal_properties.set_array('cv', cv * norm_primitive_to_unitcell)
 
     return {'thermal_properties': thermal_properties, 'dos': dos, 'band_structure': band_structure}
 

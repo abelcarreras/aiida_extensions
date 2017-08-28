@@ -16,12 +16,6 @@ ParameterData = DataFactory('parameter')
 ArrayData = DataFactory('array')
 
 
-def gcd(L):
-    import fractions
-    L = np.unique(L, return_counts=True)[1]
-    return reduce(fractions.gcd, L)
-
-
 def check_dos_stable(wf, tol=1e-6):
 
     try:
@@ -132,11 +126,6 @@ def qha_prediction(wf, interval, min, max, use_all_data=True):
     fe_phonon = np.array(fe_phonon).T[:, sort_index]
     entropy = np.array(entropy).T[:, sort_index]
     cv = np.array(cv).T[:, sort_index]
-
-    # Normalize to from unitformula to unitcell
-    norm_unitformula_to_unitcell = gcd([site.kind_name for site in final_structure.sites])
-    volumes *= norm_unitformula_to_unitcell
-    electronic_energies *= norm_unitformula_to_unitcell
 
     # Calculate QHA properties
     phonopy_qha = PhonopyQHA(np.array(volumes),
@@ -859,16 +848,6 @@ class WorkflowQHA(Workflow):
         entropy = np.array(entropy).T[:, sort_index]
         cv = np.array(cv).T[:, sort_index]
 
-        # Normalize to from unitformula to unitcell
-        norm_unitformula_to_unitcell = gcd([site.kind_name for site in final_structure.sites])
-        volumes *= norm_unitformula_to_unitcell
-        electronic_energies *= norm_unitformula_to_unitcell
-
-
-        self.append_to_report('Thermal data is normalized to unit cell')
-        fe_phonon *= norm_unitformula_to_unitcell
-        entropy *= norm_unitformula_to_unitcell
-        cv *= norm_unitformula_to_unitcell
 
         # Calculate QHA properties
         phonopy_qha = PhonopyQHA(np.array(volumes),
@@ -889,6 +868,16 @@ class WorkflowQHA(Workflow):
         heat_capacity_P_numerical = phonopy_qha.get_heat_capacity_P_numerical()
         volume_expansion = phonopy_qha.get_volume_expansion()
         gibbs_temperature = phonopy_qha.get_gibbs_temperature()
+
+
+        # Normalize to from unitformula to unitcell
+        def gcd(L):
+            import fractions
+            L = np.unique(L, return_counts=True)[1]
+            return reduce(fractions.gcd, L)
+
+        norm_unitformula_to_unitcell = gcd([site.kind_name for site in final_structure.sites])
+        heat_capacity_P_numerical /= norm_unitformula_to_unitcell
 
         def get_file_from_numpy_array(data, text_list=None):
             import StringIO
@@ -938,6 +927,11 @@ class WorkflowQHA(Workflow):
         free_energy = thermal_properties.get_array('free_energy')
         temperatures = thermal_properties.get_array('temperature')
         cv = thermal_properties.get_array('cv')
+
+        # Normalize from unitcell to unitformula
+        free_energy /= norm_unitformula_to_unitcell
+        entropy /= norm_unitformula_to_unitcell
+        cv /= norm_unitformula_to_unitcell
 
         freq_dos = dos.get_array('frequency')
         total_dos = dos.get_array('total_dos')
