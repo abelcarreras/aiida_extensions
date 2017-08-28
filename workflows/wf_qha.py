@@ -16,6 +16,12 @@ ParameterData = DataFactory('parameter')
 ArrayData = DataFactory('array')
 
 
+def gcd(L):
+    import fractions
+    L = np.unique(L, return_counts=True)[1]
+    return reduce(fractions.gcd, L)
+
+
 def check_dos_stable(wf, tol=1e-6):
 
     try:
@@ -126,6 +132,11 @@ def qha_prediction(wf, interval, min, max, use_all_data=True):
     fe_phonon = np.array(fe_phonon).T[:, sort_index]
     entropy = np.array(entropy).T[:, sort_index]
     cv = np.array(cv).T[:, sort_index]
+
+    # Normalize to from unitformula to unitcell
+    norm_unitformula_to_unitcell = gcd([site.kind_name for site in final_structure.sites])
+    volumes *= norm_unitformula_to_unitcell
+    electronic_energies *= norm_unitformula_to_unitcell
 
     # Calculate QHA properties
     phonopy_qha = PhonopyQHA(np.array(volumes),
@@ -849,16 +860,15 @@ class WorkflowQHA(Workflow):
         cv = np.array(cv).T[:, sort_index]
 
         # Normalize to from unitformula to unitcell
-        def gcd(L):
-            import fractions
-            L = np.unique(L, return_counts=True)[1]
-            return reduce(fractions.gcd, L)
+        norm_unitformula_to_unitcell = gcd([site.kind_name for site in final_structure.sites])
+        volumes *= norm_unitformula_to_unitcell
+        electronic_energies *= norm_unitformula_to_unitcell
 
-        unit_formula_to_unitcell = gcd([site.kind_name for site in final_structure.sites])
+
         self.append_to_report('Thermal data is normalized to unit cell')
-        fe_phonon *= unit_formula_to_unitcell
-        entropy *= unit_formula_to_unitcell
-        cv *= unit_formula_to_unitcell
+        fe_phonon *= norm_unitformula_to_unitcell
+        entropy *= norm_unitformula_to_unitcell
+        cv *= norm_unitformula_to_unitcell
 
         # Calculate QHA properties
         phonopy_qha = PhonopyQHA(np.array(volumes),
@@ -876,7 +886,7 @@ class WorkflowQHA(Workflow):
         helmholtz_volume = phonopy_qha.get_helmholtz_volume()
         thermal_expansion = phonopy_qha.get_thermal_expansion()
         volume_temperature = phonopy_qha.get_volume_temperature()
-        heat_capacity_P_numerical = phonopy_qha.get_heat_capacity_P_numerical()/unit_formula_to_unitcell
+        heat_capacity_P_numerical = phonopy_qha.get_heat_capacity_P_numerical()
         volume_expansion = phonopy_qha.get_volume_expansion()
         gibbs_temperature = phonopy_qha.get_gibbs_temperature()
 
