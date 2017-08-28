@@ -162,7 +162,7 @@ def qha_prediction(wf, interval, min, max, use_all_data=True):
 #    if (np.max(min_stresses) - np.min(min_stresses)) < 1:
 #        return None
 
-    tolerance = 1.0
+    tolerance = 0.8
     addition = (np.max(min_stresses) - np.min(min_stresses)) * tolerance
     return np.min(min_stresses) - addition, np.max(min_stresses) + addition
 

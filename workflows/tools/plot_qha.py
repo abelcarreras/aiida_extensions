@@ -34,7 +34,7 @@ def get_phonon(structure, force_constants, phonopy_input):
     return phonon
 
 
-def calculate_qha_inline(**kwargs):
+def calculate_qha_inline(**kwargs):  # Not used for now
 
     from phonopy import PhonopyQHA
     from phonopy.structure.atoms import Atoms as PhonopyAtoms
