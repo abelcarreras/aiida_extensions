@@ -936,7 +936,19 @@ class WorkflowQHA(Workflow):
         freq_dos = dos.get_array('frequency')
         total_dos = dos.get_array('total_dos')
         partial_symbols = dos.get_array('partial_symbols')
-        partial_dos = dos.get_array('partial_dos').T
+        partial_dos = dos.get_array('partial_dos')
+
+        # Check atom equivalences in partial DOS
+        delete_list = []
+        for i, dos_i in enumerate(partial_dos):
+            for j, dos_j in enumerate(partial_dos):
+                if i < j:
+                    if np.allclose(dos_i, dos_j, rtol=1, atol=1e-8) and partial_symbols[i] == partial_symbols[j]:
+                        dos_i += dos_j
+                        delete_list.append(j)
+
+        partial_dos = np.delete(partial_dos, delete_list, 0).T
+        partial_symbols = np.delete(partial_symbols, delete_list)
 
         data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(freq_dos, total_dos)),
                                               'total_dos')

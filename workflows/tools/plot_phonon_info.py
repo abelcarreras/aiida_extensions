@@ -87,7 +87,7 @@ for i, dos in enumerate(partial_dos):
 plt.legend()
 #plt.show()
 
-# Termal properties
+# Thermal properties
 thermal = wf.get_result('thermal_properties')
 
 free_energy = thermal.get_array('free_energy')
@@ -99,7 +99,7 @@ plt.figure(3)
 
 plt.xlabel('Temperature [K]')
 
-plt.suptitle('Thermal properties')
+plt.suptitle('Thermal properties (per unit cell)')
 plt.plot(temperature, free_energy, label='Free energy (KJ/mol)')
 plt.plot(temperature, entropy, label='entropy (KJ/mol)')
 plt.plot(temperature, cv, label='Cv (J/mol)')
