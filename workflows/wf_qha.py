@@ -922,6 +922,7 @@ class WorkflowQHA(Workflow):
         # Get data and write the files
         thermal_properties = wf_zero.get_result('thermal_properties')
         dos = wf_zero.get_result('dos')
+        band_structure = wf_zero.get_result('band_structure')
 
         entropy = thermal_properties.get_array('entropy')
         free_energy = thermal_properties.get_array('free_energy')
@@ -933,6 +934,7 @@ class WorkflowQHA(Workflow):
         entropy /= norm_unitformula_to_unitcell
         cv /= norm_unitformula_to_unitcell
 
+        # Density of states
         freq_dos = dos.get_array('frequency')
         total_dos = dos.get_array('total_dos')
         partial_symbols = dos.get_array('partial_symbols')
@@ -956,8 +958,20 @@ class WorkflowQHA(Workflow):
         data_folder.create_file_from_filelike(get_file_from_numpy_array(np.column_stack((freq_dos, partial_dos)),
                                                                         text_list=['T'] + partial_symbols.tolist()),
                                               'partial_dos')
+
+        # Thermal properties
         data_folder.create_file_from_filelike(
             get_file_from_numpy_array(np.column_stack((temperatures, entropy, free_energy, cv))), 'thermal_properties')
+
+        # Phonon band structure
+        band_array = []
+        for i, freq in enumerate(band_structure.get_array('frequencies')):
+            for j, q in enumerate(band_structure.get_array('q_path')[i]):
+                #          print [q] + freq[j].tolist()
+                band_array.append([q] + freq[j].tolist())
+
+        band_array = np.array(band_array)
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(band_array), 'phonon_band_structure')
 
         self.append_to_report('Harmonic data written in files')
 
