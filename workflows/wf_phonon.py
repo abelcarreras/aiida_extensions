@@ -199,8 +199,8 @@ def phonopy_calculation_inline(**kwargs):
     # Stores DOS data in DB as a workflow result
     dos = ArrayData()
     dos.set_array('frequency', total_dos[0])
-    dos.set_array('total_dos', total_dos[1])
-    dos.set_array('partial_dos', partial_dos[1])
+    dos.set_array('total_dos', total_dos[1] * norm_primitive_to_unitcell)
+    dos.set_array('partial_dos', partial_dos[1] * norm_primitive_to_unitcell)
     dos.set_array('partial_symbols', np.array(phonon.primitive.symbols))
 
     # THERMAL PROPERTIES (per primtive cell)
