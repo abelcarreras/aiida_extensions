@@ -8,8 +8,10 @@ from aiida.workflows.wf_phonon import WorkflowPhonon
 from aiida.orm import load_workflow
 
 import numpy as np
-from phonopy import PhonopyQHA
+import StringIO
 
+from phonopy import PhonopyQHA
+from phonon_common import arrange_band_labels
 
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
@@ -879,8 +881,9 @@ class WorkflowQHA(Workflow):
         norm_unitformula_to_unitcell = gcd([site.kind_name for site in final_structure.sites])
         heat_capacity_P_numerical /= norm_unitformula_to_unitcell
 
+        # convert numpy string into web page ready text file
         def get_file_from_numpy_array(data, text_list=None):
-            import StringIO
+
             output = StringIO.StringIO()
             if text_list is None:
                 output.write('No caption\n')
@@ -967,11 +970,21 @@ class WorkflowQHA(Workflow):
         band_array = []
         for i, freq in enumerate(band_structure.get_array('frequencies')):
             for j, q in enumerate(band_structure.get_array('q_path')[i]):
-                #          print [q] + freq[j].tolist()
                 band_array.append([q] + freq[j].tolist())
 
         band_array = np.array(band_array)
+
+
+        x_labels, labels_e = arrange_band_labels(band_structure)
+
+        output = StringIO.StringIO()
+
+        for i, j in zip(x_labels, labels_e):
+            output.write(u'{0:12.8f}       {1}\n'.format(i, j).encode('utf-8'))
+        output.seek(0)
+
         data_folder.create_file_from_filelike(get_file_from_numpy_array(band_array), 'phonon_band_structure')
+        data_folder.create_file_from_filelike(output, 'phonon_band_structure_labels')
 
         self.append_to_report('Harmonic data written in files')
 
