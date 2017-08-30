@@ -98,21 +98,19 @@ def arrange_band_labels(band_structure):
 
         return text_string
 
-    # Labels
-    if 'labels' in band_structure.get_arraynames():
-        labels_array = band_structure.get_array('labels')
+    labels_array = band_structure.get_array('labels')
 
-        labels = []
-        labels_positions = []
-        for i, freq in enumerate(band_structure.get_array('q_path')):
-            if labels_array[i][0] == labels_array[i-1][1]:
-                labels.append(replace_list(labels_array[i][0],substitutions))
-            else:
-                labels.append(replace_list(labels_array[i-1][1]+'/'+labels_array[i][0], substitutions))
-            labels_positions.append(band_structure.get_array('q_path')[i][0])
-        labels_positions.append(band_structure.get_array('q_path')[-1][-1])
-        labels.append(replace_list(labels_array[-1][1], substitutions))
-        labels[0] = replace_list(labels_array[0][0], substitutions)
+    labels = []
+    labels_positions = []
+    for i, freq in enumerate(band_structure.get_array('q_path')):
+        if labels_array[i][0] == labels_array[i-1][1]:
+            labels.append(replace_list(labels_array[i][0],substitutions))
+        else:
+            labels.append(replace_list(labels_array[i-1][1]+'/'+labels_array[i][0], substitutions))
+        labels_positions.append(band_structure.get_array('q_path')[i][0])
+    labels_positions.append(band_structure.get_array('q_path')[-1][-1])
+    labels.append(replace_list(labels_array[-1][1], substitutions))
+    labels[0] = replace_list(labels_array[0][0], substitutions)
 
     return labels_positions, labels
 
