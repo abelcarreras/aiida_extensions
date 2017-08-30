@@ -86,3 +86,43 @@ def thermal_expansion(volumes, electronic_energies, gruneisen, stresses=None, t_
     return temperatures, min_volume, min_stress
 
 
+def arrange_band_labels(band_structure):
+
+    substitutions = {'GAMMA': u'\u0393'
+                     }
+
+    def replace_list(text_string, substitutions):
+
+        for item in substitutions.iteritems():
+            text_string = text_string.replace(item[0], item[1])
+
+        return text_string
+
+    # Labels
+    if 'labels' in band_structure.get_arraynames():
+        labels_array = band_structure.get_array('labels')
+
+        labels = []
+        labels_positions = []
+        for i, freq in enumerate(band_structure.get_array('q_path')):
+            if labels_array[i][0] == labels_array[i-1][1]:
+                labels.append(replace_list(labels_array[i][0],substitutions))
+            else:
+                labels.append(replace_list(labels_array[i-1][1]+'/'+labels_array[i][0], substitutions))
+            labels_positions.append(band_structure.get_array('q_path')[i][0])
+        labels_positions.append(band_structure.get_array('q_path')[-1][-1])
+        labels.append(replace_list(labels_array[-1][1], substitutions))
+        labels[0] = replace_list(labels_array[0][0], substitutions)
+
+    return labels_positions, labels
+
+
+def write_unicode_file(labels_positions, labels):
+    import StringIO
+    output = StringIO.StringIO()
+
+    for i, j in zip(labels_positions, labels):
+       output.write(u'{0:12.8f}       {1}\n'.format(i, j).encode('utf-8'))
+    output.seek(0)
+
+    return output
