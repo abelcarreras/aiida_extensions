@@ -479,7 +479,7 @@ class WorkflowPhonon(Workflow):
         self.append_to_report('Workflow starting')
 
         if self._optimize:
-            self.add_attribute('counter', 20)  # define max number of optimization iterations
+            self.add_attribute('counter', 10)  # define max number of optimization iterations
             self.next(self.optimize)
         else:
             self.next(self.displacements)

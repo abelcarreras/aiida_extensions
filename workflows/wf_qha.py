@@ -967,13 +967,14 @@ class WorkflowQHA(Workflow):
             get_file_from_numpy_array(np.column_stack((temperatures, entropy, free_energy, cv))), 'thermal_properties')
 
         # Phonon band structure
+
         band_array = []
         for i, freq in enumerate(band_structure.get_array('frequencies')):
             for j, q in enumerate(band_structure.get_array('q_path')[i]):
                 band_array.append([q] + freq[j].tolist())
 
         band_array = np.array(band_array)
-
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(band_array), 'phonon_band_structure')
 
         x_labels, labels_e = arrange_band_labels(band_structure)
 
@@ -983,8 +984,8 @@ class WorkflowQHA(Workflow):
             output.write(u'{0:12.8f}       {1}\n'.format(i, j).encode('utf-8'))
         output.seek(0)
 
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(band_array), 'phonon_band_structure')
         data_folder.create_file_from_filelike(output, 'phonon_band_structure_labels')
+
 
         self.append_to_report('Harmonic data written in files')
 
