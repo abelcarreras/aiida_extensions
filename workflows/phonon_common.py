@@ -140,7 +140,7 @@ def smearing_function_mesh(X, Y, frequencies, gruneisen, sigma=0.1):
     for freq, grune in zip(frequencies, gruneisen):
         total += gaussian(X,Y, sigma, freq, grune)
 
-    return total
+    return total/len(frequencies)
 
 if __name__ == '__main__':
 
