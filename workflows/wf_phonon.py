@@ -38,6 +38,36 @@ def get_path_using_seekpath(structure, band_resolution=30):
             'labels': path_data['path']}
 
 
+@make_inline
+def refine_cell(**kwargs):
+    import spglib
+    from phonopy.structure.atoms import Atoms as PhonopyAtoms
+
+    structure = kwargs.pop('structure')
+    symprec = kwargs.pop('symprec')
+
+    bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
+                        positions=[site.position for site in structure.sites],
+                        cell=structure.cell)
+
+    structure_data = (structure.cell,
+                      bulk.get_scaled_positions(),
+                      bulk.get_atomic_numbers())
+
+    lattice, refined_positions, numbers = spglib.refine_cell(structure_data, symprec=symprec)
+
+    refined_bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
+                        scaled_positions=refined_positions,
+                        cell=lattice)
+
+    refined_structure = StructureData(cell=lattice)
+    for position, symbol in zip(refined_bulk.get_positions(), refined_bulk.get_chemical_symbols()):
+        refined_structure.append_atom(position=position,
+                                      symbols=symbol)
+
+    return {'refined_structure': refined_structure}
+
+
 # Create supercells with displacements to calculate forces
 @make_inline
 def create_supercells_with_displacements_inline(**kwargs):
@@ -504,6 +534,9 @@ class WorkflowPhonon(Workflow):
             last_calc = self.get_step_calculations(self.optimize).latest('id')
             try:
                 structure = last_calc.out.output_structure
+
+                structure = refine_cell({"structure": structure, 'symprec': 1e-5})[1]['refined_structure']
+
                 forces = last_calc.out.output_array.get_array('forces')[-1]
                 stresses = last_calc.out.output_array.get_array('stress')
 

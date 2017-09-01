@@ -5,14 +5,12 @@ from aiida.orm import load_node, load_workflow
 from aiida.orm import Code, DataFactory
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
 ArrayData = DataFactory('array')
 KpointsData = DataFactory('array.kpoints')
-
-import numpy as np
-
 
 def get_plot(band_data, q_path, title='', ylabel='', labels=None, q_points=None, freq_tolerance=1e-5):
 

@@ -984,8 +984,7 @@ class WorkflowQHA(Workflow):
             output.write(u'{0:12.8f}       {1}\n'.format(i, j).encode('utf-8'))
         output.seek(0)
 
-        data_folder.create_file_from_filelike(output, 'phonon_band_structure_labels')
-
+        data_folder.create_file_from_filelike(output, 'band_structure_labels')
 
         self.append_to_report('Harmonic data written in files')
 
