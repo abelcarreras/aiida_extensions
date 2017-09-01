@@ -535,7 +535,6 @@ class WorkflowPhonon(Workflow):
             try:
                 structure = last_calc.out.output_structure
 
-                structure = refine_cell_inline({"structure": structure, 'symprec': 1e-5})[1]['refined_structure']
 
                 forces = last_calc.out.output_array.get_array('forces')[-1]
                 stresses = last_calc.out.output_array.get_array('stress')
@@ -562,6 +561,9 @@ class WorkflowPhonon(Workflow):
 
         else:
             structure = parameters['structure']
+
+        # refine structure using spglib
+        structure = refine_cell_inline({"structure": structure, 'symprec': 1e-5})[1]['refined_structure']
 
         self.append_to_report('Optimize structure {}/{}'.format(len(optimized) + 1, len(optimized) + counter + 1))
 
