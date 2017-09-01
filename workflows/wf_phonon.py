@@ -39,7 +39,7 @@ def get_path_using_seekpath(structure, band_resolution=30):
 
 
 @make_inline
-def refine_cell(**kwargs):
+def refine_cell_inline(**kwargs):
     import spglib
     from phonopy.structure.atoms import Atoms as PhonopyAtoms
 
@@ -535,7 +535,7 @@ class WorkflowPhonon(Workflow):
             try:
                 structure = last_calc.out.output_structure
 
-                structure = refine_cell({"structure": structure, 'symprec': 1e-5})[1]['refined_structure']
+                structure = refine_cell_inline({"structure": structure, 'symprec': 1e-5})[1]['refined_structure']
 
                 forces = last_calc.out.output_array.get_array('forces')[-1]
                 stresses = last_calc.out.output_array.get_array('stress')
