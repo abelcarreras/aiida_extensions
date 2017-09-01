@@ -576,6 +576,7 @@ class WorkflowPhonon(Workflow):
         self.attach_calculation(calc)
 
         if counter < 1:
+            self.add_attribute('counter', 10)  # define max number of displacement iterations
             self.next(self.displacements)
         else:
             self.add_attribute('counter', counter - 1)
