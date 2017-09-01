@@ -349,47 +349,6 @@ def phonopy_merge(**kwargs):
     return {'final_results': total_data}
 
 
-def smearing_function_mesh(X, Y, frequencies, gruneisen, sigma=0.1):
-
-    frequencies = frequencies.reshape(-1)
-    gruneisen = gruneisen.reshape(-1)
-
-    def gaussian(X, Y, sigma, freq, grune):
-        result = 1.0/np.sqrt(2*np.pi*sigma**2) * np.exp(-((X-freq)**2 + (Y-grune)**2)/(2*sigma**2))
-        return result
-
-
-    total = np.zeros_like(X)
-    for freq, grune in zip(frequencies, gruneisen):
-        total += gaussian(X,Y, sigma, freq, grune)
-
-    return total
-
-if __name__ == '__main__':
-
-    def gaussian(X, Y, sigma, freq, grune):
-        result = 1.0/np.sqrt(2*np.pi*sigma**2) * np.exp(-((X-freq)**2 + (Y-grune)**2)/(2*sigma**2))
-        return result
-
-    x = np.arange(-2, 2, 0.1)
-    y = np.arange(-2, 2, 0.1)
-    X, Y = np.meshgrid(x,y)
-
-    frequencies = np.sin(np.linspace(-6.3, 6.3, 1000))
-    gruneisen = np.cos(np.linspace(-6.3, 6.3, 1000))
-
-    Z = smearing_function_mesh(X, Y, frequencies, gruneisen)
-
-    #Z = gaussian(X, Y, 0.1, 0, 0)
-    import matplotlib.pyplot as plt
-
-    plt.contour(X, Y, Z)
-    plt.show()
-    exit()
-
-    plt.plot(np.arange(-10, 10, 0.1), [gaussian(x, 0, 0.5, [0, 0]) for x in np.arange(-10, 10, 0.1)])
-    plt.show()
-    exit()
 
     # Start script here
 
