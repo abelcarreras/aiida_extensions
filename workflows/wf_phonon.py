@@ -44,7 +44,6 @@ def refine_cell_inline(**kwargs):
     from phonopy.structure.atoms import Atoms as PhonopyAtoms
 
     structure = kwargs.pop('structure')
-    symprec = kwargs.pop('symprec')
 
     bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
                         positions=[site.position for site in structure.sites],
@@ -54,7 +53,7 @@ def refine_cell_inline(**kwargs):
                       bulk.get_scaled_positions(),
                       bulk.get_atomic_numbers())
 
-    lattice, refined_positions, numbers = spglib.refine_cell(structure_data, symprec=symprec)
+    lattice, refined_positions, numbers = spglib.refine_cell(structure_data, symprec=1e-5)
 
     refined_bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
                         scaled_positions=refined_positions,
@@ -563,7 +562,7 @@ class WorkflowPhonon(Workflow):
             structure = parameters['structure']
 
         # refine structure using spglib
-        structure = refine_cell_inline({"structure": structure, 'symprec': 1e-5})[1]['refined_structure']
+        structure = refine_cell_inline({"structure": structure})[1]['refined_structure']
 
         self.append_to_report('Optimize structure {}/{}'.format(len(optimized) + 1, len(optimized) + counter + 1))
 
