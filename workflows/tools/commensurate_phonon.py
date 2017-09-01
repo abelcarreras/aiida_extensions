@@ -1,14 +1,18 @@
 from aiida import load_dbenv
 
-load_dbenv()
+try:
+    load_dbenv()
 
-from aiida.orm import load_node, load_workflow
-from aiida.orm import Code, DataFactory
+    from aiida.orm import load_node, load_workflow
+    from aiida.orm import Code, DataFactory
 
-StructureData = DataFactory('structure')
-ParameterData = DataFactory('parameter')
-ArrayData = DataFactory('array')
-KpointsData = DataFactory('array.kpoints')
+    StructureData = DataFactory('structure')
+    ParameterData = DataFactory('parameter')
+    ArrayData = DataFactory('array')
+    KpointsData = DataFactory('array.kpoints')
+
+except:
+    pass
 
 import numpy as np
 
@@ -345,62 +349,102 @@ def phonopy_merge(**kwargs):
     return {'final_results': total_data}
 
 
+def smearing_function_mesh(X, Y, frequencies, gruneisen, sigma=0.1):
+
+    frequencies = frequencies.reshape(-1)
+    gruneisen = gruneisen.reshape(-1)
+
+    def gaussian(X, Y, sigma, freq, grune):
+        result = 1.0/np.sqrt(2*np.pi*sigma**2) * np.exp(-((X-freq)**2 + (Y-grune)**2)/(2*sigma**2))
+        return result
 
 
-# Start script here
+    total = np.zeros_like(X)
+    for freq, grune in zip(frequencies, gruneisen):
+        total += gaussian(X,Y, sigma, freq, grune)
 
-# Workflow phonon (at given volume)
-wf = load_workflow(431)
-parameters = wf.get_parameters()
-results = wf.get_results()
+    return total
 
-inline_params = {'structure': results['final_structure'],
-                 'phonopy_input': parameters['phonopy_input'],
-                 'force_constants': results['force_constants']}
+if __name__ == '__main__':
 
-harmonic = phonopy_commensurate_inline(**inline_params)
+    def gaussian(X, Y, sigma, freq, grune):
+        result = 1.0/np.sqrt(2*np.pi*sigma**2) * np.exp(-((X-freq)**2 + (Y-grune)**2)/(2*sigma**2))
+        return result
 
+    x = np.arange(-2, 2, 0.1)
+    y = np.arange(-2, 2, 0.1)
+    X, Y = np.meshgrid(x,y)
 
+    frequencies = np.sin(np.linspace(-6.3, 6.3, 1000))
+    gruneisen = np.cos(np.linspace(-6.3, 6.3, 1000))
 
-# At reference volume (at T = 0)
-wf = load_workflow(432)
-parameters = wf.get_parameters()
-results_r = wf.get_results()
-results_h = wf.get_results()
+    Z = smearing_function_mesh(X, Y, frequencies, gruneisen)
 
+    #Z = gaussian(X, Y, 0.1, 0, 0)
+    import matplotlib.pyplot as plt
 
-inline_params = {'structure': results_h['final_structure'],
-                 'phonopy_input': parameters['phonopy_input'],
-                 'force_constants': results_h['force_constants'],
-                 'r_force_constants': results_r['r_force_constants']}
+    plt.contour(X, Y, Z)
+    plt.show()
+    exit()
 
+    plt.plot(np.arange(-10, 10, 0.1), [gaussian(x, 0, 0.5, [0, 0]) for x in np.arange(-10, 10, 0.1)])
+    plt.show()
+    exit()
 
-renormalized = phonopy_commensurate_shifts_inline(**inline_params)
+    # Start script here
 
+    # Workflow phonon (at given volume)
+    wf = load_workflow(431)
+    parameters = wf.get_parameters()
+    results = wf.get_results()
 
+    inline_params = {'structure': results['final_structure'],
+                     'phonopy_input': parameters['phonopy_input'],
+                     'force_constants': results['force_constants']}
 
-
-
-inline_params = {'structure': results_h['final_structure'],
-                 'phonopy_input': parameters['phonopy_input'],
-                 'harmonic': harmonic,
-                 'renormalized': renormalized}
-
-total = phonopy_merge(**inline_params)
-
-print total
-
-inline_params = {'structure': results_h['final_structure'],
-                 'phonopy_input': parameters['phonopy_input'],
-                 'force_constants': total['force_constants']}
-
-results = phonopy_calculation_inline(**inline_params)[1]
-
-band = results['band_structure']
+    harmonic = phonopy_commensurate_inline(**inline_params)
 
 
-# Phonon Band structure plot
-plot_data(results['band_structure'])
+
+    # At reference volume (at T = 0)
+    wf = load_workflow(432)
+    parameters = wf.get_parameters()
+    results_r = wf.get_results()
+    results_h = wf.get_results()
+
+
+    inline_params = {'structure': results_h['final_structure'],
+                     'phonopy_input': parameters['phonopy_input'],
+                     'force_constants': results_h['force_constants'],
+                     'r_force_constants': results_r['r_force_constants']}
+
+
+    renormalized = phonopy_commensurate_shifts_inline(**inline_params)
+
+
+
+
+
+    inline_params = {'structure': results_h['final_structure'],
+                     'phonopy_input': parameters['phonopy_input'],
+                     'harmonic': harmonic,
+                     'renormalized': renormalized}
+
+    total = phonopy_merge(**inline_params)
+
+    print total
+
+    inline_params = {'structure': results_h['final_structure'],
+                     'phonopy_input': parameters['phonopy_input'],
+                     'force_constants': total['force_constants']}
+
+    results = phonopy_calculation_inline(**inline_params)[1]
+
+    band = results['band_structure']
+
+
+    # Phonon Band structure plot
+    plot_data(results['band_structure'])
 
 
 
