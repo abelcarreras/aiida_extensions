@@ -148,7 +148,7 @@ def get_data_info(structure):
     pmg_structure = structure.get_pymatgen_structure()
     formula = pmg_structure.formula
     space_group = pmg_structure.get_space_group_info()
-    lattice_vectors = pmg_structure.lattce.matrix
+    lattice_vectors = pmg_structure.lattice.matrix
     positions = pmg_structure.frac_coordinates
     species = pmg_structure.species
     volume = pmg_structure.volume
