@@ -160,9 +160,9 @@ def get_data_info(structure):
 
     info_data += '\n'
     info_data += 'Lattice vectors\n'
-    info_data += ('{0:10.8f} {1:10.8f} {2:10.8f}\n'
-                  '{3:10.8f} {4:10.8f} {5:10.8f}\n'
-                  '{6:10.8f} {7:10.8f} {8:10.8f}\n').format(lattice_vectors.reshape(-1))
+    info_data += ('{0:10.8f} {1:10.8f} {2:10.8f}\n'.format(*lattice_vectors[0]) +
+                  '{0:10.8f} {1:10.8f} {2:10.8f}\n'.format(*lattice_vectors[1]) +
+                  '{0:10.8f} {1:10.8f} {2:10.8f}\n'.format(*lattice_vectors[2]))
     info_data += '\n'
     info_data += 'Positions\n'
     for i, xyz in enumerate(positions):
