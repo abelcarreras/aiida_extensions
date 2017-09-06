@@ -154,21 +154,20 @@ def get_data_info(structure):
     volume = pmg_structure.volume
 
     info_data = ''
-    info_data += 'Formula: {}\n'.format(formula)
-    info_data += '<br>Space group: {}   #{}\n'.format(*space_group)
-    info_data += '<br>Space group: {}   #{}\n'.format(*space_group)
+    info_data += '<b>Formula:</b> {}\n'.format(formula)
+    info_data += '<br><b>Space group:</b> {}   #{}\n'.format(*space_group)
 
     info_data += '\n'
-    info_data += '<br><b>Lattice vectors (Angstroms)</b>\n'
+    info_data += '<br><br><b>Lattice vectors (Angstroms)</b>\n'
     info_data += ('<br>{0:10.8f}&nbsp;{1:10.8f}&nbsp;{2:10.8f}\n'.format(*lattice_vectors[0]) +
                   '<br>{0:10.8f}&nbsp;{1:10.8f}&nbsp;{2:10.8f}\n'.format(*lattice_vectors[1]) +
                   '<br>{0:10.8f}&nbsp;{1:10.8f}&nbsp;{2:10.8f}\n'.format(*lattice_vectors[2]))
     info_data += '\n'
-    info_data += '<br><b>Positions (frac. coord)</b>\n'
+    info_data += '<br><br><b>Positions (frac. coord)</b>\n'
     for i, xyz in enumerate(positions):
         info_data += ('<br>{}&nbsp;'.format(species[i]) + '{0:10.8f}&nbsp;{1:10.8f}&nbsp;{2:10.8f}\n'.format(*xyz))
     info_data += '\n'
-    info_data += '<br>Volume {} Angstroms<sup>3</sup>\n'.format(volume)
+    info_data += '<br><br><b>Volume:</b> {} Angstroms<sup>3</sup>\n'.format(volume)
 
     return info_data
 
