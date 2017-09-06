@@ -2,7 +2,6 @@ from aiida.orm import Code, DataFactory
 from aiida.orm.workflow import Workflow
 from aiida.orm.calculation.inline import make_inline
 
-
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
 ArrayData = DataFactory('array')
@@ -42,8 +41,10 @@ def get_path_using_seekpath(structure, band_resolution=30):
 def refine_cell_inline(**kwargs):
     import spglib
     from phonopy.structure.atoms import Atoms as PhonopyAtoms
+    import itertools
 
     structure = kwargs.pop('structure')
+
 
     bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
                         positions=[site.position for site in structure.sites],
@@ -59,8 +60,20 @@ def refine_cell_inline(**kwargs):
                         scaled_positions=refined_positions,
                         cell=lattice)
 
-    refined_structure = StructureData(cell=lattice)
-    for position, symbol in zip(refined_bulk.get_positions(), refined_bulk.get_chemical_symbols()):
+    supercell = np.array(np.diagonal(np.divide(structure.cell, lattice)), dtype=int)
+
+    refined_cell = np.dot(lattice, np.diag(supercell))
+
+    # Recover original structure
+    position_supercell = []
+    for k in range(len(refined_bulk.get_positions())):
+         for r in itertools.product(*[range (i) for i in supercell[::-1]]):
+             position_supercell.append(refined_bulk.get_positions()[k,:] + np.dot(np.array(r[::-1]), refined_cell))
+    position_supercell = np.array(position_supercell)
+
+    # create new aiida structure object
+    refined_structure = StructureData(cell=refined_cell)
+    for position, symbol in zip(position_supercell, bulk.get_chemical_symbols()):
         refined_structure.append_atom(position=position,
                                       symbols=symbol)
 
