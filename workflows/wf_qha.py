@@ -13,9 +13,35 @@ import StringIO
 from phonopy import PhonopyQHA
 from phonon_common import arrange_band_labels
 
-StructureData = DataFactory('structure')
+#StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
 ArrayData = DataFactory('array')
+
+
+from aiida.orm.data.structure import StructureData
+test = StructureData()
+
+test.export()
+
+# Normalize to from unitformula to unitcell
+def gcd(L):
+    import fractions
+    L = np.unique(L, return_counts=True)[1]
+    return reduce(fractions.gcd, L)
+
+
+# convert numpy string into web page ready text file
+def get_file_from_numpy_array(data, text_list=None):
+    output = StringIO.StringIO()
+    if text_list is None:
+        output.write('No caption\n')
+    else:
+        output.write('       '.join(text_list) + '\n')
+
+    for line in np.array(data).astype(str):
+        output.write('       '.join(line) + '\n')
+    output.seek(0)
+    return output
 
 
 def check_dos_stable(wf, tol=1e-6):
@@ -595,30 +621,28 @@ class WorkflowQHA(Workflow):
             # if min_stress > test_range[0] and max_stress < test_range[1] and total_range / interval < 3:
             #    interval *= 0.5
 
-            if abs(max - min)/interval < 1:
+            if abs(test_range[1] - test_range[0])/interval < 1:
                 interval *= 0.5
 
 
             if max_stress > test_range[1]:
                 self.append_to_report('Increase max {} + {}'.format(test_range[1],
-                                                                    np.ceil(np.min([total_range/2, abs(max_stress - test_range[1])]) / interval) * interval))
+                               np.ceil(np.min([total_range/2, abs(max_stress - test_range[1])]) / interval) * interval))
                 test_range[1] += np.ceil(np.min([total_range/2, abs(max_stress - test_range[1])]) / interval) * interval
             else:
                 self.append_to_report('Decrease max {} - {}'.format(test_range[1],
-                                                                    np.ceil(np.min([total_range / 2, abs(max_stress - test_range[1])]) / interval) * interval))
+                              np.ceil(np.min([total_range / 2, abs(max_stress - test_range[1])]) / interval) * interval))
                 test_range[1] -= np.ceil(np.min([total_range / 2, abs(max_stress - test_range[1])]) / interval) * interval
 
             if min_stress < test_range[0]:
                 self.append_to_report('Increase min {} - {}'.format(test_range[0],
-                                                                    np.ceil(np.min([total_range / 2, abs(test_range[0] - min_stress)]) / interval) * interval))
+                              np.ceil(np.min([total_range / 2, abs(test_range[0] - min_stress)]) / interval) * interval))
                 test_range[0] -= np.ceil(np.min([total_range/2, abs(test_range[0] - min_stress)]) / interval) * interval
             else:
                 self.append_to_report('Decrease min {} + {}'.format(test_range[0],
-                                                                    np.ceil(np.min([total_range/2, abs(test_range[0] - min_stress)]) / interval) * interval))
+                              np.ceil(np.min([total_range/2, abs(test_range[0] - min_stress)]) / interval) * interval))
                 test_range[0] += np.ceil(np.min([total_range/2, abs(test_range[0] - min_stress)]) / interval) * interval
 
-
-            #  ----------------------------------------------------------------------------
 
         total_range = abs(test_range[1] - test_range[0])
         #total_range = abs(max - min)
@@ -650,14 +674,6 @@ class WorkflowQHA(Workflow):
                 self.append_to_report('Safety exit (not converged): n_press {}'.format(len(test_pressures)))
                 self.next(self.complete)
                 return
-
-            # self.append_to_report('pressure list before unique {}'.format(test_pressures))
-
-            #test_pressures = np.array(test_pressures)
-            #test_pressures = test_pressures[np.unique(np.round(test_pressures, decimals=4),
-            #                                          return_index=True)[1]].tolist()
-
-            # self.append_to_report('pressure list {}'.format(test_pressures))
 
             # Remove duplicates
             for wf_test in wf_complete_list:
@@ -726,7 +742,8 @@ class WorkflowQHA(Workflow):
                     else:
                         # self.append_to_report('compare: {} {}'.format(wf_test.get_attribute('pressure'), pressure))
                         if np.isclose(wf_test.get_attribute('pressure'), pressure, atol=interval/4., rtol=0):
-                            # To make sure that the calculation did not fail and if it is the case give a second chance to finish correctly
+                            # To make sure that the calculation did not fail and if it is the case give a second
+                            # chance to finish correctly
                             test_pressures.remove(pressure)
                             # self.append_to_report('IS close! -> remove {}'.format(pressure))
                 except:
@@ -806,7 +823,8 @@ class WorkflowQHA(Workflow):
         test_pressures = [min + interval * i for i in range(n_points)]
 
         wf_complete_list = []
-        for step_name in ['pressure_expansions', 'collect_data', 'complete', 'pressure_manual_expansions', 'pressure_gruneisen']:
+        for step_name in ['pressure_expansions', 'collect_data', 'complete', 'pressure_manual_expansions',
+                          'pressure_gruneisen']:
             if self.get_step(step_name):
                 wf_complete_list += list(self.get_step(step_name).get_sub_workflows())
 
@@ -819,108 +837,18 @@ class WorkflowQHA(Workflow):
         min_stress, max_stress = qha_prediction(self, interval, min, max)
         self.append_to_report('Final QHA prediction {} {}'.format(min_stress, max_stress))
 
-        volumes = []
-        electronic_energies = []
-        temperatures = []
-        fe_phonon = []
-        entropy = []
-        cv = []
-
-        for wf_test in wf_complete_list:
-            for pressure in test_pressures:
-                if wf_test.get_state() == 'FINISHED':
-                    if np.isclose(wf_test.get_attribute('pressure'), pressure, atol=interval / 4, rtol=0):
-                        thermal_properties = wf_test.get_result('thermal_properties')
-                        optimized_data = wf_test.get_result('optimized_structure_data')
-                        final_structure = wf_test.get_result('final_structure')
-
-                        electronic_energies.append(optimized_data.dict.energy)
-                        volumes.append(final_structure.get_cell_volume())
-                        temperatures = thermal_properties.get_array('temperature')
-                        fe_phonon.append(thermal_properties.get_array('free_energy'))
-                        entropy.append(thermal_properties.get_array('entropy'))
-                        cv.append(thermal_properties.get_array('cv'))
-
-        sort_index = np.argsort(volumes)
-
-        volumes = np.array(volumes)[sort_index]
-        electronic_energies = np.array(electronic_energies)[sort_index]
-        temperatures = np.array(temperatures)
-        fe_phonon = np.array(fe_phonon).T[:, sort_index]
-        entropy = np.array(entropy).T[:, sort_index]
-        cv = np.array(cv).T[:, sort_index]
-
-
-        # Calculate QHA properties
-        phonopy_qha = PhonopyQHA(np.array(volumes),
-                                 np.array(electronic_energies),
-                                 eos="vinet",
-                                 temperatures=np.array(temperatures),
-                                 free_energy=np.array(fe_phonon),
-                                 cv=np.array(cv),
-                                 entropy=np.array(entropy),
-                                 # t_max=options.t_max,
-                                 verbose=False)
-
-        # Get data
-        qha_temperatures = phonopy_qha._qha._temperatures[:phonopy_qha._qha._max_t_index]
-        helmholtz_volume = phonopy_qha.get_helmholtz_volume()
-        thermal_expansion = phonopy_qha.get_thermal_expansion()
-        volume_temperature = phonopy_qha.get_volume_temperature()
-        heat_capacity_P_numerical = phonopy_qha.get_heat_capacity_P_numerical()
-        volume_expansion = phonopy_qha.get_volume_expansion()
-        gibbs_temperature = phonopy_qha.get_gibbs_temperature()
-
-
-        # Normalize to from unitformula to unitcell
-        def gcd(L):
-            import fractions
-            L = np.unique(L, return_counts=True)[1]
-            return reduce(fractions.gcd, L)
-
-        norm_unitformula_to_unitcell = gcd([site.kind_name for site in final_structure.sites])
-        heat_capacity_P_numerical /= norm_unitformula_to_unitcell
-
-        # convert numpy string into web page ready text file
-        def get_file_from_numpy_array(data, text_list=None):
-
-            output = StringIO.StringIO()
-            if text_list is None:
-                output.write('No caption\n')
-            else:
-                output.write('       '.join(text_list) + '\n')
-
-            for line in np.array(data).astype(str):
-                output.write('       '.join(line) + '\n')
-            output.seek(0)
-            return output
 
         data_folder = self.current_folder.get_subfolder('DATA_FILES')
         data_folder.create()
 
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, gibbs_temperature)),
-                                              'gibbs_temperature')
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, volume_expansion)),
-                                              'volume_expansion')
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, volume_temperature)),
-                                              'volume_temperature')
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, thermal_expansion)),
-                                              'thermal_expansion')
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, heat_capacity_P_numerical)),
-                                              'heat_capacity_P_numerical')
+        ############################
+        # Get harmonic results
+        ############################
 
-        self.append_to_report('QHA properties calculated and written in files')
+        wf_zero = self.get_step('start').get_sub_workflows()[0].get_step('start').get_sub_workflows()[0]
+        final_structure = wf_zero.get_result('final_structure')
+        norm_unitformula_to_unitcell = gcd([site.kind_name for site in final_structure.sites])
 
-        # Get harmonic data at P = 0
-        wf_zero = None
-        for wf_i in wf_complete_list:
-            if wf_i.get_attribute('pressure') == 0.0:
-                wf_zero = wf_i
-
-        if wf_zero is None:
-            self.append_to_report('No harmonic information found at P=0')
-            self.next(self.exit)
-            return
 
         # Get data and write the files
         thermal_properties = wf_zero.get_result('thermal_properties')
@@ -988,5 +916,120 @@ class WorkflowQHA(Workflow):
 
         self.append_to_report('Harmonic data written in files')
 
-        self.next(self.exit)
+        ############################
+        # Get structure
+        ############################
+        import pymatgen.io.cif as cif
+        pmg_structure = final_structure.get_pymatgen_structure()
+        cif.CifWriter(pmg_structure, symprec=0.1).write_file(data_folder.abspath + '/structure.cif')
 
+        # Save info data
+        info_data = StringIO.StringIO()
+        info_data.write('Some data\n More data\n and additional data')
+        info_data.seek(0)
+
+        data_folder.create_file_from_filelike(info_data, 'info_data.txt')
+
+
+        ############################
+        # Get gruneisen results
+        ############################
+
+        wf_grune = self.get_step('start').get_sub_workflows()[0]
+        mesh = wf_grune.get_result('mesh')
+
+        freq_grune = mesh.get_array('frequencies')
+        param_grune = mesh.get_array('gruneisen')
+
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(
+            np.column_stack((freq_grune.reshape(-1), param_grune.reshape(-1)))), 'gruneisen_mesh')
+
+
+        band_structure = wf_grune.get_result('band_structure')
+
+        q_tolerance = 1e-5
+        band_array = []
+        for i , freq in enumerate(band_structure.get_array('gruneisen')):
+              for j, q in enumerate(band_structure.get_array('q_path')[i]):
+                  print 'q', q
+                  if np.linalg.norm( band_structure.get_array('q_points')[i,j]) > q_tolerance:
+                       band_array.append( [q] + freq[j].tolist())
+        #         else:
+        #               band_array.append( [np.nan] + freq[j].tolist())
+              band_array.append( [np.nan] + freq[0].tolist())
+        band_array = np.array(band_array)
+
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(band_array), 'gruneisen_band_structure')
+
+
+        ####################
+        # Get QHA results
+        ####################
+
+        volumes = []
+        electronic_energies = []
+        temperatures = []
+        fe_phonon = []
+        entropy = []
+        cv = []
+
+        for wf_test in wf_complete_list:
+            for pressure in test_pressures:
+                if wf_test.get_state() == 'FINISHED':
+                    if np.isclose(wf_test.get_attribute('pressure'), pressure, atol=interval / 4, rtol=0):
+                        thermal_properties = wf_test.get_result('thermal_properties')
+                        optimized_data = wf_test.get_result('optimized_structure_data')
+                        final_structure = wf_test.get_result('final_structure')
+
+                        electronic_energies.append(optimized_data.dict.energy)
+                        volumes.append(final_structure.get_cell_volume())
+                        temperatures = thermal_properties.get_array('temperature')
+                        fe_phonon.append(thermal_properties.get_array('free_energy'))
+                        entropy.append(thermal_properties.get_array('entropy'))
+                        cv.append(thermal_properties.get_array('cv'))
+
+        sort_index = np.argsort(volumes)
+
+        volumes = np.array(volumes)[sort_index]
+        electronic_energies = np.array(electronic_energies)[sort_index]
+        temperatures = np.array(temperatures)
+        fe_phonon = np.array(fe_phonon).T[:, sort_index]
+        entropy = np.array(entropy).T[:, sort_index]
+        cv = np.array(cv).T[:, sort_index]
+
+
+        # Calculate QHA properties
+        phonopy_qha = PhonopyQHA(np.array(volumes),
+                                 np.array(electronic_energies),
+                                 eos="vinet",
+                                 temperatures=np.array(temperatures),
+                                 free_energy=np.array(fe_phonon),
+                                 cv=np.array(cv),
+                                 entropy=np.array(entropy),
+                                 # t_max=options.t_max,
+                                 verbose=False)
+
+        # Get data
+        qha_temperatures = phonopy_qha._qha._temperatures[:phonopy_qha._qha._max_t_index]
+        helmholtz_volume = phonopy_qha.get_helmholtz_volume()
+        thermal_expansion = phonopy_qha.get_thermal_expansion()
+        volume_temperature = phonopy_qha.get_volume_temperature()
+        heat_capacity_P_numerical = phonopy_qha.get_heat_capacity_P_numerical()/norm_unitformula_to_unitcell
+        volume_expansion = phonopy_qha.get_volume_expansion()
+        gibbs_temperature = phonopy_qha.get_gibbs_temperature()
+
+
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, gibbs_temperature)),
+                                              'gibbs_temperature')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, volume_expansion)),
+                                              'volume_expansion')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, volume_temperature)),
+                                              'volume_temperature')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, thermal_expansion)),
+                                              'thermal_expansion')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, heat_capacity_P_numerical)),
+                                              'heat_capacity_P_numerical')
+
+        self.append_to_report('QHA properties calculated and written in files')
+
+        self.next(self.exit)
