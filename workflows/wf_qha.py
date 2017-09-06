@@ -13,15 +13,9 @@ import StringIO
 from phonopy import PhonopyQHA
 from phonon_common import arrange_band_labels
 
-#StructureData = DataFactory('structure')
-ParameterData = DataFactory('parameter')
-ArrayData = DataFactory('array')
-
-
 from aiida.orm.data.structure import StructureData
-test = StructureData()
+from aiida.orm.data.array import ArrayData
 
-test.export()
 
 # Normalize to from unitformula to unitcell
 def gcd(L):
@@ -338,7 +332,6 @@ def calculate_qha_inline(**kwargs):
 
 @make_inline
 def create_volumes_inline(**kwargs):
-    import numpy as np
     initial_structure = kwargs['structure']
     volume_relations = kwargs['volumes'].get_dict()['relations']
 
