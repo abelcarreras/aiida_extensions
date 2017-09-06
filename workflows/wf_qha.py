@@ -357,13 +357,17 @@ class WorkflowQHA(Workflow):
         if 'manual' in kwargs:
             self._manual = kwargs['manual']
         else:
-            self._manual = False  # By default expansion method is pressure
+            self._manual = False  # By default automatic mode
 
         if 'only_grune' in kwargs:
             self._only_grune = kwargs['only_grune']
         else:
-            self._only_grune = False  # By default expansion method is pressure
+            self._only_grune = False  # By default use only grune to determine all QHA volume expansions
 
+        if 'n_points' in kwargs:
+            self._n_points = kwargs['n_points']
+        else:
+            self._n_points = 10  # By default use 10 points in automatic mode
 
     # Calculates the reference crystal structure (optimize it if requested)
     @Workflow.step
@@ -912,6 +916,7 @@ class WorkflowQHA(Workflow):
         ############################
         # Get structure
         ############################
+
         import pymatgen.io.cif as cif
         pmg_structure = final_structure.get_pymatgen_structure()
         cif.CifWriter(pmg_structure, symprec=0.1).write_file(data_folder.abspath + '/structure.cif')

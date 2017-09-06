@@ -142,6 +142,41 @@ def smearing_function_mesh(X, Y, frequencies, gruneisen, sigma=0.1):
 
     return total/len(frequencies)
 
+
+def get_data_info(structure):
+
+    pmg_structure = structure.get_pymatgen_structure()
+    formula = pmg_structure.formula
+    space_group = pmg_structure.get_space_group_info()
+    lattice_vectors = pmg_structure.lattce.matrix
+    positions = pmg_structure.frac_coordinates
+    species = pmg_structure.species
+    volume = pmg_structure.volume
+
+    info_data = ''
+    info_data += 'Formula: {}'.format(formula)
+    info_data += 'Space group: {}   #{}\n'.format(*space_group)
+    info_data += 'Space group: {}   #{}\n'.format(*space_group)
+
+    info_data += '\n'
+    info_data += 'Lattice vectors\n'
+    info_data += ('{0:10.8f} {1:10.8f} {2:10.8f}\n'
+                  '{3:10.8f} {4:10.8f} {5:10.8f}\n'
+                  '{6:10.8f} {7:10.8f} {8:10.8f}\n').format(lattice_vectors.reshape(-1))
+    info_data += '\n'
+    info_data += 'Positions\n'
+    for i, xyz in enumerate(positions):
+        info_data += ('{}'.format(species[i]) + '{0:10.8f} {1:10.8f} {2:10.8f}\n'.format(*xyz))
+    info_data += '\n'
+    info_data += 'Volume {}\n'.format(volume)
+
+    return info_data
+
+
+
+
+
+
 if __name__ == '__main__':
 
     def gaussian(X, Y, sigma, freq, grune):
