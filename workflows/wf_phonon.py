@@ -60,7 +60,8 @@ def refine_cell_inline(**kwargs):
                         scaled_positions=refined_positions,
                         cell=lattice)
 
-    supercell = np.array(np.diagonal(np.divide(structure.cell, lattice)), dtype=int)
+    with np.errstate(divide='ignore'):
+        supercell = np.array(np.diagonal(np.divide(structure.cell, lattice)), dtype=int)
 
     refined_cell = np.dot(lattice, np.diag(supercell))
 
