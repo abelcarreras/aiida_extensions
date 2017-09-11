@@ -431,6 +431,7 @@ class WorkflowPhonon(Workflow):
             vasp_input_forces = dict(incar)
             vasp_input_forces.update({
                 'PREC': 'Accurate',
+                'ISYM': 0,
                 'ISTART': 0,
                 'IBRION': -1,
                 'NSW': 1,
