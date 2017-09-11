@@ -11,7 +11,7 @@ import numpy as np
 import StringIO
 
 from phonopy import PhonopyQHA
-from phonon_common import arrange_band_labels
+from phonon_common import arrange_band_labels, get_data_info
 
 from aiida.orm.data.structure import StructureData
 from aiida.orm.data.array import ArrayData
@@ -923,7 +923,8 @@ class WorkflowQHA(Workflow):
 
         # Save info data
         info_data = StringIO.StringIO()
-        info_data.write('Some data\n More data\n and additional data')
+        info_data.write(get_data_info(final_structure))
+
         info_data.seek(0)
 
         data_folder.create_file_from_filelike(info_data, 'info_data.txt')
