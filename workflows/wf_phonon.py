@@ -407,7 +407,8 @@ class WorkflowPhonon(Workflow):
                 'EDIFF': 1e-08,
                 'EDIFFG': -1e-08,
                 'ADDGRID': '.TRUE.',
-                'LREAL': '.FALSE.'})
+                'LREAL': '.FALSE.',
+                'PSTRESS': pressure}) # unit: kb -> kB
             incar = vasp_input_optimize
 
         if type == 'optimize_constant_volume':
@@ -439,8 +440,6 @@ class WorkflowPhonon(Workflow):
                 'ADDGRID': '.TRUE.',
                 'LREAL': '.FALSE.'})
             incar = vasp_input_forces
-
-        incar.update({'PSTRESS': pressure})  # unit: kb -> kB
 
         # KPOINTS
         kpoints = parameters['kpoints']
