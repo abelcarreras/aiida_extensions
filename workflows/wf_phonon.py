@@ -576,7 +576,7 @@ class WorkflowPhonon(Workflow):
             structure = parameters['structure']
 
         # refine structure using spglib
-        structure = refine_cell_inline(structure=structure)[1]['refined_structure']
+        # structure = refine_cell_inline(structure=structure)[1]['refined_structure']
 
         self.append_to_report('Optimize structure {}/{}'.format(len(optimized) + 1, len(optimized) + counter + 1))
 
