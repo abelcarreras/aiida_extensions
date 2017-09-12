@@ -927,7 +927,7 @@ class WorkflowQHA(Workflow):
 
         info_data.seek(0)
 
-        data_folder.create_file_from_filelike(info_data, 'info_data.txt')
+        data_folder.create_file_from_filelike(info_data, 'info_data.html')
 
 
         ############################
