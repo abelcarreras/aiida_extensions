@@ -172,8 +172,32 @@ def get_data_info(structure):
     return info_data
 
 
+def get_helmholtz_volume_from_phonopy_qha(phonopy_qha, thin_number=10):
 
+    from numpy import max, min
+    self = phonopy_qha._qha
+    volume_points = np.linspace(min(self._volumes),
+                                max(self._volumes),
+                                201)
+    min_volumes = []
+    min_energies = []
 
+    volumes = self._volumes
+    selected_energies = []
+    energies_points = []
+
+    for i, t in enumerate(self._temperatures[:self._max_t_index]):
+        if i % thin_number == 0:
+            min_volumes.append(self._equiv_volumes[i])
+            min_energies.append(self._equiv_energies[i])
+
+            selected_energies.append(self._free_energies[i])
+
+            energies_points.append(self._eos(volume_points, *self._equiv_parameters[i]))
+
+    return {'fit': (volume_points, np.array(energies_points)),
+            'points':  (volumes, np.array(selected_energies)),
+            'minimum': (min_volumes, min_energies)}
 
 
 if __name__ == '__main__':
@@ -201,3 +225,5 @@ if __name__ == '__main__':
     plt.plot(np.arange(-10, 10, 0.1), [gaussian(x, 0, 0.5, [0, 0]) for x in np.arange(-10, 10, 0.1)])
     plt.show()
     exit()
+
+

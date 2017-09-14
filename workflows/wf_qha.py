@@ -275,14 +275,14 @@ def calculate_qha_inline(**kwargs):
     cv = []
 
     for i in range(len(structure_list)):
-       # volumes.append(kwargs.pop(key).get_cell_volume())
-       volumes.append(kwargs.pop('final_structure_{}'.format(i)).get_cell_volume())
-       electronic_energies.append(kwargs.pop('optimized_structure_data_{}'.format(i)).dict.energy)
-       thermal_properties = kwargs.pop('thermal_properties_{}'.format(i))
-       temperatures = thermal_properties.get_array('temperature')
-       fe_phonon.append(thermal_properties.get_array('free_energy'))
-       entropy.append(thermal_properties.get_array('entropy'))
-       cv.append(thermal_properties.get_array('cv'))
+        # volumes.append(kwargs.pop(key).get_cell_volume())
+        volumes.append(kwargs.pop('final_structure_{}'.format(i)).get_cell_volume())
+        electronic_energies.append(kwargs.pop('optimized_structure_data_{}'.format(i)).dict.energy)
+        thermal_properties = kwargs.pop('thermal_properties_{}'.format(i))
+        temperatures = thermal_properties.get_array('temperature')
+        fe_phonon.append(thermal_properties.get_array('free_energy'))
+        entropy.append(thermal_properties.get_array('entropy'))
+        cv.append(thermal_properties.get_array('cv'))
 
     sort_index = np.argsort(volumes)
 
@@ -318,14 +318,13 @@ def calculate_qha_inline(**kwargs):
 
     qha_output = ArrayData()
 
-    qha_output.set_array('temperature', np.array(qha_temperatures))
+    qha_output.set_array('temperatures', np.array(qha_temperatures))
     qha_output.set_array('helmholtz_volume', np.array(helmholtz_volume))
     qha_output.set_array('thermal_expansion', np.array(thermal_expansion))
     qha_output.set_array('volume_temperature', np.array(volume_temperature))
     qha_output.set_array('heat_capacity_P_numerical', np.array(heat_capacity_P_numerical))
     qha_output.set_array('volume_expansion', np.array(volume_expansion))
     qha_output.set_array('gibbs_temperature', np.array(gibbs_temperature))
-
 
     return {'qha_output': qha_output}
 
@@ -424,7 +423,7 @@ class WorkflowQHA(Workflow):
 
             self.attach_workflow(wf)
             wf.start()
-        self.next(self.qha_calculation_write_files)
+        self.next(self.qha_calculation)
 
     # Auto expansion just using Gruneisen prediction
     @Workflow.step
@@ -453,7 +452,7 @@ class WorkflowQHA(Workflow):
 
             self.attach_workflow(wf)
             wf.start()
-        self.next(self.qha_calculation_write_files)
+        self.next(self.qha_calculation)
 
 
     # Auto expansion by searching real DOS limits (hopping algorithm)
@@ -764,9 +763,9 @@ class WorkflowQHA(Workflow):
         if len(test_pressures):
             self.append_to_report('Not yet completed, {} left'.format(len(test_pressures)))
             # self.next(self.complete)
-            self.next(self.qha_calculation_write_files)
+            self.next(self.qha_calculation)
         else:
-            self.next(self.qha_calculation_write_files)
+            self.next(self.qha_calculation)
 
     @Workflow.step
     def qha_calculation(self):
@@ -779,17 +778,24 @@ class WorkflowQHA(Workflow):
         n_points = int((max - min) / interval) + 1
         test_pressures = [min + interval * i for i in range(n_points)]
 
-        # Remove duplicates
-        wf_complete_list = list(self.get_step('pressure_expansions').get_sub_workflows())
-        wf_complete_list += list(self.get_step('collect_data').get_sub_workflows())
-        wf_complete_list += list(self.get_step('complete').get_sub_workflows())
+        # Workflow list
+        wf_complete_list = []
+        for step_name in ['pressure_expansions', 'collect_data', 'complete', 'pressure_manual_expansions',
+                          'pressure_gruneisen']:
+            if self.get_step(step_name):
+                wf_complete_list += list(self.get_step(step_name).get_sub_workflows())
 
+        # Add phonon workflow at 0 pressure from gruneisen workflow if exists
+        try:
+            wf_complete_list += list(
+                self.get_step('start').get_sub_workflows()[0].get_step('start').get_sub_workflows())
+        except:
+            pass
 
         min_stress, max_stress = qha_prediction(self, interval, min, max)
         self.append_to_report('Final QHA prediction {} {}'.format(min_stress, max_stress))
 
         inline_params = {}
-
         for wf_test in wf_complete_list:
             for i, pressure in enumerate(test_pressures):
                 if np.isclose(wf_test.get_attribute('pressure'), pressure, atol=interval / 4, rtol=0):
@@ -805,11 +811,183 @@ class WorkflowQHA(Workflow):
 
         self.add_result('qha_output', qha_result['qha_output'])
 
-        self.next(self.exit)
+        self.next(self.qha_calculation_write_files)
 
 
     @Workflow.step
     def qha_calculation_write_files(self):
+
+        data_folder = self.current_folder.get_subfolder('DATA_FILES')
+        data_folder.create()
+
+        ############################
+        # Get harmonic results
+        ############################
+
+        wf_zero = self.get_step('start').get_sub_workflows()[0].get_step('start').get_sub_workflows()[0]
+        final_structure = wf_zero.get_result('final_structure')
+        norm_unitformula_to_unitcell = gcd([site.kind_name for site in final_structure.sites])
+
+
+        # Get data and write the files
+        thermal_properties = wf_zero.get_result('thermal_properties')
+        dos = wf_zero.get_result('dos')
+        band_structure = wf_zero.get_result('band_structure')
+
+        entropy = thermal_properties.get_array('entropy')
+        free_energy = thermal_properties.get_array('free_energy')
+        temperatures = thermal_properties.get_array('temperature')
+        cv = thermal_properties.get_array('cv')
+
+        # Normalize from unitcell to unitformula
+        free_energy /= norm_unitformula_to_unitcell
+        entropy /= norm_unitformula_to_unitcell
+        cv /= norm_unitformula_to_unitcell
+
+        # Density of states
+        freq_dos = dos.get_array('frequency')
+        total_dos = dos.get_array('total_dos')
+        partial_symbols = dos.get_array('partial_symbols')
+        partial_dos = dos.get_array('partial_dos')
+
+        # Check atom equivalences in partial DOS
+        delete_list = []
+        for i, dos_i in enumerate(partial_dos):
+            for j, dos_j in enumerate(partial_dos):
+                if i < j:
+                    if np.allclose(dos_i, dos_j, rtol=1, atol=1e-8) and partial_symbols[i] == partial_symbols[j]:
+                        dos_i += dos_j
+                        delete_list.append(j)
+
+        partial_dos = np.delete(partial_dos, delete_list, 0).T
+        partial_symbols = np.delete(partial_symbols, delete_list)
+
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(freq_dos, total_dos)),
+                                              'total_dos')
+
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(np.column_stack((freq_dos, partial_dos)),
+                                                                        text_list=['T'] + partial_symbols.tolist()),
+                                              'partial_dos')
+
+        # Thermal properties
+        data_folder.create_file_from_filelike(
+            get_file_from_numpy_array(np.column_stack((temperatures, entropy, free_energy, cv))), 'thermal_properties')
+
+        # Phonon band structure
+
+        band_array = []
+        for i, freq in enumerate(band_structure.get_array('frequencies')):
+            for j, q in enumerate(band_structure.get_array('q_path')[i]):
+                band_array.append([q] + freq[j].tolist())
+
+        band_array = np.array(band_array)
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(band_array), 'phonon_band_structure')
+
+        x_labels, labels_e = arrange_band_labels(band_structure)
+
+        output = StringIO.StringIO()
+
+        for i, j in zip(x_labels, labels_e):
+            output.write(u'{0:12.8f}       {1}\n'.format(i, j).encode('utf-8'))
+        output.seek(0)
+
+        data_folder.create_file_from_filelike(output, 'band_structure_labels')
+
+        self.append_to_report('Harmonic data written in files')
+
+        ############################
+        # Get structure
+        ############################
+
+        import pymatgen.io.cif as cif
+        pmg_structure = final_structure.get_pymatgen_structure()
+        cif.CifWriter(pmg_structure, symprec=0.1).write_file(data_folder.abspath + '/structure.cif')
+
+        # Save info data
+        info_data = StringIO.StringIO()
+        info_data.write(get_data_info(final_structure))
+
+        info_data.seek(0)
+
+        data_folder.create_file_from_filelike(info_data, 'info_data.html')
+
+
+        ############################
+        # Get gruneisen results
+        ############################
+
+        wf_grune = self.get_step('start').get_sub_workflows()[0]
+        mesh = wf_grune.get_result('mesh')
+
+        freq_grune = mesh.get_array('frequencies')
+        param_grune = mesh.get_array('gruneisen')
+
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(
+            np.column_stack((freq_grune.reshape(-1), param_grune.reshape(-1)))), 'gruneisen_mesh')
+
+
+        band_structure = wf_grune.get_result('band_structure')
+
+        q_tolerance = 1e-5
+        band_array = []
+        for i , freq in enumerate(band_structure.get_array('gruneisen')):
+              for j, q in enumerate(band_structure.get_array('q_path')[i]):
+                  print 'q', q
+                  if np.linalg.norm( band_structure.get_array('q_points')[i,j]) > q_tolerance:
+                       band_array.append( [q] + freq[j].tolist())
+        #         else:
+        #               band_array.append( [np.nan] + freq[j].tolist())
+              band_array.append( [np.nan] + freq[0].tolist())
+        band_array = np.array(band_array)
+
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(band_array), 'gruneisen_band_structure')
+
+
+        ####################
+        # Get QHA results
+        ####################
+
+        qha_output = self.get_result('qha_output')
+
+        #free_energy_volume_fitting = get_helmholtz_volume_from_phonopy_qha(phonopy_qha)
+        qha_temperatures = qha_output.get_array('temperatures')
+        # helmholtz_volume = phonopy_qha.get_helmholtz_volume()
+        thermal_expansion = qha_output.get_array('thermal_expansion')
+        volume_temperature = qha_output.get_array('volume_temperature')
+        heat_capacity_P_numerical = qha_output.get_array('heat_capacity_P_numerical')/norm_unitformula_to_unitcell
+        volume_expansion = qha_output.get_array('volume_expansion')
+        gibbs_temperature = qha_output.get_array('gibbs_temperature')
+
+#        data_folder.create_file_from_filelike(get_file_from_numpy_array(
+#            np.column_stack((free_energy_volume_fitting['fit'][0], free_energy_volume_fitting['fit'][1].T))),
+#                                              'free_energy_fit')
+#        data_folder.create_file_from_filelike(get_file_from_numpy_array(
+#            np.column_stack((free_energy_volume_fitting['points'][0], free_energy_volume_fitting['points'][1].T))),
+#                                              'free_energy_points')
+#        data_folder.create_file_from_filelike(get_file_from_numpy_array(
+#            zip(free_energy_volume_fitting['minimum'][0], free_energy_volume_fitting['minimum'][1])),
+#                                              'free_energy_min')
+
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, gibbs_temperature)),
+                                              'gibbs_temperature')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, volume_expansion)),
+                                              'volume_expansion')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, volume_temperature)),
+                                              'volume_temperature')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, thermal_expansion)),
+                                              'thermal_expansion')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, heat_capacity_P_numerical)),
+                                              'heat_capacity_P_numerical')
+
+        self.append_to_report('QHA properties calculated and written in files')
+
+        self.next(self.exit)
+
+
+    @Workflow.step
+    def qha_calculation_write_files_2(self):
+
+        from phonon_common import get_helmholtz_volume_from_phonopy_qha
 
         interval = self.get_attribute('interval')
 
@@ -1009,14 +1187,25 @@ class WorkflowQHA(Workflow):
                                  verbose=False)
 
         # Get data
+
+        free_energy_volume_fitting = get_helmholtz_volume_from_phonopy_qha(phonopy_qha)
         qha_temperatures = phonopy_qha._qha._temperatures[:phonopy_qha._qha._max_t_index]
-        helmholtz_volume = phonopy_qha.get_helmholtz_volume()
+        # helmholtz_volume = phonopy_qha.get_helmholtz_volume()
         thermal_expansion = phonopy_qha.get_thermal_expansion()
         volume_temperature = phonopy_qha.get_volume_temperature()
         heat_capacity_P_numerical = phonopy_qha.get_heat_capacity_P_numerical()/norm_unitformula_to_unitcell
         volume_expansion = phonopy_qha.get_volume_expansion()
         gibbs_temperature = phonopy_qha.get_gibbs_temperature()
 
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(
+            np.column_stack((free_energy_volume_fitting['fit'][0], free_energy_volume_fitting['fit'][1].T))),
+                                              'free_energy_fit')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(
+            np.column_stack((free_energy_volume_fitting['points'][0], free_energy_volume_fitting['points'][1].T))),
+                                              'free_energy_points')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(
+            zip(free_energy_volume_fitting['minimum'][0], free_energy_volume_fitting['minimum'][1])),
+                                              'free_energy_min')
 
         data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, gibbs_temperature)),
                                               'gibbs_temperature')
