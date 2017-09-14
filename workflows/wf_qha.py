@@ -381,7 +381,11 @@ class WorkflowQHA(Workflow):
         self.append_to_report('Starting workflow_workflow')
         self.append_to_report('Phonon calculation of base structure')
 
+        self.add_attribute('manual', True)
+
         if self._manual:
+            self.add_attribute('manual', True)
+
             self.next(self.pressure_manual_expansions)
             return
 
@@ -415,10 +419,15 @@ class WorkflowQHA(Workflow):
         wf_parameters = self.get_parameters()
 
         test_pressures = wf_parameters['scan_pressures']  # in kbar
+        if not 0.0 in test_pressures:
+            test_pressures.append(0.0)
 
-        self.add_attribute('interval', test_pressures[1] - test_pressures[0])
-        self.add_attribute('max', test_pressures[1])
-        self.add_attribute('min', test_pressures[0])
+        if np.min(np.diff(test_pressures)) < 1e-5:
+
+            self.next(self.exit)
+            return
+
+        self.add_attribute('interval', np.min(np.diff(test_pressures)))
 
         # wfs_test = [821, 820]
         for i, pressure in enumerate(test_pressures):
@@ -779,11 +788,20 @@ class WorkflowQHA(Workflow):
 
         interval = self.get_attribute('interval')
 
-        max = self.get_attribute('max')
-        min = self.get_attribute('min')
+        if self.get_attribute('manual'):
+            test_pressures = self.get_parameter('scan_pressures')  # in kbar
 
-        n_points = int((max - min) / interval) + 1
-        test_pressures = [min + interval * i for i in range(n_points)]
+        else:
+
+            max = self.get_attribute('max')
+            min = self.get_attribute('min')
+
+            n_points = int((max - min) / interval) + 1
+            test_pressures = [min + interval * i for i in range(n_points)]
+
+            min_stress, max_stress = qha_prediction(self, interval, min, max)
+            self.append_to_report('Final QHA prediction {} {}'.format(min_stress, max_stress))
+
 
         # Workflow list
         wf_complete_list = []
@@ -799,8 +817,6 @@ class WorkflowQHA(Workflow):
         except:
             pass
 
-        min_stress, max_stress = qha_prediction(self, interval, min, max)
-        self.append_to_report('Final QHA prediction {} {}'.format(min_stress, max_stress))
 
         inline_params = {}
         for wf_test in wf_complete_list:
