@@ -408,6 +408,7 @@ class WorkflowPhonon(Workflow):
                 'EDIFFG': -1e-08,
                 'ADDGRID': '.TRUE.',
                 'LREAL': '.FALSE.',
+                'LEPSILON': '.TRUE.',
                 'PSTRESS': pressure}) # unit: kb -> kB
             incar = vasp_input_optimize
 

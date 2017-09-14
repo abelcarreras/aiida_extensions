@@ -262,6 +262,7 @@ def gruneisen_predict(wf_origin, wf_plus, wf_minus):
 def calculate_qha_inline(**kwargs):
 
     from phonopy import PhonopyQHA
+    from phonon_common import get_helmholtz_volume_from_phonopy_qha
     import numpy as np
 
 #    thermal_properties_list = [key for key, value in kwargs.items() if 'thermal_properties' in key.lower()]
@@ -307,6 +308,8 @@ def calculate_qha_inline(**kwargs):
                              verbose=False)
 
     # Get data
+    free_energy_volume_fitting = get_helmholtz_volume_from_phonopy_qha(phonopy_qha)
+
     qha_temperatures = phonopy_qha._qha._temperatures[:phonopy_qha._qha._max_t_index]
     helmholtz_volume = phonopy_qha.get_helmholtz_volume()
     thermal_expansion = phonopy_qha.get_thermal_expansion()
@@ -319,12 +322,16 @@ def calculate_qha_inline(**kwargs):
     qha_output = ArrayData()
 
     qha_output.set_array('temperatures', np.array(qha_temperatures))
-    qha_output.set_array('helmholtz_volume', np.array(helmholtz_volume))
+    #qha_output.set_array('helmholtz_volume', np.array(helmholtz_volume))
     qha_output.set_array('thermal_expansion', np.array(thermal_expansion))
     qha_output.set_array('volume_temperature', np.array(volume_temperature))
     qha_output.set_array('heat_capacity_P_numerical', np.array(heat_capacity_P_numerical))
     qha_output.set_array('volume_expansion', np.array(volume_expansion))
     qha_output.set_array('gibbs_temperature', np.array(gibbs_temperature))
+
+    qha_output.set_array('helmholtz_volume_points', np.array(free_energy_volume_fitting['fit']))
+    qha_output.set_array('helmholtz_volume_fit', np.array(free_energy_volume_fitting['points']))
+    qha_output.set_array('helmholtz_volume_minimum', np.array([free_energy_volume_fitting['minimum']]))
 
     return {'qha_output': qha_output}
 
@@ -804,7 +811,7 @@ class WorkflowQHA(Workflow):
                     final_structure = wf_test.get_result('final_structure')
 
                     inline_params.update({'thermal_properties_{}'.format(i): thermal_properties})
-                    inline_params.update({'optimized_data_{}'.format(i): optimized_data})
+                    inline_params.update({'optimized_structure_data_{}'.format(i): optimized_data})
                     inline_params.update({'final_structure_{}'.format(i): final_structure})
 
         qha_result = calculate_qha_inline(**inline_params)[1]
@@ -958,15 +965,20 @@ class WorkflowQHA(Workflow):
         volume_expansion = qha_output.get_array('volume_expansion')
         gibbs_temperature = qha_output.get_array('gibbs_temperature')
 
-#        data_folder.create_file_from_filelike(get_file_from_numpy_array(
-#            np.column_stack((free_energy_volume_fitting['fit'][0], free_energy_volume_fitting['fit'][1].T))),
-#                                              'free_energy_fit')
-#        data_folder.create_file_from_filelike(get_file_from_numpy_array(
-#            np.column_stack((free_energy_volume_fitting['points'][0], free_energy_volume_fitting['points'][1].T))),
-#                                              'free_energy_points')
-#        data_folder.create_file_from_filelike(get_file_from_numpy_array(
-#            zip(free_energy_volume_fitting['minimum'][0], free_energy_volume_fitting['minimum'][1])),
-#                                              'free_energy_min')
+        volumes = qha_output.get_array('helmholtz_volume_points')[0]
+        helmholtz_volume = qha_output.get_array('helmholtz_volume_points')[1]
+        volumes_fit = qha_output.get_array('helmholtz_volume_fit')[0]
+        helmholtz_volume_fit = qha_output.get_array('helmholtz_volume_fit')[1]
+        volumes_min = qha_output.get_array('helmholtz_volume_minimum')[0]
+        helmholtz_volume_min = qha_output.get_array('helmholtz_volume_minimum')[1]
+
+
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(np.column_stack((volumes_fit, helmholtz_volume_fit.T))),
+                                              'free_energy_fit')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(np.column_stack((volumes, helmholtz_volume.T))),
+                                              'free_energy_points')
+        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(volumes_min, helmholtz_volume_min)),
+                                              'free_energy_min')
 
         data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, gibbs_temperature)),
                                               'gibbs_temperature')
@@ -1132,8 +1144,8 @@ class WorkflowQHA(Workflow):
                   if np.linalg.norm( band_structure.get_array('q_points')[i,j]) > q_tolerance:
                        band_array.append( [q] + freq[j].tolist())
         #         else:
-        #               band_array.append( [np.nan] + freq[j].tolist())
-              band_array.append( [np.nan] + freq[0].tolist())
+        #               band_array.append([np.nan] + freq[j].tolist())
+              band_array.append([np.nan] + freq[0].tolist())
         band_array = np.array(band_array)
 
         data_folder.create_file_from_filelike(get_file_from_numpy_array(band_array), 'gruneisen_band_structure')
