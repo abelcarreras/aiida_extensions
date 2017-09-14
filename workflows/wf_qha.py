@@ -28,7 +28,7 @@ def gcd(L):
 def get_file_from_numpy_array(data, text_list=None):
     output = StringIO.StringIO()
     if text_list is None:
-        output.write('No caption\n')
+        output.write('# No caption\n')
     else:
         output.write('       '.join(text_list) + '\n')
 
@@ -331,7 +331,7 @@ def calculate_qha_inline(**kwargs):
 
     qha_output.set_array('helmholtz_volume_points', np.array(free_energy_volume_fitting['fit']))
     qha_output.set_array('helmholtz_volume_fit', np.array(free_energy_volume_fitting['points']))
-    qha_output.set_array('helmholtz_volume_minimum', np.array([free_energy_volume_fitting['minimum']]))
+    qha_output.set_array('helmholtz_volume_minimum', np.array(free_energy_volume_fitting['minimum']))
 
     return {'qha_output': qha_output}
 
