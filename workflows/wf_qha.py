@@ -419,11 +419,10 @@ class WorkflowQHA(Workflow):
         wf_parameters = self.get_parameters()
 
         test_pressures = wf_parameters['scan_pressures']  # in kbar
-        if not 0.0 in test_pressures:
-            test_pressures.append(0.0)
+        if not 0 in test_pressures:
+            test_pressures.append(0)
 
         if np.min(np.diff(test_pressures)) < 1e-5:
-
             self.next(self.exit)
             return
 
