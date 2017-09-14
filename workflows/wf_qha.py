@@ -573,7 +573,7 @@ class WorkflowQHA(Workflow):
             if not ok_inf:
                 test_range[0] += interval
 
-            if np.isclose(test_range[0], test_range[1], atol=interval/4, rtol=0):
+            if np.isclose(test_range[0], test_range[1], atol=interval/4, rtol=0) or interval < 0.001:
                 self.next(self.exit)
                 self.append_to_report('Stable range not found')
                 return
@@ -652,7 +652,6 @@ class WorkflowQHA(Workflow):
                 self.append_to_report('Decrease min {} + {}'.format(test_range[0],
                               np.ceil(np.min([total_range/2, abs(test_range[0] - min_stress)]) / interval) * interval))
                 test_range[0] += np.ceil(np.min([total_range/2, abs(test_range[0] - min_stress)]) / interval) * interval
-
 
         total_range = abs(test_range[1] - test_range[0])
         #total_range = abs(max - min)
