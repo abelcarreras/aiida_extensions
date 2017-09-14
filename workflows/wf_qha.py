@@ -422,11 +422,10 @@ class WorkflowQHA(Workflow):
         if not 0 in test_pressures:
             test_pressures.append(0)
 
-        if np.min(np.diff(test_pressures)) < 1e-5:
-            self.next(self.exit)
-            return
-
-        self.add_attribute('interval', np.min(np.diff(test_pressures)))
+        if np.min(np.diff(test_pressures)) > 1e-5:
+            self.add_attribute('interval', np.min(np.diff(test_pressures)))
+        else:
+            self.add_attribute('interval', np.abs(test_pressures[1]-test_pressures[0]))
 
         # wfs_test = [821, 820]
         for i, pressure in enumerate(test_pressures):
