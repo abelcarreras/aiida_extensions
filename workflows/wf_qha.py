@@ -16,26 +16,13 @@ from phonon_common import arrange_band_labels, get_data_info
 from aiida.orm.data.structure import StructureData
 from aiida.orm.data.array import ArrayData
 
+from phonon_common import get_file_from_numpy_array
 
 # Normalize to from unitformula to unitcell
 def gcd(L):
     import fractions
     L = np.unique(L, return_counts=True)[1]
     return reduce(fractions.gcd, L)
-
-
-# convert numpy string into web page ready text file
-def get_file_from_numpy_array(data, text_list=None):
-    output = StringIO.StringIO()
-    if text_list is None:
-        output.write('# No caption\n')
-    else:
-        output.write('       '.join(text_list) + '\n')
-
-    for line in np.array(data).astype(str):
-        output.write('       '.join(line) + '\n')
-    output.seek(0)
-    return output
 
 
 def check_dos_stable(wf, tol=1e-6):
@@ -329,8 +316,8 @@ def calculate_qha_inline(**kwargs):
     qha_output.set_array('volume_expansion', np.array(volume_expansion))
     qha_output.set_array('gibbs_temperature', np.array(gibbs_temperature))
 
-    qha_output.set_array('helmholtz_volume_points', np.array(free_energy_volume_fitting['fit']))
-    qha_output.set_array('helmholtz_volume_fit', np.array(free_energy_volume_fitting['points']))
+    qha_output.set_array('helmholtz_volume_points', np.array(free_energy_volume_fitting['points']))
+    qha_output.set_array('helmholtz_volume_fit', np.array(free_energy_volume_fitting['fit']))
     qha_output.set_array('helmholtz_volume_minimum', np.array(free_energy_volume_fitting['minimum']))
 
     return {'qha_output': qha_output}
@@ -831,7 +818,8 @@ class WorkflowQHA(Workflow):
 
         self.add_result('qha_output', qha_result['qha_output'])
 
-        self.next(self.qha_calculation_write_files)
+        self.next(self.store_final_info)
+        # self.next(self.qha_calculation_write_files)
 
 
     @Workflow.step
@@ -1019,20 +1007,28 @@ class WorkflowQHA(Workflow):
 
         self.next(self.exit)
 
-
     @Workflow.step
-    def qha_calculation_write_files_2(self):
+    def store_final_info(self):
 
-        from phonon_common import get_helmholtz_volume_from_phonopy_qha
+        from phonon_common import structure_to_poscar, get_FORCE_CONSTANTS_txt, get_file_from_txt
 
         interval = self.get_attribute('interval')
 
-        max = self.get_attribute('max')
-        min = self.get_attribute('min')
+        if self.get_attribute('manual'):
+            test_pressures = self.get_parameter('scan_pressures')  # in kbar
 
-        n_points = int((max - min) / interval) + 1
-        test_pressures = [min + interval * i for i in range(n_points)]
+        else:
 
+            max = self.get_attribute('max')
+            min = self.get_attribute('min')
+
+            n_points = int((max - min) / interval) + 1
+            test_pressures = [min + interval * i for i in range(n_points)]
+
+            min_stress, max_stress = qha_prediction(self, interval, min, max)
+            self.append_to_report('Final QHA prediction {} {}'.format(min_stress, max_stress))
+
+        # Workflow list
         wf_complete_list = []
         for step_name in ['pressure_expansions', 'collect_data', 'complete', 'pressure_manual_expansions',
                           'pressure_gruneisen']:
@@ -1041,219 +1037,71 @@ class WorkflowQHA(Workflow):
 
         # Add phonon workflow at 0 pressure from gruneisen workflow if exists
         try:
-            wf_complete_list += list(self.get_step('start').get_sub_workflows()[0].get_step('start').get_sub_workflows())
+            wf_complete_list += list(
+                self.get_step('start').get_sub_workflows()[0].get_step('start').get_sub_workflows())
         except:
             pass
 
-        min_stress, max_stress = qha_prediction(self, interval, min, max)
-        self.append_to_report('Final QHA prediction {} {}'.format(min_stress, max_stress))
-
-
-        data_folder = self.current_folder.get_subfolder('DATA_FILES')
-        data_folder.create()
-
-        ############################
-        # Get harmonic results
-        ############################
-
-        wf_zero = self.get_step('start').get_sub_workflows()[0].get_step('start').get_sub_workflows()[0]
-        final_structure = wf_zero.get_result('final_structure')
-        norm_unitformula_to_unitcell = gcd([site.kind_name for site in final_structure.sites])
-
-
-        # Get data and write the files
-        thermal_properties = wf_zero.get_result('thermal_properties')
-        dos = wf_zero.get_result('dos')
-        band_structure = wf_zero.get_result('band_structure')
-
-        entropy = thermal_properties.get_array('entropy')
-        free_energy = thermal_properties.get_array('free_energy')
-        temperatures = thermal_properties.get_array('temperature')
-        cv = thermal_properties.get_array('cv')
-
-        # Normalize from unitcell to unitformula
-        free_energy /= norm_unitformula_to_unitcell
-        entropy /= norm_unitformula_to_unitcell
-        cv /= norm_unitformula_to_unitcell
-
-        # Density of states
-        freq_dos = dos.get_array('frequency')
-        total_dos = dos.get_array('total_dos')
-        partial_symbols = dos.get_array('partial_symbols')
-        partial_dos = dos.get_array('partial_dos')
-
-        # Check atom equivalences in partial DOS
-        delete_list = []
-        for i, dos_i in enumerate(partial_dos):
-            for j, dos_j in enumerate(partial_dos):
-                if i < j:
-                    if np.allclose(dos_i, dos_j, rtol=1, atol=1e-8) and partial_symbols[i] == partial_symbols[j]:
-                        dos_i += dos_j
-                        delete_list.append(j)
-
-        partial_dos = np.delete(partial_dos, delete_list, 0).T
-        partial_symbols = np.delete(partial_symbols, delete_list)
-
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(freq_dos, total_dos)),
-                                              'total_dos')
-
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(np.column_stack((freq_dos, partial_dos)),
-                                                                        text_list=['T'] + partial_symbols.tolist()),
-                                              'partial_dos')
-
-        # Thermal properties
-        data_folder.create_file_from_filelike(
-            get_file_from_numpy_array(np.column_stack((temperatures, entropy, free_energy, cv))), 'thermal_properties')
-
-        # Phonon band structure
-
-        band_array = []
-        for i, freq in enumerate(band_structure.get_array('frequencies')):
-            for j, q in enumerate(band_structure.get_array('q_path')[i]):
-                band_array.append([q] + freq[j].tolist())
-
-        band_array = np.array(band_array)
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(band_array), 'phonon_band_structure')
-
-        x_labels, labels_e = arrange_band_labels(band_structure)
-
-        output = StringIO.StringIO()
-
-        for i, j in zip(x_labels, labels_e):
-            output.write(u'{0:12.8f}       {1}\n'.format(i, j).encode('utf-8'))
-        output.seek(0)
-
-        data_folder.create_file_from_filelike(output, 'band_structure_labels')
-
-        self.append_to_report('Harmonic data written in files')
-
-        ############################
-        # Get structure
-        ############################
-
-        import pymatgen.io.cif as cif
-        pmg_structure = final_structure.get_pymatgen_structure()
-        cif.CifWriter(pmg_structure, symprec=0.1).write_file(data_folder.abspath + '/structure.cif')
-
-        # Save info data
-        info_data = StringIO.StringIO()
-        info_data.write(get_data_info(final_structure))
-
-        info_data.seek(0)
-
-        data_folder.create_file_from_filelike(info_data, 'info_data.html')
-
-
-        ############################
-        # Get gruneisen results
-        ############################
-
-        wf_grune = self.get_step('start').get_sub_workflows()[0]
-        mesh = wf_grune.get_result('mesh')
-
-        freq_grune = mesh.get_array('frequencies')
-        param_grune = mesh.get_array('gruneisen')
-
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(
-            np.column_stack((freq_grune.reshape(-1), param_grune.reshape(-1)))), 'gruneisen_mesh')
-
-
-        band_structure = wf_grune.get_result('band_structure')
-
-        q_tolerance = 1e-5
-        band_array = []
-        for i , freq in enumerate(band_structure.get_array('gruneisen')):
-              for j, q in enumerate(band_structure.get_array('q_path')[i]):
-                  print 'q', q
-                  if np.linalg.norm( band_structure.get_array('q_points')[i,j]) > q_tolerance:
-                       band_array.append( [q] + freq[j].tolist())
-        #         else:
-        #               band_array.append([np.nan] + freq[j].tolist())
-              band_array.append([np.nan] + freq[0].tolist())
-        band_array = np.array(band_array)
-
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(band_array), 'gruneisen_band_structure')
-
-
-        ####################
-        # Get QHA results
-        ####################
-
-        volumes = []
-        electronic_energies = []
-        temperatures = []
-        fe_phonon = []
-        entropy = []
-        cv = []
-
+        final_list = []
         for wf_test in wf_complete_list:
-            for pressure in test_pressures:
-                if wf_test.get_state() == 'FINISHED':
-                    if np.isclose(wf_test.get_attribute('pressure'), pressure, atol=interval / 4, rtol=0):
-                        thermal_properties = wf_test.get_result('thermal_properties')
-                        optimized_data = wf_test.get_result('optimized_structure_data')
-                        final_structure = wf_test.get_result('final_structure')
+            for i, pressure in enumerate(test_pressures):
+                if np.isclose(wf_test.get_attribute('pressure'), pressure, atol=interval / 4, rtol=0):
+                    final_list.append(wf_test)
 
-                        electronic_energies.append(optimized_data.dict.energy)
-                        volumes.append(final_structure.get_cell_volume())
-                        temperatures = thermal_properties.get_array('temperature')
-                        fe_phonon.append(thermal_properties.get_array('free_energy'))
-                        entropy.append(thermal_properties.get_array('entropy'))
-                        cv.append(thermal_properties.get_array('cv'))
+        data_folder = self.current_folder.get_subfolder('DETAILS')
+        data_folder.create()
+        for i, wf_test in enumerate(final_list):
 
-        sort_index = np.argsort(volumes)
+            data_phonon_folder = data_folder.get_subfolder('{}'.format(i))
+            data_phonon_folder.create()
 
-        volumes = np.array(volumes)[sort_index]
-        electronic_energies = np.array(electronic_energies)[sort_index]
-        temperatures = np.array(temperatures)
-        fe_phonon = np.array(fe_phonon).T[:, sort_index]
-        entropy = np.array(entropy).T[:, sort_index]
-        cv = np.array(cv).T[:, sort_index]
+            # Get optimized info data
+            pressure = wf_test.get_attribute('pressure')
+            energy = wf_test.get_result('optimized_structure_data').dict.energy
+            info_data = 'pressure: {}\n energy: {}\n'.format(pressure, energy)
+
+            # Get data and write the files
+            thermal_properties = wf_test.get_result('thermal_properties')
+            dos = wf_test.get_result('dos')
+            # band_structure = wf_test.get_result('band_structure')
+            force_constants_obj = wf_test.get_result('force_constants')
+            final_structure = wf_test.get_result('final_structure')
 
 
-        # Calculate QHA properties
-        phonopy_qha = PhonopyQHA(np.array(volumes),
-                                 np.array(electronic_energies),
-                                 eos="vinet",
-                                 temperatures=np.array(temperatures),
-                                 free_energy=np.array(fe_phonon),
-                                 cv=np.array(cv),
-                                 entropy=np.array(entropy),
-                                 # t_max=options.t_max,
-                                 verbose=False)
+            entropy = thermal_properties.get_array('entropy')
+            free_energy = thermal_properties.get_array('free_energy')
+            temperatures = thermal_properties.get_array('temperature')
+            cv = thermal_properties.get_array('cv')
 
-        # Get data
+            # Density of states
+            freq_dos = dos.get_array('frequency')
+            total_dos = dos.get_array('total_dos')
+            # partial_symbols = dos.get_array('partial_symbols')
+            # partial_dos = dos.get_array('partial_dos')
 
-        free_energy_volume_fitting = get_helmholtz_volume_from_phonopy_qha(phonopy_qha)
-        qha_temperatures = phonopy_qha._qha._temperatures[:phonopy_qha._qha._max_t_index]
-        # helmholtz_volume = phonopy_qha.get_helmholtz_volume()
-        thermal_expansion = phonopy_qha.get_thermal_expansion()
-        volume_temperature = phonopy_qha.get_volume_temperature()
-        heat_capacity_P_numerical = phonopy_qha.get_heat_capacity_P_numerical()/norm_unitformula_to_unitcell
-        volume_expansion = phonopy_qha.get_volume_expansion()
-        gibbs_temperature = phonopy_qha.get_gibbs_temperature()
+            # Force constants
+            force_constants = force_constants_obj.get_array('force_constanst')
 
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(
-            np.column_stack((free_energy_volume_fitting['fit'][0], free_energy_volume_fitting['fit'][1].T))),
-                                              'free_energy_fit')
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(
-            np.column_stack((free_energy_volume_fitting['points'][0], free_energy_volume_fitting['points'][1].T))),
-                                              'free_energy_points')
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(
-            zip(free_energy_volume_fitting['minimum'][0], free_energy_volume_fitting['minimum'][1])),
-                                              'free_energy_min')
+            # write files
 
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, gibbs_temperature)),
-                                              'gibbs_temperature')
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, volume_expansion)),
-                                              'volume_expansion')
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, volume_temperature)),
-                                              'volume_temperature')
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, thermal_expansion)),
-                                              'thermal_expansion')
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(zip(qha_temperatures, heat_capacity_P_numerical)),
-                                              'heat_capacity_P_numerical')
+            data_phonon_folder.create_file_from_filelike(get_file_from_txt(info_data),
+                                                         'info_data')
 
-        self.append_to_report('QHA properties calculated and written in files')
+            data_phonon_folder.create_file_from_filelike(get_file_from_txt(get_FORCE_CONSTANTS_txt(force_constants)),
+                                                         'FORCE_CONSTANTS')
 
+            data_phonon_folder.create_file_from_filelike(get_file_from_txt(structure_to_poscar(final_structure)),
+                                                         'POSCAR')
+
+            data_phonon_folder.create_file_from_filelike(get_file_from_numpy_array(zip(freq_dos, total_dos)),
+                                                         'total_dos')
+
+            data_phonon_folder.create_file_from_filelike(get_file_from_numpy_array(zip(temperatures, entropy)),
+                                                         'gibbs_temperature')
+            data_phonon_folder.create_file_from_filelike(get_file_from_numpy_array(zip(temperatures, free_energy)),
+                                                         'volume_temperature')
+            data_phonon_folder.create_file_from_filelike(get_file_from_numpy_array(zip(temperatures, cv)),
+                                                         'volume_temperature')
+
+        self.append_to_report('stored data in: {}'.format(data_folder.abspath))
         self.next(self.exit)

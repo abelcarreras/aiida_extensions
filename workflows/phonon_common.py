@@ -125,6 +125,15 @@ def write_unicode_file(labels_positions, labels):
 
     return output
 
+def get_file_from_txt(text):
+
+    import StringIO
+    output = StringIO.StringIO()
+    output.write(text)
+    output.seek(0)
+
+    return output
+
 
 def smearing_function_mesh(X, Y, frequencies, gruneisen, sigma=0.1):
 
@@ -141,6 +150,21 @@ def smearing_function_mesh(X, Y, frequencies, gruneisen, sigma=0.1):
         total += gaussian(X,Y, sigma, freq, grune)
 
     return total/len(frequencies)
+
+
+# convert numpy string into web page ready text file
+def get_file_from_numpy_array(data, text_list=None):
+    import StringIO
+    output = StringIO.StringIO()
+    if text_list is None:
+        output.write('# No caption\n')
+    else:
+        output.write('       '.join(text_list) + '\n')
+
+    for line in np.array(data).astype(str):
+        output.write('       '.join(line) + '\n')
+    output.seek(0)
+    return output
 
 
 def get_data_info(structure):
@@ -198,6 +222,37 @@ def get_helmholtz_volume_from_phonopy_qha(phonopy_qha, thin_number=10):
     return {'fit': (volume_points, np.array(energies_points)),
             'points':  (volumes, np.array(selected_energies)),
             'minimum': (min_volumes, min_energies)}
+
+
+# Write to files
+def get_FORCE_CONSTANTS_txt(force_constants_object):
+
+    force_constants = force_constants_object.get_array('force_constants')
+
+    # Write FORCE CONSTANTS
+    force_constants_txt = '{0}\n'.format(len(force_constants))
+    for i, fc in enumerate(force_constants):
+        for j, atomic_fc in enumerate(fc):
+            force_constants_txt += '{0} {1}\n'.format(i, j)
+            for line in atomic_fc:
+                force_constants_txt += '{0:20.16f} {1:20.16f} {2:20.16f}\n'.format(*line)
+
+    return force_constants_txt
+
+
+def structure_to_poscar(structure):
+    poscar = ' '.join(np.unique([site.kind_name for site in structure.sites]))
+    poscar += '\n1.0\n'
+    cell = structure.cell
+    for row in cell:
+        poscar += '{0: 22.16f} {1: 22.16f} {2: 22.16f}\n'.format(*row)
+    poscar += ' '.join(np.unique([site.kind_name for site in structure.sites])) + '\n'
+    poscar += str(len(structure.sites)) + '\n'
+    poscar += 'Cartesian\n'
+    for site in structure.sites:
+        poscar += '{0: 22.16f} {1: 22.16f} {2: 22.16f}\n'.format(*site.position)
+
+    return poscar
 
 
 if __name__ == '__main__':
