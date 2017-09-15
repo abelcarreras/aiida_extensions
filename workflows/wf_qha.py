@@ -1080,7 +1080,7 @@ class WorkflowQHA(Workflow):
             # partial_dos = dos.get_array('partial_dos')
 
             # Force constants
-            force_constants = force_constants_obj.get_array('force_constanst')
+            force_constants = force_constants_obj.get_array('force_constants')
 
             # write files
 
