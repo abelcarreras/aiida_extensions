@@ -1064,7 +1064,7 @@ class WorkflowQHA(Workflow):
             thermal_properties = wf_test.get_result('thermal_properties')
             dos = wf_test.get_result('dos')
             # band_structure = wf_test.get_result('band_structure')
-            force_constants_obj = wf_test.get_result('force_constants')
+            force_constants = wf_test.get_result('force_constants')
             final_structure = wf_test.get_result('final_structure')
 
 
@@ -1079,10 +1079,8 @@ class WorkflowQHA(Workflow):
             # partial_symbols = dos.get_array('partial_symbols')
             # partial_dos = dos.get_array('partial_dos')
 
-            # Force constants
-            force_constants = force_constants_obj.get_array('force_constants')
-
             # write files
+            self.append_to_report('data to be stored in: {}'.format(data_folder.abspath))
 
             data_phonon_folder.create_file_from_filelike(get_file_from_txt(info_data),
                                                          'info_data')
