@@ -844,7 +844,15 @@ class WorkflowQHA(Workflow):
         # Get harmonic results
         ############################
 
-        wf_zero = self.get_step('start').get_sub_workflows()[0].get_step('start').get_sub_workflows()[0]
+        try:
+            wf_zero = self.get_step('start').get_sub_workflows()[0].get_step('start').get_sub_workflows()[0]
+        except IndexError:
+            wf_complete_list = list(self.get_step('pressure_manual_expansions').get_sub_workflows())
+            for wf_test in wf_complete_list:
+                if np.isclose(wf_test.get_attribute('pressure'), 0, atol=1e-4, rtol=0):
+                    wf_zero = wf_test
+                    break
+
         final_structure = wf_zero.get_result('final_structure')
         norm_unitformula_to_unitcell = gcd([site.kind_name for site in final_structure.sites])
 
@@ -936,32 +944,35 @@ class WorkflowQHA(Workflow):
         # Get gruneisen results
         ############################
 
-        wf_grune = self.get_step('start').get_sub_workflows()[0]
-        mesh = wf_grune.get_result('mesh')
+        try:
+            wf_grune = self.get_step('start').get_sub_workflows()[0]
+            mesh = wf_grune.get_result('mesh')
 
-        freq_grune = mesh.get_array('frequencies')
-        param_grune = mesh.get_array('gruneisen')
+            freq_grune = mesh.get_array('frequencies')
+            param_grune = mesh.get_array('gruneisen')
 
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(
-            np.column_stack((freq_grune.reshape(-1), param_grune.reshape(-1)))), 'gruneisen_mesh')
+            data_folder.create_file_from_filelike(get_file_from_numpy_array(
+                np.column_stack((freq_grune.reshape(-1), param_grune.reshape(-1)))), 'gruneisen_mesh')
 
 
-        band_structure = wf_grune.get_result('band_structure')
+            band_structure = wf_grune.get_result('band_structure')
 
-        q_tolerance = 1e-5
-        band_array = []
-        for i , freq in enumerate(band_structure.get_array('gruneisen')):
-              for j, q in enumerate(band_structure.get_array('q_path')[i]):
-                  print 'q', q
-                  if np.linalg.norm( band_structure.get_array('q_points')[i,j]) > q_tolerance:
-                       band_array.append( [q] + freq[j].tolist())
-        #         else:
-        #               band_array.append( [np.nan] + freq[j].tolist())
-              band_array.append( [np.nan] + freq[0].tolist())
-        band_array = np.array(band_array)
+            q_tolerance = 1e-5
+            band_array = []
+            for i , freq in enumerate(band_structure.get_array('gruneisen')):
+                  for j, q in enumerate(band_structure.get_array('q_path')[i]):
+                      print 'q', q
+                      if np.linalg.norm( band_structure.get_array('q_points')[i,j]) > q_tolerance:
+                           band_array.append( [q] + freq[j].tolist())
+            #         else:
+            #               band_array.append( [np.nan] + freq[j].tolist())
+                  band_array.append( [np.nan] + freq[0].tolist())
+            band_array = np.array(band_array)
 
-        data_folder.create_file_from_filelike(get_file_from_numpy_array(band_array), 'gruneisen_band_structure')
+            data_folder.create_file_from_filelike(get_file_from_numpy_array(band_array), 'gruneisen_band_structure')
 
+        except IndexError:
+            self.append_to_report('Gruneisen calculation not available')
 
         ####################
         # Get QHA results
