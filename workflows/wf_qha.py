@@ -368,11 +368,9 @@ class WorkflowQHA(Workflow):
         self.append_to_report('Starting workflow_workflow')
         self.append_to_report('Phonon calculation of base structure')
 
-        self.add_attribute('manual', True)
+        self.add_attribute('manual', self._manual)
 
         if self._manual:
-            self.add_attribute('manual', True)
-
             self.next(self.pressure_manual_expansions)
             return
 
@@ -1052,13 +1050,13 @@ class WorkflowQHA(Workflow):
         data_folder.create()
         for i, wf_test in enumerate(final_list):
 
-            data_phonon_folder = data_folder.get_subfolder('{}'.format(i))
+            data_phonon_folder = data_folder.get_subfolder('phonon {}'.format(i))
             data_phonon_folder.create()
 
             # Get optimized info data
             pressure = wf_test.get_attribute('pressure')
             energy = wf_test.get_result('optimized_structure_data').dict.energy
-            info_data = 'pressure: {}\n energy: {}\n'.format(pressure, energy)
+            info_data = 'pressure: {}\nenergy: {}\n'.format(pressure, energy)
 
             # Get data and write the files
             thermal_properties = wf_test.get_result('thermal_properties')
