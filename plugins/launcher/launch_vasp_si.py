@@ -15,7 +15,7 @@ codename = 'vasp541mpi@stern'
 #  Define input parameters #
 ############################
 
-a = 5.404
+a = 5.40400123456789
 cell = [[a, 0, 0],
         [0, a, 0],
         [0, 0, a]]
