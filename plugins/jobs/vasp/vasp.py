@@ -82,7 +82,7 @@ def assemble_poscar(
 
         try:
             structure = structure.get_pymatgen_structure()
-            print structure
+            print structure.lattice.matrix
         except Exception as e:
             msg = errmsg('aiida2vasp').format('structure', e)
             raise ValueError(msg)
