@@ -25,10 +25,15 @@ __contact__ = u'zicm_at_tcd.ie'
 def write_poscar(poscar, file='POSCAR'):
     poscar_dict = poscar.as_dict()
 
+
     types = [site['species'][0]['element'] for site in poscar_dict['structure']['sites']]
     atom_type_unique = np.unique(types, return_index=True)
+
+    # To use unique without sorting
     sort_index = np.argsort(atom_type_unique[1])
+    elements = np.array(atom_type_unique[0])[sort_index]
     elements_count= np.diff(np.append(np.array(atom_type_unique[1])[sort_index], [len(types)]))
+    print elements
 
     print poscar_dict
     poscar_txt = poscar_dict['comment']
