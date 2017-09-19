@@ -136,6 +136,7 @@ def disassemble_poscar(poscar):
 
     try:
         poscar_struct = StructureData(pymatgen_structure=poscar.structure)
+        print 'poscar_struct', poscar_struct
         structure_extras = ArrayData()
 
         opt = False
