@@ -31,7 +31,7 @@ def write_poscar(poscar, file='POSCAR'):
     for row in cell:
         poscar_txt += '{0: 22.16f} {1: 22.16f} {2: 22.16f}\n'.format(*row)
 
-    poscar_txt += ' '.join(np.unique([site['species']['element'] for site in poscar_dict['sites']])) + '\n'
+    poscar_txt += ' '.join(np.unique([site['species'][0]['element'] for site in poscar_dict['structure']['sites']])) + '\n'
     print poscar_txt
     exit()
 
