@@ -114,6 +114,8 @@ def assemble_poscar(
             velocities = None
             selective_dynamics = None
 
+        print structure.lattice.matrix
+
         # creating new POSCAR object
         poscar = vaspio.Poscar(
             structure,
