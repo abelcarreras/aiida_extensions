@@ -607,7 +607,7 @@ class VaspCalculation(JobCalculation):
         try:
             write_poscar(poscar, file=tempfolder.get_abs_path('POSCAR'))
             incar.write_file(tempfolder.get_abs_path('INCAR'))
-            poscar.write_file(tempfolder.get_abs_path('POSCAR'))
+            # poscar.write_file(tempfolder.get_abs_path('POSCAR'))
             potcar.write_file(tempfolder.get_abs_path('POTCAR'))
             kpoints.write_file(tempfolder.get_abs_path('KPOINTS'))
             if chgcar:
