@@ -73,21 +73,25 @@ def get_trajectory_txt(trajectory):
 
 def structure_to_poscar(structure):
 
-    atom_type_unique = np.unique([site.kind_name for site in structure.sites], return_index=True)[1]
-    labels = np.diff(np.append(atom_type_unique, [len(structure.sites)]))
+    types = [site.kind_name for site in structure.sites]
+    atom_type_unique = np.unique(types, return_index=True)
+    sort_index = np.argsort(atom_type_unique[1])
+    elements = np.array(atom_type_unique[0])[sort_index]
+    elements_count= np.diff(np.append(np.array(atom_type_unique[1])[sort_index], [len(types)]))
 
-    poscar = ' '.join(np.unique([site.kind_name for site in structure.sites]))
+    poscar = '# VASP POSCAR generated using aiida workflow '
     poscar += '\n1.0\n'
     cell = structure.cell
     for row in cell:
         poscar += '{0: 22.16f} {1: 22.16f} {2: 22.16f}\n'.format(*row)
-    poscar += ' '.join(np.unique([site.kind_name for site in structure.sites]))+'\n'
-    poscar += ' '.join(np.array(labels, dtype=str))+'\n'
+    poscar += ' '.join([str(e) for e in elements]) + '\n'
+    poscar += ' '.join([str(e) for e in elements_count]) + '\n'
     poscar += 'Cartesian\n'
     for site in structure.sites:
         poscar += '{0: 22.16f} {1: 22.16f} {2: 22.16f}\n'.format(*site.position)
 
     return poscar
+
 
 
 def parameters_to_input_file(parameters_object):
