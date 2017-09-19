@@ -27,10 +27,7 @@ def write_poscar(poscar, file='POSCAR'):
 
     types = [site['species'][0]['element'] for site in poscar_dict['structure']['sites']]
     atom_type_unique = np.unique(types, return_index=True)
-
-    # To use unique without sorting
     sort_index = np.argsort(atom_type_unique[1])
-    elements = np.array(atom_type_unique[0])[sort_index]
     elements_count= np.diff(np.append(np.array(atom_type_unique[1])[sort_index], [len(types)]))
 
     print poscar_dict
@@ -40,8 +37,10 @@ def write_poscar(poscar, file='POSCAR'):
     for row in cell:
         poscar_txt += '{0: 22.16f} {1: 22.16f} {2: 22.16f}\n'.format(*row)
 
+    poscar_txt += ' '.join(np.unique([site['species'][0]['element'] for site in poscar_dict['structure']['sites']])) + '\n'
+    print  [site['species'][0]['element'] for site in poscar_dict['structure']['sites']]
     poscar_txt += ' '.join([str(e) for e in elements_count]) + '\n'
-    #print [site['species'][0]['element'] for site in poscar_dict['structure']['sites']]
+
     poscar_txt += str(len(poscar_dict['structure']['sites'])) + '\n'
     poscar_txt += 'Cartesian\n'
     for site in poscar_dict['structure']['sites']:
