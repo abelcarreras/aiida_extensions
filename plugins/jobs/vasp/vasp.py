@@ -22,6 +22,22 @@ __contributors__ = "Mario Zic"
 __contact__ = u'zicm_at_tcd.ie'
 
 
+def write_poscar(poscar, file='POSCAR'):
+    poscar_dict = poscar.as_dict()
+
+    poscar_txt = poscar_dict['comment']
+    poscar_txt += '\n1.0\n'
+    cell = poscar_dict['matrix']
+    for row in cell:
+        poscar_txt += '{0: 22.16f} {1: 22.16f} {2: 22.16f}\n'.format(*row)
+    poscar_txt += ' '.join(np.unique([site['species']['element'] for site in poscar_dict['sites']])) + '\n'
+    poscar_txt += str(len(poscar_dict['sites'])) + '\n'
+    poscar_txt += 'Cartesian\n'
+    for site in poscar_dict['sites']:
+        poscar_txt += '{0: 22.16f} {1: 22.16f} {2: 22.16f}\n'.format(*site['xyz'])
+
+    print poscar_txt
+
 def errmsg(key):
     """
     Returns an error message string which can then be easily formated.
@@ -114,8 +130,6 @@ def assemble_poscar(
             velocities = None
             selective_dynamics = None
 
-        print structure.lattice.matrix
-
         # creating new POSCAR object
         poscar = vaspio.Poscar(
             structure,
@@ -123,7 +137,6 @@ def assemble_poscar(
             velocities=velocities,
             predictor_corrector=predictor_corrector)
         # set comment line
-        print 'poscar_vaspio', poscar.as_dict()
 
         tmp = poscar.comment
         poscar.comment = (
@@ -581,6 +594,7 @@ class VaspCalculation(JobCalculation):
 
         # === set up calculation dir ===
         try:
+            write_poscar(poscar, file=tempfolder.get_abs_path('POSCAR'))
             incar.write_file(tempfolder.get_abs_path('INCAR'))
             poscar.write_file(tempfolder.get_abs_path('POSCAR'))
             potcar.write_file(tempfolder.get_abs_path('POTCAR'))
