@@ -45,7 +45,8 @@ def write_poscar(poscar, file='POSCAR'):
     for site in poscar_dict['structure']['sites']:
         poscar_txt += '{0: 22.16f} {1: 22.16f} {2: 22.16f}\n'.format(*site['xyz'])
 
-    print poscar_txt
+    with open(file, 'r') as f:
+        f.write(poscar_txt)
 
 def errmsg(key):
     """
