@@ -27,7 +27,7 @@ def write_poscar(poscar, file='POSCAR'):
 
     poscar_txt = poscar_dict['comment']
     poscar_txt += '\n1.0\n'
-    cell = poscar_dict['lattice']['matrix']
+    cell = poscar_dict['structure']['lattice']['matrix']
     for row in cell:
         poscar_txt += '{0: 22.16f} {1: 22.16f} {2: 22.16f}\n'.format(*row)
     poscar_txt += ' '.join(np.unique([site['species']['element'] for site in poscar_dict['sites']])) + '\n'
