@@ -64,7 +64,7 @@ machine_dict = {
     'parallel_env':'mpi*',
     'tot_num_mpiprocs' : 16}
 
-test_only = False
+test_only = True
 
 
 ###################
