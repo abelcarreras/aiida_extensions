@@ -123,7 +123,7 @@ def assemble_poscar(
             velocities=velocities,
             predictor_corrector=predictor_corrector)
         # set comment line
-        print 'poscar_vaspio', poscar
+        print 'poscar_vaspio', poscar.get_string(significant_figures=10)
 
         tmp = poscar.comment
         poscar.comment = (
