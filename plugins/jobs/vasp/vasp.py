@@ -24,7 +24,7 @@ __contact__ = u'zicm_at_tcd.ie'
 
 def write_poscar(poscar, file='POSCAR'):
     poscar_dict = poscar.as_dict()
-
+    print poscar_dict
     poscar_txt = poscar_dict['comment']
     poscar_txt += '\n1.0\n'
     cell = poscar_dict['structure']['lattice']['matrix']
