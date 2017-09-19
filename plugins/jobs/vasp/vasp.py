@@ -42,7 +42,6 @@ def write_poscar(poscar, file='POSCAR'):
         poscar_txt += '{0: 22.16f} {1: 22.16f} {2: 22.16f}\n'.format(*row)
 
     poscar_txt += ' '.join(np.unique([site['species'][0]['element'] for site in poscar_dict['structure']['sites']])) + '\n'
-    print  [site['species'][0]['element'] for site in poscar_dict['structure']['sites']]
     poscar_txt += ' '.join([str(e) for e in elements]) + '\n'
     poscar_txt += ' '.join([str(e) for e in elements_count]) + '\n'
 
