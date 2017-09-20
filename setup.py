@@ -40,6 +40,5 @@ setup(
              'launcher/launch_quasiparticle_lammps_gan.py',
              'launcher/launch_quasiparticle_scan.py',
              'launcher/launch_quasiparticle_thermo_lammps.py']
-
 )
 
