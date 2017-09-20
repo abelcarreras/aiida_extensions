@@ -14,8 +14,8 @@ setup(
             'lammps.combinate = plugins.jobs.lammps.combinate:CombinateCalculation',
             'lammps.force = plugins.jobs.lammps.force:ForceCalculation',
             'lammps.optimize = plugins.jobs.lammps.optimize:OptimizeCalculation'
-            'phonopy = plugins.jobs.phonopy: PhonopyCalculation'],
-            'dynaphopy = plugins.jobs.dynaphopy: DynaphopyCalculation'
+            'phonopy = plugins.jobs.phonopy: PhonopyCalculation',
+            'dynaphopy = plugins.jobs.dynaphopy: DynaphopyCalculation'],
         'aiida.parsers': [
             'lammps.force = plugins.parsers.lammps.force:ForceParser',
             'lammps.optimize = plugins.parsers.lammps.optimize:OptimizeParser',
