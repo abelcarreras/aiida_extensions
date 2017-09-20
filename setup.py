@@ -16,11 +16,13 @@ setup(
             'lammps.combinate = plugins.jobs.lammps.combinate:CombinateCalculation',
             'lammps.force = plugins.jobs.lammps.force:ForceCalculation',
             'lammps.optimize = plugins.jobs.lammps.optimize:OptimizeCalculation'
+            'lammps.md = plugins.jobs.lammps.md:MdCalculation'
             'phonopy = plugins.jobs.phonopy: PhonopyCalculation',
             'dynaphopy = plugins.jobs.dynaphopy: DynaphopyCalculation'],
         'aiida.parsers': [
             'lammps.force = plugins.parsers.lammps.force:ForceParser',
             'lammps.optimize = plugins.parsers.lammps.optimize:OptimizeParser',
+            'lammps.md = plugins.parsers.lammps.md:MdParser'
             'phonopy = plugins.parsers.phonopy: PhonopyParser',
             'dynaphopy = plugins.parsers.dynaphopy: DynaphopyParser'],
         'aiida.workflows': [
