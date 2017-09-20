@@ -9,6 +9,8 @@ setup(
     author_email='abelcarreras@gmail.com',
     license='MIT license',
     packages=find_packages(exclude=['aiida']),
+    setup_requires=['reentry'],
+    reentry_register=True,
     entry_points={
         'aiida.calculations': [
             'lammps.combinate = plugins.jobs.lammps.combinate:CombinateCalculation',
