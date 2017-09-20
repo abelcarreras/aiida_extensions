@@ -32,15 +32,6 @@ setup(
             'wf_quasiparticle_thermo = workflows.wf_quasiparticle_thermo : WorkflowQuasiparticle',
             'wf_scan_quasiparticle = workflows.wf_scan_quasiparticle : WorkflowScanQuasiparticle',
         ]
-    },
-    scripts=['workflows/launcher/launch_gruneisen_lammps_gan.py',
-             'workflows/launcher/launch_gruneisen_lammps_na.py',
-             'workflows/launcher/launch_gruneisen_lammps_si.py',
-             'workflows/launcher/launch_phonon_lammps_ar.py',
-             'workflows/launcher/launch_phonon_lammps_gan.py',
-             'workflows/launcher/launch_phonon_lammps_na.py',
-             'workflows/launcher/launch_quasiparticle_lammps_gan.py',
-             'workflows/launcher/launch_quasiparticle_scan.py',
-             'workflows/launcher/launch_quasiparticle_thermo_lammps.gan.py']
+    }
 )
 
