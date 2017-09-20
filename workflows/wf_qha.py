@@ -816,9 +816,8 @@ class WorkflowQHA(Workflow):
 
         self.add_result('qha_output', qha_result['qha_output'])
 
-        self.next(self.store_final_info)
-        # self.next(self.qha_calculation_write_files)
-
+        # self.next(self.store_final_info)
+        self.next(self.qha_calculation_write_files)
 
     @Workflow.step
     def qha_calculation_write_files(self):
@@ -1003,7 +1002,7 @@ class WorkflowQHA(Workflow):
 
         self.append_to_report('QHA properties calculated and written in files')
 
-        self.next(self.exit)
+        self.next(self.store_final_info)
 
     @Workflow.step
     def store_final_info(self):
@@ -1050,7 +1049,7 @@ class WorkflowQHA(Workflow):
         data_folder.create()
         for i, wf_test in enumerate(final_list):
 
-            data_phonon_folder = data_folder.get_subfolder('phonon {}'.format(i))
+            data_phonon_folder = data_folder.get_subfolder('phonon_{}'.format(i))
             data_phonon_folder.create()
 
             # Get optimized info data
