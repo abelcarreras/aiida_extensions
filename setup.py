@@ -39,6 +39,6 @@ setup(
              'workflows/launcher/launch_phonon_lammps_na.py',
              'workflows/launcher/launch_quasiparticle_lammps_gan.py',
              'workflows/launcher/launch_quasiparticle_scan.py',
-             'workflows/launcher/launch_quasiparticle_thermo_lammps_gan.py']
+             'workflows/launcher/launch_quasiparticle_thermo_lammps.gan.py']
 )
 
