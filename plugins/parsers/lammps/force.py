@@ -1,11 +1,6 @@
 from aiida.parsers.parser import Parser
 from aiida.parsers.exceptions import OutputParsingError
 
-try:
-    from aiida.orm.calculation.job.lammps.force import ForceCalculation
-except:
-    pass
-
 from aiida.orm import DataFactory
 
 ArrayData = DataFactory('array')
@@ -120,13 +115,7 @@ class ForceParser(Parser):
         """
         Initialize the instance of LammpsParser
         """
-        # check for valid input
-        try:
-            if not isinstance(calc, ForceCalculation):
-                raise OutputParsingError("Input calculation must be a lammps ForceCalculation")
-            self._calc = calc
-        except:
-            super(ForceParser, self).__init__(calc)
+        super(ForceParser, self).__init__(calc)
 
     def parse_with_retrieved(self, retrieved):
         """
