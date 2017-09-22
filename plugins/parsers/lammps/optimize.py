@@ -3,7 +3,6 @@ from aiida.parsers.exceptions import OutputParsingError
 from aiida.orm.data.array import ArrayData
 from aiida.orm.data.structure import StructureData
 from aiida.orm.data.parameter import ParameterData
-from aiida.orm.calculation.job.lammps.optimize import OptimizeCalculation
 
 import numpy as np
 
@@ -161,10 +160,7 @@ class OptimizeParser(Parser):
         """
         Initialize the instance of LammpsParser
         """
-        # check for valid input
-        if not isinstance(calc, OptimizeCalculation):
-            raise OutputParsingError("Input calculation must be a lammps OptimizeCalculation")
-        self._calc = calc
+        super(OptimizeParser, self).__init__(calc)
 
     def parse_with_retrieved(self, retrieved):
         """

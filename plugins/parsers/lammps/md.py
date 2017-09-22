@@ -2,7 +2,6 @@ from aiida.parsers.parser import Parser
 from aiida.parsers.exceptions import OutputParsingError
 from aiida.orm.data.array import ArrayData
 from aiida.orm.data.parameter import ParameterData
-from aiida.orm.calculation.job.lammps.md import MdCalculation
 from aiida.orm.data.array.trajectory import TrajectoryData
 
 import numpy as np
@@ -140,10 +139,7 @@ class MdParser(Parser):
         """
         Initialize the instance of LammpsParser
         """
-        # check for valid input
-        if not isinstance(calc, MdCalculation):
-            raise OutputParsingError("Input calculation must be a MdCalculation")
-        self._calc = calc
+        super(MdParser, self).__init__(calc)
 
     def parse_with_retrieved(self, retrieved):
         """

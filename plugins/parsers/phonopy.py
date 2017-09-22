@@ -2,7 +2,6 @@ from aiida.parsers.parser import Parser
 from aiida.parsers.exceptions import OutputParsingError
 from aiida.orm.data.array import ArrayData
 from aiida.orm.data.parameter import ParameterData
-from aiida.orm.calculation.job.phonopy import PhonopyCalculation
 
 import numpy as np
 
@@ -30,10 +29,7 @@ class PhonopyParser(Parser):
         """
         Initialize the instance of PhonopyParser
         """
-        # check for valid input
-        if not isinstance(calc, PhonopyCalculation):
-            raise OutputParsingError("Input calculation must be a PhonopyCalculation")
-        self._calc = calc
+        super(PhonopyParser, self).__init__(calc)
 
     def parse_with_retrieved(self, retrieved):
         """
