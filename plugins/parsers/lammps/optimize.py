@@ -53,8 +53,6 @@ def read_log_file(logfile):
 
     cell=super_cell.T
 
-
- #   cell = np.array([a, b, c], dtype=float).T
     if np.linalg.det(cell) < 0:
         cell = -1.0*cell
 
