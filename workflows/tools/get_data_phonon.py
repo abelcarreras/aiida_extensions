@@ -58,15 +58,15 @@ phonon.set_force_constants(force_constants)
 
 # Save band structure to PDF
 bands = []
-q_start  = np.array([0.5, 0.5, 0.0])
-q_end    = np.array([0.0, 0.0, 0.0])
+q_start = np.array([0.5, 0.5, 0.0])
+q_end   = np.array([0.0, 0.0, 0.0])
 band = []
 for i in range(51):
     band.append(q_start + (q_end - q_start) / 50 * i)
 bands.append(band)
 
-q_start  = np.array([0.0, 0.0, 0.0])
-q_end    = np.array([0.5, 0.0, 0.0])
+q_start = np.array([0.0, 0.0, 0.0])
+q_end   = np.array([0.5, 0.0, 0.0])
 band = []
 for i in range(51):
     band.append(q_start + (q_end - q_start) / 50 * i)
