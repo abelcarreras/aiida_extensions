@@ -262,7 +262,7 @@ def phonopy_calculation_inline(**kwargs):
 class Wf_phononWorkflow(Workflow):
 #class WorkflowPhonon(Workflow):
     def __init__(self, **kwargs):
-        super(WorkflowPhonon, self).__init__(**kwargs)
+        super(Wf_phononWorkflow, self).__init__(**kwargs)
         if 'optimize' in kwargs:
             self._optimize = kwargs['optimize']
         else:
