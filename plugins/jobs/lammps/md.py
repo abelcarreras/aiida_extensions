@@ -127,7 +127,7 @@ class MdCalculation(JobCalculation):
         self._OUTPUT_TRAJECTORY_FILE_NAME = 'trajectory.lammpstrj'
 
         self._OUTPUT_FILE_NAME = 'log.lammps'
-        self._default_parser = "lammps.md"
+        self._default_parser = 'lammps.md'
 
     @classproperty
     def _use_methods(cls):
