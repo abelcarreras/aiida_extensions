@@ -27,7 +27,7 @@ setup(
              # 'vasp.vasp = plugins.parsers.vasp:VaspParser',
             'phonopy = plugins.parsers.phonopy: PhonopyParser',
             'dynaphopy = plugins.parsers.dynaphopy: DynaphopyParser'],
-        'aiida.workflows.user': [
+        'aiida.workflows.phonon': [
             'wf_phonon = workflows.wf_phonon:WorkflowPhonon',
             'wf_gruneisen_pressure = workflows.wf_gruneisen_pressure:WorkflowGruneisen',
             'wf_gruneisen_volume = workflows.wf_gruneisen_volume:WorkflowGruneisen',
