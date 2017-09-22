@@ -2,21 +2,25 @@ from aiida.orm import Code, DataFactory
 from aiida.orm.workflow import Workflow
 from aiida.orm.calculation.inline import make_inline
 
-from aiida.workflows.wf_gruneisen_pressure import WorkflowGruneisen
-from aiida.workflows.wf_phonon import WorkflowPhonon
+#from aiida.workflows.wf_gruneisen_pressure import WorkflowGruneisen
+#from aiida.workflows.wf_phonon import WorkflowPhonon
+#from aiida.orm.data.structure import StructureData
+#from aiida.orm.data.array import ArrayData
 
 from aiida.orm import load_workflow
-
 import numpy as np
 import StringIO
 
 from phonopy import PhonopyQHA
-from phonon_common import arrange_band_labels, get_data_info
+from phonon_common import arrange_band_labels, get_data_info, get_file_from_numpy_array
 
-from aiida.orm.data.structure import StructureData
-from aiida.orm.data.array import ArrayData
+WorkflowPhonon = DataFactory('wf_phonon')
+WorkflowGruneisen = DataFactory('wf_gruneisen_pressure')
 
-from phonon_common import get_file_from_numpy_array
+StructureData = DataFactory('structure')
+ParameterData = DataFactory('parameter')
+ArrayData = DataFactory('array')
+
 
 # Normalize to from unitformula to unitcell
 def gcd(L):
@@ -339,9 +343,9 @@ def create_volumes_inline(**kwargs):
     return structures
 
 
-class WorkflowQHA(Workflow):
+class Wf_qhaWorkflow(Workflow):
     def __init__(self, **kwargs):
-        super(WorkflowQHA, self).__init__(**kwargs)
+        super(Wf_qhaWorkflow, self).__init__(**kwargs)
         if 'expansion_method' in kwargs:
             self._expansion_method = kwargs['expansion_method']
         else:

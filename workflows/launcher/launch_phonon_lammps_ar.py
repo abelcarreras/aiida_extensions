@@ -1,6 +1,6 @@
 from aiida import load_dbenv
 load_dbenv()
-from aiida.orm import Code, DataFactory
+from aiida.orm import Code, DataFactory, WorkflowFactory
 
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
@@ -84,7 +84,7 @@ wf_parameters = {
     }
 
 #Submit workflow
-from aiida.workflows.wf_phonon import WorkflowPhonon
+WorkflowPhonon = WorkflowFactory('wf_phonon')
 wf = WorkflowPhonon(params=wf_parameters, optimize=True, pressure=0.0)  # pressure in kb
 
 wf.label = 'LAMMPS Lennad-Jones Ar'

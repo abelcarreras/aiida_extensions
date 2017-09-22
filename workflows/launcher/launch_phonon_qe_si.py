@@ -1,6 +1,6 @@
 from aiida import load_dbenv
 load_dbenv()
-from aiida.orm import Code, DataFactory
+from aiida.orm import Code, DataFactory, WorkflowFactory
 
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
@@ -88,7 +88,7 @@ wf_parameters = {
 
 
 #Submit workflow
-from aiida.workflows.wf_phonon import WorkflowPhonon
+WorkflowPhonon = WorkflowFactory('wf_phonon')
 wf = WorkflowPhonon(params=wf_parameters, optimize=True)
 
 wf.label = 'QE Si'

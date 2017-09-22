@@ -1,6 +1,6 @@
 from aiida import load_dbenv
 load_dbenv()
-from aiida.orm import Code, DataFactory
+from aiida.orm import Code, DataFactory, WorkflowFactory
 
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
@@ -78,7 +78,7 @@ wf_parameters = {
     }
 
 #Submit workflow
-from aiida.workflows.wf_gruneisen_pressure import WorkflowGruneisen
+WorkflowGruneisen = WorkflowFactory('wf_gruneisen_pressure')
 wf = WorkflowGruneisen(params=wf_parameters, pre_optimize=True)  # pressure in kb
 
 wf.label = 'Gruneisen LJ Na'

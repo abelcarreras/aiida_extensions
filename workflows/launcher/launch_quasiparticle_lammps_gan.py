@@ -1,6 +1,6 @@
 from aiida import load_dbenv
 load_dbenv()
-from aiida.orm import Code, DataFactory, load_node
+from aiida.orm import Code, DataFactory, load_node, WorkflowFactory
 
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
@@ -106,7 +106,7 @@ wf_parameters = {
 }
 
 
-from aiida.workflows.wf_quasiparticle import WorkflowQuasiparticle
+WorkflowQuasiparticle = WorkflowFactory('wf_quasiparticle')
 wf = WorkflowQuasiparticle(params=wf_parameters,
                            optimize=True,
                            use_optimized_structure_for_md=True)

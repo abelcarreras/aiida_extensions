@@ -1,12 +1,13 @@
-from aiida.orm import Code, DataFactory
+from aiida.orm import Code, DataFactory, WorkflowFactory
 from aiida.orm.workflow import Workflow
 from aiida.orm.calculation.inline import make_inline
 
-from aiida.workflows.wf_phonon import WorkflowPhonon
+#from aiida.workflows.wf_phonon import WorkflowPhonon
 from aiida.orm import load_node, load_workflow
 
 import numpy as np
 
+WorkflowPhonon = DataFactory('wf_phonon')
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
 ArrayData = DataFactory('array')
@@ -248,9 +249,9 @@ def create_volumes_inline(**kwargs):
     return structures
 
 
-class WorkflowGruneisen(Workflow):
+class Wf_gruneisen_pressureWorkflow(Workflow):
     def __init__(self, **kwargs):
-        super(WorkflowGruneisen, self).__init__(**kwargs)
+        super(Wf_gruneisen_pressureWorkflow, self).__init__(**kwargs)
         if 'pre_optimize' in kwargs:
             self._pre_optimize = kwargs['pre_optimize']
         else:

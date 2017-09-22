@@ -2,15 +2,17 @@ from aiida.orm import Code, DataFactory
 from aiida.orm.workflow import Workflow
 from aiida.orm.calculation.inline import make_inline
 
-from aiida.workflows.wf_quasiparticle_thermo import WorkflowQuasiparticle
+#from aiida.workflows.wf_quasiparticle_thermo import WorkflowQuasiparticle
 # from aiida.orm import load_node, load_workflow
 
 import numpy as np
 
+
+WorkflowQuasiparticle = DataFactory('wf_quasiparticle_thermo')
+
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
 ArrayData = DataFactory('array')
-
 
 @make_inline
 def create_volumes_inline(**kwargs):
@@ -29,9 +31,9 @@ def create_volumes_inline(**kwargs):
     return structures
 
 
-class WorkflowScanQuasiparticle(Workflow):
+class Wf_scan_quasiparticleWorkflow(Workflow):
     def __init__(self, **kwargs):
-        super(WorkflowScanQuasiparticle, self).__init__(**kwargs)
+        super(Wf_scan_quasiparticleWorkflow, self).__init__(**kwargs)
 
 
     @Workflow.step

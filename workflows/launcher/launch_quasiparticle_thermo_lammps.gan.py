@@ -1,6 +1,6 @@
 from aiida import load_dbenv
 load_dbenv()
-from aiida.orm import Code, DataFactory, load_node
+from aiida.orm import Code, DataFactory, load_node, WorkflowFactory
 
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
@@ -102,7 +102,8 @@ wf_parameters = {
     'scan_temperatures': range(300, 1500, 100)
 }
 
-from aiida.workflows.wf_quasiparticle_thermo import WorkflowQuasiparticle
+WorkflowQuasiparticle = WorkflowFactory('wf_quasiparticle_thermo')
+
 wf = WorkflowQuasiparticle(params=wf_parameters, optimize=False)
 
 wf.label = 'quasiparticle scan GaN'

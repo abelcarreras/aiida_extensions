@@ -1,8 +1,10 @@
 from aiida.orm import Code, DataFactory
 from aiida.orm.workflow import Workflow
-from aiida.workflows.wf_phonon import WorkflowPhonon
+#from aiida.workflows.wf_phonon import WorkflowPhonon
 from aiida.orm import load_node, load_workflow
 from aiida.orm.calculation.inline import make_inline
+
+WorkflowPhonon = DataFactory('wf_phonon')
 
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
@@ -39,9 +41,9 @@ def generate_supercell_inline(**kwargs):
     return {"supercell": supercell}
 
 
-class WorkflowQuasiparticle(Workflow):
+class Wf_quasiparticleWorkflow(Workflow):
     def __init__(self, **kwargs):
-        super(WorkflowQuasiparticle, self).__init__(**kwargs)
+        super(Wf_quasiparticleWorkflow, self).__init__(**kwargs)
 
         if 'use_optimized_structure_for_md' in kwargs:
             self._use_optimized_structure_for_md = kwargs['use_optimized_structure_for_md']
