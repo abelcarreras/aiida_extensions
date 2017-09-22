@@ -1,6 +1,6 @@
 from aiida import load_dbenv
 load_dbenv()
-from aiida.orm import Code, DataFactory, load_node
+from aiida.orm import Code, DataFactory, load_node, WorkflowFactory
 import numpy as np
 
 
