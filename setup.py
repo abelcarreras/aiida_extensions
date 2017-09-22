@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='aiida_extensions',
+    name='aiida-phonon',
     version='0.1',
     description='AiiDA plugin for running phonon calculations using phonopy',
     url='https://github.com/abelcarreras/aiida_extensions',
