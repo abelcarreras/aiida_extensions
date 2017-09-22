@@ -9,6 +9,7 @@ setup(
     author_email='abelcarreras@gmail.com',
     license='MIT license',
     packages=find_packages(exclude=['aiida']),
+    requires=['phonopy', 'numpy'],
     setup_requires=['reentry'],
     reentry_register=True,
     entry_points={
