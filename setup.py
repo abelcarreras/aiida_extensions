@@ -29,8 +29,8 @@ setup(
             'dynaphopy = plugins.parsers.dynaphopy: DynaphopyParser'],
         'aiida.workflows': [
             'wf_phonon = workflows.wf_phonon:WorkflowPhonon',
-            'wf_grunesien_pressure = workflows.wf_gruneisen_pressure:WorkflowGruneisen',
-            'wf_grunesien_volume = workflows.wf_gruneisen_volume:WorkflowGruneisen',
+            'wf_gruneisen_pressure = workflows.wf_gruneisen_pressure:WorkflowGruneisen',
+            'wf_gruneisen_volume = workflows.wf_gruneisen_volume:WorkflowGruneisen',
             'wf_qha = workflows.qha:WorkflowQHA',
             'wf_quasiparticle = workflows.quasiparticle:WorkflowQuasiparticle',
             'wf_quasiparticle_thermo = workflows.wf_quasiparticle_thermo:WorkflowQuasiparticle',
