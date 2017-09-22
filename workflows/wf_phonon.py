@@ -259,8 +259,8 @@ def phonopy_calculation_inline(**kwargs):
 
     return {'thermal_properties': thermal_properties, 'dos': dos, 'band_structure': band_structure}
 
-
-class WorkflowPhonon(Workflow):
+class Wf_phononWorkflow(Workflow):
+#class WorkflowPhonon(Workflow):
     def __init__(self, **kwargs):
         super(WorkflowPhonon, self).__init__(**kwargs)
         if 'optimize' in kwargs:
