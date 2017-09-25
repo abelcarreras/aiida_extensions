@@ -7,7 +7,7 @@ from aiida.orm import load_node, load_workflow
 
 import numpy as np
 
-WorkflowPhonon = DataFactory('wf_phonon')
+WorkflowPhonon = WorkflowFactory('wf_phonon')
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
 ArrayData = DataFactory('array')

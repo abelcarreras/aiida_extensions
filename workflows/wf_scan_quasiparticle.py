@@ -1,4 +1,4 @@
-from aiida.orm import Code, DataFactory
+from aiida.orm import Code, DataFactory, WorkflowFactory
 from aiida.orm.workflow import Workflow
 from aiida.orm.calculation.inline import make_inline
 
@@ -8,7 +8,7 @@ from aiida.orm.calculation.inline import make_inline
 import numpy as np
 
 
-WorkflowQuasiparticle = DataFactory('wf_quasiparticle_thermo')
+WorkflowQuasiparticle = WorkflowFactory('wf_quasiparticle_thermo')
 
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')

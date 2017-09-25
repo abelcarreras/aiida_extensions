@@ -1,4 +1,4 @@
-from aiida.orm import Code, DataFactory
+from aiida.orm import Code, DataFactory, WorkflowFactory
 from aiida.orm.workflow import Workflow
 from aiida.orm.calculation.inline import make_inline
 
@@ -14,7 +14,7 @@ import StringIO
 from phonopy import PhonopyQHA
 from phonon_common import arrange_band_labels, get_data_info, get_file_from_numpy_array
 
-WorkflowPhonon = DataFactory('wf_phonon')
+WorkflowPhonon = WorkflowFactory('wf_phonon')
 WorkflowGruneisen = DataFactory('wf_gruneisen_pressure')
 
 StructureData = DataFactory('structure')

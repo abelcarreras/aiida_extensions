@@ -1,4 +1,4 @@
-from aiida.orm import Code, DataFactory
+from aiida.orm import Code, DataFactory, WorkflowFactory
 from aiida.orm.workflow import Workflow
 from aiida.orm.calculation.inline import make_inline
 
@@ -7,7 +7,7 @@ from aiida.orm.calculation.inline import make_inline
 
 import numpy as np
 
-WorkflowPhonon = DataFactory('wf_phonon')
+WorkflowPhonon = WorkflowFactory('wf_phonon')
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
 ArrayData = DataFactory('array')
