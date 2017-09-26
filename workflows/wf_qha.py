@@ -467,6 +467,10 @@ class Wf_qhaWorkflow(Workflow):
         prediction = self.get_step('start').get_sub_workflows()[0].get_result('thermal_expansion_prediction')
         stresses = prediction.get_array('stresses')
 
+        if np.isnan(stresses).any():
+            self.append_to_report('Gruneisen Prediction error')
+            exit()
+
         test_pressures = [np.min(stresses), np.max(stresses)]  # in kbar
 
         total_range = test_pressures[1] - test_pressures[0]

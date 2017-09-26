@@ -38,13 +38,12 @@ def get_path_using_seekpath(structure, band_resolution=30):
 
 
 @make_inline
-def refine_cell_inline(**kwargs):
+def standardize_cell_inline(**kwargs):
     import spglib
     from phonopy.structure.atoms import Atoms as PhonopyAtoms
     import itertools
 
     structure = kwargs.pop('structure')
-
 
     bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
                         positions=[site.position for site in structure.sites],
@@ -54,31 +53,23 @@ def refine_cell_inline(**kwargs):
                       bulk.get_scaled_positions(),
                       bulk.get_atomic_numbers())
 
-    lattice, refined_positions, numbers = spglib.refine_cell(structure_data, symprec=1e-5)
+    #lattice, refined_positions, numbers = spglib.refine_cell(structure_data, symprec=1e-5)
+    lattice, standardized_positions, numbers = spglib.standardize_cell(structure_data,
+                                                                       symprec=1e-5,
+                                                                       to_primitive=0,
+                                                                       no_idealize=1)
 
-    refined_bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
-                        scaled_positions=refined_positions,
-                        cell=lattice)
-
-    with np.errstate(divide='ignore'):
-        supercell = np.array(np.diagonal(np.divide(structure.cell, lattice)), dtype=int)
-
-    refined_cell = np.dot(lattice, np.diag(supercell))
-
-    # Recover original structure
-    position_supercell = []
-    for k in range(len(refined_bulk.get_positions())):
-         for r in itertools.product(*[range (i) for i in supercell[::-1]]):
-             position_supercell.append(refined_bulk.get_positions()[k,:] + np.dot(np.array(r[::-1]), refined_cell))
-    position_supercell = np.array(position_supercell)
+    standardized_bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
+                                     scaled_positions=standardized_positions,
+                                     cell=lattice)
 
     # create new aiida structure object
-    refined_structure = StructureData(cell=refined_cell)
-    for position, symbol in zip(position_supercell, bulk.get_chemical_symbols()):
-        refined_structure.append_atom(position=position,
+    standarized = StructureData(cell=lattice)
+    for position, symbol in zip(standardized_bulk.get_positions(), bulk.get_chemical_symbols()):
+        standarized.append_atom(position=position,
                                       symbols=symbol)
 
-    return {'refined_structure': refined_structure}
+    return {'standardized_structure': standarized}
 
 
 # Create supercells with displacements to calculate forces
@@ -576,8 +567,8 @@ class Wf_phononWorkflow(Workflow):
         else:
             structure = parameters['structure']
 
-        # refine structure using spglib
-        # structure = refine_cell_inline(structure=structure)[1]['refined_structure']
+        # Standardize structure using spglib
+        structure = standardize_cell_inline(structure=structure)[1]['standardized_structure']
 
         self.append_to_report('Optimize structure {}/{}'.format(len(optimized) + 1, len(optimized) + counter + 1))
 

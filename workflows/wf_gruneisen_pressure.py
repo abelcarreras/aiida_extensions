@@ -90,7 +90,7 @@ def get_path_using_seekpath(structure, band_resolution=30):
     for set in path_data['path']:
         band_ranges.append([labels[set[0]], labels[set[1]]])
 
-    bands =[]
+    bands = []
     for q_start, q_end in band_ranges:
         band = []
         for i in range(band_resolution+1):
