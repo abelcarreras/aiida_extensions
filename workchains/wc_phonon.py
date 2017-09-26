@@ -404,14 +404,14 @@ class FrozenPhonon(WorkChain):
         spec.input("pressure", valid_type=Float)
       #  spec.dynamic_input("optimize")
 
-        spec.outline(cls.create_displacement_calculations,
-                     if_(cls.remote_phonopy)(cls.get_force_constants_remote,
-                                             cls.collect_phonopy_data).else_(
-                         cls.get_force_constants))
+        #spec.outline(cls.create_displacement_calculations,
+        #             if_(cls.remote_phonopy)(cls.get_force_constants_remote,
+        #                                     cls.collect_phonopy_data).else_(
+        #                 cls.get_force_constants))
 
         print 'test1!'
-     #   spec.outline(cls.create_displacement_calculations, cls.get_force_constants)
-     #   spec.outline(cls.create_displacement_calculations, cls.get_force_constants_remote, cls.collect_phonopy_data)
+        spec.outline(cls.create_displacement_calculations, cls.get_force_constants)
+        #spec.outline(cls.create_displacement_calculations, cls.get_force_constants_remote, cls.collect_phonopy_data)
 
         # spec.dynamic_output()
 
