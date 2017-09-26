@@ -678,8 +678,9 @@ if __name__ == "__main__":
                   machine=machine,
                   es_settings=es_settings,
                   ph_settings=ph_settings,
+                  # Optional settings
                   pressure=Float(10),
-                  optimize=Bool(False)
+                  optimize=Bool(0)
                   )
 
     # Check results
