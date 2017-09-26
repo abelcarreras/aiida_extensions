@@ -412,7 +412,7 @@ class FrozenPhonon(WorkChain):
         print 'test1!'
         spec.outline(cls.create_displacement_calculations, cls.get_force_constants)
         #spec.outline(cls.create_displacement_calculations, cls.get_force_constants_remote, cls.collect_phonopy_data)
-
+        return
         # spec.dynamic_output()
 
     def remote_phonopy(self, ctx):
