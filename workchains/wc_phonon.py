@@ -413,7 +413,6 @@ class FrozenPhonon(WorkChain):
      #   spec.outline(cls.create_displacement_calculations, cls.get_force_constants)
      #   spec.outline(cls.create_displacement_calculations, cls.get_force_constants_remote, cls.collect_phonopy_data)
 
-        print 'test!'
         spec.dynamic_output()
 
 
@@ -424,6 +423,7 @@ class FrozenPhonon(WorkChain):
         structures = create_supercells_with_displacements_using_phonopy(self.inputs.structure,
                                                                         self.inputs.ph_settings)
 
+        print 'test!'
         ctx.data_sets = structures.pop('data_sets')
         ctx.number_of_displacements = len(structures)
 
