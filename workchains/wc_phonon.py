@@ -415,11 +415,12 @@ class FrozenPhonon(WorkChain):
 
         # spec.dynamic_output()
 
-
     def remote_phonopy(self, ctx):
         return 'code' in self.inputs.ph_settings.get_dict()
 
     def create_displacement_calculations(self, ctx):
+
+        print 'test2!'
         structures = create_supercells_with_displacements_using_phonopy(self.inputs.structure,
                                                                         self.inputs.ph_settings)
 
