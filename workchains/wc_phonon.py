@@ -400,7 +400,7 @@ class FrozenPhonon(WorkChain):
         spec.input("ph_settings", valid_type=ParameterData)
         spec.input("es_settings", valid_type=ParameterData)
         # Should be optional
-        spec.input("optimize", valid_type=Bool)
+        #spec.input("optimize", valid_type=Bool)
         spec.input("pressure", valid_type=Float)
       #  spec.dynamic_input("optimize")
 
@@ -680,7 +680,7 @@ if __name__ == "__main__":
                   ph_settings=ph_settings,
                   # Optional settings
                   pressure=Float(10),
-                  optimize=Bool(0)
+                  # optimize=Bool(0)
                   )
 
     # Check results
