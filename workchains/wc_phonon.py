@@ -231,7 +231,7 @@ def create_supercells_with_displacements_using_phonopy(structure, phonopy_input)
     from phonopy import Phonopy
     import numpy as np
 
-   # Generate phonopy phonon object
+    # Generate phonopy phonon object
     bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
                         positions=[site.position for site in structure.sites],
                         cell=structure.cell)
@@ -245,13 +245,12 @@ def create_supercells_with_displacements_using_phonopy(structure, phonopy_input)
 
     cells_with_disp = phonon.get_supercells_with_displacements()
 
- # Transform cells to StructureData and set them ready to return
+    # Transform cells to StructureData and set them ready to return
     data_sets = phonon.get_displacement_dataset()
     data_sets_object = ArrayData()
     for i, first_atoms in enumerate(data_sets['first_atoms']):
         data_sets_array = np.array([first_atoms['direction'], first_atoms['number'], first_atoms['displacement']])
         data_sets_object.set_array('data_sets_{}'.format(i), data_sets_array)
-
 
     disp_cells = {'data_sets':data_sets_object}
     for i, phonopy_supercell in enumerate(cells_with_disp):
@@ -732,7 +731,7 @@ if __name__ == "__main__":
 
     machine = ParameterData(dict=machine_dict)
 
-    results = run(FrozenPhonon,
+    results = async(FrozenPhonon,
                   structure=structure,
                   machine=machine,
                   es_settings=es_settings,
