@@ -448,7 +448,7 @@ class FrozenPhonon(WorkChain):
         #                 cls.get_force_constants))
 
         print 'test1!'
-        #spec.outline(cls.create_displacement_calculations, cls.get_force_constants)
+        spec.outline(cls.create_displacement_calculations, cls.get_force_constants)
         #spec.outline(cls.create_displacement_calculations, cls.get_force_constants_remote, cls.collect_phonopy_data)
 
         # spec.dynamic_output()
@@ -475,18 +475,18 @@ class FrozenPhonon(WorkChain):
         self.out('force_constants', force_constants)
 
 
-    def remote_phonopy(self, ctx):
+    def remote_phonopy(self):
         return 'code' in self.inputs.ph_settings.get_dict()
 
-    def create_displacement_calculations(self, ctx):
+    def create_displacement_calculations(self):
 
         print 'test2!'
         structures = create_supercells_with_displacements_using_phonopy(self.inputs.structure,
                                                                         self.inputs.ph_settings)
 
         print 'test!'
-        ctx.data_sets = structures.pop('data_sets')
-        ctx.number_of_displacements = len(structures)
+        self.ctx.data_sets = structures.pop('data_sets')
+        self.ctx.number_of_displacements = len(structures)
 
         generate_inputs = { 'quantumespresso.pw' : generate_qe_params,
                             'vasp.vasp': generate_vasp_params}
@@ -501,7 +501,7 @@ class FrozenPhonon(WorkChain):
             labels = ['structure_1', 'structure_0', 'structure_3', 'structure_2']
             for pk, label in zip(nodes, labels):
                 future = load_node(pk)
-                ctx._content[label] = future.get_outputs_dict()
+                self.ctx._content[label] = future.get_outputs_dict()
             return
 
         calcs = {}
@@ -524,12 +524,12 @@ class FrozenPhonon(WorkChain):
 
         return ToContext(**calcs)
 
-    def get_force_constants(self, ctx):
+    def get_force_constants(self):
 
   #      print ctx._get_dict()
 
         wf_inputs = {}
-        for key, value in ctx._get_dict().iteritems():
+        for key, value in self.ctx._get_dict().iteritems():
             if key.startswith('structure_'):
                 wf_inputs[key.replace('structure', 'forces')] = value['output_array']
 
@@ -571,9 +571,9 @@ class FrozenPhonon(WorkChain):
 
         return ToContext(**calcs)
 
-    def collect_phonopy_data(self, ctx):
+    def collect_phonopy_data(self):
 
-        force_constants = ctx.phonopy_results['array_data']
+        force_constants = self.ctx.phonopy_results['array_data']
 
         phonon_properties = get_properties_from_phonopy(self.inputs.structure,
                                                         self.inputs.ph_settings,
