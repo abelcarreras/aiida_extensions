@@ -455,7 +455,7 @@ class FrozenPhonon(WorkChain):
         spec.outline(cls.test1, cls.test2)
 
 
-    def test1(self, ctx):
+    def test1(self):
         print 'test2!'
         structures = create_supercells_with_displacements_using_phonopy(self.inputs.structure,
                                                                         self.inputs.ph_settings)
