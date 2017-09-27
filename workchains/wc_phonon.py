@@ -752,7 +752,7 @@ if __name__ == "__main__":
                   )
 
     # Check results
-    print results.
+    print results
 
     exit()
 
