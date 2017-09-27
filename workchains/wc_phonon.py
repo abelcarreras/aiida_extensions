@@ -412,9 +412,13 @@ class FrozenPhonon2(WorkChain):
 
 
     def test1(self):
+        print 'tatata'
         pass
 
     def test2(self):
+        print 'hohohoho'
+        force_constants = ParameterData(dict={'test', 0})
+        self.out('force_constants', force_constants)
         pass
 
 class FrozenPhonon(WorkChain):
@@ -715,7 +719,9 @@ if __name__ == "__main__":
                   )
 
     # Check results
+    print results
 
+    exit()
     print results['force_constants'].get_array('force_constants')
 
     print results['force_constants'].pk
