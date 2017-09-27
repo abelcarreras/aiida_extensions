@@ -455,12 +455,16 @@ class FrozenPhonon(WorkChain):
         spec.outline(cls.test1, cls.test2)
 
 
-    def test1(self):
+    def test1(self, ctx):
         print 'test2!'
         structures = create_supercells_with_displacements_using_phonopy(self.inputs.structure,
                                                                         self.inputs.ph_settings)
-        print 'tatata'
+        ctx.data_sets = structures.pop('data_sets')
+        ctx.number_of_displacements = len(structures)
 
+        generate_inputs = { 'quantumespresso.pw' : generate_qe_params,
+                            'vasp.vasp': generate_vasp_params}
+        print 'tatata'
 
     def test2(self):
         print 'hohohoho'
