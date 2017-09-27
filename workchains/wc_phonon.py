@@ -417,6 +417,8 @@ class FrozenPhonon2(WorkChain):
 
     def test2(self):
         print 'hohohoho'
+        print self.inputs.ph_settings.get_dict()
+
         force_constants = ArrayData()
         force_constants.set_array('test', np.array([0, 0]))
         self.out('force_constants', force_constants)
