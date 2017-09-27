@@ -552,6 +552,8 @@ class FrozenPhonon(WorkChain):
         self.out('phonon_properties', phonon_properties['thermal_properties'])
         self.out('dos', phonon_properties['dos'])
 
+        return
+
     def get_force_constants_remote(self):
         wf_inputs = {}
         for key, value in self.ctx._get_dict().iteritems():
@@ -585,6 +587,8 @@ class FrozenPhonon(WorkChain):
         self.out('force_constants', force_constants)
         self.out('phonon_properties', phonon_properties['thermal_properties'])
         self.out('dos', phonon_properties['dos'])
+
+        return
 
 
 ################### EXAMPLE INPUT FOR VASP AND QUANTUM ESPRESSO ###################
@@ -737,7 +741,7 @@ if __name__ == "__main__":
 
     machine = ParameterData(dict=machine_dict)
 
-    results = run(FrozenPhonon,
+    results = submit(FrozenPhonon,
                   structure=structure,
                   machine=machine,
                   es_settings=es_settings,
