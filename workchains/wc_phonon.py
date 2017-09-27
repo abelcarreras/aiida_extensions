@@ -494,7 +494,7 @@ class FrozenPhonon(WorkChain):
             labels = ['structure_1', 'structure_0', 'structure_3', 'structure_2']
             for pk, label in zip(nodes, labels):
                 future = load_node(pk)
-                self.ctx._content[label] = future.get_outputs_dict()
+                self.ctx._content[label] = future
             return
 
         calcs = {}
