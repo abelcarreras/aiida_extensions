@@ -396,13 +396,12 @@ class FrozenPhonon(WorkChain):
     def define(cls, spec):
         super(FrozenPhonon, cls).define(spec)
         spec.input("structure", valid_type=StructureData)
-        spec.input("machine", valid_type=ParameterData)
-        spec.input("ph_settings", valid_type=ParameterData)
-        spec.input("es_settings", valid_type=ParameterData)
+#        spec.input("machine", valid_type=ParameterData)
+#        spec.input("ph_settings", valid_type=ParameterData)
+#        spec.input("es_settings", valid_type=ParameterData)
         # Should be optional
-        spec.input("optimize", valid_type=Bool)
-        spec.input("pressure", valid_type=Float)
-      #  spec.dynamic_input("optimize")
+#        spec.input("optimize", valid_type=Bool)
+#        spec.input("pressure", valid_type=Float)
 
         #spec.outline(cls.create_displacement_calculations,
         #             if_(cls.remote_phonopy)(cls.get_force_constants_remote,
@@ -410,7 +409,7 @@ class FrozenPhonon(WorkChain):
         #                 cls.get_force_constants))
 
         print 'test1!'
-        spec.outline(cls.create_displacement_calculations)
+        spec.outline(cls.create_displacement_calculations, cls.get_force_constants)
         #spec.outline(cls.create_displacement_calculations, cls.get_force_constants_remote, cls.collect_phonopy_data)
         return
         # spec.dynamic_output()
@@ -676,12 +675,12 @@ if __name__ == "__main__":
 
     results = run(FrozenPhonon,
                   structure=structure,
-                  machine=machine,
-                  es_settings=es_settings,
-                  ph_settings=ph_settings,
+#                  machine=machine,
+#                  es_settings=es_settings,
+#                  ph_settings=ph_settings,
                   # Optional settings
-                  pressure=Float(10),
-                  optimize=Bool(0)
+#                  pressure=Float(10),
+#                  optimize=Bool(0)
                   )
 
     # Check results
