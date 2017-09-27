@@ -731,7 +731,7 @@ if __name__ == "__main__":
 
     machine = ParameterData(dict=machine_dict)
 
-    results = submit(FrozenPhonon2,
+    results = submit(FrozenPhonon,
                   structure=structure,
                   machine=machine,
                   es_settings=es_settings,
