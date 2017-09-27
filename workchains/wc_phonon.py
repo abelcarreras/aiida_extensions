@@ -549,13 +549,13 @@ class FrozenPhonon(WorkChain):
         self.out('phonon_properties', phonon_properties['thermal_properties'])
         self.out('dos', phonon_properties['dos'])
 
-    def get_force_constants_remote(self, ctx):
+    def get_force_constants_remote(self):
         wf_inputs = {}
-        for key, value in ctx._get_dict().iteritems():
+        for key, value in self.ctx._get_dict().iteritems():
             if key.startswith('structure_'):
                 wf_inputs[key.replace('structure', 'forces')] = value['output_array']
 
-        wf_inputs['data_sets'] = ctx.data_sets
+        wf_inputs['data_sets'] = self.ctx.data_sets
         force_sets = create_forces_set(**wf_inputs)['force_sets']
 
         code_label = self.inputs.ph_settings.get_dict()['code']
