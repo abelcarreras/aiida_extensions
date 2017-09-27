@@ -731,7 +731,7 @@ if __name__ == "__main__":
 
     machine = ParameterData(dict=machine_dict)
 
-    results = submit(FrozenPhonon,
+    results = run(FrozenPhonon,
                   structure=structure,
                   machine=machine,
                   es_settings=es_settings,
@@ -744,7 +744,6 @@ if __name__ == "__main__":
     # Check results
     print results
 
-    exit()
     print results['force_constants'].get_array('force_constants')
 
     print results['force_constants'].pk
