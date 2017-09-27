@@ -448,10 +448,25 @@ class FrozenPhonon(WorkChain):
         #                 cls.get_force_constants))
 
         print 'test1!'
-        spec.outline(cls.create_displacement_calculations, cls.get_force_constants)
+        #spec.outline(cls.create_displacement_calculations, cls.get_force_constants)
         #spec.outline(cls.create_displacement_calculations, cls.get_force_constants_remote, cls.collect_phonopy_data)
 
         # spec.dynamic_output()
+        spec.outline(cls.test1, cls.test2)
+
+
+    def test1(self):
+        print 'tatata'
+
+
+    def test2(self):
+        print 'hohohoho'
+        print self.inputs.ph_settings.get_dict()
+
+        force_constants = ArrayData()
+        force_constants.set_array('test', np.array([0, 0]))
+        self.out('force_constants', force_constants)
+
 
     def remote_phonopy(self, ctx):
         return 'code' in self.inputs.ph_settings.get_dict()
@@ -712,7 +727,7 @@ if __name__ == "__main__":
 
     machine = ParameterData(dict=machine_dict)
 
-    results = run(FrozenPhonon2,
+    results = run(FrozenPhonon,
                   structure=structure,
                   machine=machine,
                   es_settings=es_settings,
