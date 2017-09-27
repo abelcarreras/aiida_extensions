@@ -534,6 +534,7 @@ class FrozenPhonon(WorkChain):
         #        wf_inputs[key.replace('structure', 'forces')] = calc.get_outputs('output_array')
 
         for i in range(self.ctx.number_of_displacements):
+            print 'forces_{}'.format(i), self.ctx.get('structure_{}'.format(i))
             wf_inputs['forces_{}'.format(i)] = self.ctx.get('structure_{}'.format(i)).get_outputs('output_array')
 
         wf_inputs['structure'] = self.inputs.structure
