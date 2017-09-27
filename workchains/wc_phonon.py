@@ -503,10 +503,13 @@ class FrozenPhonon(WorkChain):
             print self.inputs.es_settings.dict.code
 
             # plugin = self.inputs.code.get_attr('input_plugin')
+
             try:
-                plugin = self.inputs.es_settings.dict.code.get_attr('input_plugin')
+                plugin = Code.get_from_string(self.inputs.es_settings.dict.code).get_attr('input_plugin')
+                # plugin = self.inputs.es_settings.dict.code.get_attr('input_plugin')
             except:
-                plugin = self.inputs.es_settings.dict.code_forces.get_attr('input_plugin')
+                plugin = Code.get_from_string(self.inputs.es_settings.dict.code_forces).get_attr('input_plugin')
+                # plugin = self.inputs.es_settings.dict.code_forces.get_attr('input_plugin')
 
             JobCalculation, calculation_input = generate_inputs[plugin](structure,
                                                                         self.inputs.machine,
