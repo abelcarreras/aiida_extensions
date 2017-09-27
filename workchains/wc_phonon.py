@@ -490,8 +490,6 @@ class FrozenPhonon(WorkChain):
 # 1) Load data from nodes
         if True: #For test
             from aiida.orm import load_node
-            nodes = [4768, 4771, 4774, 4777] # QE
-         #   nodes = [4646, 4651, 4656, 4661] # VASP
             nodes = [461200, 461205, 461210, 461215] # VASP
             labels = ['structure_1', 'structure_0', 'structure_3', 'structure_2']
             for pk, label in zip(nodes, labels):
@@ -533,6 +531,7 @@ class FrozenPhonon(WorkChain):
         #    if key.startswith('structure_'):
         #        wf_inputs[key.replace('structure', 'forces')] = calc.get_outputs('output_array')
 
+        print 'DISP', self.ctx.number_of_displacements
         for i in range(self.ctx.number_of_displacements):
             print 'forces_{}'.format(i), self.ctx.get('structure_{}'.format(i))
             wf_inputs['forces_{}'.format(i)] = self.ctx.get('structure_{}'.format(i)).get_outputs('output_array')
