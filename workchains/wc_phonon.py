@@ -526,12 +526,15 @@ class FrozenPhonon(WorkChain):
 
     def get_force_constants(self):
 
-        print self.ctx
+        #print self.ctx
 
         wf_inputs = {}
-        for key, calc in self.ctx._get_dict().iteritems():
-            if key.startswith('structure_'):
-                wf_inputs[key.replace('structure', 'forces')] = calc.get_outputs('output_array')
+        #for key, calc in self.ctx._get_dict().iteritems():
+        #    if key.startswith('structure_'):
+        #        wf_inputs[key.replace('structure', 'forces')] = calc.get_outputs('output_array')
+
+        for i in self.ctx.number_of_displacements:
+            wf_inputs['forces_{}'.format(i)] = self.ctx.get('structure_{}'.format(i)).get_output('output_array')
 
         wf_inputs['structure'] = self.inputs.structure
         wf_inputs['phonopy_input'] = self.inputs.ph_settings
