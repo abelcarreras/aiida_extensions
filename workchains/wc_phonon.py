@@ -142,7 +142,7 @@ def generate_vasp_params(structure, machine, settings):
     inputs._options.max_wallclock_seconds = machine.dict.max_wallclock_seconds
 
     # INCAR (parameters)
-    inputs.incar = ParameterData(dict=settings.dict.incar)
+    inputs.incar = ParameterData(dict=settings.dict.parameters)
 
 
     # POTCAR (pseudo)
