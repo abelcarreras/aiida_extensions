@@ -117,7 +117,7 @@ def generate_qe_params(code, structure, machine, settings, kpoints, pseudo):
     return PwCalculation.process(), inputs
 
 
-def generate_vasp_params(code, structure, machine, settings):
+def generate_vasp_params(structure, machine, settings):
     """
     generate the input paramemeters needed to run a calculation for VASP
     :param structure:  aiida StructureData object
@@ -129,10 +129,11 @@ def generate_vasp_params(code, structure, machine, settings):
     #plugin = self.inputs.es_settings.dict.code.get_attr('input_plugin')
 
     # The inputs
+
     inputs = VaspCalculation.process().get_inputs_template()
 
     # code
-    inputs.code = code
+    inputs.code = Code.get_from_string(settings.dict.code)
 
     # structure
     inputs.structure = structure
