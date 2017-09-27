@@ -474,7 +474,8 @@ class FrozenPhonon(WorkChain):
 
     def create_displacement_calculations(self):
 
-        print 'test2!'
+        print 'test2!', self.ctx
+
         structures = create_supercells_with_displacements_using_phonopy(self.inputs.structure,
                                                                         self.inputs.ph_settings)
 
@@ -525,12 +526,12 @@ class FrozenPhonon(WorkChain):
 
     def get_force_constants(self):
 
-        print self.ctx._get_dict()
+        print self.ctx
 
         wf_inputs = {}
-        for key, value in self.ctx._get_dict().iteritems():
+        for key, calc in self.ctx._get_dict().iteritems():
             if key.startswith('structure_'):
-                wf_inputs[key.replace('structure', 'forces')] = value['output_array']
+                wf_inputs[key.replace('structure', 'forces')] = calc.get_outputs('output_array')
 
         wf_inputs['structure'] = self.inputs.structure
         wf_inputs['phonopy_input'] = self.inputs.ph_settings
