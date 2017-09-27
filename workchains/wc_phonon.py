@@ -473,6 +473,7 @@ class FrozenPhonon(WorkChain):
 
     def create_displacement_calculations(self, ctx):
 
+        pass
         print 'test2!'
         structures = create_supercells_with_displacements_using_phonopy(self.inputs.structure,
                                                                         self.inputs.ph_settings)
