@@ -500,12 +500,12 @@ class FrozenPhonon(WorkChain):
         for label, structure in structures.iteritems():
             print label, structure
 
+            print self.inputs.es_settings.dict.code_forces
+
             # plugin = self.inputs.code.get_attr('input_plugin')
             try:
                 plugin = self.inputs.es_settings.dict.code.get_attr('input_plugin')
             except:
-                print self.inputs.es_settings.dict.code_forces
-                exit()
                 plugin = self.inputs.es_settings.dict.code_forces.get_attr('input_plugin')
 
             JobCalculation, calculation_input = generate_inputs[plugin](structure,
