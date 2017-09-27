@@ -405,7 +405,7 @@ class FrozenPhonon2(WorkChain):
 
 
         print 'test1!'
-        spec.outline(cls.tes1t, cls.test2)
+        spec.outline(cls.test1, cls.test2)
         #spec.outline(cls.create_displacement_calculations, cls.get_force_constants_remote, cls.collect_phonopy_data)
 
         # spec.dynamic_output()
