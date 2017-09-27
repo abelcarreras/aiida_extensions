@@ -488,7 +488,7 @@ class FrozenPhonon(WorkChain):
 
 ############### FOR TESTING ###############
 # 1) Load data from nodes
-        if True: #For test
+        if False: #For test
             from aiida.orm import load_node
             nodes = [461200, 461205, 461210, 461215] # VASP
             labels = ['structure_1', 'structure_0', 'structure_3', 'structure_2']
