@@ -171,9 +171,9 @@ def generate_vasp_params(structure, machine, settings):
     # Kpoints
     from pymatgen.io import vasp as vaspio
 
-    # kpoints_pg = vaspio.Kpoints.automatic_density(structure.get_pymatgen_structure(), settings.dict.kpoints_per_atom)
-    kpoints_pg = vaspio.Kpoints.monkhorst_automatic(kpts=[2, 2, 2],
-                                                    shift=[0.0, 0.0, 0.0])
+    kpoints_pg = vaspio.Kpoints.automatic_density(structure.get_pymatgen_structure(), settings.dict.kpoints_per_atom)
+    #kpoints_pg = vaspio.Kpoints.monkhorst_automatic(kpts=[2, 2, 2],
+    #                                                shift=[0.0, 0.0, 0.0])
 
     kpoints = ParameterData(dict=kpoints_pg.as_dict())
     inputs.kpoints = kpoints
@@ -387,46 +387,6 @@ def get_properties_from_phonopy(structure, phonopy_input, force_constants):
 
     return {'thermal_properties': thermal_properties, 'dos': dos}
 
-###TEST FUNCTION ###
-class FrozenPhonon2(WorkChain):
-    """
-    Workflow to calculate the force constants and phonon properties using phonopy
-    """
-
-    @classmethod
-    def define(cls, spec):
-        super(FrozenPhonon2, cls).define(spec)
-        spec.input("structure", valid_type=StructureData)
-        spec.input("machine", valid_type=ParameterData)
-        spec.input("ph_settings", valid_type=ParameterData)
-        spec.input("es_settings", valid_type=ParameterData)
-        # Should be optional
-        spec.input("optimize", valid_type=Bool)
-        spec.input("pressure", valid_type=Float)
-      #  spec.dynamic_input("optimize")
-
-
-        print 'test1!'
-        spec.outline(cls.test1, cls.test2)
-        #spec.outline(cls.create_displacement_calculations, cls.get_force_constants_remote, cls.collect_phonopy_data)
-
-        # spec.dynamic_output()
-
-
-    def test1(self):
-        print 'tatata'
-
-
-    def test2(self):
-        print 'hohohoho'
-        print self.inputs.ph_settings.get_dict()
-
-        force_constants = ArrayData()
-        force_constants.set_array('test', np.array([0, 0]))
-        self.out('force_constants', force_constants)
-
-############
-
 class FrozenPhonon(WorkChain):
     """
     Workflow to calculate the force constants and phonon properties using phonopy
@@ -449,25 +409,11 @@ class FrozenPhonon(WorkChain):
         #                                     cls.collect_phonopy_data).else_(
         #                 cls.get_force_constants))
 
-        print 'test1!'
         spec.outline(cls.create_displacement_calculations, cls.get_force_constants)
         #spec.outline(cls.create_displacement_calculations, cls.get_force_constants_remote, cls.collect_phonopy_data)
 
         # spec.dynamic_output()
         #spec.outline(cls.test1, cls.test2)
-
-
-    def test1(self):
-        print 'tatata'
-
-    def test2(self):
-        print 'hohohoho'
-        print self.inputs.ph_settings.get_dict()
-
-        force_constants = ArrayData()
-        force_constants.set_array('test', np.array([0, 0]))
-        self.out('force_constants', force_constants)
-
 
     def remote_phonopy(self):
         return 'code' in self.inputs.ph_settings.get_dict()
@@ -741,7 +687,7 @@ if __name__ == "__main__":
 
     machine = ParameterData(dict=machine_dict)
 
-    results = async(FrozenPhonon,
+    results = submit(FrozenPhonon,
                   structure=structure,
                   machine=machine,
                   es_settings=es_settings,
@@ -751,10 +697,12 @@ if __name__ == "__main__":
                   optimize=Bool(0)
                   )
 
-    # Check results
-    print results
+    ToContext(phonon_run=results)
 
     exit()
+
+    # Check results
+    print results
 
     print results['force_constants'].get_array('force_constants')
 
