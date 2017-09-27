@@ -148,8 +148,8 @@ def generate_vasp_params(structure, machine, settings):
     # POTCAR (pseudo)
     inputs.potcar = ParameterData(dict=settings.dict.pseudos)
 
-    settings = {'PARSER_INSTRUCTIONS':[]}
-    pinstr = settings['PARSER_INSTRUCTIONS']
+    settings_parse = {'PARSER_INSTRUCTIONS':[]}
+    pinstr = settings_parse['PARSER_INSTRUCTIONS']
     pinstr += [{
         'instr': 'array_data_parser',
         'type': 'data',
@@ -170,15 +170,17 @@ def generate_vasp_params(structure, machine, settings):
 
     # Kpoints
     from pymatgen.io import vasp as vaspio
+
+    # kpoints_pg = vaspio.Kpoints.automatic_density(structure.get_pymatgen_structure(), settings.dict.kpoints_per_atom)
     kpoints_pg = vaspio.Kpoints.monkhorst_automatic(kpts=[2, 2, 2],
                                                     shift=[0.0, 0.0, 0.0])
+
     kpoints = ParameterData(dict=kpoints_pg.as_dict())
     inputs.kpoints = kpoints
 
-    inputs.settings = ParameterData(dict=settings)
+    inputs.settings = ParameterData(dict=settings_parse)
 
     return VaspCalculation.process(), inputs
-
 
 
 def generate_phonopy_params(code, structure, parameters, machine, data_sets):
@@ -523,7 +525,7 @@ class FrozenPhonon(WorkChain):
 
     def get_force_constants(self):
 
-  #      print ctx._get_dict()
+        print self.ctx._get_dict()
 
         wf_inputs = {}
         for key, value in self.ctx._get_dict().iteritems():
