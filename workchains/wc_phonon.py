@@ -687,7 +687,7 @@ if __name__ == "__main__":
 
     machine = ParameterData(dict=machine_dict)
 
-    results = submit(FrozenPhonon,
+    results = run(FrozenPhonon,
                   structure=structure,
                   machine=machine,
                   es_settings=es_settings,
@@ -697,9 +697,6 @@ if __name__ == "__main__":
                   optimize=Bool(0)
                   )
 
-    ToContext(phonon_run=results)
-
-    exit()
 
     # Check results
     print results
