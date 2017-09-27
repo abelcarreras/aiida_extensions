@@ -500,7 +500,7 @@ class FrozenPhonon(WorkChain):
         for label, structure in structures.iteritems():
             print label, structure
 
-            print self.inputs.es_settings.dict.code_forces
+            print self.inputs.es_settings.dict.code
 
             # plugin = self.inputs.code.get_attr('input_plugin')
             try:
