@@ -385,7 +385,7 @@ def get_properties_from_phonopy(structure, phonopy_input, force_constants):
 
     return {'thermal_properties': thermal_properties, 'dos': dos}
 
-
+###TEST FUNCTION ###
 class FrozenPhonon2(WorkChain):
     """
     Workflow to calculate the force constants and phonon properties using phonopy
@@ -413,7 +413,7 @@ class FrozenPhonon2(WorkChain):
 
     def test1(self):
         print 'tatata'
-        pass
+
 
     def test2(self):
         print 'hohohoho'
@@ -422,7 +422,8 @@ class FrozenPhonon2(WorkChain):
         force_constants = ArrayData()
         force_constants.set_array('test', np.array([0, 0]))
         self.out('force_constants', force_constants)
-        pass
+
+############
 
 class FrozenPhonon(WorkChain):
     """
