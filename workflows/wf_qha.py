@@ -932,7 +932,6 @@ class Wf_qhaWorkflow(Workflow):
 
         data_folder.create_file_from_filelike(info_data, 'info_data.html')
 
-
         ############################
         # Get gruneisen results
         ############################
