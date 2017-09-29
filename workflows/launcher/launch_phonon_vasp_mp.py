@@ -12,7 +12,7 @@ from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
 
 ##########################
-structure_id = 'mp-12668'
+structure_id = 'mp-1265'
 ##########################
 
 # Define the supercell size to use to calculate the forces in phonopy
