@@ -12,6 +12,7 @@ from aiida.parsers.plugins.vasp.instruction import BaseInstruction
 #
 from pymatgen.io import vasp
 #
+
 import phonopy.interface.vasp as vasp_phonopy 
 
 # This file has been modified from the original code by Mario Zic
@@ -25,7 +26,7 @@ __contact__ = u'zicm_at_tcd.ie'
 
 class Output_parametersInstruction(BaseInstruction):
 
-    _input_file_list_ = ['vasprun.xml', 'OUTCAR']
+    _input_file_list_ = ['vasprun.xml']
 
     def _parser_function(self):
         """
@@ -36,19 +37,10 @@ class Output_parametersInstruction(BaseInstruction):
 
         parser_warnings = {}  # return non-critical errors
 
-
-        # extract data
-        try: 
-            with open(self._out_folder.get_abs_path('OUTCAR'), 'r') as f:
-                text = f.readlines()
-        except:
-            print ('Error opening')   
-
         vspr = vasp.Vasprun(self._out_folder.get_abs_path('vasprun.xml'), exception_on_bad_xml=False)
         # vasp_param['final_energy'] = vspr.final_energy  # This includes PV
-        # vasp_param['energy'] = vspr.ionic_steps[-1]['e_fr_energy'] #Not quite the energy
+        # vasp_param['energy'] = vspr.ionic_steps[-1]['e_fr_energy'] # Not quite the energy
         vasp_param['energy'] = vspr.ionic_steps[-1]['electronic_steps'][-1]['e_wo_entrp']
-#            vasp_param['volume'] = vspr.final_structure.lattice.volume  #Not here!, not necessary
 
 #        except Exception, e:
 #            msg = (
