@@ -178,15 +178,15 @@ wf_parameters = {
      'structure': structure,
      'phonopy_input': {'parameters': phonopy_parameters},
      'input_force': {'code': 'vasp541mpi@stern',
-                    'parameters': incar_dict,
-                    'resources': machine_dict,
-                    'pseudo': pseudo_dict,
-                    'kpoints': kpoints_dict},
+                     'parameters': incar_dict,
+                     'resources': machine_dict,
+                     'pseudo': pseudo_dict,
+                     'kpoints': kpoints_dict},
      'input_optimize': {'code': 'vasp541mpi@stern',
-                       'parameters': incar_dict,
-                       'resources': machine_dict,
-                       'pseudo': pseudo_dict,
-                       'kpoints': kpoints_dict}
+                        'parameters': incar_dict,
+                        'resources': machine_dict,
+                        'pseudo': pseudo_dict,
+                        'kpoints': kpoints_dict}
 }
 
 #Define calculation to perform and lauch
