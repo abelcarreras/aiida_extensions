@@ -37,18 +37,23 @@ def get_path_using_seekpath(structure, band_resolution=30):
             'labels': path_data['path']}
 
 
-def get_born_parameters(phonon, borns, epsilon, symprec=1e-5):
+def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
     from phonopy.structure.cells import get_primitive, get_supercell
     from phonopy.structure.symmetry import Symmetry
 
+    print ('inside born parameters')
     pmat = phonon.get_primitive_matrix()
     smat = phonon.get_supercell_matrix()
     ucell = phonon.get_unitcell()
 
-    num_atom = len(borns)
+    print pmat
+    print smat
+    print ucell
+
+    num_atom = len(born_charges)
     assert num_atom == ucell.get_number_of_atoms(), \
         "num_atom %d != len(borns) %d" % (ucell.get_number_of_atoms(),
-                                          len(borns))
+                                          len(born_charges))
 
     inv_smat = np.linalg.inv(smat)
     scell = get_supercell(ucell, smat, symprec=symprec)
@@ -58,9 +63,11 @@ def get_born_parameters(phonon, borns, epsilon, symprec=1e-5):
     s_indep_atoms = p2s[p_sym.get_independent_atoms()]
     u2u = scell.get_unitcell_to_unitcell_map()
     u_indep_atoms = [u2u[x] for x in s_indep_atoms]
-    reduced_borns = borns[u_indep_atoms].copy()
+    reduced_borns = born_charges[u_indep_atoms].copy()
 
     born_dict = {'born': reduced_borns, 'dielectric': epsilon, 'factor': None}
+
+    print ('final born dict', born_dict)
 
     return born_dict
 
@@ -216,7 +223,6 @@ def phonopy_calculation_inline(**kwargs):
     force_constants = kwargs.pop('force_constants').get_array('force_constants')
     bands = get_path_using_seekpath(structure)
 
-
     # Generate phonopy phonon object
     bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
                         positions=[site.position for site in structure.sites],
@@ -227,14 +233,16 @@ def phonopy_calculation_inline(**kwargs):
                      primitive_matrix=phonopy_input['primitive'],
                      symprec=phonopy_input['symmetry_precision'])
 
-    try:
-        nac_data = kwargs.pop('nac_data')
-        born = nac_data.get_array('born')
-        epsilon = nac_data.get_array('epsilon')
+#    try:
+    print ('trying born')
+    nac_data = kwargs.pop('nac_data')
+    born = nac_data.get_array('born')
+    epsilon = nac_data.get_array('epsilon')
 
-        phonon.set_nac_params(get_born_parameters(phonon, born, epsilon))
-    except:
-        pass
+    phonon.set_nac_params(get_born_parameters(phonon, born, epsilon))
+    print ('born succeed')
+#    except:
+#        pass
 
     phonon.set_force_constants(force_constants)
 
