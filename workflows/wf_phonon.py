@@ -41,9 +41,9 @@ def get_born_parameters(phonon, borns, epsilon, symprec=1e-5):
     from phonopy.structure.cells import get_primitive, get_supercell
     from phonopy.structure.symmetry import Symmetry
 
-    pmat =  phonon.get_primitive_matrix()
+    pmat = phonon.get_primitive_matrix()
     smat = phonon.get_supercell_matrix()
-    ucell =  phonon.get_unitcell()
+    ucell = phonon.get_unitcell()
 
     num_atom = len(borns)
     assert num_atom == ucell.get_number_of_atoms(), \
