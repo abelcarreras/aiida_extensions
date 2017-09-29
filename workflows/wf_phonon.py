@@ -236,7 +236,7 @@ def phonopy_calculation_inline(**kwargs):
 #    try:
     print ('trying born')
     nac_data = kwargs.pop('nac_data')
-    born = nac_data.get_array('born')
+    born = nac_data.get_array('born_charges')
     epsilon = nac_data.get_array('epsilon')
 
     phonon.set_nac_params(get_born_parameters(phonon, born, epsilon))
@@ -639,7 +639,7 @@ class Wf_phononWorkflow(Workflow):
             calc = self.generate_calculation(structure, parameters['input_optimize'], type='optimize')
 
         calc.label = 'optimization'
-        print 'created calculation with PK={}'.format(calc.pk)
+        print ('created calculation with PK={}'.format(calc.pk))
         self.attach_calculation(calc)
 
         if counter < 1:

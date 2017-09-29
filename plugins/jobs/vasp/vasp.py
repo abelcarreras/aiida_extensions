@@ -31,7 +31,6 @@ def write_poscar(poscar, file='POSCAR'):
     elements = np.array(atom_type_unique[0])[sort_index]
     elements_count= np.diff(np.append(np.array(atom_type_unique[1])[sort_index], [len(types)]))
 
-    print poscar_dict
     poscar_txt = poscar_dict['comment']
     poscar_txt += '\n1.0\n'
     cell = poscar_dict['structure']['lattice']['matrix']
@@ -109,7 +108,7 @@ def assemble_poscar(
 
         try:
             structure = structure.get_pymatgen_structure()
-            print structure.lattice.matrix
+            # print structure.lattice.matrix
         except Exception as e:
             msg = errmsg('aiida2vasp').format('structure', e)
             raise ValueError(msg)
