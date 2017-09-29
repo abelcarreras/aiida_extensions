@@ -37,6 +37,34 @@ def get_path_using_seekpath(structure, band_resolution=30):
             'labels': path_data['path']}
 
 
+def get_born_parameters(phonon, borns, epsilon, symprec=1e-5):
+    from phonopy.structure.cells import get_primitive, get_supercell
+    from phonopy.structure.symmetry import Symmetry
+
+    pmat =  phonon.get_primitive_matrix()
+    smat = phonon.get_supercell_matrix()
+    ucell =  phonon.get_unitcell()
+
+    num_atom = len(borns)
+    assert num_atom == ucell.get_number_of_atoms(), \
+        "num_atom %d != len(borns) %d" % (ucell.get_number_of_atoms(),
+                                          len(borns))
+
+    inv_smat = np.linalg.inv(smat)
+    scell = get_supercell(ucell, smat, symprec=symprec)
+    pcell = get_primitive(scell, np.dot(inv_smat, pmat), symprec=symprec)
+    p2s = np.array(pcell.get_primitive_to_supercell_map(), dtype='intc')
+    p_sym = Symmetry(pcell, is_symmetry=True, symprec=symprec)
+    s_indep_atoms = p2s[p_sym.get_independent_atoms()]
+    u2u = scell.get_unitcell_to_unitcell_map()
+    u_indep_atoms = [u2u[x] for x in s_indep_atoms]
+    reduced_borns = borns[u_indep_atoms].copy()
+
+    born_dict = {'born': reduced_borns, 'dielectric': epsilon, 'factor': None}
+
+    return born_dict
+
+
 @make_inline
 def standardize_cell_inline(**kwargs):
     import spglib
@@ -188,6 +216,7 @@ def phonopy_calculation_inline(**kwargs):
     force_constants = kwargs.pop('force_constants').get_array('force_constants')
     bands = get_path_using_seekpath(structure)
 
+
     # Generate phonopy phonon object
     bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
                         positions=[site.position for site in structure.sites],
@@ -197,6 +226,15 @@ def phonopy_calculation_inline(**kwargs):
                      phonopy_input['supercell'],
                      primitive_matrix=phonopy_input['primitive'],
                      symprec=phonopy_input['symmetry_precision'])
+
+    try:
+        nac_data = kwargs.pop('nac_data')
+        born = nac_data.get_array('born')
+        epsilon = nac_data.get_array('epsilon')
+
+        phonon.set_nac_params(get_born_parameters(phonon, born, epsilon))
+    except:
+        pass
 
     phonon.set_force_constants(force_constants)
 
@@ -246,6 +284,7 @@ def phonopy_calculation_inline(**kwargs):
     thermal_properties.set_array('cv', cv * norm_primitive_to_unitcell)
 
     return {'thermal_properties': thermal_properties, 'dos': dos, 'band_structure': band_structure}
+
 
 class Wf_phononWorkflow(Workflow):
 #class WorkflowPhonon(Workflow):
@@ -398,7 +437,6 @@ class Wf_phononWorkflow(Workflow):
                 'EDIFFG': -1e-08,
                 'ADDGRID': '.TRUE.',
                 'LREAL': '.FALSE.',
-                'LEPSILON': '.TRUE.',
                 'PSTRESS': pressure}) # unit: kb -> kB
             incar = vasp_input_optimize
 
@@ -432,6 +470,21 @@ class Wf_phononWorkflow(Workflow):
                 'ADDGRID': '.TRUE.',
                 'LREAL': '.FALSE.'})
             incar = vasp_input_forces
+
+        if type == 'born_charges':
+            vasp_input_epsilon = dict(incar)
+            vasp_input_epsilon.update({
+                'PREC': 'Accurate',
+                'LEPSILON': '.TRUE.',
+                'ISTART': 0,
+                'IBRION': 1,
+                'NSW': 0,
+                'LWAVE': '.FALSE.',
+                'LCHARG': '.FALSE.',
+                'EDIFF': 1e-08,
+                'ADDGRID': '.TRUE.',
+                'LREAL': '.FALSE.'})
+            incar = vasp_input_epsilon
 
         # KPOINTS
         kpoints = parameters['kpoints']
@@ -588,7 +641,6 @@ class Wf_phononWorkflow(Workflow):
             self.add_attribute('counter', counter - 1)
             self.next(self.optimize)
 
-
     # Prepare supercells with displacements
     @Workflow.step
     def displacements(self):
@@ -621,12 +673,7 @@ class Wf_phononWorkflow(Workflow):
                     self.add_attribute('counter', counter - 1)
 
             if all_calc_ok:
-                if 'code' in parameters['phonopy_input']:
-                    self.append_to_report('Remote phonon calculation')
-                    self.next(self.force_constants_calculation_remote)
-                else:
-                    self.append_to_report('Local phonon calculation')
-                    self.next(self.force_constants_calculation)
+                self.next(self.born_charges)
                 return
         else:
             optimized = self.get_step('optimize')
@@ -669,9 +716,24 @@ class Wf_phononWorkflow(Workflow):
     #            self.next(self.force_constants_calculation)
 
 
+    @Workflow.step
+    def born_charges(self):
+
+        parameters = self.get_parameters()
+        structure = self.get_result('final_structure')  # Collects the forces and prepares force constants
+
+        calc = self.generate_calculation(structure, parameters['input_optimize'], type='born_charges')
+        self.attach_calculation(calc)
+
+        if 'code' in parameters['phonopy_input']:
+            self.append_to_report('Remote phonon calculation')
+            self.next(self.force_constants_calculation_remote)
+        else:
+            self.append_to_report('Local phonon calculation')
+            self.next(self.force_constants_calculation)
+        return
 
 
-    # Collects the forces and prepares force constants
     @Workflow.step
     def force_constants_calculation(self):
 
@@ -740,6 +802,9 @@ class Wf_phononWorkflow(Workflow):
 
         parameters_phonopy = self.get_parameters()['phonopy_input']
 
+        born_calc = self.get_step_calculations(self.born_charges)[0]
+        born_charges = born_calc.get_outputs_dict()['output_array']
+
         remote_phonopy = self.get_step('force_constants_calculation_remote')
 
         if remote_phonopy is None:
@@ -753,7 +818,8 @@ class Wf_phononWorkflow(Workflow):
 
         inline_params = {'structure': structure,
                          'phonopy_input': ParameterData(dict=parameters_phonopy['parameters']),
-                         'force_constants': force_constants}
+                         'force_constants': force_constants,
+                         'nac_data': born_charges}
 
         results = phonopy_calculation_inline(**inline_params)[1]
 
