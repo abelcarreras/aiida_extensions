@@ -58,6 +58,7 @@ class Array_data_parserInstruction(BaseInstruction):
 
                         born_charges = np.array(born_charges)
                         array_data.set_array('born_charges', born_charges)
+
                         break
                 except KeyError:
                     pass

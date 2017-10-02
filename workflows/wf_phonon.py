@@ -40,6 +40,7 @@ def get_path_using_seekpath(structure, band_resolution=30):
 def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
     from phonopy.structure.cells import get_primitive, get_supercell
     from phonopy.structure.symmetry import Symmetry
+    from phonopy.interface import get_default_physical_units
 
     print ('inside born parameters')
     pmat = phonon.get_primitive_matrix()
@@ -65,7 +66,9 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
     u_indep_atoms = [u2u[x] for x in s_indep_atoms]
     reduced_borns = born_charges[u_indep_atoms].copy()
 
-    born_dict = {'born': reduced_borns, 'dielectric': epsilon, 'factor': None}
+    factor = get_default_physical_units('vasp')['nac_factor']  # born charges in VASP units
+
+    born_dict = {'born': reduced_borns, 'dielectric': epsilon, 'factor': factor}
 
     print ('final born dict', born_dict)
 
