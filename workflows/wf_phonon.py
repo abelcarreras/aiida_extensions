@@ -750,9 +750,9 @@ class Wf_phononWorkflow(Workflow):
         structure = self.get_result('final_structure')  # Collects the forces and prepares force constants
 
         calc = self.generate_calculation(structure, parameters['input_optimize'], type='born_charges')
-        calc.label = 'single point'
 
         if calc is not None:
+            calc.label = 'single point'
             self.attach_calculation(calc)
 
         if 'code' in parameters['phonopy_input']:
