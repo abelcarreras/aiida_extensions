@@ -168,7 +168,7 @@ def get_force_constants_inline(**kwargs):
 
     # Build data_sets from forces of supercells with displacments
     data_sets = phonon.get_displacement_dataset()
-    print data_sets
+
     for i, first_atoms in enumerate(data_sets['first_atoms']):
         first_atoms['forces'] = kwargs.pop('force_{}'.format(i)).get_array('forces')[-1]
 
@@ -213,7 +213,6 @@ def get_force_sets_inline(**kwargs):
     for i, first_atoms in enumerate(data_sets['first_atoms']):
         first_atoms['forces'] = kwargs.pop('force_{}'.format(i)).get_array('forces')[-1]
 
-    print data_sets
     data = ArrayData()
     data.set_array('force_sets', np.array(data_sets))
 
@@ -345,13 +344,11 @@ class Wf_phononWorkflow(Workflow):
         calc = code.new_calc(max_wallclock_seconds=3600,
                              resources=parameters['resources'])
 
-
         calc.label = "test lammps calculation"
         calc.description = "A much longer description"
         calc.use_code(code)
         calc.use_structure(structure)
         calc.use_potential(ParameterData(dict=parameters['potential']))
-
 
         #if code.get_input_plugin_name() == 'lammps.optimize':
         if type == 'optimize':
