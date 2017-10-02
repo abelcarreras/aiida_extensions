@@ -328,11 +328,15 @@ class Wf_phononWorkflow(Workflow):
 
     def generate_calculation_lammps(self, structure, parameters, type='optimize', pressure=0.0):
 
+        if type == 'born_charges':
+            return None
+
         codename = parameters['code']
         code = Code.get_from_string(codename)
 
         calc = code.new_calc(max_wallclock_seconds=3600,
                              resources=parameters['resources'])
+
 
         calc.label = "test lammps calculation"
         calc.description = "A much longer description"
@@ -731,7 +735,9 @@ class Wf_phononWorkflow(Workflow):
         structure = self.get_result('final_structure')  # Collects the forces and prepares force constants
 
         calc = self.generate_calculation(structure, parameters['input_optimize'], type='born_charges')
-        self.attach_calculation(calc)
+
+        if calc is not None:
+            self.attach_calculation(calc)
 
         if 'code' in parameters['phonopy_input']:
             self.append_to_report('Remote phonon calculation')

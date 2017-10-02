@@ -85,7 +85,6 @@ def read_lammps_forces(file_name):
 
         cells.append(super_cell.T)
 
-
         position_number = file_map.find('ITEM: ATOMS')
         file_map.seek(position_number)
         file_map.readline()
@@ -101,7 +100,6 @@ def read_lammps_forces(file_name):
     file_map.close()
 
     forces = np.array([forces], dtype=float)
-
 
     return forces
 
