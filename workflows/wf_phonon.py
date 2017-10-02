@@ -97,6 +97,8 @@ def standardize_cell_inline(**kwargs):
                                                                        to_primitive=0,
                                                                        no_idealize=1)
 
+    print lattice, standardized_positions, numbers
+
     standardized_bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
                                      scaled_positions=standardized_positions,
                                      cell=lattice)
