@@ -240,6 +240,8 @@ def phonopy_calculation_inline(**kwargs):
                      primitive_matrix=phonopy_input['primitive'],
                      symprec=phonopy_input['symmetry_precision'])
 
+    phonon.set_force_constants(force_constants)
+
 #    try:
     print ('trying born')
     nac_data = kwargs.pop('nac_data')
@@ -250,8 +252,6 @@ def phonopy_calculation_inline(**kwargs):
     print ('born succeed')
 #    except:
 #        pass
-
-    phonon.set_force_constants(force_constants)
 
     # Normalization factor primitive to unit cell
     norm_primitive_to_unitcell = phonon.unitcell.get_number_of_atoms() / phonon.primitive.get_number_of_atoms()
