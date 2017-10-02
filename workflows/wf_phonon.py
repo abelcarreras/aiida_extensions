@@ -79,6 +79,8 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
 def standardize_cell_inline(**kwargs):
     import spglib
     from phonopy.structure.atoms import Atoms as PhonopyAtoms
+    from phonopy.structure.atoms import atom_data
+
     import itertools
 
     structure = kwargs.pop('structure')
@@ -97,15 +99,18 @@ def standardize_cell_inline(**kwargs):
                                                                        to_primitive=0,
                                                                        no_idealize=1)
 
-    print lattice, standardized_positions, numbers
-    print [site.kind_name for site in structure.sites]
-    standardized_bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
+    symbols = [atom_data[i][1] for i in numbers]
+
+    #print lattice, standardized_positions, numbers
+    #print [site.kind_name for site in structure.sites]
+    print symbols
+    standardized_bulk = PhonopyAtoms(symbols=symbols,
                                      scaled_positions=standardized_positions,
                                      cell=lattice)
 
     # create new aiida structure object
     standarized = StructureData(cell=lattice)
-    for position, symbol in zip(standardized_bulk.get_positions(), bulk.get_chemical_symbols()):
+    for position, symbol in zip(standardized_bulk.get_positions(), standardized_bulk.get_chemical_symbols()):
         standarized.append_atom(position=position,
                                       symbols=symbol)
 
