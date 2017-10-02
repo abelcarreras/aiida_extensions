@@ -832,8 +832,6 @@ class Wf_phononWorkflow(Workflow):
 
         parameters_phonopy = self.get_parameters()['phonopy_input']
 
-        born_calc = self.get_step_calculations(self.born_charges)[0]
-        born_charges = born_calc.get_outputs_dict()['output_array']
 
         remote_phonopy = self.get_step('force_constants_calculation_remote')
 
@@ -848,8 +846,14 @@ class Wf_phononWorkflow(Workflow):
 
         inline_params = {'structure': structure,
                          'phonopy_input': ParameterData(dict=parameters_phonopy['parameters']),
-                         'force_constants': force_constants,
-                         'nac_data': born_charges}
+                         'force_constants': force_constants}
+
+        try:
+            born_calc = self.get_step_calculations(self.born_charges)[0]
+            born_charges = born_calc.get_outputs_dict()['output_array']
+            inline_params.update({'nac_data': born_charges})
+        except IndexError:
+            pass
 
         results = phonopy_calculation_inline(**inline_params)[1]
 
