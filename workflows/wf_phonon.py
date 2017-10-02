@@ -206,6 +206,7 @@ def get_force_sets_inline(**kwargs):
     for i, first_atoms in enumerate(data_sets['first_atoms']):
         first_atoms['forces'] = kwargs.pop('force_{}'.format(i)).get_array('forces')[-1]
 
+    print data_sets
     data = ArrayData()
     data.set_array('force_sets', np.array(data_sets))
 
