@@ -8,32 +8,54 @@ from aiida.common.utils import classproperty
 
 import numpy as np
 
+# for future use
+def get_BORN_txt(structure, parameters, nac_data, symprec=1.e-5):
 
-def get_FORCE_SETS_txt_old(data_sets_object):
-    names = data_sets_object.get_arraynames()
-    num_atom = len(data_sets_object.get_array(names[0])[3])
+    from phonopy.structure.cells import get_primitive, get_supercell
+    from phonopy.structure.symmetry import Symmetry
+    from phonopy.interface import get_default_physical_units
+    from phonopy.structure.atoms import Atoms as PhonopyAtoms
 
-    data_list = []
-    for name in names:
-        data_list.append({'direction': data_sets_object.get_array(name)[0],
-                          'number': data_sets_object.get_array(name)[1],
-                          'displacement': data_sets_object.get_array(name)[2],
-                          'forces': data_sets_object.get_array(name)[3]})
-    data_sets = {'natom': num_atom, 'first_atoms': data_list}
+    born_charges = nac_data.get_array('born_charges')
+    epsilon = nac_data.get_array('epsilon')
 
-    displacements = data_sets['first_atoms']
-    forces = [x['forces'] for x in data_sets['first_atoms']]
+    print ('inside born parameters')
+    pmat = parameters['primitive']
+    smat = parameters['supercell']
 
-    # Write FORCE_SETS
-    force_sets_txt = "%-5d\n" % num_atom
-    force_sets_txt += "%-5d\n" % len(displacements)
-    for count, disp in enumerate(displacements):
-        force_sets_txt += "\n%-5d\n" % (disp['number'] + 1)
-        force_sets_txt += "%20.16f %20.16f %20.16f\n" % (tuple(disp['displacement']))
+    ucell = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
+                         positions=[site.position for site in structure.sites],
+                         cell=structure.cell)
 
-        for f in forces[count]:
-            force_sets_txt += "%15.10f %15.10f %15.10f\n" % (tuple(f))
-    return force_sets_txt
+    num_atom = len(born_charges)
+    assert num_atom == ucell.get_number_of_atoms(), \
+        "num_atom %d != len(borns) %d" % (ucell.get_number_of_atoms(),
+                                          len(born_charges))
+
+    inv_smat = np.linalg.inv(smat)
+    scell = get_supercell(ucell, smat, symprec=symprec)
+    pcell = get_primitive(scell, np.dot(inv_smat, pmat), symprec=symprec)
+    p2s = np.array(pcell.get_primitive_to_supercell_map(), dtype='intc')
+    p_sym = Symmetry(pcell, is_symmetry=True, symprec=symprec)
+    s_indep_atoms = p2s[p_sym.get_independent_atoms()]
+    u2u = scell.get_unitcell_to_unitcell_map()
+    u_indep_atoms = [u2u[x] for x in s_indep_atoms]
+    reduced_borns = born_charges[u_indep_atoms].copy()
+
+    factor = get_default_physical_units('vasp')['nac_factor']  # born charges in VASP units
+
+    born_txt = ('{}\n'.format(factor))
+    for num in epsilon.flatten():
+        born_txt += ('{0:4.8f}'.format(num))
+    born_txt += ('\n')
+
+    for atom in reduced_borns:
+        for num in atom:
+            born_txt += ('{0:4.8f}'.format(num))
+        born_txt += ('\n')
+    born_txt += ('{}\n'.format(factor))
+
+    return born_txt
 
 
 def get_FORCE_SETS_txt(data_sets_object):
@@ -107,6 +129,7 @@ class PhonopyCalculation(JobCalculation):
         self._INPUT_FILE_NAME = 'phonopy.conf'
         self._INPUT_CELL = 'POSCAR'
         self._INPUT_FORCE_SETS = 'FORCE_SETS'
+        self._INPUT_NAC = 'BORN'
 
         self._OUTPUT_FILE_NAME = 'FORCE_CONSTANTS'
         self._default_parser = "phonopy"
@@ -138,6 +161,12 @@ class PhonopyCalculation(JobCalculation):
                 'linkname': 'structure',
                 'docstring': "Use a node for the structure",
             },
+            "nac_data": {
+                'valid_types': StructureData,
+                'additional_parameter': None,
+                'linkname': 'nac_data',
+                'docstring': "Use a node for the Non-analitical corrections data",
+            },
         })
         return retdict
 
@@ -155,12 +184,7 @@ class PhonopyCalculation(JobCalculation):
         try:
             parameters_data = inputdict.pop(self.get_linkname('parameters'))
         except KeyError:
-            pass
-            # raise InputValidationError("No parameters specified for this "
-            #                           "calculation")
-        if not isinstance(parameters_data, ParameterData):
-            raise InputValidationError("parameters is not of type "
-                                       "ParameterData")
+            raise InputValidationError("No parameters specified for this calculation")
 
         try:
             structure = inputdict.pop(self.get_linkname('structure'))
@@ -177,6 +201,12 @@ class PhonopyCalculation(JobCalculation):
         except KeyError:
             raise InputValidationError("no code is specified for this calculation")
 
+        try:
+            nac_data = inputdict.pop(self.get_linkname('nac_data'))
+        except KeyError:
+            nac_data = None
+
+
         ##############################
         # END OF INITIAL INPUT CHECK #
         ##############################
@@ -186,6 +216,13 @@ class PhonopyCalculation(JobCalculation):
         cell_txt = structure_to_poscar(structure)
         input_txt = parameters_to_input_file(parameters_data)
         force_sets_txt = get_FORCE_SETS_txt(data_sets)
+
+        # For future use (not actually used, test only)
+        if nac_data is not  None:
+            born_txt = get_BORN_txt(structure, parameters_data, nac_data)
+            nac_filename = tempfolder.get_abs_path(self._INPUT_NAC)
+            with open(nac_filename, 'w') as infile:
+                infile.write(born_txt)
 
         # =========================== dump to file =============================
 

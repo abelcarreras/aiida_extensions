@@ -245,16 +245,16 @@ def phonopy_calculation_inline(**kwargs):
 
     phonon.set_force_constants(force_constants)
 
-#    try:
-    print ('trying born')
-    nac_data = kwargs.pop('nac_data')
-    born = nac_data.get_array('born_charges')
-    epsilon = nac_data.get_array('epsilon')
+    try:
+        print ('trying born')
+        nac_data = kwargs.pop('nac_data')
+        born = nac_data.get_array('born_charges')
+        epsilon = nac_data.get_array('epsilon')
 
-    phonon.set_nac_params(get_born_parameters(phonon, born, epsilon))
-    print ('born succeed')
-#    except:
-#        pass
+        phonon.set_nac_params(get_born_parameters(phonon, born, epsilon))
+        print ('born succeed')
+    except:
+        pass
 
     # Normalization factor primitive to unit cell
     norm_primitive_to_unitcell = phonon.unitcell.get_number_of_atoms() / phonon.primitive.get_number_of_atoms()
@@ -743,6 +743,7 @@ class Wf_phononWorkflow(Workflow):
         structure = self.get_result('final_structure')  # Collects the forces and prepares force constants
 
         calc = self.generate_calculation(structure, parameters['input_optimize'], type='born_charges')
+        calc.label = 'single point'
 
         if calc is not None:
             self.attach_calculation(calc)
