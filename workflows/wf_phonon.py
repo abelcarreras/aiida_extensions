@@ -109,7 +109,7 @@ def standardize_cell_inline(**kwargs):
                                      cell=lattice)
 
     # create new aiida structure object
-    standarized = StructureData(cell=lattice)
+    standarized = StructureData(cell=standardized_bulk.get_cell())
     for position, symbol in zip(standardized_bulk.get_positions(), standardized_bulk.get_chemical_symbols()):
         standarized.append_atom(position=position,
                                       symbols=symbol)

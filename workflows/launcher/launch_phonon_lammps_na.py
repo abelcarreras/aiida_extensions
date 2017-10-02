@@ -79,7 +79,7 @@ wf_parameters = {
 
 #Submit workflow
 WorkflowPhonon = WorkflowFactory('wf_phonon')
-wf = WorkflowPhonon(params=wf_parameters, optimize=True, pressure=0.0)  # pressure in kb
+wf = WorkflowPhonon(params=wf_parameters, optimize=False, pressure=0.0)  # pressure in kb
 
 wf.label = 'LAMMPS Lennad-Jones'
 wf.start()
