@@ -157,10 +157,14 @@ def get_force_constants_inline(**kwargs):
                         positions=[site.position for site in structure.sites],
                         cell=structure.cell)
 
+    print bulk
+    print
     phonon = Phonopy(bulk,
                      phonopy_input['supercell'],
                      primitive_matrix=phonopy_input['primitive'],
                      symprec=phonopy_input['symmetry_precision'])
+
+    phonon.generate_displacements(distance=phonopy_input['distance'])
 
     # Build data_sets from forces of supercells with displacments
     data_sets = phonon.get_displacement_dataset()
@@ -201,6 +205,8 @@ def get_force_sets_inline(**kwargs):
                      phonopy_input['supercell'],
                      primitive_matrix=phonopy_input['primitive'],
                      symprec=phonopy_input['symmetry_precision'])
+
+    phonon.generate_displacements(distance=phonopy_input['distance'])
 
     # Build data_sets from forces of supercells with displacments
     data_sets = phonon.get_displacement_dataset()
