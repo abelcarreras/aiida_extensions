@@ -1,6 +1,7 @@
 from aiida.orm import Code, DataFactory
 from aiida.orm.workflow import Workflow
 from aiida.orm.calculation.inline import make_inline
+from aiida.common.exceptions import AiidaException
 
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
@@ -867,7 +868,7 @@ class Wf_phononWorkflow(Workflow):
             born_calc = self.get_step_calculations(self.born_charges)[0]
             born_charges = born_calc.get_outputs_dict()['output_array']
             inline_params.update({'nac_data': born_charges})
-        except IndexError:
+        except AiidaException:
             pass
 
         results = phonopy_calculation_inline(**inline_params)[1]
