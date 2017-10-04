@@ -710,7 +710,12 @@ class Wf_phononWorkflow(Workflow):
                 if self.get_attribute('include_born'):
                     self.next(self.born_charges)
                 else:
-                    self.next(self.force_constants_calculation)
+                    if 'code' in parameters['phonopy_input']:
+                        self.append_to_report('Remote phonon calculation')
+                        self.next(self.force_constants_calculation_remote)
+                    else:
+                        self.append_to_report('Local phonon calculation')
+                        self.next(self.force_constants_calculation)
                 return
         else:
             optimized = self.get_step('optimize')
