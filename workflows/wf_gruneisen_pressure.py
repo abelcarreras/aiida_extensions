@@ -257,6 +257,11 @@ class Wf_gruneisen_pressureWorkflow(Workflow):
         else:
             self._pre_optimize = True  # By default pre-optimization is done
 
+        if 'include_born' in kwargs:
+            self._include_born = kwargs['include_born']
+        else:
+            self._include_born = False  # By default not include born
+
         if 'pressure' in kwargs:
             self._pressure = kwargs['pressure']
         else:
@@ -268,6 +273,8 @@ class Wf_gruneisen_pressureWorkflow(Workflow):
             self._p_displacement = 2  # in Kbar
 
 
+
+
     # Calculates the reference crystal structure (optimize it if requested)
     @Workflow.step
     def start(self):
@@ -275,6 +282,8 @@ class Wf_gruneisen_pressureWorkflow(Workflow):
         self.append_to_report('Phonon calculation of base structure')
 
         self.add_attribute('pressure', self._pressure)
+        self.add_attribute('include_born', self._include_born)
+
         self.add_attribute('p_displacement', self._p_displacement)
 
         if not self._pre_optimize:
@@ -289,7 +298,8 @@ class Wf_gruneisen_pressureWorkflow(Workflow):
         wf = WorkflowPhonon(params=wf_parameters,
                             optimize=True,
                             constant_volume=False,
-                            pressure=self._pressure)
+                            pressure=self._pressure,
+                            include_born=self._include_born)
         # wf = load_workflow(440)
 
         wf.store()
@@ -314,7 +324,10 @@ class Wf_gruneisen_pressureWorkflow(Workflow):
 
             self.append_to_report('pressure: {}'.format(pressure))
 
-            wf = WorkflowPhonon(params=wf_parameters, optimize=True, pressure=pressure)
+            wf = WorkflowPhonon(params=wf_parameters,
+                                optimize=True,
+                                pressure=pressure,
+                                include_born=self.get_attribute('include_born'))
             # wf = load_workflow(list[i])
 
             wf.store()
@@ -343,7 +356,9 @@ class Wf_gruneisen_pressureWorkflow(Workflow):
 
             self.append_to_report('pressure: {}'.format(pressure))
 
-            wf = WorkflowPhonon(params=wf_parameters, optimize=True, pressure=pressure)
+            wf = WorkflowPhonon(params=wf_parameters, optimize=True,
+                                pressure=pressure,
+                                include_born=self.get_attribute('include_born'))
             # wf = load_workflow(list[i])
 
             wf.store()
