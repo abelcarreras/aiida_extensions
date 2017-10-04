@@ -332,6 +332,12 @@ class Wf_phononWorkflow(Workflow):
         else:
             self._pressure = 0.0  # By default pre-optimization is done
 
+        if 'include_born' in kwargs:
+            self._include_born = kwargs['include_born']
+        else:
+            self._include_born = False  # By default born not included
+
+
     # Correct scaled coordinates (not in use now)
     def get_scaled_positions_lines(self, scaled_positions):
 
@@ -599,6 +605,7 @@ class Wf_phononWorkflow(Workflow):
         else:
             self.next(self.displacements)
 
+        self.add_attribute('include_born', self._include_born)
         self.add_attribute('pressure', self._pressure)
         self.add_attribute('constant_volume', self._constant_volume)
 
@@ -700,7 +707,10 @@ class Wf_phononWorkflow(Workflow):
                     self.add_attribute('counter', counter - 1)
 
             if all_calc_ok:
-                self.next(self.born_charges)
+                if self.get_attribute('include_born'):
+                    self.next(self.born_charges)
+                else:
+                    self.next(self.force_constants_calculation)
                 return
         else:
             optimized = self.get_step('optimize')
