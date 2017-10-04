@@ -33,11 +33,9 @@ class Array_data_parserInstruction(BaseInstruction):
             root = tree.getroot()
 
             for elements in root.iter('varray'):
-                # print elements.tag, elements.attrib
                 if elements.attrib['name'] == 'epsilon':
                     epsilon = []
                     for row in elements:
-                        # print row.text
                         epsilon.append(np.array(row.text.split(), dtype=float))
 
                     epsilon = np.array(epsilon)
@@ -49,10 +47,8 @@ class Array_data_parserInstruction(BaseInstruction):
                     if elements.attrib['name'] == 'born_charges':
                         born_charges = []
                         for atom in elements[1:]:
-                            # print atom
                             atom_array = []
                             for c in atom:
-                                # print c.text.split()
                                 atom_array.append(np.array(c.text.split(), dtype=float))
                             born_charges.append(atom_array)
 
@@ -65,7 +61,7 @@ class Array_data_parserInstruction(BaseInstruction):
         except:
             pass
 
-        parser_warnings = {}  # return non-critical errors
+        # Use pymatgen vasp parser to get atomic forces and stress tensor
 
         vspr = Vasprun(self._out_folder.get_abs_path('vasprun.xml'), exception_on_bad_xml=False)
 
@@ -105,8 +101,6 @@ class Array_data_parserInstruction(BaseInstruction):
             )
             raise OutputParsingError(msg)
 
-        if not parser_warnings:
-            parser_warnings = None
+        parser_warnings = None
 
-#        print nodes_list
         return nodes_list, parser_warnings
