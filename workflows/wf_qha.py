@@ -379,6 +379,7 @@ class Wf_qhaWorkflow(Workflow):
 
         self.add_attribute('manual', self._manual)
         self.add_attribute('n_points', self._n_points)
+        self.add_attribute('include_born', self._include_born)
 
         if self._manual:
             self.next(self.pressure_manual_expansions)
@@ -432,7 +433,10 @@ class Wf_qhaWorkflow(Workflow):
             self.append_to_report('pressure: {}'.format(pressure))
 
             # Submit workflow
-            wf = WorkflowPhonon(params=wf_parameters, pressure=pressure, optimize=True)
+            wf = WorkflowPhonon(params=wf_parameters,
+                                pressure=pressure,
+                                optimize=True,
+                                include_born=self.get_attribute('include_born'))
             wf.store()
 
             self.attach_workflow(wf)
@@ -461,7 +465,10 @@ class Wf_qhaWorkflow(Workflow):
             self.append_to_report('pressure: {}'.format(pressure))
 
             # Submit workflow
-            wf = WorkflowPhonon(params=wf_parameters, pressure=pressure, optimize=True)
+            wf = WorkflowPhonon(params=wf_parameters,
+                                pressure=pressure,
+                                optimize=True,
+                                include_born=self.get_attribute('include_born'))
             wf.store()
 
             self.attach_workflow(wf)
@@ -501,7 +508,10 @@ class Wf_qhaWorkflow(Workflow):
             self.append_to_report('pressure: {}'.format(pressure))
 
             # Submit workflow
-            wf = WorkflowPhonon(params=wf_parameters, pressure=pressure, optimize=True)
+            wf = WorkflowPhonon(params=wf_parameters,
+                                pressure=pressure,
+                                optimize=True,
+                                include_born=self.get_attribute('include_born'))
             wf.store()
 
             #wf = load_workflow(wfs_test[i])
@@ -702,7 +712,10 @@ class Wf_qhaWorkflow(Workflow):
             # self.append_to_report('pressure: {}'.format(pressure))
 
             # Submit workflow
-            wf = WorkflowPhonon(params=wf_parameters, pressure=pressure, optimize=True)
+            wf = WorkflowPhonon(params=wf_parameters,
+                                pressure=pressure,
+                                optimize=True,
+                                include_born=self.get_attribute('include_born'))
             wf.store()
 
             # wf = load_workflow(wfs_test[i])
@@ -769,7 +782,10 @@ class Wf_qhaWorkflow(Workflow):
             self.append_to_report('pressure: {}'.format(pressure))
 
             # Submit workflow
-            wf = WorkflowPhonon(params=wf_parameters, pressure=pressure, optimize=True)
+            wf = WorkflowPhonon(params=wf_parameters,
+                                pressure=pressure,
+                                optimize=True,
+                                include_born=self.get_attribute('include_born'))
             wf.store()
 
             # wf = load_workflow(wfs_test[i])
