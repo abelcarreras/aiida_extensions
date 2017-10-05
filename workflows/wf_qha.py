@@ -378,6 +378,7 @@ class Wf_qhaWorkflow(Workflow):
         self.append_to_report('Phonon calculation of base structure')
 
         self.add_attribute('manual', self._manual)
+        self.add_attribute('n_points', self._n_points)
 
         if self._manual:
             self.next(self.pressure_manual_expansions)
@@ -447,7 +448,7 @@ class Wf_qhaWorkflow(Workflow):
         prediction = self.get_step('start').get_sub_workflows()[0].get_result('thermal_expansion_prediction')
         stresses = prediction.get_array('stresses')
 
-        n_points = wf_parameters['n_points']
+        n_points = self.get_attribute('n_points')
 
         test_pressures = np.linspace(-1.0 * np.max(stresses), np.max(stresses), n_points)  # in kbar
 
@@ -518,7 +519,7 @@ class Wf_qhaWorkflow(Workflow):
 
         # self.get_step_calculations(self.optimize).latest('id')
 
-        n_points = wf_parameters['n_points']
+        n_points = self.get_attribute('n_points')
 
         test_range = np.sort(self.get_attribute('test_range'))
         total_range = self.get_attribute('total_range')
