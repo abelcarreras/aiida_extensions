@@ -151,11 +151,11 @@ print pseudo_dict
 # This is implemented in pymatgen which is called in phonon_workflow using 'Automatic' style
 if system == 'insulator' or system == 'semiconductor':
     # 100 Kpoints/atom
-    kpoints_per_atom = 100
+    kpoints_per_atom = 200
 
     # 1000 kpoints/atom
 if system == 'metal':
-    kpoints_per_atom = 1000
+    kpoints_per_atom = 2000
 
 kpoints_dict = {'style': 'Automatic',
                 'kpoints_per_atom': kpoints_per_atom}
