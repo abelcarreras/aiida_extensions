@@ -351,6 +351,11 @@ class Wf_qhaWorkflow(Workflow):
         else:
             self._expansion_method = 'pressure'  # By default expansion method is pressure
 
+        if 'include_born' in kwargs:
+            self._include_born = kwargs['include_born']
+        else:
+            self._include_born = False  # By default not include born
+
         if 'manual' in kwargs:
             self._manual = kwargs['manual']
         else:
@@ -381,7 +386,12 @@ class Wf_qhaWorkflow(Workflow):
         wf_parameters = self.get_parameters()
         # self.append_to_report('crystal: ' + wf_parameters['structure'].get_formula())
 
-        wf = WorkflowGruneisen(params=wf_parameters, constant_volume=False, pre_optimize=True, p_displacement=2, pressure=0)
+        wf = WorkflowGruneisen(params=wf_parameters,
+                               constant_volume=False,
+                               pre_optimize=True,
+                               p_displacement=2,
+                               pressure=0,
+                               include_born=self._include_born)
         wf.store()
 
         #wf = load_workflow(332)
