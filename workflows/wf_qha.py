@@ -15,7 +15,7 @@ from phonopy import PhonopyQHA
 from phonon_common import arrange_band_labels, get_data_info, get_file_from_numpy_array
 
 WorkflowPhonon = WorkflowFactory('wf_phonon')
-WorkflowGruneisen = DataFactory('wf_gruneisen_pressure')
+WorkflowGruneisen = WorkflowFactory('wf_gruneisen_pressure')
 
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
