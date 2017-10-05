@@ -194,7 +194,7 @@ WorkflowPhonon = WorkflowFactory('wf_phonon')
 wf = WorkflowPhonon(params=wf_parameters, optimize=True, include_born=False)
 
 wf.label = material_name
-wf.description = 'QHA {}'.format(structure.get_formula())
+wf.description = 'PHON {}'.format(structure.get_formula())
 
 wf.start()
 
