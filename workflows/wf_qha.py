@@ -838,14 +838,15 @@ class Wf_qhaWorkflow(Workflow):
         inline_params = {}
         for wf_test in wf_complete_list:
             for i, pressure in enumerate(test_pressures):
-                if np.isclose(wf_test.get_attribute('pressure'), pressure, atol=interval / 4, rtol=0):
-                    thermal_properties = wf_test.get_result('thermal_properties')
-                    optimized_data = wf_test.get_result('optimized_structure_data')
-                    final_structure = wf_test.get_result('final_structure')
+                if wf_test.get_state() == 'FINISHED':
+                    if np.isclose(wf_test.get_attribute('pressure'), pressure, atol=interval / 4, rtol=0):
+                        thermal_properties = wf_test.get_result('thermal_properties')
+                        optimized_data = wf_test.get_result('optimized_structure_data')
+                        final_structure = wf_test.get_result('final_structure')
 
-                    inline_params.update({'thermal_properties_{}'.format(i): thermal_properties})
-                    inline_params.update({'optimized_structure_data_{}'.format(i): optimized_data})
-                    inline_params.update({'final_structure_{}'.format(i): final_structure})
+                        inline_params.update({'thermal_properties_{}'.format(i): thermal_properties})
+                        inline_params.update({'optimized_structure_data_{}'.format(i): optimized_data})
+                        inline_params.update({'final_structure_{}'.format(i): final_structure})
 
         qha_result = calculate_qha_inline(**inline_params)[1]
 
