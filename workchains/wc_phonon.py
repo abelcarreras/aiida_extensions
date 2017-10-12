@@ -697,7 +697,6 @@ if __name__ == "__main__":
                   optimize=Bool(0)
                   )
 
-
     # Check results
     print results
 
