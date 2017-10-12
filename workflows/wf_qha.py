@@ -1077,8 +1077,9 @@ class Wf_qhaWorkflow(Workflow):
         final_list = []
         for wf_test in wf_complete_list:
             for i, pressure in enumerate(test_pressures):
-                if np.isclose(wf_test.get_attribute('pressure'), pressure, atol=interval / 4, rtol=0):
-                    final_list.append(wf_test)
+                if wf_test.get_state() == 'FINISHED':
+                    if np.isclose(wf_test.get_attribute('pressure'), pressure, atol=interval / 4, rtol=0):
+                        final_list.append(wf_test)
 
         data_folder = self.current_folder.get_subfolder('DETAILS')
         data_folder.create()
