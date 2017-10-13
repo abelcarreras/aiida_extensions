@@ -134,7 +134,7 @@ def generate_lammps_params(structure, machine, settings, plugin, pressure=0.0, t
     if type == 'optimize':
         lammps_parameters = dict(settings.dict.parameters)
         lammps_parameters.update({'pressure': pressure})  # pressure kb
-        inputs.use_parameters(ParameterData(dict=lammps_parameters))
+        inputs.parameters(ParameterData(dict=lammps_parameters))
 
     inputs.store_all()
 
