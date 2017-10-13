@@ -49,7 +49,8 @@ class OptimizeStructure(WorkChain):
                                                             self.inputs.es_settings,
                                                             type='optimize')
 
-        print 'job created'
+        print 'job created', JobCalculation
+        print 'calculation_input', calculation_input
 #        calculation_input._label = label
         future = submit(JobCalculation, **calculation_input)
         calcs = {'optimize': future}
