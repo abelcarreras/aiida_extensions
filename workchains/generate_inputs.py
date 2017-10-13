@@ -218,7 +218,7 @@ def generate_inputs(structure, machine, es_settings, type='single_point'):
     except:
 
         print 'here'
-        plugin = Code.get_from_string(es_settings.dict.code[0]).get_attr('input_plugin')
+        plugin = Code.get_from_string(es_settings.dict.code.values()[0]).get_attr('input_plugin')
         print 'hora'
 
         lammps_plugins =['lammps.forces', 'lammps.optimize', 'lammps.md']
