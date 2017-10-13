@@ -44,13 +44,6 @@ class OptimizeStructure(WorkChain):
             structure = self.inputs.structure
         print 'got structure'
 
-        try:
-            plugin = Code.get_from_string(self.inputs.es_settings.dict.code).get_attr('input_plugin')
-            # plugin = self.inputs.es_settings.dict.code.get_attr('input_plugin')
-        except:
-            plugin = Code.get_from_string(self.inputs.es_settings.dict.code_forces).get_attr('input_plugin')
-            # plugin = self.inputs.es_settings.dict.code_forces.get_attr('input_plugin')
-
         JobCalculation, calculation_input = generate_inputs(self.inputs.structure,
                                                             self.inputs.machine,
                                                             self.inputs.es_settings)
