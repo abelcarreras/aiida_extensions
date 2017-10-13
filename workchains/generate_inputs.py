@@ -127,7 +127,7 @@ def generate_lammps_params(structure, machine, settings, plugin, pressure=0.0, t
     inputs._options.resources = machine.dict.resources
     inputs._options.max_wallclock_seconds = machine.dict.max_wallclock_seconds
 
-    print 'done inputs'
+    print 'done inputs', structure
     inputs.structure(structure)
     print 'potential', settings.dict.potential
     inputs.potential(ParameterData(dict=settings.dict.potential))
