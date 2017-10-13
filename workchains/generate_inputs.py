@@ -129,6 +129,7 @@ def generate_lammps_params(structure, machine, settings, plugin, pressure=0.0, t
 
     print 'done inputs'
     inputs.structure(structure)
+    print 'potential', settings.dict.potential
     inputs.potential(ParameterData(dict=settings.dict.potential))
 
     print 'done structure'
