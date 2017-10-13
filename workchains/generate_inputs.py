@@ -141,7 +141,7 @@ def generate_lammps_params(structure, machine, settings, pressure=0.0, type=None
     return LammpsCalculation.process(), inputs
 
 
-def generate_vasp_params(structure, machine, settings, plugin, type=None):
+def generate_vasp_params(structure, machine, settings, type=None):
     """
     generate the input paramemeters needed to run a calculation for VASP
     :param structure:  aiida StructureData object
@@ -150,7 +150,12 @@ def generate_vasp_params(structure, machine, settings, plugin, type=None):
     :return: Calculation process object, input dictionary
     """
 
-    # plugin = self.inputs.es_settings.dict.code.get_attr('input_plugin')
+    if type is None:
+        code = settings.dict.code
+    else:
+        code = settings.dict.code[type]
+
+    plugin = Code.get_from_string(code).get_attr('input_plugin')
 
     VaspCalculation = CalculationFactory(plugin)
 
@@ -219,7 +224,7 @@ def generate_inputs(structure, machine, es_settings, type=None):
 
     print 'plugin', plugin
     if plugin == 'vasp.vasp':
-        return generate_vasp_params(structure, machine, es_settings, plugin, type=type)
+        return generate_vasp_params(structure, machine, es_settings, type=type)
 
     # elif plugin == 'quantumespresso.pw':
     #     return generate_qe_params(structure, machine, es_settings)
