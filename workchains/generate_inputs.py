@@ -136,7 +136,6 @@ def generate_lammps_params(structure, machine, settings, plugin, pressure=0.0, t
         lammps_parameters.update({'pressure': pressure})  # pressure kb
         inputs.parameters(ParameterData(dict=lammps_parameters))
 
-    inputs.store_all()
 
     return LammpsCalculation.process(), inputs
 
