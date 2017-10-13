@@ -203,7 +203,6 @@ def generate_vasp_params(structure, machine, settings):
 
 
 def generate_inputs(structure, machine, es_settings, type='single_point'):
-    code = es_settings.dict.cod
 
     try:
         plugin = Code.get_from_string(es_settings.dict.code).get_attr('input_plugin')
@@ -217,7 +216,11 @@ def generate_inputs(structure, machine, es_settings, type='single_point'):
             print 'No supported plugin'
             exit()
     except:
+
+        print 'here'
         plugin = Code.get_from_string(es_settings.dict.code[0]).get_attr('input_plugin')
+        print 'hora'
+
         lammps_plugins =['lammps.forces', 'lammps.optimize', 'lammps.md']
         if plugin in lammps_plugins:
             return generate_lammps_params(structure, machine, es_settings, type=type)
