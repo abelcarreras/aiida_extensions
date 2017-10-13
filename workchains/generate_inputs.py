@@ -122,7 +122,7 @@ def generate_lammps_params(structure, machine, settings, pressure=0.0, type=None
 
     else:
         print 'get code', settings.dict.code
-        code = settings.dict.code['type']
+        code = settings.dict.code[type]
 
     print ('code', code)
 
