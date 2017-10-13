@@ -39,9 +39,10 @@ class OptimizeStructure(WorkChain):
     def optimize_cycle(self):
 
         # self.ctx._get_dict()
-
+        print 'start optimization'
         if not 'structure' in self.ctx:
             structure = self.inputs.structure
+        print 'got structure'
 
         try:
             plugin = Code.get_from_string(self.inputs.es_settings.dict.code).get_attr('input_plugin')
@@ -54,13 +55,14 @@ class OptimizeStructure(WorkChain):
                                                             self.inputs.machine,
                                                             self.inputs.es_settings)
 
+        print 'job created'
 #        calculation_input._label = label
         future = submit(JobCalculation, **calculation_input)
         calcs = {'optimize': future}
-
+        print 'job sent'
         return ToContext(**calcs)
 
     def get_data(self):
-
+        print 'get_job'
         self.out('optimized_structure', self.ctx.get('optimize'))
 
