@@ -127,8 +127,11 @@ def generate_lammps_params(structure, machine, settings, plugin, pressure=0.0, t
     inputs._options.resources = machine.dict.resources
     inputs._options.max_wallclock_seconds = machine.dict.max_wallclock_seconds
 
+    print 'done inputs'
     inputs.structure(structure)
     inputs.potential(ParameterData(dict=settings.dict.potential))
+
+    print 'done structure'
 
     # if code.get_input_plugin_name() == 'lammps.optimize':
     if type == 'optimize':
@@ -136,6 +139,7 @@ def generate_lammps_params(structure, machine, settings, plugin, pressure=0.0, t
         lammps_parameters.update({'pressure': pressure})  # pressure kb
         inputs.parameters(ParameterData(dict=lammps_parameters))
 
+    print 'done optimize'
 
     return LammpsCalculation.process(), inputs
 
