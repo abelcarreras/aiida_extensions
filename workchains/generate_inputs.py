@@ -215,6 +215,7 @@ def generate_vasp_params(structure, machine, settings, type=None):
 
 def generate_inputs(structure, machine, es_settings, type=None):
 
+    print 'generate inputs start'
     if type is None:
         plugin = Code.get_from_string(es_settings.dict.code).get_attr('input_plugin')
 
@@ -228,6 +229,7 @@ def generate_inputs(structure, machine, es_settings, type=None):
     #     return generate_qe_params(structure, machine, es_settings)
 
     elif plugin in ['lammps.forces', 'lammps.optimize', 'lammps.md']:
+        print 'yeah!'
         return generate_lammps_params(structure, machine, es_settings, type=type)
     else:
         print 'No supported plugin'
