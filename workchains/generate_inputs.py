@@ -122,9 +122,13 @@ def generate_lammps_params(structure, machine, settings, pressure=0.0, type=None
     else:
         code = settings.dict.code['type']
 
+    print ('code', code)
+
     LammpsCalculation = CalculationFactory(code)
 
     inputs = LammpsCalculation.process().get_inputs_template()
+
+    print inputs
 
     inputs._options.resources = machine.dict.resources
     inputs._options.max_wallclock_seconds = machine.dict.max_wallclock_seconds
