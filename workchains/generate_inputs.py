@@ -221,6 +221,7 @@ def generate_inputs(structure, machine, es_settings, type=None):
         plugin = Code.get_from_string(es_settings.dict.code).get_attr('input_plugin')
 
     else:
+        print es_settings.dict.code
         plugin = Code.get_from_string(es_settings.dict.code[type]).get_attr('input_plugin')
 
     print 'plugin', plugin
