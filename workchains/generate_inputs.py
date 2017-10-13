@@ -221,7 +221,7 @@ def generate_inputs(structure, machine, es_settings, type=None):
         plugin = Code.get_from_string(es_settings.dict.code).get_attr('input_plugin')
 
     else:
-        plugin = Code.get_from_string(es_settings.dict.code[type][1]).get_attr('input_plugin')
+        plugin = Code.get_from_string(es_settings.dict.code[type]).get_attr('input_plugin')
 
     print 'plugin', plugin
     if plugin == 'vasp.vasp':
