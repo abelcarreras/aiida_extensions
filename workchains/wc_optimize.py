@@ -55,13 +55,17 @@ class OptimizeStructure(WorkChain):
         print 'job created', JobCalculation
         print 'calculation_input', calculation_input
 
-        calculation_input._label = 'optimize'
+        # calculation_input._label = 'optimize'
         future = submit(JobCalculation, **calculation_input)
+        print ('pk={}'.format(future.pk))
         calcs = {'optimize': future}
         print 'job sent'
         return ToContext(**calcs)
 
     def get_data(self):
         print 'get_job'
+        self.ctx._get_dict().iteritems()
+        self.ctx.get('optimize')
+        exit()
         self.out('optimized_structure', self.ctx.get('optimize'))
 
