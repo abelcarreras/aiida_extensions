@@ -217,12 +217,11 @@ def generate_inputs(structure, machine, es_settings, type='single_point'):
             exit()
     except:
 
-        print 'here'
         plugin = Code.get_from_string(es_settings.dict.code.values()[0]).get_attr('input_plugin')
-        print 'hora'
-
-        lammps_plugins =['lammps.forces', 'lammps.optimize', 'lammps.md']
+        print 'plugin', plugin
+        lammps_plugins = ['lammps.forces', 'lammps.optimize', 'lammps.md']
         if plugin in lammps_plugins:
+            print 'yeah!'
             return generate_lammps_params(structure, machine, es_settings, type=type)
         else:
             print 'No supported plugin'
