@@ -174,7 +174,7 @@ if True:
                   pressure=Float(10),
                   )
 
-    print (results)
+    print(results)
 else:
 
     future = submit(OptimizeStructure,
