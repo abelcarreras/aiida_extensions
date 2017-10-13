@@ -164,12 +164,25 @@ machine_dict = {'resources': {'num_machines': 1,
 machine = ParameterData(dict=machine_dict)
 
 from aiida.workflows.wc_optimize import OptimizeStructure
-future = submit(OptimizeStructure,
-                structure=structure,
-                machine=machine,
-                es_settings=es_settings,
-                # Optional settings
-                pressure=Float(10),
-                )
 
-print('Running workchain with pk={}'.format(future.pid))
+if True:
+    results = run(OptimizeStructure,
+                  structure=structure,
+                  machine=machine,
+                  es_settings=es_settings,
+                  # Optional settings
+                  pressure=Float(10),
+                  )
+
+    print (results)
+else:
+
+    future = submit(OptimizeStructure,
+                    structure=structure,
+                    machine=machine,
+                    es_settings=es_settings,
+                    # Optional settings
+                    pressure=Float(10),
+                    )
+
+    print('Running workchain with pk={}'.format(future.pid))
