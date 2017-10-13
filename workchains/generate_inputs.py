@@ -107,7 +107,7 @@ def generate_qe_params(code, structure, machine, settings, kpoints, pseudo):
     return PwCalculation.process(), inputs
 
 
-def generate_lammps_params(structure, machine, settings, plugin, pressure=0.0, type=None):
+def generate_lammps_params(structure, machine, settings, pressure=0.0, type=None):
     """
     generate the input paramemeters needed to run a calculation for LAMMPS
     :param structure:  aiida StructureData object
@@ -118,9 +118,20 @@ def generate_lammps_params(structure, machine, settings, plugin, pressure=0.0, t
 
     print 'start generate', type
 
+
+
+    if type is None:
+        code = settings.dict.code
+    else:
+        code = settings.dict.code[type]
+
+    plugin = Code.get_from_string(code).get_attr('input_plugin')
+
     LammpsCalculation = CalculationFactory(plugin)
 
     inputs = LammpsCalculation.process().get_inputs_template()
+
+    inputs.code = Code.get_from_string(code)
 
     print inputs
 
@@ -228,7 +239,7 @@ def generate_inputs(structure, machine, es_settings, type=None):
 
     elif plugin in ['lammps.forces', 'lammps.optimize', 'lammps.md']:
         print 'yeah!'
-        return generate_lammps_params(structure, machine, es_settings, plugin, type=type)
+        return generate_lammps_params(structure, machine, es_settings, type=type)
     else:
         print 'No supported plugin'
         exit()
