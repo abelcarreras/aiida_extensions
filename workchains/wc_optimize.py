@@ -57,7 +57,7 @@ class OptimizeStructure(WorkChain):
 
         # calculation_input._label = 'optimize'
         future = submit(JobCalculation, **calculation_input)
-        print ('pk={}'.format(future.pk))
+        print ('pk={}'.format(future.pid))
         calcs = {'optimize': future}
         print 'job sent'
         return ToContext(**calcs)
