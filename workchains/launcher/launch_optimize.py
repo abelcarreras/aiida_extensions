@@ -55,7 +55,7 @@ ph_settings = ParameterData(dict={'supercell': [[2,0,0],
                                   })
 
 # VASP SPECIFIC
-if True:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
+if False:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
     incar_dict = {
         # 'PREC'   : 'Accurate',
         'EDIFF'  : 1e-08,
@@ -119,7 +119,7 @@ if False:
 
 
 # LAMMPS SPECIFIC
-if False:
+if True:
     # GaN Tersoff
     tersoff_gan = {
         'Ga Ga Ga': '1.0 0.007874 1.846 1.918000 0.75000 -0.301300 1.0 1.0 1.44970 410.132 2.87 0.15 1.60916 535.199',
