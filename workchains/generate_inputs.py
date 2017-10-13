@@ -116,7 +116,13 @@ def generate_lammps_params(structure, machine, settings, pressure=0.0, type=None
     :return: Calculation process object, input dictionary
     """
 
-    LammpsCalculation = CalculationFactory(settings.dict.code)
+    if type is None:
+        code = settings.dict.code
+
+    else:
+        code = settings.dict.code['type']
+
+    LammpsCalculation = CalculationFactory(code)
 
     inputs = LammpsCalculation.process().get_inputs_template()
 
@@ -137,7 +143,7 @@ def generate_lammps_params(structure, machine, settings, pressure=0.0, type=None
     return LammpsCalculation.process(), inputs
 
 
-def generate_vasp_params(structure, machine, settings):
+def generate_vasp_params(structure, machine, settings, type=None):
     """
     generate the input paramemeters needed to run a calculation for VASP
     :param structure:  aiida StructureData object
@@ -202,27 +208,22 @@ def generate_vasp_params(structure, machine, settings):
     return VaspCalculation.process(), inputs
 
 
-def generate_inputs(structure, machine, es_settings, type='single_point'):
+def generate_inputs(structure, machine, es_settings, type=None):
 
-    try:
+    if type is None:
         plugin = Code.get_from_string(es_settings.dict.code).get_attr('input_plugin')
 
-        if plugin == 'vasp.vasp':
-            return generate_vasp_params(structure, machine, es_settings)
+    else:
+        plugin = Code.get_from_string(es_settings.dict.code[type][1]).get_attr('input_plugin')
 
-        # elif plugin == 'quantumespresso.pw':
-        #     return generate_qe_params(structure, machine, es_settings)
-        else:
-            print 'No supported plugin'
-            exit()
-    except:
+    if plugin == 'vasp.vasp':
+        return generate_vasp_params(structure, machine, es_settings, type=type)
 
-        plugin = Code.get_from_string(es_settings.dict.code.values()[0]).get_attr('input_plugin')
-        print 'plugin', plugin
-        lammps_plugins = ['lammps.forces', 'lammps.optimize', 'lammps.md']
-        if plugin in lammps_plugins:
-            print 'yeah!'
-            return generate_lammps_params(structure, machine, es_settings, type=type)
-        else:
-            print 'No supported plugin'
-            exit()
+    # elif plugin == 'quantumespresso.pw':
+    #     return generate_qe_params(structure, machine, es_settings)
+
+    elif plugin in ['lammps.forces', 'lammps.optimize', 'lammps.md']:
+        return generate_lammps_params(structure, machine, es_settings, type=type)
+    else:
+        print 'No supported plugin'
+        exit()
