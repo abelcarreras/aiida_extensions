@@ -274,8 +274,6 @@ class FrozenPhonon(WorkChain):
         self.ctx.data_sets = structures.pop('data_sets')
         self.ctx.number_of_displacements = len(structures)
 
-        generate_inputs = { 'quantumespresso.pw' : generate_qe_params,
-                            'vasp.vasp': generate_vasp_params}
 
 ############### FOR TESTING ###############
 # 1) Load data from nodes
@@ -296,16 +294,9 @@ class FrozenPhonon(WorkChain):
 
             # plugin = self.inputs.code.get_attr('input_plugin')
 
-            try:
-                plugin = Code.get_from_string(self.inputs.es_settings.dict.code).get_attr('input_plugin')
-                # plugin = self.inputs.es_settings.dict.code.get_attr('input_plugin')
-            except:
-                plugin = Code.get_from_string(self.inputs.es_settings.dict.code_forces).get_attr('input_plugin')
-                # plugin = self.inputs.es_settings.dict.code_forces.get_attr('input_plugin')
-
-            JobCalculation, calculation_input = generate_inputs[plugin](structure,
-                                                                        self.inputs.machine,
-                                                                        self.inputs.es_settings)
+            JobCalculation, calculation_input = generate_inputs(structure,
+                                                                self.inputs.machine,
+                                                                self.inputs.es_settings)
 
             calculation_input._label = label
             future = submit(JobCalculation, **calculation_input)

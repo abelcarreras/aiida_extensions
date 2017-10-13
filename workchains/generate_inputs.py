@@ -202,6 +202,25 @@ def generate_vasp_params(structure, machine, settings):
     return VaspCalculation.process(), inputs
 
 
-# List of functions
-generate_inputs = {'quantumespresso.pw': generate_qe_params,
-                   'vasp.vasp': generate_vasp_params}
+def generate_inputs(structure, machine, es_settings, type='single_point'):
+    code = es_settings.dict.cod
+
+    try:
+        plugin = Code.get_from_string(es_settings.dict.code).get_attr('input_plugin')
+
+        if plugin == 'vasp.vasp':
+            return generate_vasp_params(structure, machine, es_settings)
+
+        # elif plugin == 'quantumespresso.pw':
+        #     return generate_qe_params(structure, machine, es_settings)
+        else:
+            print 'No supported plugin'
+            exit()
+    except:
+        plugin = Code.get_from_string(es_settings.dict.code[0]).get_attr('input_plugin')
+        lammps_plugins =['lammps.forces', 'lammps.optimize', 'lammps.md']
+        if plugin in lammps_plugins:
+            return generate_lammps_params(structure, machine, es_settings, type=type)
+        else:
+            print 'No supported plugin'
+            exit()

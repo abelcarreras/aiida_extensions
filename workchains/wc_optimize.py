@@ -50,9 +50,9 @@ class OptimizeStructure(WorkChain):
             plugin = Code.get_from_string(self.inputs.es_settings.dict.code_forces).get_attr('input_plugin')
             # plugin = self.inputs.es_settings.dict.code_forces.get_attr('input_plugin')
 
-        JobCalculation, calculation_input = generate_inputs[plugin](structure,
-                                                                    self.inputs.machine,
-                                                                    self.inputs.es_settings)
+        JobCalculation, calculation_input = generate_inputs(self.inputs.structure,
+                                                            self.inputs.machine,
+                                                            self.inputs.es_settings)
 
 #        calculation_input._label = label
         future = submit(JobCalculation, **calculation_input)
