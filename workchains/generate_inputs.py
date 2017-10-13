@@ -223,6 +223,7 @@ def generate_inputs(structure, machine, es_settings, type=None):
     else:
         plugin = Code.get_from_string(es_settings.dict.code[type][1]).get_attr('input_plugin')
 
+    print 'plugin', plugin
     if plugin == 'vasp.vasp':
         return generate_vasp_params(structure, machine, es_settings, type=type)
 
