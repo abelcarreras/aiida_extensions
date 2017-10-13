@@ -116,11 +116,12 @@ def generate_lammps_params(structure, machine, settings, pressure=0.0, type=None
     :return: Calculation process object, input dictionary
     """
 
-    print 'start generate'
+    print 'start generate', type
     if type is None:
         code = settings.dict.code
 
     else:
+        print 'get code', settings.dict.code
         code = settings.dict.code['type']
 
     print ('code', code)
