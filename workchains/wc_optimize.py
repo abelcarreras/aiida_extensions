@@ -49,7 +49,7 @@ class OptimizeStructure(WorkChain):
         JobCalculation, calculation_input = generate_inputs(self.inputs.structure,
                                                             self.inputs.machine,
                                                             self.inputs.es_settings,
-                                                            #type='optimize'
+                                                            type='optimize'
                                                             )
 
         print 'job created', JobCalculation
