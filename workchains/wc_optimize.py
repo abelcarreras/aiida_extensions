@@ -46,7 +46,7 @@ class OptimizeStructure(WorkChain):
             structure = self.inputs.structure
         print 'got structure'
 
-        JobCalculation, calculation_input = generate_inputs(self.inputs.structure,
+        JobCalculation, calculation_input = generate_inputs(structure,
                                                             self.inputs.machine,
                                                             self.inputs.es_settings,
                                                             type='optimize'
