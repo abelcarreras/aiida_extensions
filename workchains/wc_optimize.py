@@ -59,10 +59,10 @@ class OptimizeStructure(WorkChain):
 
         if not_converged == 0:
             print ('Converged')
-            return False
+            return True
 
         print ('Not converged: {}'.format(not_converged))
-        return False
+        return True
 
     def optimize_cycle(self):
 
