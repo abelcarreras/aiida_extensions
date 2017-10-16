@@ -31,7 +31,7 @@ class OptimizeStructure(WorkChain):
         # Should be optional
         spec.input("pressure", valid_type=Float)
 
-        # spec.outline(cls.optimize_cycle, _While(cls.not_converged)(cls.optimize_cycle), cls.get_data)
+        spec.outline(cls.optimize_cycle, _While(cls.not_converged)(cls.optimize_cycle), cls.get_data)
 
         spec.outline(cls.optimize_cycle, cls.get_data)
 
@@ -64,9 +64,6 @@ class OptimizeStructure(WorkChain):
 
     def get_data(self):
         print 'get_job'
-        print(self.ctx._get_dict()['optimize'])
-        print self.ctx.optimize
-        print ('-----')
-        print(self.ctx.get('optimize'))
+        output_array = self.ctx.get('optimize').out.output_array
         self.out('optimized_structure', self.ctx.get('optimize').out.output_structure)
 
