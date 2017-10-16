@@ -36,6 +36,32 @@ class OptimizeStructure(WorkChain):
         spec.outline(cls.optimize_cycle, cls.get_data)
 
     def not_converged(self):
+        tolerance_forces = 1e-5
+        tolerance_stress = 1e-2
+
+        if not 'structure' in self.ctx:
+            return False
+
+        if not 'presure' in self.inputs:
+            pressure = 0
+
+        output_array = self.ctx.get('optimize').out.output_array
+        forces = output_array.get_array('forces')
+        stresses = output_array.get_array('stress')
+
+        not_converged_forces = len(np.where(abs(forces) > tolerance_forces)[0])
+        if len(stresses.shape) > 2:
+            stresses = stresses[-1] * 10
+
+        not_converged_stress = len(np.where(abs(np.diag(stresses) - pressure) > tolerance_stress)[0])
+        np.fill_diagonal(stresses, 0.0)
+        not_converged_stress += len(np.where(abs(stresses) > tolerance_stress)[0])
+        not_converged = not_converged_forces + not_converged_stress
+
+        if not_converged == 0:
+            return True
+
+        print ('Not converged: {}'.format(not_converged))
         return False
 
     def optimize_cycle(self):
@@ -65,6 +91,7 @@ class OptimizeStructure(WorkChain):
     def get_data(self):
         print 'get_job'
         output_array = self.ctx.get('optimize').out.output_array
+
         self.ctx.structure = self.ctx.get('optimize').out.output_structure
 
         self.out('optimized_structure', self.ctx.get('optimize').out.output_structure)
