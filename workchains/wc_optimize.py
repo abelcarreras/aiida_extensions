@@ -37,9 +37,7 @@ class OptimizeStructure(WorkChain):
 
     def not_converged(self):
         tolerance_forces = 1e-5
-        tolerance_stress = 1e-8
-
-        print ('Check convergence')
+        tolerance_stress = 1e-2
 
         if not 'structure' in self.ctx:
             return False
@@ -62,7 +60,7 @@ class OptimizeStructure(WorkChain):
 
         if not_converged == 0:
             print ('Converged')
-            return True
+            return False
 
         print ('Not converged: {}'.format(not_converged))
         return False
