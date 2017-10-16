@@ -29,7 +29,7 @@ class OptimizeStructure(WorkChain):
         spec.input("machine", valid_type=ParameterData)
         spec.input("es_settings", valid_type=ParameterData)
         # Should be optional
-        spec.dynamic_input("pressure", valid_type=Float)
+        spec.input("pressure", valid_type=Float)
 
         spec.outline(cls.optimize_cycle, _While(cls.not_converged)(cls.optimize_cycle), cls.get_data)
 
