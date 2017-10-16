@@ -211,7 +211,7 @@ def generate_vasp_params(structure, machine, settings, type=None):
     return VaspCalculation.process(), inputs
 
 
-def generate_inputs(structure, machine, es_settings, type=None):
+def generate_inputs(structure, machine, es_settings, type=None, pressure=0.0):
 
     print 'generate inputs start, type', type
 
@@ -230,7 +230,7 @@ def generate_inputs(structure, machine, es_settings, type=None):
     #     return generate_qe_params(structure, machine, es_settings)
 
     elif plugin in ['lammps.forces', 'lammps.optimize', 'lammps.md']:
-        return generate_lammps_params(structure, machine, es_settings, type=type)
+        return generate_lammps_params(structure, machine, es_settings, type=type, pressure=pressure)
     else:
         print 'No supported plugin'
         exit()

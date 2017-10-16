@@ -182,7 +182,7 @@ else:
                     machine=machine,
                     es_settings=es_settings,
                     # Optional settings
-                    pressure=Float(10),
+                    pressure=Float(0.0),
                     )
 
     print('Running workchain with pk={}'.format(future.pid))

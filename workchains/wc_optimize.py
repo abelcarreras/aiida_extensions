@@ -41,8 +41,8 @@ class OptimizeStructure(WorkChain):
 
         print ('Check convergence')
 
-        if not 'presure' in self.inputs:
-            pressure = 0
+        if not 'pressure' in self.inputs:
+            pressure = 0.0
 
         output_array = self.ctx.get('optimize').out.output_array
         forces = output_array.get_array('forces')
@@ -71,15 +71,19 @@ class OptimizeStructure(WorkChain):
 
         # self.ctx._get_dict()
         print 'start optimization'
+
         if not 'structure' in self.ctx:
             self.ctx.structure = self.inputs.structure
+        if not 'pressure' in self.inputs:
+            self.ctx.pressure = 0.0
 
         print 'got structure'
 
         JobCalculation, calculation_input = generate_inputs(self.ctx.structure,
                                                             self.inputs.machine,
                                                             self.inputs.es_settings,
-                                                            type='optimize'
+                                                            pressure=self.ctx.pressure,
+                                                            type='optimize',
                                                             )
 
         # calculation_input._label = 'optimize'
