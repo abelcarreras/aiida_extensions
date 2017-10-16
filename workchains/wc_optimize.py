@@ -68,5 +68,5 @@ class OptimizeStructure(WorkChain):
         print self.ctx.optimize
         print ('-----')
         #print(self.ctx.get('optimize'))
-        self.out('optimized_structure', self.ctx.optimize)
+        self.out('optimized_structure', self.ctx.optimize.out.output_structure)
 
