@@ -39,6 +39,8 @@ class OptimizeStructure(WorkChain):
         tolerance_forces = 1e-5
         tolerance_stress = 1e-8
 
+        print ('TEST')
+
         if not 'structure' in self.ctx:
             return False
 
@@ -79,9 +81,6 @@ class OptimizeStructure(WorkChain):
                                                             type='optimize'
                                                             )
 
-        print 'job created', JobCalculation
-        print 'calculation_input', calculation_input
-
         # calculation_input._label = 'optimize'
         future = submit(JobCalculation, **calculation_input)
         print ('pk = {}'.format(future.pid))
@@ -91,7 +90,6 @@ class OptimizeStructure(WorkChain):
 
     def get_data(self):
         print 'get_job'
-        output_array = self.ctx.get('optimize').out.output_array
 
         self.ctx.structure = self.ctx.get('optimize').out.output_structure
 

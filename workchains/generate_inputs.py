@@ -230,7 +230,6 @@ def generate_inputs(structure, machine, es_settings, type=None):
     #     return generate_qe_params(structure, machine, es_settings)
 
     elif plugin in ['lammps.forces', 'lammps.optimize', 'lammps.md']:
-        print 'yeah!'
         return generate_lammps_params(structure, machine, es_settings, type=type)
     else:
         print 'No supported plugin'
