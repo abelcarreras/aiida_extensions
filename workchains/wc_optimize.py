@@ -74,7 +74,9 @@ class OptimizeStructure(WorkChain):
 
         if not 'structure' in self.ctx:
             self.ctx.structure = self.inputs.structure
-        if not 'pressure' in self.inputs:
+        if 'pressure' in self.inputs:
+            self.ctx.pressure = self.inputs.pressure
+        else:
             self.ctx.pressure = 0.0
 
         print 'got structure'
