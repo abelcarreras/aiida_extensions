@@ -64,7 +64,8 @@ class OptimizeStructure(WorkChain):
 
     def get_data(self):
         print 'get_job'
-        print(self.ctx._get_dict())
-        print(self.ctx.get('optimize'))
+        print(self.ctx._get_dict()['optimize'])
+        print ('-----')
+        print(self.ctx.get_('optimize'))
         self.out('optimized_structure', self.ctx.get('optimize'))
 
