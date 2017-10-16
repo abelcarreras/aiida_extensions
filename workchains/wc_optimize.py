@@ -29,7 +29,7 @@ class OptimizeStructure(WorkChain):
         spec.input("machine", valid_type=ParameterData)
         spec.input("es_settings", valid_type=ParameterData)
         # Should be optional
-        spec.input("pressure", valid_type=Float)
+        spec.dynamic_input("pressure", valid_type=Float)
 
         spec.outline(cls.optimize_cycle, _While(cls.not_converged)(cls.optimize_cycle), cls.get_data)
 
@@ -41,7 +41,9 @@ class OptimizeStructure(WorkChain):
 
         print ('Check convergence')
 
-        if not 'pressure' in self.inputs:
+        if 'pressure' in self.inputs:
+            pressure = self.inputs.pressure
+        else:
             pressure = 0.0
 
         output_array = self.ctx.get('optimize').out.output_array
