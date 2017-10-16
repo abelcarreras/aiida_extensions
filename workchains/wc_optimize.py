@@ -48,6 +48,9 @@ class OptimizeStructure(WorkChain):
         forces = output_array.get_array('forces')
         stresses = output_array.get_array('stress')
 
+        print forces
+        print stresses
+
         not_converged_forces = len(np.where(abs(forces) > tolerance_forces)[0])
         if len(stresses.shape) > 2:
             stresses = stresses[-1] * 10
