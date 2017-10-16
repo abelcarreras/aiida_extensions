@@ -39,7 +39,7 @@ class OptimizeStructure(WorkChain):
         tolerance_forces = 1e-5
         tolerance_stress = 1e-8
 
-        print ('TEST')
+        print ('Check convergence')
 
         if not 'structure' in self.ctx:
             return False
