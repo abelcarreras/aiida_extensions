@@ -59,7 +59,7 @@ class OptimizeStructure(WorkChain):
 
         if not_converged == 0:
             print ('Converged')
-            return True
+            return False
 
         print ('Not converged: {}'.format(not_converged))
         return True
