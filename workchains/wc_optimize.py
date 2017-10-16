@@ -33,11 +33,13 @@ class OptimizeStructure(WorkChain):
 
         spec.outline(cls.optimize_cycle, _While(cls.not_converged)(cls.optimize_cycle), cls.get_data)
 
-        spec.outline(cls.optimize_cycle, cls.get_data)
+        #spec.outline(cls.optimize_cycle, cls.get_data)
 
     def not_converged(self):
         tolerance_forces = 1e-5
         tolerance_stress = 1e-2
+
+        print ('Check convergence')
 
         if not 'structure' in self.ctx:
             return False
@@ -60,7 +62,7 @@ class OptimizeStructure(WorkChain):
 
         if not_converged == 0:
             print ('Converged')
-            return False
+            return True
 
         print ('Not converged: {}'.format(not_converged))
         return False
