@@ -95,4 +95,5 @@ class OptimizeStructure(WorkChain):
         self.ctx.structure = self.ctx.get('optimize').out.output_structure
 
         self.out('optimized_structure', self.ctx.get('optimize').out.output_structure)
+        self.out('optimized_structure_data', self.ctx.get('optimize').out.output_parameters)
 
