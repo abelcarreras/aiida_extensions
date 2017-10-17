@@ -11,7 +11,7 @@ class ForceSets(Data):
         self._cached_arrays = {}
 
         if 'data_sets' in kwargs:
-            print 'yeah'
+            self.set_data_sets(kwargs['data_sets'])
 
     def get_number_of_atoms(self):
         """
