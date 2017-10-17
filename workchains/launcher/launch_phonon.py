@@ -146,8 +146,8 @@ if True:
                   'max_evaluations': 1000000,
                   'max_iterations': 500000}
 
-    settings_dict = {'code_forces': 'lammps_force@stern',
-                     'code_optimize': 'lammps_optimize@stern',
+    settings_dict = {'code': {'optimize': 'lammps_optimize@boston',
+                              'forces': 'lammps_force@boston'},
                      'parameters': parameters,
                      'potential': potential}
 
@@ -171,7 +171,7 @@ future = submit(FrozenPhonon,
                 ph_settings=ph_settings,
                 # Optional settings
                 pressure=Float(10),
-                optimize=Bool(0)
+                optimize=Bool(False)
                 )
 
 print('Running workchain with pk={}'.format(future.pid))

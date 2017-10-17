@@ -274,6 +274,11 @@ class FrozenPhonon(WorkChain):
     def remote_phonopy(self):
         return 'code' in self.inputs.ph_settings.get_dict()
 
+    def do_optimize(self):
+        if 'optimize' in self.inputs:
+            return self.inputs.optimize
+        return False
+
     def create_displacement_calculations(self):
 
         print 'test2!', self.ctx
@@ -307,7 +312,9 @@ class FrozenPhonon(WorkChain):
 
             JobCalculation, calculation_input = generate_inputs(structure,
                                                                 self.inputs.machine,
-                                                                self.inputs.es_settings)
+                                                                self.inputs.es_settings,
+                                                                #pressure=self.ctx.pressure,
+                                                                type='forces')
 
             calculation_input._label = label
             future = submit(JobCalculation, **calculation_input)
