@@ -245,8 +245,8 @@ class FrozenPhonon(WorkChain):
         spec.input("ph_settings", valid_type=ParameterData)
         spec.input("es_settings", valid_type=ParameterData)
         # Should be optional
-        spec.input("optimize", valid_type=Bool)
-        spec.input("pressure", valid_type=Float)
+        spec.input("optimize", valid_type=Bool, required=False, default=Bool(True))
+        spec.input("pressure", valid_type=Float, required=False, default=Float(0.0))
       #  spec.dynamic_input("optimize")
 
         #spec.outline(cls.create_displacement_calculations,
@@ -259,13 +259,11 @@ class FrozenPhonon(WorkChain):
 
     def optimize(self):
 
-
         future = submit(OptimizeStructure,
                         structure=self.inputs.structure,
                         machine=self.inputs.machine,
                         es_settings=self.inputs.es_settings,
-                        # Optional settings
-                        pressure=Float(0.0),
+                        pressure=self.inputs.pressure,
                         )
 
         calcs = {'optimized': future}
@@ -313,7 +311,7 @@ class FrozenPhonon(WorkChain):
             JobCalculation, calculation_input = generate_inputs(structure,
                                                                 self.inputs.machine,
                                                                 self.inputs.es_settings,
-                                                                #pressure=self.ctx.pressure,
+                                                                #pressure=self.input.pressure,
                                                                 type='forces')
 
             calculation_input._label = label
