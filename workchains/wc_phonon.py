@@ -95,21 +95,16 @@ def create_supercells_with_displacements_using_phonopy(structure, phonopy_input)
 
     # Transform cells to StructureData and set them ready to return
     data_sets = phonon.get_displacement_dataset()
-    print data_sets
-    print '----'
     data_sets_object = ForceSets()
     data_sets_object.set_data_sets(data_sets)
 
-    print data_sets_object.get_data_sets()
 
-    exit()
+    #data_sets_object = ArrayData()
+    #for i, first_atoms in enumerate(data_sets['first_atoms']):
+    #    data_sets_array = np.array([first_atoms['direction'], first_atoms['number'], first_atoms['displacement']])
+    #    data_sets_object.set_array('data_sets_{}'.format(i), data_sets_array)
 
-    data_sets_object = ArrayData()
-    for i, first_atoms in enumerate(data_sets['first_atoms']):
-        data_sets_array = np.array([first_atoms['direction'], first_atoms['number'], first_atoms['displacement']])
-        data_sets_object.set_array('data_sets_{}'.format(i), data_sets_array)
-
-    disp_cells = {'data_sets':data_sets_object}
+    disp_cells = {'data_sets': data_sets_object}
     for i, phonopy_supercell in enumerate(cells_with_disp):
         supercell = StructureData(cell=phonopy_supercell.get_cell())
         for symbol, position in zip(phonopy_supercell.get_chemical_symbols(),
