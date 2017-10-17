@@ -23,6 +23,8 @@ from aiida.work.workchain import if_
 PwCalculation = CalculationFactory('quantumespresso.pw')
 PhonopyCalculation = CalculationFactory('phonopy')
 
+from aiida.workflows.wc_optimize import OptimizeStructure
+
 import numpy as np
 from generate_inputs import *
 
@@ -58,8 +60,6 @@ def generate_phonopy_params(code, structure, parameters, machine, data_sets):
     inputs.data_sets = data_sets
 
     return PhonopyCalculation.process(), inputs
-
-
 
 
 @workfunction
@@ -254,11 +254,22 @@ class FrozenPhonon(WorkChain):
         #                                     cls.collect_phonopy_data).else_(
         #                 cls.get_force_constants))
 
-        spec.outline(cls.create_displacement_calculations, cls.get_force_constants)
+        spec.outline(cls.optimize, cls.create_displacement_calculations, cls.get_force_constants)
         #spec.outline(cls.create_displacement_calculations, cls.get_force_constants_remote, cls.collect_phonopy_data)
 
-        # spec.dynamic_output()
-        #spec.outline(cls.test1, cls.test2)
+    def optimize(self):
+
+
+        future = submit(OptimizeStructure,
+                        structure=self.inputs.structure,
+                        machine=self.inputs.machine,
+                        es_settings=self.inputs.es_settings,
+                        # Optional settings
+                        pressure=Float(0.0),
+                        )
+
+        calcs = {'optimized': future}
+        return ToContext(**calcs)
 
     def remote_phonopy(self):
         return 'code' in self.inputs.ph_settings.get_dict()
@@ -266,11 +277,11 @@ class FrozenPhonon(WorkChain):
     def create_displacement_calculations(self):
 
         print 'test2!', self.ctx
+        structure = self.ctx.optimized['optimized_structure']
 
-        structures = create_supercells_with_displacements_using_phonopy(self.inputs.structure,
+        structures = create_supercells_with_displacements_using_phonopy(structure,
                                                                         self.inputs.ph_settings)
 
-        print 'test!'
         self.ctx.data_sets = structures.pop('data_sets')
         self.ctx.number_of_displacements = len(structures)
 
