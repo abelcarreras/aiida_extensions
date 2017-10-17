@@ -171,18 +171,17 @@ if True:
                   machine=machine,
                   es_settings=es_settings,
                   # Optional settings
-                  pressure=Float(10),
+                  pressure=Float(10.0),
                   )
 
     print(results)
 else:
-
     future = submit(OptimizeStructure,
                     structure=structure,
                     machine=machine,
                     es_settings=es_settings,
                     # Optional settings
-                    pressure=Float(0.0),
+                    pressure=Float(10.0),
                     )
 
     print('Running workchain with pk={}'.format(future.pid))

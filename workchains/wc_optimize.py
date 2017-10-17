@@ -52,7 +52,7 @@ class OptimizeStructure(WorkChain):
         if len(stresses.shape) > 2:
             stresses = stresses[-1] * 10
 
-        not_converged_stress = len(np.where(abs(np.diag(stresses) - self.ctx.pressure) > tolerance_stress)[0])
+        not_converged_stress = len(np.where(abs(np.diag(stresses) - float(self.ctx.pressure)) > tolerance_stress)[0])
         np.fill_diagonal(stresses, 0.0)
         not_converged_stress += len(np.where(abs(stresses) > tolerance_stress)[0])
         not_converged = not_converged_forces + not_converged_stress
