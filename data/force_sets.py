@@ -10,6 +10,7 @@ class ForceSets(Data):
         super(ForceSets, self).__init__(*args, **kwargs)
         self._cached_arrays = {}
         print args
+        print kwargs
 
     def get_number_of_atoms(self):
         """
