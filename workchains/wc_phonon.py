@@ -258,7 +258,7 @@ class FrozenPhonon(WorkChain):
         #spec.outline(cls.create_displacement_calculations, cls.get_force_constants_remote, cls.collect_phonopy_data)
 
     def optimize(self):
-
+        print 'start optimize'
         future = submit(OptimizeStructure,
                         structure=self.inputs.structure,
                         machine=self.inputs.machine,
@@ -272,14 +272,10 @@ class FrozenPhonon(WorkChain):
     def remote_phonopy(self):
         return 'code' in self.inputs.ph_settings.get_dict()
 
-    def do_optimize(self):
-        if 'optimize' in self.inputs:
-            return self.inputs.optimize
-        return False
-
     def create_displacement_calculations(self):
 
-        print 'test2!', self.ctx
+        print 'test2!', self.ctx._get_dict()
+
         structure = self.ctx.optimized['optimized_structure']
 
         structures = create_supercells_with_displacements_using_phonopy(structure,
