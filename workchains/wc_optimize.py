@@ -33,6 +33,8 @@ class OptimizeStructure(WorkChain):
 
         spec.outline(cls.optimize_cycle, _While(cls.not_converged)(cls.optimize_cycle), cls.get_data)
 
+        cls.ctx.test = 0
+
         #spec.outline(cls.optimize_cycle, cls.get_data)
 
     def not_converged(self):
