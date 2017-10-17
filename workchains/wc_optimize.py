@@ -29,6 +29,7 @@ class OptimizeStructure(WorkChain):
         spec.input("machine", valid_type=ParameterData)
         spec.input("es_settings", valid_type=ParameterData)
         print spec.get_input("structure")
+        print spec.get_dynamic_input()
         exit()
         # Should be optional
         if spec.has_input("pressure"):
