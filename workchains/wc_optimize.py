@@ -28,7 +28,7 @@ class OptimizeStructure(WorkChain):
         spec.input("structure", valid_type=StructureData)
         spec.input("machine", valid_type=ParameterData)
         spec.input("es_settings", valid_type=ParameterData)
-        spec.input("pressure", default=Float(0.0))
+        spec.input("pressure", required=False, default=Float(0.0))
 
 
 
