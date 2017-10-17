@@ -97,7 +97,7 @@ def create_supercells_with_displacements_using_phonopy(structure, phonopy_input)
     data_sets = phonon.get_displacement_dataset()
     data_sets_object = ForceSets()
     data_sets_object.set_data_sets(data_sets)
-
+    exit()
 
     #data_sets_object = ArrayData()
     #for i, first_atoms in enumerate(data_sets['first_atoms']):
