@@ -267,8 +267,10 @@ class FrozenPhonon(WorkChain):
                         )
         future = load_node(481308)
 
-        calcs = {'optimized': future}
-        return ToContext(**calcs)
+        self.ctx._content['optimized'] = future
+
+        #calcs = {'optimized': future}
+        #return ToContext(**calcs)
 
     def remote_phonopy(self):
         return 'code' in self.inputs.ph_settings.get_dict()
