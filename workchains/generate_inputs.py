@@ -229,7 +229,7 @@ def generate_inputs(structure, machine, es_settings, type=None, pressure=0.0):
     # elif plugin == 'quantumespresso.pw':
     #     return generate_qe_params(structure, machine, es_settings)
 
-    elif plugin in ['lammps.forces', 'lammps.optimize', 'lammps.md']:
+    elif plugin in ['lammps.force', 'lammps.optimize', 'lammps.md']:
         return generate_lammps_params(structure, machine, es_settings, type=type, pressure=pressure)
     else:
         print 'No supported plugin'
