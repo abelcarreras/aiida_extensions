@@ -98,8 +98,9 @@ def create_supercells_with_displacements_using_phonopy(structure, phonopy_input)
 
     data_sets_object = ForceSets()
     data_sets_object.set_data_sets(data_sets)
-    print data_sets_object.store()
-    print data_sets_object
+
+    print data_sets_object.get_data_sets()
+
     exit()
 
     data_sets_object = ArrayData()
