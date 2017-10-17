@@ -28,12 +28,8 @@ class OptimizeStructure(WorkChain):
         spec.input("structure", valid_type=StructureData)
         spec.input("machine", valid_type=ParameterData)
         spec.input("es_settings", valid_type=ParameterData)
-        spec.input("pressure")
-        # Should be optional
-        if spec.has_input("pressure"):
-            spec.input("pressure", valid_type=Float)
-        else:
-            spec.input_port("pressure", spec.get_input('pressure'))
+        spec.input("pressure", valid_type=Float, default=0.0)
+
 
 
         spec.outline(cls.optimize_cycle, _While(cls.not_converged)(cls.optimize_cycle), cls.get_data)
