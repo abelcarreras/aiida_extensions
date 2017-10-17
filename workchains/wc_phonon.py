@@ -277,6 +277,7 @@ class FrozenPhonon(WorkChain):
         print 'start displacements'
         print 'test2!', self.ctx._get_dict()
 
+        exit()
         structure = self.ctx.optimized['optimized_structure']
 
         structures = create_supercells_with_displacements_using_phonopy(structure,
