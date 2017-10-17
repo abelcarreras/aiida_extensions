@@ -264,12 +264,9 @@ class FrozenPhonon(WorkChain):
                         es_settings=self.inputs.es_settings,
                         pressure=self.inputs.pressure,
                         )
-        future = load_node(481308)
+        #future = load_node(481308)
 
-        self.ctx._content['optimized'] = future
-
-        #calcs = {'optimized': future}
-        #return ToContext(**calcs)
+        return ToContext(optimized=future)
 
     def remote_phonopy(self):
         return 'code' in self.inputs.ph_settings.get_dict()
@@ -278,7 +275,11 @@ class FrozenPhonon(WorkChain):
         print 'start displacements'
         print 'test2!', self.ctx._get_dict()
 
-        structure = self.ctx.optimized.out.optimized_structure
+        if 'optimized' in self.ctx:
+            structure = self.ctx.optimized.out.optimized_structure
+        else:
+            structure = self.inputs.structure
+
 
         structures = create_supercells_with_displacements_using_phonopy(structure,
                                                                         self.inputs.ph_settings)
@@ -286,12 +287,11 @@ class FrozenPhonon(WorkChain):
         self.ctx.data_sets = structures.pop('data_sets')
         self.ctx.number_of_displacements = len(structures)
 
-
 ############### FOR TESTING ###############
 # 1) Load data from nodes
         if False: #For test
             from aiida.orm import load_node
-            nodes = [461200, 461205, 461210, 461215] # VASP
+            nodes = [461200, 461205, 461210, 461215]# VASP
             labels = ['structure_1', 'structure_0', 'structure_3', 'structure_2']
             for pk, label in zip(nodes, labels):
                 future = load_node(pk)
