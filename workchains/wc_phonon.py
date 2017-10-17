@@ -96,9 +96,6 @@ def create_supercells_with_displacements_using_phonopy(structure, phonopy_input)
     # Transform cells to StructureData and set them ready to return
     data_sets = phonon.get_displacement_dataset()
     data_sets_object = ForceSets(data_sets=data_sets)
-    #data_sets_object.set_data_sets(data_sets)
-    print data_sets_object.get_data_sets()
-    exit()
 
     #data_sets_object = ArrayData()
     #for i, first_atoms in enumerate(data_sets['first_atoms']):
@@ -123,11 +120,18 @@ def create_forces_set(**kwargs):
     import numpy as np
 
     data_set = kwargs.pop('data_sets')
+    forces = []
+    for i in range(data_set.get_number_of_displacements()):
+        forces.append(kwargs.pop('forces_{}'.format(i)).get_array('forces')[0])
+
+    data_set.set_forces(forces)
+    return {'force_sets': data_set}
+
 
     force_sets = ArrayData()
     for i in data_set.get_arraynames():
         force_array = kwargs.pop(i.replace('data_sets', 'forces')).get_array('forces')[0]
-        data_set_array =  np.array([data_set.get_array(i)[0], data_set.get_array(i)[1], data_set.get_array(i)[2], force_array])
+        data_set_array = np.array([data_set.get_array(i)[0], data_set.get_array(i)[1], data_set.get_array(i)[2], force_array])
         force_sets.set_array(i, data_set_array)
 
     return {'force_sets': force_sets}

@@ -124,6 +124,7 @@ class ForceSets(Data):
         import tempfile
         import numpy
 
+        forces = numpy.array(forces)
         with tempfile.NamedTemporaryFile() as f:
             numpy.save(f, forces)
             f.flush()  # Important to flush here, otherwise the next copy command
