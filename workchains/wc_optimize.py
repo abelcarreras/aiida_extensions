@@ -33,7 +33,7 @@ class OptimizeStructure(WorkChain):
         if spec.has_input("pressure"):
             spec.input("pressure", valid_type=Float)
         else:
-            spec.input_port("pressure", Float(0.0))
+            spec.input_port("pressure", spec.get_input('pressure'))
 
 
         spec.outline(cls.optimize_cycle, _While(cls.not_converged)(cls.optimize_cycle), cls.get_data)
