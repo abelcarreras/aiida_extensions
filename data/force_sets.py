@@ -10,7 +10,7 @@ class ForceSets(Data):
         super(ForceSets, self).__init__(*args, **kwargs)
         self._cached_arrays = {}
 
-    def get_natom(self):
+    def get_number_of_atoms(self):
         """
         Return the shape of an array (read from the value cached in the
         properties for efficiency reasons).
@@ -18,26 +18,13 @@ class ForceSets(Data):
         """
         return tuple(self.get_attr("natom"))
 
-    def get_displacements(self):
+    def get_number_of_displacements(self):
         """
         Return the shape of an array (read from the value cached in the
         properties for efficiency reasons).
         :param name: The name of the array.
         """
         return tuple(self.get_attr("ndisplacements"))
-
-
-    def get_array(self):
-        """
-        Return the force constants stored in the node as a numpy array
-        """
-        import numpy
-
-        fname = 'force_constants.npy'
-
-        array = numpy.load(self.get_abs_path(fname))
-        return array
-
 
     def get_data_sets(self):
         """
@@ -59,8 +46,6 @@ class ForceSets(Data):
                                 'displacement': displacement[i]})
 
         return {'natom': natom, 'first_atoms': first_atoms}
-
-
 
     def get_force_sets(self):
         """
@@ -85,9 +70,7 @@ class ForceSets(Data):
 
         return {'natom': natom, 'first_atoms': first_atoms}
 
-
-
-    #{'natom': 64, 'first_atoms': [{'direction': [1, 0, 0], 'number': 0, 'displacement': array([0.01, 0., 0.])}]}
+    # {'natom': 64, 'first_atoms': [{'direction': [1, 0, 0], 'number': 0, 'displacement': array([0.01, 0., 0.])}]}
 
     def set_data_sets(self, data_sets):
 
@@ -132,8 +115,6 @@ class ForceSets(Data):
             f.flush()  # Important to flush here, otherwise the next copy command
             # will just copy an empty file
             self.add_path(f.name, 'displacement.npy')
-
-
 
     def set_forces(self, forces):
 
