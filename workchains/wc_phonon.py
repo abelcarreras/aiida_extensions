@@ -147,8 +147,7 @@ def get_force_constants_from_phonopy(**kwargs):
 
     phonon = Phonopy(bulk,
                      phonopy_input['supercell'],
-                     primitive_matrix=phonopy_input['primitive'],
-                     distance=phonopy_input['distance'])
+                     primitive_matrix=phonopy_input['primitive'])
 
     phonon.generate_displacements(distance=phonopy_input['distance'])
 
