@@ -279,7 +279,7 @@ class FrozenPhonon(WorkChain):
         print 'start displacements'
         print 'test2!', self.ctx._get_dict()
 
-        structure = self.ctx.optimized['optimized_structure']
+        structure = self.ctx.optimized.out.optimized_structure
 
         print structure
         exit()
