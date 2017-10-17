@@ -274,7 +274,7 @@ class FrozenPhonon(WorkChain):
         return 'code' in self.inputs.ph_settings.get_dict()
 
     def create_displacement_calculations(self):
-
+        print 'start displacements'
         print 'test2!', self.ctx._get_dict()
 
         structure = self.ctx.optimized['optimized_structure']
