@@ -28,7 +28,11 @@ class OptimizeStructure(WorkChain):
         spec.input("structure", valid_type=StructureData)
         spec.input("machine", valid_type=ParameterData)
         spec.input("es_settings", valid_type=ParameterData)
+        # Optional
         spec.input("pressure", required=False, default=Float(0.0))
+        spec.input("tolerance_forces", required=False, default=Float(1e-5))
+        spec.input("tolerance_stress", required=False, default=Float(1e-2))
+
 
 
 
@@ -37,8 +41,6 @@ class OptimizeStructure(WorkChain):
         #spec.outline(cls.optimize_cycle, cls.get_data)
 
     def not_converged(self):
-        tolerance_forces = 1e-5
-        tolerance_stress = 1e-2
 
         print ('Check convergence')
 
@@ -49,13 +51,14 @@ class OptimizeStructure(WorkChain):
         print forces
         print stresses
 
-        not_converged_forces = len(np.where(abs(forces) > tolerance_forces)[0])
+        not_converged_forces = len(np.where(abs(forces) > float(self.inputs.tolerance_forces))[0])
         if len(stresses.shape) > 2:
             stresses = stresses[-1] * 10
 
-        not_converged_stress = len(np.where(abs(np.diag(stresses) - float(self.ctx.pressure)) > tolerance_stress)[0])
+        not_converged_stress = len(np.where(abs(np.diag(stresses) - float(self.inputs.pressure)) >
+                                            float(self.inputs.tolerance_stress))[0])
         np.fill_diagonal(stresses, 0.0)
-        not_converged_stress += len(np.where(abs(stresses) > tolerance_stress)[0])
+        not_converged_stress += len(np.where(abs(stresses) > float(self.inputs.tolerance_stress))[0])
         not_converged = not_converged_forces + not_converged_stress
 
         if not_converged == 0:
@@ -72,17 +75,13 @@ class OptimizeStructure(WorkChain):
 
         if not 'structure' in self.ctx:
             self.ctx.structure = self.inputs.structure
-        if 'pressure' in self.inputs:
-            self.ctx.pressure = self.inputs.pressure
-        else:
-            self.ctx.pressure = 0.0
 
         print 'got structure'
 
         JobCalculation, calculation_input = generate_inputs(self.ctx.structure,
                                                             self.inputs.machine,
                                                             self.inputs.es_settings,
-                                                            pressure=self.ctx.pressure,
+                                                            pressure=self.inputs.pressure,
                                                             type='optimize',
                                                             )
 
