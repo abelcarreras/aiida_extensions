@@ -8,7 +8,7 @@ from aiida.work.workchain import WorkChain, ToContext
 from aiida.work.workfunction import workfunction
 
 from aiida.work.run import run, submit, async
-from aiida.orm import Code, CalculationFactory
+from aiida.orm import Code, CalculationFactory, load_node
 from aiida.orm.data.parameter import ParameterData
 from aiida.orm.data.array import ArrayData
 from aiida.orm.data.structure import StructureData
@@ -265,6 +265,7 @@ class FrozenPhonon(WorkChain):
                         es_settings=self.inputs.es_settings,
                         pressure=self.inputs.pressure,
                         )
+        future = load_node(481308)
 
         calcs = {'optimized': future}
         return ToContext(**calcs)
