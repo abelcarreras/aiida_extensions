@@ -95,7 +95,7 @@ def create_supercells_with_displacements_using_phonopy(structure, phonopy_input)
 
     # Transform cells to StructureData and set them ready to return
     data_sets = phonon.get_displacement_dataset()
-    data_sets_object = ForceSets()
+    data_sets_object = ForceSets(data_sets)
     data_sets_object.set_data_sets(data_sets)
     exit()
 
