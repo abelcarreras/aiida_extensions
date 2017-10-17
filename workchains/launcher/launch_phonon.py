@@ -164,15 +164,29 @@ machine_dict = {'resources': {'num_machines': 1,
 machine = ParameterData(dict=machine_dict)
 
 from aiida.workflows.wc_phonon import FrozenPhonon
-future = run(FrozenPhonon,
-                structure=structure,
-                machine=machine,
-                es_settings=es_settings,
-                ph_settings=ph_settings,
-                # Optional settings
-                pressure=Float(10),
-                optimize=Bool(False)
-                )
 
-print future
-print('Running workchain with pk={}'.format(future.pid))
+if True:
+    result = run(FrozenPhonon,
+                 structure=structure,
+                 machine=machine,
+                 es_settings=es_settings,
+                 ph_settings=ph_settings,
+                 # Optional settings
+                 pressure=Float(10),
+                 optimize=Bool(False)
+                 )
+
+    print (result)
+else:
+    future = submit(FrozenPhonon,
+                    structure=structure,
+                    machine=machine,
+                    es_settings=es_settings,
+                    ph_settings=ph_settings,
+                    # Optional settings
+                    pressure=Float(10),
+                    optimize=Bool(False)
+                    )
+
+    print future
+    print('Running workchain with pk={}'.format(future.pid))
