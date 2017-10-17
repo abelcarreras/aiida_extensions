@@ -281,6 +281,8 @@ class FrozenPhonon(WorkChain):
 
         structure = self.ctx.optimized['optimized_structure']
 
+        print structure
+        exit()
         structures = create_supercells_with_displacements_using_phonopy(structure,
                                                                         self.inputs.ph_settings)
 
