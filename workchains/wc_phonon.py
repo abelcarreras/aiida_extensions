@@ -15,6 +15,9 @@ from aiida.orm.data.structure import StructureData
 from aiida.orm.data.array.kpoints import KpointsData
 from aiida.orm.data.upf import UpfData
 from aiida.orm.data.base import Str, Float, Bool
+from aiida.orm.data.force_sets import ForceSets
+from aiida.orm.data.force_constants import ForceConstants
+
 
 #from aiida.orm.calculation.job.quantumespresso.pw import PwCalculation
 #from aiida.orm.calculation.job.vasp.vasp import VaspCalculation
@@ -92,6 +95,12 @@ def create_supercells_with_displacements_using_phonopy(structure, phonopy_input)
 
     # Transform cells to StructureData and set them ready to return
     data_sets = phonon.get_displacement_dataset()
+
+    data_sets_object = DataSets()
+    data_sets_object.set_data_sets(data_sets)
+    print data_sets_object
+    exit()
+
     data_sets_object = ArrayData()
     for i, first_atoms in enumerate(data_sets['first_atoms']):
         data_sets_array = np.array([first_atoms['direction'], first_atoms['number'], first_atoms['displacement']])
@@ -264,9 +273,9 @@ class FrozenPhonon(WorkChain):
                         es_settings=self.inputs.es_settings,
                         pressure=self.inputs.pressure,
                         )
-        #future = load_node(481308)
+        self.ctx._content['optimize'] = load_node(481308)
 
-        return ToContext(optimized=future)
+        #return ToContext(optimized=future)
 
     def remote_phonopy(self):
         return 'code' in self.inputs.ph_settings.get_dict()
