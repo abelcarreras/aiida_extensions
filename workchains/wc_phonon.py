@@ -119,16 +119,17 @@ def create_forces_set(**kwargs):
 
     import numpy as np
 
-    data_set = kwargs.pop('data_sets')
+    data_sets = kwargs.pop('data_sets')
+
+    force_sets = ForceSets(data_sets=data_sets.get_data_sets())
     forces = []
-    for i in range(data_set.get_number_of_displacements()):
+    for i in range(data_sets.get_number_of_displacements()):
         forces.append(kwargs.pop('forces_{}'.format(i)).get_array('forces')[0])
 
-    print forces
-    data_set.set_forces(forces)
+    force_sets.set_forces(forces)
 
     exit()
-    return {'force_sets': data_set}
+    return {'force_sets': force_sets}
 
 
     force_sets = ArrayData()
