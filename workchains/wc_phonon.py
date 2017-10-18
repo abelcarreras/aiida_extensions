@@ -344,7 +344,7 @@ class FrozenPhonon(WorkChain):
         for key, calc in self.ctx:
             if key.startswith('structure_'):
                 print 'key', key
-                wf_inputs[key.replace('structure', 'forces')] = calc.get_outputs('output_array')
+                wf_inputs[key.replace('structure', 'forces')] = calc.out.structure.out.output_array
 
         print wf_inputs
 
@@ -352,7 +352,7 @@ class FrozenPhonon(WorkChain):
         print 'DISP', self.ctx.number_of_displacements
         for i in range(self.ctx.number_of_displacements):
             print 'forces_{}'.format(i), self.ctx.get('structure_{}'.format(i))
-            wf_inputs['forces_{}'.format(i)] = self.ctx.get('structure_{}'.format(i)).get_outputs_dict()['output_array']
+            wf_inputs['forces_{}'.format(i)] = self.ctx.get('structure_{}'.format(i)).out.output_array
 
         wf_inputs['structure'] = self.inputs.structure
         wf_inputs['phonopy_input'] = self.inputs.ph_settings
