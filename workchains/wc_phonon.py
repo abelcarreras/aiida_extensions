@@ -126,6 +126,8 @@ def create_forces_set(**kwargs):
         forces.append(kwargs.pop('forces_{}'.format(i)).get_array('forces')[0])
 
     force_sets.set_forces(forces)
+    print force_sets.get_force_sets()
+    exit()
 
     return {'force_sets': force_sets}
 
