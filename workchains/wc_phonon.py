@@ -355,6 +355,11 @@ class FrozenPhonon(WorkChain):
             print 'forces_{}'.format(i), self.ctx.get('structure_{}'.format(i))
             wf_inputs['forces_{}'.format(i)] = self.ctx.get('structure_{}'.format(i)).out.output_array
 
+        wf_inputs['data_sets'] = self.ctx.data_sets
+        force_sets = create_forces_set(**wf_inputs)['force_sets']
+
+        print force_sets
+
         exit()
 
         wf_inputs['structure'] = self.inputs.structure
