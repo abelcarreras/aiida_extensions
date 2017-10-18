@@ -263,7 +263,9 @@ class FrozenPhonon(WorkChain):
             self.ctx._content['optimize'] = load_node(481308)
             return
 
-        return ToContext(optimized=future)
+        optimized = {'optimized': future}
+        return ToContext(**optimized)
+        #return ToContext(optimized=future)
 
     def create_displacement_calculations(self):
         print 'create displacements'
