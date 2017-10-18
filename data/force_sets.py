@@ -44,7 +44,7 @@ class ForceSets(Data):
 
         first_atoms = []
         for i in range(ndisplacements):
-            first_atoms.append({'directions': direction[i],
+            first_atoms.append({'direction': direction[i],
                                 'number': number[i],
                                 'displacement': displacement[i]})
 
