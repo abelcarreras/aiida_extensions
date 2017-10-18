@@ -162,7 +162,8 @@ def generate_vasp_params(structure, machine, settings, type=None, pressure=0.0):
     inputs = VaspCalculation.process().get_inputs_template()
 
     # code
-    inputs.code = Code.get_from_string(settings.dict.code)
+    inputs.code = Code.get_from_string(code)
+
 
     # structure
     inputs.structure = structure
