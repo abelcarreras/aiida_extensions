@@ -397,6 +397,9 @@ class FrozenPhonon(WorkChain):
 
     def collect_phonopy_data(self):
 
+        print 'collect phonopy data'
+        print self.ctx._get_dict()
+
         force_constants = self.ctx.phonopy_output['array_data']
 
         phonon_properties = get_properties_from_phonopy(self.inputs.structure,
