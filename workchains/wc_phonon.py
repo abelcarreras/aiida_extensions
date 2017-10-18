@@ -125,8 +125,9 @@ def create_forces_set(**kwargs):
         forces.append(kwargs.pop('forces_{}'.format(i)).get_array('forces')[0])
 
     print forces
-    exit()
     data_set.set_forces(forces)
+
+    exit()
     return {'force_sets': data_set}
 
 
