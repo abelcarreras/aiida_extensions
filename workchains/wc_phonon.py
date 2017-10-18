@@ -335,8 +335,8 @@ class FrozenPhonon(WorkChain):
             future = submit(JobCalculation, **calculation_input)
             print 'phonopy FC calc:', future.pid
 
-            phonopy_input = {'phonopy_output': future}
-            return ToContext(**phonopy_input)
+            #phonopy_input = {'phonopy_output': future}
+            #return ToContext(**phonopy_input)
 
             return ToContext(phonopy_output=future)
         else:
