@@ -259,7 +259,7 @@ class FrozenPhonon(WorkChain):
         #                                     cls.collect_phonopy_data).else_(
         #                 cls.get_force_constants))
 
-        spec.outline(cls.optimize, cls.create_displacement_calculations, cls.get_force_constants)
+        spec.outline(cls.optimize, cls.create_displacement_calculations, cls.get_force_constants, cls.collect_phonopy_data)
         #spec.outline(cls.create_displacement_calculations, cls.get_force_constants_remote, cls.collect_phonopy_data)
 
     def optimize(self):
@@ -325,16 +325,6 @@ class FrozenPhonon(WorkChain):
 
     def get_force_constants(self):
 
-
-        #print 'dict', self.ctx._get_dict()
-        # wf_inputs = {}
-        #for key, calc in self.ctx._get_dict():
-        #    if key.startswith('structure_'):
-        #        print 'key', key
-        #        wf_inputs[key.replace('structure', 'forces')] = calc.out.output_array
-
-        #print wf_inputs
-
         wf_inputs = {}
         print 'DISP', self.ctx.number_of_displacements
         for i in range(self.ctx.number_of_displacements):
@@ -352,12 +342,26 @@ class FrozenPhonon(WorkChain):
         wf_inputs['machine'] = self.inputs.machine
         wf_inputs['force_sets'] = self.ctx.force_sets
 
-        phonopy_output = get_force_constants_from_phonopy(**wf_inputs)
-        force_constants = phonopy_output['array_data']
+        remote = False
+        if not remote:
+            phonopy_output = get_force_constants_from_phonopy(**wf_inputs)
+            force_constants = phonopy_output['array_data']
+
+        else:
+            code_label = self.inputs.ph_settings.get_dict()['code']
+            JobCalculation, calculation_input = generate_phonopy_params(Code.get_from_string(code_label),
+                                                                        self.inputs.structure,
+                                                                        self.inputs.ph_settings,
+                                                                        self.inputs.machine,
+                                                                        self.ctx.force_sets)
+
+            future = submit(JobCalculation, **calculation_input)
+            calcs = {'phonopy_output': future}
+            return ToContext(**calcs)
 
         phonon_properties = get_properties_from_phonopy(self.inputs.structure,
-                                                       self.inputs.ph_settings,
-                                                       force_constants)
+                                                        self.inputs.ph_settings,
+                                                        force_constants)
 
         self.out('force_constants', force_constants)
         self.out('phonon_properties', phonon_properties['thermal_properties'])
@@ -389,7 +393,7 @@ class FrozenPhonon(WorkChain):
 
     def collect_phonopy_data(self):
 
-        force_constants = self.ctx.phonopy_results['array_data']
+        force_constants = self.ctx.phonopy_output['array_data']
 
         phonon_properties = get_properties_from_phonopy(self.inputs.structure,
                                                         self.inputs.ph_settings,
