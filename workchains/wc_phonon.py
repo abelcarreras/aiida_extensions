@@ -342,7 +342,7 @@ class FrozenPhonon(WorkChain):
         wf_inputs['machine'] = self.inputs.machine
         wf_inputs['force_sets'] = self.ctx.force_sets
 
-        remote = False
+        remote = True
         if not remote:
             #phonopy_output = get_force_constants_from_phonopy(**wf_inputs)
             self.ctx.phonopy_output = get_force_constants_from_phonopy(**wf_inputs)
