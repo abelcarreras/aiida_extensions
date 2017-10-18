@@ -82,8 +82,8 @@ if True:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
     settings_dict = {'code': {'optimize': 'vasp541mpi@boston',
                               'forces': 'vasp541mpi@boston'},
                      'parameters': incar_dict,
-                     'kpoints': kpoints_dict,
-                     # 'kpoints_per_atom': 1000,  # k-point density
+                     #'kpoints': kpoints_dict,
+                     'kpoints_per_atom': 1000,  # k-point density
                      'pseudos': potcar.as_dict()}
 
     # pseudos = ParameterData(dict=potcar.as_dict())
