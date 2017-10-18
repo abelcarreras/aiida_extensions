@@ -124,6 +124,8 @@ def create_forces_set(**kwargs):
     for i in range(data_set.get_number_of_displacements()):
         forces.append(kwargs.pop('forces_{}'.format(i)).get_array('forces')[0])
 
+    print forces
+    exit()
     data_set.set_forces(forces)
     return {'force_sets': data_set}
 
@@ -342,7 +344,7 @@ class FrozenPhonon(WorkChain):
 
 
         #print 'dict', self.ctx._get_dict()
-        wf_inputs = {}
+        # wf_inputs = {}
         #for key, calc in self.ctx._get_dict():
         #    if key.startswith('structure_'):
         #        print 'key', key
@@ -350,6 +352,7 @@ class FrozenPhonon(WorkChain):
 
         #print wf_inputs
 
+        wf_inputs = {}
         print 'DISP', self.ctx.number_of_displacements
         for i in range(self.ctx.number_of_displacements):
             print 'forces_{}'.format(i), self.ctx.get('structure_{}'.format(i))
