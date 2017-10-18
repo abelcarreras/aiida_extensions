@@ -270,7 +270,7 @@ def generate_vasp_params(structure, machine, settings, type=None, pressure=0.0):
     else:
         print settings.dict.kpoints
         kpoints_pg = vaspio.Kpoints(comment='aiida generated',
-                                    style=settings.dict.kpoints['style'],
+                                    style=settings.dict.kpoints['type'],
                                     kpts=(settings.dict.kpoints['points'],), kpts_shift=settings.dict['shift'])
 
     inputs.kpoints = ParameterData(dict=kpoints_pg.as_dict())
