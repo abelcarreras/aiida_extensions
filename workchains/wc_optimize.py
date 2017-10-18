@@ -68,10 +68,12 @@ class OptimizeStructure(WorkChain):
         # self.ctx._get_dict()
         print 'start optimization'
 
-        if not 'structure' in self.ctx:
-            self.ctx.structure = self.inputs.structure
+        if not 'optimize' in self.ctx:
+            structure = self.inputs.structure
+        else:
+            structure = self.ctx.optimize.out.output_structure
 
-        JobCalculation, calculation_input = generate_inputs(self.ctx.structure,
+        JobCalculation, calculation_input = generate_inputs(structure,
                                                             self.inputs.machine,
                                                             self.inputs.es_settings,
                                                             pressure=self.inputs.pressure,
