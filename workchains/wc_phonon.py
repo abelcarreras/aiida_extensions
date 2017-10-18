@@ -344,8 +344,9 @@ class FrozenPhonon(WorkChain):
 
         remote = False
         if not remote:
-            phonopy_output = get_force_constants_from_phonopy(**wf_inputs)
-            force_constants = phonopy_output['array_data']
+            #phonopy_output = get_force_constants_from_phonopy(**wf_inputs)
+            self.ctx.phonopy_output = get_force_constants_from_phonopy(**wf_inputs)
+            #force_constants = phonopy_output['array_data']
 
         else:
             code_label = self.inputs.ph_settings.get_dict()['code']
@@ -358,6 +359,8 @@ class FrozenPhonon(WorkChain):
             future = submit(JobCalculation, **calculation_input)
             calcs = {'phonopy_output': future}
             return ToContext(**calcs)
+
+        return
 
         phonon_properties = get_properties_from_phonopy(self.inputs.structure,
                                                         self.inputs.ph_settings,
