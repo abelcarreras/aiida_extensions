@@ -55,10 +55,8 @@ ph_settings = ParameterData(dict={'supercell': [[2,0,0],
                                   })
 
 # VASP SPECIFIC
-if False:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
+if True:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
     incar_dict = {
-        # 'PREC'   : 'Accurate',
-        'EDIFF'  : 1e-08,
         'NELMIN' : 5,
         'NELM'   : 100,
         'ENCUT'  : 400,
@@ -70,20 +68,22 @@ if False:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
 
     es_settings = ParameterData(dict=incar_dict)
 
-
     from pymatgen.io import vasp as vaspio
-    #kpoints
-    #kpoints_pg = vaspio.Kpoints.monkhorst_automatic(
-    #                         kpts=[2, 2, 2],
-    #                         shift=[0.0, 0.0, 0.0])
-    #kpoints = ParameterData(dict=kpoints_pg.as_dict())
 
     potcar = vaspio.Potcar(symbols=['Ga', 'N'],
                            functional='PBE')
 
-    settings_dict = {'code': 'vasp541mpi@boston',
+    # custom k-points
+    # supported_modes = Enum(("Gamma", "Monkhorst", "Automatic", "Line_mode", "Cartesian", "Reciprocal"))
+    kpoints_dict = {'type': 'Monkhorst',
+                    'points': [2, 2, 2],
+                    'shift': [0.0, 0.0, 0.0]}
+
+    settings_dict = {'code': {'optimize': 'vasp541mpi@boston',
+                              'forces': 'vasp541mpi@boston'},
                      'parameters': incar_dict,
-                     'kpoints_per_atom': 1000,  # k-point density
+                     'kpoints': kpoints_dict,
+                     # 'kpoints_per_atom': 1000,  # k-point density
                      'pseudos': potcar.as_dict()}
 
     # pseudos = ParameterData(dict=potcar.as_dict())
