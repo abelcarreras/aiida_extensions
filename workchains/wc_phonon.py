@@ -342,7 +342,7 @@ class FrozenPhonon(WorkChain):
             wf_inputs['forces_{}'.format(i)] = self.ctx.get('structure_{}'.format(i)).out.output_array
 
         wf_inputs['data_sets'] = self.ctx.data_sets
-        force_sets = create_forces_set(**wf_inputs)['force_sets']
+        self.ctx.force_sets = create_forces_set(**wf_inputs)['force_sets']
 
         wf_inputs = {}
 
@@ -350,7 +350,7 @@ class FrozenPhonon(WorkChain):
         wf_inputs['phonopy_input'] = self.inputs.ph_settings
 
         wf_inputs['machine'] = self.inputs.machine
-        wf_inputs['force_sets'] = force_sets
+        wf_inputs['force_sets'] = self.ctx.force_sets
 
         phonopy_output = get_force_constants_from_phonopy(**wf_inputs)
         force_constants = phonopy_output['array_data']
