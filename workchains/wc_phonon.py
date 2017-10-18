@@ -117,20 +117,16 @@ def create_supercells_with_displacements_using_phonopy(structure, phonopy_input)
 def create_forces_set(**kwargs):
     # Build data_sets from forces of supercells with displacments
 
-    import numpy as np
-
     data_sets = kwargs.pop('data_sets')
 
-    print data_sets.get_data_sets()
-
     force_sets = ForceSets(data_sets=data_sets.get_data_sets())
+
     forces = []
     for i in range(data_sets.get_number_of_displacements()):
         forces.append(kwargs.pop('forces_{}'.format(i)).get_array('forces')[0])
 
     force_sets.set_forces(forces)
 
-    exit()
     return {'force_sets': force_sets}
 
 
