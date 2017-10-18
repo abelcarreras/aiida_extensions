@@ -258,7 +258,7 @@ class FrozenPhonon(WorkChain):
                         pressure=self.inputs.pressure,
                         )
         # For testing
-        testing = False
+        testing = True
         if testing:
             self.ctx._content['optimize'] = load_node(481308)
             return
