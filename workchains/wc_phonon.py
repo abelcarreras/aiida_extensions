@@ -258,11 +258,12 @@ class FrozenPhonon(WorkChain):
                         pressure=self.inputs.pressure,
                         )
         # For testing
-        testing = True
+        testing = False
         if testing:
             self.ctx._content['optimize'] = load_node(481308)
             return
 
+        print future.pk
         optimized = {'optimized': future}
         return ToContext(**optimized)
         #return ToContext(optimized=future)
