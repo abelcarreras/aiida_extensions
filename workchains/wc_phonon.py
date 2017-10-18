@@ -18,28 +18,28 @@ from aiida.orm.data.base import Str, Float, Bool
 from aiida.orm.data.force_sets import ForceSets
 from aiida.orm.data.force_constants import ForceConstants
 
-
 #from aiida.orm.calculation.job.quantumespresso.pw import PwCalculation
 #from aiida.orm.calculation.job.vasp.vasp import VaspCalculation
 from aiida.work.workchain import if_
-
-PwCalculation = CalculationFactory('quantumespresso.pw')
-PhonopyCalculation = CalculationFactory('phonopy')
 
 from aiida.workflows.wc_optimize import OptimizeStructure
 
 import numpy as np
 from generate_inputs import *
 
-def generate_phonopy_params(code, structure, parameters, machine, data_sets):
+PwCalculation = CalculationFactory('quantumespresso.pw')
+PhonopyCalculation = CalculationFactory('phonopy')
+
+
+def generate_phonopy_params(code, structure, parameters, machine, force_sets):
     """
     Generate inputs parameters needed to do a remote phonopy calculation
-    :param code: Aiida Code object
-    :param structure: Aiida StructureData Object
-    :param parameters: Aiida Parametersdata object containing a dictionary with the data neede to run a phonopy
-                       calculation: supercell matrix, primitive matrix, displacement, distance and mesh (others may be included in the future)
-    :param machine: Aiida Parametersdata object containing a dictioary with the computational resources information
-    :param data_sets: Aiida ParametersData object containing the collected forces and displacement onformation of all the supercells
+    :param code: AiiDA Code object
+    :param structure: AiiDA StructureData Object
+    :param parameters: AiiDA ParametersData object containing a dictionary with the data neede to run a phonopy
+                       calculation: supercell matrix, primitive matrix, displacement, distance and mesh
+    :param machine: AiiDA ParametersData object containing a dictionary with the computational resources information
+    :param force_sets: AiiDA ParametersData object containing the collected forces and displacement information
     :return: Calculation process object, input dictionary
     """
 
@@ -60,7 +60,7 @@ def generate_phonopy_params(code, structure, parameters, machine, data_sets):
     inputs._options.max_wallclock_seconds = machine.dict.max_wallclock_seconds
 
     # data_sets
-    inputs.data_sets = data_sets
+    inputs.data_sets = force_sets
 
     return PhonopyCalculation.process(), inputs
 
@@ -70,10 +70,10 @@ def create_supercells_with_displacements_using_phonopy(structure, phonopy_input)
     """
     Create the supercells with the displacements to use the finite displacements methodology to calculate the
     force constants
-    :param structure: Aiida StructureData Object
-    :param phonopy_input: Aiida Parametersdata object containing a dictionary with the data needed to run phonopy:
+    :param structure: AiiDa StructureData object
+    :param phonopy_input: AiiDa ParametersData object containing a dictionary with the data needed to run phonopy:
             supercells matrix, primitive matrix and displacement distance.
-    :return: dictionary of Aiida StructureData Objects containing the cells with displacements
+    :return: dictionary of AiiDa StructureData Objects containing the cells with displacements
     """
     from phonopy.structure.atoms import Atoms as PhonopyAtoms
     from phonopy import Phonopy
@@ -96,11 +96,6 @@ def create_supercells_with_displacements_using_phonopy(structure, phonopy_input)
     # Transform cells to StructureData and set them ready to return
     data_sets = phonon.get_displacement_dataset()
     data_sets_object = ForceSets(data_sets=data_sets)
-
-    #data_sets_object = ArrayData()
-    #for i, first_atoms in enumerate(data_sets['first_atoms']):
-    #    data_sets_array = np.array([first_atoms['direction'], first_atoms['number'], first_atoms['displacement']])
-    #    data_sets_object.set_array('data_sets_{}'.format(i), data_sets_array)
 
     disp_cells = {'data_sets': data_sets_object}
     for i, phonopy_supercell in enumerate(cells_with_disp):
@@ -130,20 +125,12 @@ def create_forces_set(**kwargs):
     return {'force_sets': force_sets}
 
 
-    force_sets = ArrayData()
-    for i in data_set.get_arraynames():
-        force_array = kwargs.pop(i.replace('data_sets', 'forces')).get_array('forces')[0]
-        data_set_array = np.array([data_set.get_array(i)[0], data_set.get_array(i)[1], data_set.get_array(i)[2], force_array])
-        force_sets.set_array(i, data_set_array)
-
-    return {'force_sets': force_sets}
-
 @workfunction
 def get_force_constants_from_phonopy(**kwargs):
     """
     Calculate the force constants using phonopy
     :param kwargs:
-    :return:
+    :return: phonopy force constants
     """
 
     from phonopy.structure.atoms import Atoms as PhonopyAtoms
@@ -186,7 +173,7 @@ def get_properties_from_phonopy(structure, phonopy_input, force_constants):
     :param phonopy_input: Aiida Parametersdata object containing a dictionary with the data needed to run phonopy:
             supercells matrix, primitive matrix and q-points mesh.
     :param force_constants:
-    :return:
+    :return: phonopy thermal properties and DOS
     """
 
     from phonopy.structure.atoms import Atoms as PhonopyAtoms
@@ -270,16 +257,19 @@ class FrozenPhonon(WorkChain):
                         es_settings=self.inputs.es_settings,
                         pressure=self.inputs.pressure,
                         )
-        self.ctx._content['optimize'] = load_node(481308)
+        # For testing
+        testing = True
+        if testing:
+            self.ctx._content['optimize'] = load_node(481308)
+            return
 
-        #return ToContext(optimized=future)
+        return ToContext(optimized=future)
 
     def remote_phonopy(self):
         return 'code' in self.inputs.ph_settings.get_dict()
 
     def create_displacement_calculations(self):
-        print 'start displacements'
-        print 'test2!', self.ctx._get_dict()
+        print 'create displacements'
 
         if 'optimized' in self.ctx:
             structure = self.ctx.optimized.out.optimized_structure
@@ -291,9 +281,9 @@ class FrozenPhonon(WorkChain):
         self.ctx.data_sets = structures.pop('data_sets')
         self.ctx.number_of_displacements = len(structures)
 
-############### FOR TESTING ###############
-# 1) Load data from nodes
-        if True: #For test
+        # Load data from nodes
+        testing = True
+        if testing:
             from aiida.orm import load_node
             nodes = [482152, 482154, 482156, 482158]  # LAMMPS
             labels = ['structure_1', 'structure_0', 'structure_3', 'structure_2']
@@ -325,61 +315,33 @@ class FrozenPhonon(WorkChain):
 
     def get_force_constants(self):
 
+        print 'calculate force constants'
+
         wf_inputs = {}
         for i in range(self.ctx.number_of_displacements):
-            #print 'forces_{}'.format(i), self.ctx.get('structure_{}'.format(i))
             wf_inputs['forces_{}'.format(i)] = self.ctx.get('structure_{}'.format(i)).out.output_array
-
         wf_inputs['data_sets'] = self.ctx.data_sets
+
         self.ctx.force_sets = create_forces_set(**wf_inputs)['force_sets']
 
-        wf_inputs = {}
-
-        wf_inputs['structure'] = self.inputs.structure
-        wf_inputs['phonopy_input'] = self.inputs.ph_settings
-
-        wf_inputs['machine'] = self.inputs.machine
-        wf_inputs['force_sets'] = self.ctx.force_sets
-
-        remote = True
-        if not remote:
-            self.ctx.phonopy_output = get_force_constants_from_phonopy(**wf_inputs)
-
-        else:
+        if 'code' in self.inputs.ph_settings.get_dict():
+            print ('remote phonopy calculation')
             code_label = self.inputs.ph_settings.get_dict()['code']
-            JobCalculation, calculation_input = generate_phonopy_params(Code.get_from_string(code_label),
-                                                                        self.inputs.structure,
-                                                                        self.inputs.ph_settings,
-                                                                        self.inputs.machine,
-                                                                        self.ctx.force_sets)
-
+            JobCalculation, calculation_input = generate_phonopy_params(code=Code.get_from_string(code_label),
+                                                                        structure=self.inputs.structure,
+                                                                        parameters=self.inputs.ph_settings,
+                                                                        machine=self.inputs.machine,
+                                                                        force_sets=self.ctx.force_sets)
             future = submit(JobCalculation, **calculation_input)
             print 'phonopy FC calc:', future.pid
             return ToContext(phonopy_ouput=future)
-
+        else:
+            print ('local phonopy calculation')
+            self.ctx.phonopy_output = get_force_constants_from_phonopy(structure=self.inputs.structure,
+                                                                       phonopy_input=self.inputs.ph_settings,
+                                                                       machine=self.inputs.machine,
+                                                                       force_sets=self.ctx.force_sets)
         return
-
-    def get_force_constants_remote(self):
-        wf_inputs = {}
-        for key, value in self.ctx._get_dict().iteritems():
-            if key.startswith('structure_'):
-                wf_inputs[key.replace('structure', 'forces')] = value['output_array']
-
-        wf_inputs['data_sets'] = self.ctx.data_sets
-        force_sets = create_forces_set(**wf_inputs)['force_sets']
-
-        code_label = self.inputs.ph_settings.get_dict()['code']
-
-        JobCalculation, calculation_input = generate_phonopy_params(Code.get_from_string(code_label),
-                                                                    self.inputs.structure,
-                                                                    self.inputs.ph_settings,
-                                                                    self.inputs.machine,
-                                                                    force_sets)
-
-        future = submit(JobCalculation, **calculation_input)
-        calcs = {'phonopy_results': future}
-
-        return ToContext(**calcs)
 
     def collect_phonopy_data(self):
 
@@ -399,173 +361,3 @@ class FrozenPhonon(WorkChain):
         self.out('dos', phonon_properties['dos'])
 
         return
-
-
-################### EXAMPLE INPUT FOR VASP AND QUANTUM ESPRESSO ###################
-
-if __name__ == "__main__":
-
-    # Define structure
-
-    import numpy as np
-
-    cell = [[ 3.1900000572, 0,           0],
-            [-1.5950000286, 2.762621076, 0],
-            [ 0.0,          0,           5.1890001297]]
-
-    structure = StructureData(cell=cell)
-
-    scaled_positions=[(0.6666669,  0.3333334,  0.0000000),
-                      (0.3333331,  0.6666663,  0.5000000),
-                      (0.6666669,  0.3333334,  0.3750000),
-                      (0.3333331,  0.6666663,  0.8750000)]
-
-    symbols=['Ga', 'Ga', 'N', 'N']
-
-    positions = np.dot(scaled_positions, cell)
-
-    for i, scaled_position in enumerate(scaled_positions):
-        structure.append_atom(position=np.dot(scaled_position, cell).tolist(),
-                              symbols=symbols[i])
-
-
-# PHONOPY settings
-    ph_settings = ParameterData(dict={'supercell': [[2,0,0],
-                                                    [0,2,0],
-                                                    [0,0,2]],
-                                      'primitive': [[1.0, 0.0, 0.0],
-                                                    [0.0, 1.0, 0.0],
-                                                    [0.0, 0.0, 1.0]],
-                                      'distance': 0.01,
-                                      'mesh': [40, 40, 40],
-                                      # 'code': 'phonopy@stern_outside'  # comment to use local phonopy
-                                      })
-
-# VASP SPECIFIC
-    if True:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
-        incar_dict = {
-            # 'PREC'   : 'Accurate',
-            'EDIFF'  : 1e-08,
-            'NELMIN' : 5,
-            'NELM'   : 100,
-            'ENCUT'  : 400,
-            'ALGO'   : 38,
-            'ISMEAR' : 0,
-            'SIGMA'  : 0.01,
-            'GGA'    : 'PS'
-        }
-
-        es_settings = ParameterData(dict=incar_dict)
-
-
-        from pymatgen.io import vasp as vaspio
-        #kpoints
-        #kpoints_pg = vaspio.Kpoints.monkhorst_automatic(
-        #                         kpts=[2, 2, 2],
-        #                         shift=[0.0, 0.0, 0.0])
-        #kpoints = ParameterData(dict=kpoints_pg.as_dict())
-
-        potcar = vaspio.Potcar(symbols=['Ga', 'N'],
-                               functional='PBE')
-
-        settings_dict = {'code': 'vasp541mpi@boston',
-                         'parameters': incar_dict,
-                         'kpoints_per_atom': 1000,  # k-point density
-                         'pseudos': potcar.as_dict()}
-
-        # pseudos = ParameterData(dict=potcar.as_dict())
-        es_settings = ParameterData(dict=settings_dict)
-
-
-
-    # QE SPECIFIC
-    if False:
-        parameters_dict = {
-            'CONTROL': {'calculation': 'scf',
-                        'tstress': True,  #  Important that this stays to get stress
-                        'tprnfor': True,},
-            'SYSTEM': {'ecutwfc': 30.,
-                       'ecutrho': 200.,},
-            'ELECTRONS': {'conv_thr': 1.e-6,}
-        }
-
-        # Kpoints
-        #kpoints_mesh = 2
-        #kpoints = KpointsData()
-        #kpoints.set_kpoints_mesh([kpoints_mesh, kpoints_mesh, kpoints_mesh])
-        #code = Code.get_from_string('pw@stern_outside')
-
-        pseudos = Str('pbe_ps')
-
-        settings_dict = {'code': 'pw@stern_outside',
-                         'parameters': parameters_dict,
-                         'kpoints_per_atom': 1000,  # k-point density
-                         'pseudos_family': 'pbe_ps'}
-
-        es_settings = ParameterData(dict=settings_dict)
-
-
-    # LAMMPS SPECIFIC
-    if False:
-        # GaN Tersoff
-        tersoff_gan = {
-            'Ga Ga Ga': '1.0 0.007874 1.846 1.918000 0.75000 -0.301300 1.0 1.0 1.44970 410.132 2.87 0.15 1.60916 535.199',
-            'N  N  N': '1.0 0.766120 0.000 0.178493 0.20172 -0.045238 1.0 1.0 2.38426 423.769 2.20 0.20 3.55779 1044.77',
-            'Ga Ga N': '1.0 0.001632 0.000 65.20700 2.82100 -0.518000 1.0 0.0 0.00000 0.00000 2.90 0.20 0.00000 0.00000',
-            'Ga N  N': '1.0 0.001632 0.000 65.20700 2.82100 -0.518000 1.0 1.0 2.63906 3864.27 2.90 0.20 2.93516 6136.44',
-            'N  Ga Ga': '1.0 0.001632 0.000 65.20700 2.82100 -0.518000 1.0 1.0 2.63906 3864.27 2.90 0.20 2.93516 6136.44',
-            'N  Ga N ': '1.0 0.766120 0.000 0.178493 0.20172 -0.045238 1.0 0.0 0.00000 0.00000 2.20 0.20 0.00000 0.00000',
-            'N  N  Ga': '1.0 0.001632 0.000 65.20700 2.82100 -0.518000 1.0 0.0 0.00000 0.00000 2.90 0.20 0.00000 0.00000',
-            'Ga N  Ga': '1.0 0.007874 1.846 1.918000 0.75000 -0.301300 1.0 0.0 0.00000 0.00000 2.87 0.15 0.00000 0.00000'}
-
-        # Silicon(C) Tersoff
-        # tersoff_si = {'Si  Si  Si ': '3.0 1.0 1.7322 1.0039e5 16.218 -0.59826 0.78734 1.0999e-6  1.7322  471.18  2.85  0.15  2.4799  1830.8'}
-
-
-        potential = {'pair_style': 'tersoff',
-                     'data': tersoff_gan}
-
-        parameters = {'relaxation': 'tri',  # iso/aniso/tri
-                      'pressure': 0.0,  # kbars
-                      'vmax': 0.000001,  # Angstrom^3
-                      'energy_tolerance': 1.0e-25,  # eV
-                      'force_tolerance': 1.0e-25,  # eV angstrom
-                      'max_evaluations': 1000000,
-                      'max_iterations': 500000}
-
-        settings_dict = {'code_forces': 'lammps_force@stern',
-                         'code_optimize': 'lammps_optimize@stern',
-                         'parameters': parameters,
-                         'potential': potential}
-
-        es_settings = ParameterData(dict=settings_dict)
-
-
-
-    # CODE INDEPENDENT
-    machine_dict = {'resources': {'num_machines': 1,
-                                  'parallel_env': 'mpi*',
-                                  'tot_num_mpiprocs': 16},
-                    'max_wallclock_seconds': 30 * 60,
-                    }
-
-    machine = ParameterData(dict=machine_dict)
-
-    results = run(FrozenPhonon,
-                  structure=structure,
-                  machine=machine,
-                  es_settings=es_settings,
-                  ph_settings=ph_settings,
-                  # Optional settings
-                  pressure=Float(10),
-                  optimize=Bool(0)
-                  )
-
-    # Check results
-    print results
-
-    print results['force_constants'].get_array('force_constants')
-
-    print results['force_constants'].pk
-    print results['phonon_properties'].pk
-    print results['dos'].pk

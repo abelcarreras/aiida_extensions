@@ -55,10 +55,8 @@ ph_settings = ParameterData(dict={'supercell': [[2,0,0],
                                   })
 
 # VASP SPECIFIC
-if False:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
+if True:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
     incar_dict = {
-        # 'PREC'   : 'Accurate',
-        'EDIFF'  : 1e-08,
         'NELMIN' : 5,
         'NELM'   : 100,
         'ENCUT'  : 400,
@@ -70,13 +68,7 @@ if False:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
 
     es_settings = ParameterData(dict=incar_dict)
 
-
     from pymatgen.io import vasp as vaspio
-    #kpoints
-    #kpoints_pg = vaspio.Kpoints.monkhorst_automatic(
-    #                         kpts=[2, 2, 2],
-    #                         shift=[0.0, 0.0, 0.0])
-    #kpoints = ParameterData(dict=kpoints_pg.as_dict())
 
     potcar = vaspio.Potcar(symbols=['Ga', 'N'],
                            functional='PBE')
@@ -87,7 +79,8 @@ if False:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
                     'points': [2, 2, 2],
                     'shift': [0.0, 0.0, 0.0]}
 
-    settings_dict = {'code': 'vasp541mpi@boston',
+    settings_dict = {'code': {'optimize': 'vasp541mpi@boston',
+                              'forces': 'vasp541mpi@boston'},
                      'parameters': incar_dict,
                      'kpoints': kpoints_dict,
                      # 'kpoints_per_atom': 1000,  # k-point density
@@ -95,7 +88,6 @@ if False:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
 
     # pseudos = ParameterData(dict=potcar.as_dict())
     es_settings = ParameterData(dict=settings_dict)
-
 
 
 # QE SPECIFIC
@@ -126,8 +118,8 @@ if False:
 
 
 # LAMMPS SPECIFIC
-if True:
-    # GaN Tersoff
+if False:
+    # GaN Tersoff potentials parameters (can be readed from a file if needed)
     tersoff_gan = {
         'Ga Ga Ga': '1.0 0.007874 1.846 1.918000 0.75000 -0.301300 1.0 1.0 1.44970 410.132 2.87 0.15 1.60916 535.199',
         'N  N  N': '1.0 0.766120 0.000 0.178493 0.20172 -0.045238 1.0 1.0 2.38426 423.769 2.20 0.20 3.55779 1044.77',
@@ -138,12 +130,8 @@ if True:
         'N  N  Ga': '1.0 0.001632 0.000 65.20700 2.82100 -0.518000 1.0 0.0 0.00000 0.00000 2.90 0.20 0.00000 0.00000',
         'Ga N  Ga': '1.0 0.007874 1.846 1.918000 0.75000 -0.301300 1.0 0.0 0.00000 0.00000 2.87 0.15 0.00000 0.00000'}
 
-    # Silicon(C) Tersoff
-    # tersoff_si = {'Si  Si  Si ': '3.0 1.0 1.7322 1.0039e5 16.218 -0.59826 0.78734 1.0999e-6  1.7322  471.18  2.85  0.15  2.4799  1830.8'}
-
-
-    potential = {'pair_style': 'tersoff',
-                 'data': tersoff_gan}
+    potential = {'pair_style': 'tersoff',  # potential type
+                 'data': tersoff_gan}  # potential data
 
     parameters = {'relaxation': 'tri',  # iso/aniso/tri
                   'pressure': 0.0,  # kbars
