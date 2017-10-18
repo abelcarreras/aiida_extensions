@@ -153,7 +153,7 @@ def get_force_constants_from_phonopy(**kwargs):
 
     structure = kwargs.pop('structure')
     phonopy_input = kwargs.pop('phonopy_input').get_dict()
-    data_sets = kwargs.pop('data_sets')
+    force_sets = kwargs.pop('force_sets')
 
  # Generate phonopy phonon object
     bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
@@ -167,23 +167,6 @@ def get_force_constants_from_phonopy(**kwargs):
     phonon.generate_displacements(distance=phonopy_input['distance'])
 
  # Build data_sets from forces of supercells with displacments
-
-    forces = []
-    for i in range(data_sets.get_number_of_displacements()):
-        forces.append(kwargs.pop('forces_{}'.format(i)).get_array('forces')[0])
-
-    data_sets.set_forces(forces)
-    force_sets = data_sets.get_force_sets()
-
-    #data_sets = phonon.get_displacement_dataset()
-    #for i, first_atoms in enumerate(data_sets['first_atoms']):
-    #    forces = kwargs.pop('forces_{}'.format(i)).get_array('forces')[0]
-    #    first_atoms['forces'] = np.array(forces, dtype='double', order='c')
-
-    # LOCAL calculation
-
-
-    # Calculate and get force constants
     phonon.set_displacement_dataset(force_sets)
     phonon.produce_force_constants()
 
@@ -248,9 +231,9 @@ def get_properties_from_phonopy(structure, phonopy_input, force_constants):
     # Stores thermal properties (per unit cell) data in DB as a workflow result
     thermal_properties = ArrayData()
     thermal_properties.set_array('temperature', t)
-    thermal_properties.set_array('free_energy', free_energy*normalization_factor)
-    thermal_properties.set_array('entropy', entropy*normalization_factor)
-    thermal_properties.set_array('cv', cv*normalization_factor)
+    thermal_properties.set_array('free_energy', free_energy * normalization_factor)
+    thermal_properties.set_array('entropy', entropy * normalization_factor)
+    thermal_properties.set_array('cv', cv * normalization_factor)
 
     return {'thermal_properties': thermal_properties, 'dos': dos}
 
@@ -363,13 +346,14 @@ class FrozenPhonon(WorkChain):
 
         print force_sets
 
-        exit()
+
+        wf_inputs = {}
 
         wf_inputs['structure'] = self.inputs.structure
         wf_inputs['phonopy_input'] = self.inputs.ph_settings
 
         wf_inputs['machine'] = self.inputs.machine
-        wf_inputs['data_sets'] = self.ctx.data_sets
+        wf_inputs['force_sets'] = self.ctx.data_sets
 
         phonopy_output = get_force_constants_from_phonopy(**wf_inputs)
         force_constants = phonopy_output['array_data']
