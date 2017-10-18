@@ -141,7 +141,7 @@ def generate_lammps_params(structure, machine, settings, pressure=0.0, type=None
     return LammpsCalculation.process(), inputs
 
 
-def generate_vasp_params(structure, machine, settings, type=None):
+def generate_vasp_params(structure, machine, settings, type=None, pressure=0.0):
     """
     generate the input paramemeters needed to run a calculation for VASP
     :param structure:  aiida StructureData object
@@ -171,7 +171,72 @@ def generate_vasp_params(structure, machine, settings, type=None):
     inputs._options.max_wallclock_seconds = machine.dict.max_wallclock_seconds
 
     # INCAR (parameters)
-    inputs.incar = ParameterData(dict=settings.dict.parameters)
+    incar = settings.dict.parameters
+
+    if type == 'optimize':
+        vasp_input_optimize = dict(incar)
+        vasp_input_optimize.update({
+            'PREC': 'Accurate',
+            'ISTART': 0,
+            'IBRION': 2,
+            'ISIF': 3,
+            'NSW': 100,
+            'LWAVE': '.FALSE.',
+            'LCHARG': '.FALSE.',
+            'EDIFF': 1e-08,
+            'EDIFFG': -1e-08,
+            'ADDGRID': '.TRUE.',
+            'LREAL': '.FALSE.',
+            'PSTRESS': pressure})  # unit: kb -> kB
+        incar = vasp_input_optimize
+
+    if type == 'optimize_constant_volume':
+        vasp_input_optimize = dict(incar)
+        vasp_input_optimize.update({
+            'PREC': 'Accurate',
+            'ISTART': 0,
+            'IBRION': 2,
+            'ISIF': 4,
+            'NSW': 100,
+            'LWAVE': '.FALSE.',
+            'LCHARG': '.FALSE.',
+            'EDIFF': 1e-08,
+            'EDIFFG': -1e-08,
+            'ADDGRID': '.TRUE.',
+            'LREAL': '.FALSE.'})
+        incar = vasp_input_optimize
+
+    if type == 'forces':
+        vasp_input_forces = dict(incar)
+        vasp_input_forces.update({
+            'PREC': 'Accurate',
+            'ISYM': 0,
+            'ISTART': 0,
+            'IBRION': -1,
+            'NSW': 1,
+            'LWAVE': '.FALSE.',
+            'LCHARG': '.FALSE.',
+            'EDIFF': 1e-08,
+            'ADDGRID': '.TRUE.',
+            'LREAL': '.FALSE.'})
+        incar = vasp_input_forces
+
+    if type == 'born_charges':
+        vasp_input_epsilon = dict(incar)
+        vasp_input_epsilon.update({
+            'PREC': 'Accurate',
+            'LEPSILON': '.TRUE.',
+            'ISTART': 0,
+            'IBRION': 1,
+            'NSW': 0,
+            'LWAVE': '.FALSE.',
+            'LCHARG': '.FALSE.',
+            'EDIFF': 1e-08,
+            'ADDGRID': '.TRUE.',
+            'LREAL': '.FALSE.'})
+        incar = vasp_input_epsilon
+
+    inputs.incar = ParameterData(dict=incar)
 
     # POTCAR (pseudo)
     inputs.potcar = ParameterData(dict=settings.dict.pseudos)
@@ -199,14 +264,14 @@ def generate_vasp_params(structure, machine, settings, type=None):
     # Kpoints
     from pymatgen.io import vasp as vaspio
 
-    kpoints_pg = vaspio.Kpoints.automatic_density(structure.get_pymatgen_structure(), settings.dict.kpoints_per_atom)
-    # kpoints_pg = vaspio.Kpoints.monkhorst_automatic(kpts=[2, 2, 2],
-    #                                                shift=[0.0, 0.0, 0.0])
+    if 'kpoints_per_atom' in settings:
+        kpoints_pg = vaspio.Kpoints.automatic_density(structure.get_pymatgen_structure(), settings.dict.kpoints_per_atom)
+    else:
+        kpoints_pg = vaspio.Kpoints(comment='aiida generated',
+                                    style=settings.dict.kpoints['style'],
+                                    kpts=(settings.dict.kpoints['points'],), kpts_shift=settings.dict['shift'])
 
-    kpoints = ParameterData(dict=kpoints_pg.as_dict())
-    inputs.kpoints = kpoints
-
-    inputs.settings = ParameterData(dict=settings_parse)
+    inputs.kpoints = ParameterData(dict=kpoints_pg.as_dict())
 
     return VaspCalculation.process(), inputs
 

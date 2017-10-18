@@ -81,9 +81,16 @@ if False:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
     potcar = vaspio.Potcar(symbols=['Ga', 'N'],
                            functional='PBE')
 
+    # custom k-points
+    # supported_modes = Enum(("Gamma", "Monkhorst", "Automatic", "Line_mode", "Cartesian", "Reciprocal"))
+    kpoints_dict = {'type': 'Monkhorst',
+                    'points': [2, 2, 2],
+                    'shift': [0.0, 0.0, 0.0]}
+
     settings_dict = {'code': 'vasp541mpi@boston',
                      'parameters': incar_dict,
-                     'kpoints_per_atom': 1000,  # k-point density
+                     'kpoints': kpoints_dict,
+                     # 'kpoints_per_atom': 1000,  # k-point density
                      'pseudos': potcar.as_dict()}
 
     # pseudos = ParameterData(dict=potcar.as_dict())

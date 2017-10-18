@@ -326,9 +326,8 @@ class FrozenPhonon(WorkChain):
     def get_force_constants(self):
 
         wf_inputs = {}
-        print 'DISP', self.ctx.number_of_displacements
         for i in range(self.ctx.number_of_displacements):
-            print 'forces_{}'.format(i), self.ctx.get('structure_{}'.format(i))
+            #print 'forces_{}'.format(i), self.ctx.get('structure_{}'.format(i))
             wf_inputs['forces_{}'.format(i)] = self.ctx.get('structure_{}'.format(i)).out.output_array
 
         wf_inputs['data_sets'] = self.ctx.data_sets
@@ -344,9 +343,7 @@ class FrozenPhonon(WorkChain):
 
         remote = True
         if not remote:
-            #phonopy_output = get_force_constants_from_phonopy(**wf_inputs)
             self.ctx.phonopy_output = get_force_constants_from_phonopy(**wf_inputs)
-            #force_constants = phonopy_output['array_data']
 
         else:
             code_label = self.inputs.ph_settings.get_dict()['code']
@@ -357,19 +354,8 @@ class FrozenPhonon(WorkChain):
                                                                         self.ctx.force_sets)
 
             future = submit(JobCalculation, **calculation_input)
-            print 'phonopy calc', future.pid
-            calcs = {'phonopy_output': future}
-            return ToContext(**calcs)
-
-        return
-
-        phonon_properties = get_properties_from_phonopy(self.inputs.structure,
-                                                        self.inputs.ph_settings,
-                                                        force_constants)
-
-        self.out('force_constants', force_constants)
-        self.out('phonon_properties', phonon_properties['thermal_properties'])
-        self.out('dos', phonon_properties['dos'])
+            print 'phonopy FC calc:', future.pid
+            return ToContext(phonopy_ouput=future)
 
         return
 
@@ -398,7 +384,6 @@ class FrozenPhonon(WorkChain):
     def collect_phonopy_data(self):
 
         print 'collect phonopy data'
-        print self.ctx._get_dict()
 
         try:
             force_constants = self.ctx.phonopy_output['array_data']
