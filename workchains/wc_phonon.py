@@ -344,18 +344,13 @@ class FrozenPhonon(WorkChain):
         wf_inputs['data_sets'] = self.ctx.data_sets
         force_sets = create_forces_set(**wf_inputs)['force_sets']
 
-        print force_sets
-        print force_sets.get_force_sets()
-        exit()
-
-
         wf_inputs = {}
 
         wf_inputs['structure'] = self.inputs.structure
         wf_inputs['phonopy_input'] = self.inputs.ph_settings
 
         wf_inputs['machine'] = self.inputs.machine
-        wf_inputs['force_sets'] = self.ctx.data_sets
+        wf_inputs['force_sets'] = force_sets
 
         phonopy_output = get_force_constants_from_phonopy(**wf_inputs)
         force_constants = phonopy_output['array_data']
