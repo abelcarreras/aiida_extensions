@@ -276,6 +276,31 @@ def generate_vasp_params(structure, machine, settings, type=None, pressure=0.0):
 
     inputs.kpoints = ParameterData(dict=kpoints_pg.as_dict())
 
+    # Parser settings
+    settings = {'PARSER_INSTRUCTIONS': []}
+    pinstr = settings['PARSER_INSTRUCTIONS']
+
+    pinstr.append({
+        'instr': 'array_data_parser',
+        'type': 'data',
+        'params': {}
+    })
+    pinstr.append({
+        'instr': 'output_parameters',
+        'type': 'data',
+        'params': {}
+    })
+
+    # additional files to return
+    settings.setdefault(
+        'ADDITIONAL_RETRIEVE_LIST', [
+            'vasprun.xml',
+        ]
+    )
+
+    inputs.settings = ParameterData(dict=settings)
+
+
     return VaspCalculation.process(), inputs
 
 
