@@ -343,6 +343,7 @@ class FrozenPhonon(WorkChain):
         wf_inputs = {}
         for key, calc in self.ctx:
             if key.startswith('structure_'):
+                print 'key', key
                 wf_inputs[key.replace('structure', 'forces')] = calc.get_outputs('output_array')
 
         print wf_inputs
