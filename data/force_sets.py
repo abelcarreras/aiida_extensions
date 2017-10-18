@@ -87,6 +87,7 @@ class ForceSets(Data):
         number = []
         displacement = []
         for first_atoms in data_sets['first_atoms']:
+            print first_atoms
             direction.append(first_atoms['direction'])
             number.append(first_atoms['number'])
             displacement.append(first_atoms['displacement'])
