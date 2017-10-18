@@ -268,6 +268,7 @@ def generate_vasp_params(structure, machine, settings, type=None, pressure=0.0):
     if 'kpoints_per_atom' in settings.get_dict():
         kpoints_pg = vaspio.Kpoints.automatic_density(structure.get_pymatgen_structure(), settings.dict.kpoints_per_atom)
     else:
+        print settings.dict.kpoints
         kpoints_pg = vaspio.Kpoints(comment='aiida generated',
                                     style=settings.dict.kpoints['style'],
                                     kpts=(settings.dict.kpoints['points'],), kpts_shift=settings.dict['shift'])
