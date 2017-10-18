@@ -65,7 +65,7 @@ def get_FORCE_SETS_txt(data_sets_object):
     try:
         data_sets_array = data_sets_object.get_array('force_sets')
         data_sets = dict(data_sets_array[None][0])
-    except:
+    except AttributeError:
         data_sets = data_sets_object.get_force_sets()
 
 #    data_list = []
