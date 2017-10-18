@@ -334,7 +334,7 @@ class FrozenPhonon(WorkChain):
                                                                         force_sets=self.ctx.force_sets)
             future = submit(JobCalculation, **calculation_input)
             print 'phonopy FC calc:', future.pid
-            return ToContext(phonopy_ouput=future)
+            return ToContext(phonopy_output=future)
         else:
             print ('local phonopy calculation')
             self.ctx.phonopy_output = get_force_constants_from_phonopy(structure=self.inputs.structure,
