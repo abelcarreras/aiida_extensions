@@ -265,11 +265,10 @@ class FrozenPhonon(WorkChain):
 
         return ToContext(optimized=future)
 
-    def remote_phonopy(self):
-        return 'code' in self.inputs.ph_settings.get_dict()
-
     def create_displacement_calculations(self):
         print 'create displacements'
+        print self.ctx._get_dict()
+
 
         if 'optimized' in self.ctx:
             structure = self.ctx.optimized.out.optimized_structure
