@@ -339,7 +339,7 @@ class FrozenPhonon(WorkChain):
 
     def get_force_constants(self):
 
-        print self.ctx
+        print 'dict', self.ctx._get_dict()
         wf_inputs = {}
         for key, calc in self.ctx._get_dict().iteritems():
             if key.startswith('structure_'):
