@@ -48,8 +48,8 @@ class OptimizeStructure(WorkChain):
         forces = output_array.get_array('forces')
         stresses = output_array.get_array('stress')
 
-        print forces
-        print stresses
+        # print forces
+        # print stresses
 
         not_converged_forces = len(np.where(abs(forces) > float(self.inputs.tolerance_forces))[0])
         if len(stresses.shape) > 2:
@@ -76,8 +76,6 @@ class OptimizeStructure(WorkChain):
         if not 'structure' in self.ctx:
             self.ctx.structure = self.inputs.structure
 
-        print 'got structure'
-
         JobCalculation, calculation_input = generate_inputs(self.ctx.structure,
                                                             self.inputs.machine,
                                                             self.inputs.es_settings,
@@ -95,7 +93,7 @@ class OptimizeStructure(WorkChain):
     def get_data(self):
         print 'get_job'
 
-        self.ctx.structure = self.ctx.get('optimize').out.output_structure
+        # self.ctx.structure = self.ctx.get('optimize').out.output_structure
 
         self.out('optimized_structure', self.ctx.get('optimize').out.output_structure)
         self.out('optimized_structure_data', self.ctx.get('optimize').out.output_parameters)
