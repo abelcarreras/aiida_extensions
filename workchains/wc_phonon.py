@@ -308,9 +308,9 @@ class FrozenPhonon(WorkChain):
 
 ############### FOR TESTING ###############
 # 1) Load data from nodes
-        if False: #For test
+        if True: #For test
             from aiida.orm import load_node
-            nodes = [481930, 481931, 481932, 481933]  # LAMMPS
+            nodes = [482152, 482154, 482156, 482158]  # LAMMPS
             labels = ['structure_1', 'structure_0', 'structure_3', 'structure_2']
             for pk, label in zip(nodes, labels):
                 future = load_node(pk)
