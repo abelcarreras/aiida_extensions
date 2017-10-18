@@ -154,7 +154,7 @@ class PhonopyCalculation(JobCalculation):
                               "for the namelists"),
             },
             "data_sets": {
-                'valid_types': ForceSets,
+                #'valid_types': ArrayData,
                 'additional_parameter': None,
                 'linkname': 'data_sets',
                 'docstring': ("Use a node that specifies the data_sets "
