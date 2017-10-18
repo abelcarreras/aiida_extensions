@@ -263,7 +263,7 @@ class FrozenPhonon(WorkChain):
             self.ctx._content['optimize'] = load_node(481308)
             return
 
-        print 'optimize:', future.pid
+        print ('optimize workchain: {}'.format(future.pid))
         #optimized = {'optimized': future}
         #return ToContext(**optimized)
         return ToContext(optimized=future)

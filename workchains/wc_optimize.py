@@ -6,13 +6,8 @@ if not is_dbenv_loaded():
 
 from aiida.work.workchain import WorkChain, ToContext
 
-from aiida.orm import Code, CalculationFactory
 from aiida.orm.data.base import Str, Float, Bool
 from aiida.work.workchain import _If, _While
-
-
-PwCalculation = CalculationFactory('quantumespresso.pw')
-PhonopyCalculation = CalculationFactory('phonopy')
 
 import numpy as np
 from generate_inputs import *
@@ -85,16 +80,14 @@ class OptimizeStructure(WorkChain):
 
         # calculation_input._label = 'optimize'
         future = submit(JobCalculation, **calculation_input)
-        print ('pk = {}'.format(future.pid))
-        calcs = {'optimize': future}
-        print 'job sent'
-        return ToContext(**calcs)
+        print ('optimize calculation pk = {}'.format(future.pid))
+        return ToContext(optimize=future)
 
     def get_data(self):
         print 'get_job'
 
         # self.ctx.structure = self.ctx.get('optimize').out.output_structure
 
-        self.out('optimized_structure', self.ctx.get('optimize').out.output_structure)
-        self.out('optimized_structure_data', self.ctx.get('optimize').out.output_parameters)
+        self.out('optimized_structure', self.ctx.optimize.out.output_structure)
+        self.out('optimized_structure_data', self.ctx.optimize.out.output_parameters)
 
