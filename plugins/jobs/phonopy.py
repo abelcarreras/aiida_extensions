@@ -2,6 +2,8 @@ from aiida.orm.calculation.job import JobCalculation
 from aiida.orm.data.parameter import ParameterData
 from aiida.orm.data.structure import StructureData
 from aiida.orm.data.array import ArrayData
+from aiida.orm.data.force_sets import ForceSets
+
 from aiida.common.exceptions import InputValidationError
 from aiida.common.datastructures import CalcInfo, CodeInfo
 from aiida.common.utils import classproperty
@@ -152,7 +154,7 @@ class PhonopyCalculation(JobCalculation):
                               "for the namelists"),
             },
             "data_sets": {
-                'valid_types': ArrayData,
+                'valid_types': ForceSets,
                 'additional_parameter': None,
                 'linkname': 'data_sets',
                 'docstring': ("Use a node that specifies the data_sets "
