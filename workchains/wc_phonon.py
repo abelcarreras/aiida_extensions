@@ -377,7 +377,7 @@ class FrozenPhonon(WorkChain):
         wf_inputs['data_sets'] = self.ctx.data_sets
         force_sets = create_forces_set(**wf_inputs)['force_sets']
 
-        print force_sets.get_data_sets()
+        print self.ctx.data_sets.get_data_sets()
         exit()
 
         code_label = self.inputs.ph_settings.get_dict()['code']
