@@ -160,7 +160,7 @@ machine = ParameterData(dict=machine_dict)
 
 from aiida.workflows.wc_phonon import FrozenPhonon
 
-if True:
+if False:
     result = run(FrozenPhonon,
                  structure=structure,
                  machine=machine,
