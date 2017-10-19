@@ -172,11 +172,10 @@ def generate_vasp_params(structure, machine, settings, type=None, pressure=0.0):
     inputs._options.max_wallclock_seconds = machine.dict.max_wallclock_seconds
 
     # INCAR (parameters)
-    incar = settings.dict.parameters
+    incar = dict(settings.dict.parameters)
 
     if type == 'optimize':
-        vasp_input_optimize = dict(incar)
-        vasp_input_optimize.update({
+        incar.update({
             'PREC': 'Accurate',
             'ISTART': 0,
             'IBRION': 2,
@@ -189,11 +188,9 @@ def generate_vasp_params(structure, machine, settings, type=None, pressure=0.0):
             'ADDGRID': '.TRUE.',
             'LREAL': '.FALSE.',
             'PSTRESS': pressure})  # unit: kb -> kB
-        incar = vasp_input_optimize
 
-    if type == 'optimize_constant_volume':
-        vasp_input_optimize = dict(incar)
-        vasp_input_optimize.update({
+    elif type == 'optimize_constant_volume':
+        incar.update({
             'PREC': 'Accurate',
             'ISTART': 0,
             'IBRION': 2,
@@ -205,11 +202,9 @@ def generate_vasp_params(structure, machine, settings, type=None, pressure=0.0):
             'EDIFFG': -1e-08,
             'ADDGRID': '.TRUE.',
             'LREAL': '.FALSE.'})
-        incar = vasp_input_optimize
 
-    if type == 'forces':
-        vasp_input_forces = dict(incar)
-        vasp_input_forces.update({
+    elif type == 'forces':
+        incar.update({
             'PREC': 'Accurate',
             'ISYM': 0,
             'ISTART': 0,
@@ -220,11 +215,9 @@ def generate_vasp_params(structure, machine, settings, type=None, pressure=0.0):
             'EDIFF': 1e-08,
             'ADDGRID': '.TRUE.',
             'LREAL': '.FALSE.'})
-        incar = vasp_input_forces
 
-    if type == 'born_charges':
-        vasp_input_epsilon = dict(incar)
-        vasp_input_epsilon.update({
+    elif type == 'born_charges':
+        incar.update({
             'PREC': 'Accurate',
             'LEPSILON': '.TRUE.',
             'ISTART': 0,
@@ -235,11 +228,10 @@ def generate_vasp_params(structure, machine, settings, type=None, pressure=0.0):
             'EDIFF': 1e-08,
             'ADDGRID': '.TRUE.',
             'LREAL': '.FALSE.'})
-        incar = vasp_input_epsilon
 
     inputs.incar = ParameterData(dict=incar)
 
-    # POTCAR (pseudo)
+    # POTCAR (pseudo potentials)
     inputs.potcar = ParameterData(dict=settings.dict.pseudos)
 
     settings_parse = {'PARSER_INSTRUCTIONS': []}
