@@ -185,13 +185,12 @@ def get_properties_from_phonopy(structure, phonopy_input, force_constants):
                         cell=structure.cell)
 
     phonopy_input = phonopy_input.get_dict()
-    force_constants = force_constants.get_array()
 
     phonon = Phonopy(bulk,
                      phonopy_input['supercell'],
                      primitive_matrix=phonopy_input['primitive'])
 
-    phonon.set_force_constants(force_constants)
+    phonon.set_force_constants(force_constants.get_array())
 
     #Normalization factor primitive to unit cell
     normalization_factor = phonon.unitcell.get_number_of_atoms()/phonon.primitive.get_number_of_atoms()
