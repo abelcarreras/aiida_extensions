@@ -40,25 +40,18 @@ class OptimizeStructure(WorkChain):
         output_array = self.ctx.get('optimize').out.output_array
         forces = output_array.get_array('forces')
         stresses = output_array.get_array('stress')
-
-        # print forces
-        # print stresses
-
-        not_converged_forces = len(np.where(abs(forces) > float(self.inputs.tolerance_forces))[0])
         if len(stresses.shape) > 2:
             stresses = stresses[-1] * 10
 
+        not_converged_forces = len(np.where(abs(forces) > float(self.inputs.tolerance_forces))[0])
         self.report('forces')
         self.report(forces)
-
-        not_converged_stress = len(np.where(abs(np.diag(stresses) - float(self.inputs.pressure)) >
-                                            float(self.inputs.tolerance_stress))[0])
-        np.fill_diagonal(stresses, 0.0)
 
         self.report('stresses')
         self.report(stresses)
 
-        not_converged_stress += len(np.where(abs(stresses) > float(self.inputs.tolerance_stress))[0])
+        stress_compare_matrix = stresses - np.diag([float(self.inputs.pressure)]*3)
+        not_converged_stress = len(np.where(abs(stress_compare_matrix) > float(self.inputs.tolerance_stress))[0])
 
         not_converged = not_converged_forces + not_converged_stress
 
