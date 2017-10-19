@@ -16,7 +16,6 @@ from aiida.orm.data.array.kpoints import KpointsData
 from aiida.orm.data.upf import UpfData
 from aiida.orm.data.base import Str, Float, Bool
 from aiida.orm.data.force_sets import ForceSets
-from aiida.orm.data.force_sets import ForceConstants
 from aiida.orm.data.force_constants import ForceConstants
 
 #from aiida.orm.calculation.job.quantumespresso.pw import PwCalculation
