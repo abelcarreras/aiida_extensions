@@ -184,8 +184,8 @@ def generate_vasp_params(structure, machine, settings, type=None, pressure=0.0):
             'NSW': 100,
             'LWAVE': '.FALSE.',
             'LCHARG': '.FALSE.',
-            'EDIFF': 1e-02,
-            'EDIFFG': -1e-02,
+            'EDIFF': 1e-08,
+            'EDIFFG': -1e-08,
             'ADDGRID': '.TRUE.',
             'LREAL': '.FALSE.',
             'PSTRESS': pressure})  # unit: kb -> kB
