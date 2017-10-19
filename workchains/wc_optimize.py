@@ -51,7 +51,7 @@ class OptimizeStructure(WorkChain):
         not_converged_stress = len(np.where(abs(stress_compare_matrix) > float(self.inputs.tolerance_stress))[0])
 
         self.report('stresses {}'.format(not_converged_stress))
-        self.report(stresses)
+        self.report(stress_compare_matrix)
 
         not_converged = not_converged_forces + not_converged_stress
 
