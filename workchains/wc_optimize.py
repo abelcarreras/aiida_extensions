@@ -44,14 +44,14 @@ class OptimizeStructure(WorkChain):
             stresses = stresses[-1] * 10
 
         not_converged_forces = len(np.where(abs(forces) > float(self.inputs.tolerance_forces))[0])
-        self.report('forces')
+        self.report('forces {}'.format(not_converged_forces))
         self.report(forces)
-
-        self.report('stresses')
-        self.report(stresses)
 
         stress_compare_matrix = stresses - np.diag([float(self.inputs.pressure)]*3)
         not_converged_stress = len(np.where(abs(stress_compare_matrix) > float(self.inputs.tolerance_stress))[0])
+
+        self.report('stresses {}'.format(not_converged_stress))
+        self.report(stresses)
 
         not_converged = not_converged_forces + not_converged_stress
 
