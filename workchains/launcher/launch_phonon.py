@@ -51,7 +51,7 @@ ph_settings = ParameterData(dict={'supercell': [[2,0,0],
                                                 [0.0, 0.0, 1.0]],
                                   'distance': 0.01,
                                   'mesh': [40, 40, 40],
-                                  # 'code': 'phonopy@stern'  # comment to use local phonopy
+                                  'code': 'phonopy@stern'  # comment to use local phonopy
                                   })
 
 # VASP SPECIFIC

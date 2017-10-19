@@ -1,7 +1,7 @@
 from aiida.parsers.parser import Parser
 from aiida.parsers.exceptions import OutputParsingError
 from aiida.orm.data.array import ArrayData
-from aiida.orm.data.forceconstants import ForceConstants
+from aiida.orm.data.force_constants import ForceConstants
 
 from aiida.orm.data.parameter import ParameterData
 
@@ -77,10 +77,10 @@ class PhonopyParser(Parser):
 
         # save force constants into node
         try:
-            array_data = ArrayData()
-            array_data.set_array('force_constants', force_constants)
+            #array_data = ArrayData()
+            #array_data.set_array('force_constants', force_constants)
 
-            new_nodes_list.append(('array_data', array_data))
+            new_nodes_list.append(('force_constants', ForceConstants(array=force_constants)))
         except KeyError:  # keys not found in json
             pass
 
