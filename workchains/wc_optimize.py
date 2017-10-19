@@ -58,9 +58,12 @@ class OptimizeStructure(WorkChain):
 
         if not_converged == 0:
             print ('Converged')
+            self.report('converged')
             return False
 
         print ('Not converged: {}'.format(not_converged))
+        self.report('Not converged: {}'.format(not_converged))
+
         return True
 
     def optimize_cycle(self):
@@ -83,6 +86,8 @@ class OptimizeStructure(WorkChain):
         # calculation_input._label = 'optimize'
         future = submit(JobCalculation, **calculation_input)
         print ('optimize calculation pk = {}'.format(future.pid))
+        self.report('optimize calculation pk = {}'.format(future.pid))
+
         return ToContext(optimize=future)
 
     def get_data(self):
