@@ -157,9 +157,9 @@ def get_force_constants_from_phonopy(**kwargs):
     phonon.set_displacement_dataset(force_sets.get_force_sets())
     phonon.produce_force_constants()
 
-    force_constants = phonon.get_force_constants()
+    #force_constants = phonon.get_force_constants()
 
-    array_force_constants = ForceConstants(force_constants=force_constants)
+    array_force_constants = ForceConstants(force_constants=phonon.get_force_constants())
     #array_data.set_array('force_constants', force_constants)
 
     return {'force_constants': array_force_constants}
