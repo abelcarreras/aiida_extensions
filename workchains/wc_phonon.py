@@ -16,6 +16,7 @@ from aiida.orm.data.array.kpoints import KpointsData
 from aiida.orm.data.upf import UpfData
 from aiida.orm.data.base import Str, Float, Bool
 from aiida.orm.data.force_sets import ForceSets
+from aiida.orm.data.force_sets import ForceConstants
 from aiida.orm.data.force_constants import ForceConstants
 
 #from aiida.orm.calculation.job.quantumespresso.pw import PwCalculation
@@ -159,10 +160,10 @@ def get_force_constants_from_phonopy(**kwargs):
 
     force_constants = phonon.get_force_constants()
 
-    array_data = ArrayData()
-    array_data.set_array('force_constants', force_constants)
+    array_force_constants = ForceConstants(force_constants=force_constants)
+    #array_data.set_array('force_constants', force_constants)
 
-    return {'array_data': array_data}
+    return {'force_constants': array_force_constants}
 
 
 @workfunction
@@ -185,7 +186,7 @@ def get_properties_from_phonopy(structure, phonopy_input, force_constants):
                         cell=structure.cell)
 
     phonopy_input = phonopy_input.get_dict()
-    force_constants = force_constants.get_array('force_constants')
+    force_constants = force_constants.get_array()
 
     phonon = Phonopy(bulk,
                      phonopy_input['supercell'],
@@ -258,7 +259,7 @@ class FrozenPhonon(WorkChain):
                         pressure=self.inputs.pressure,
                         )
         # For testing
-        testing = False
+        testing = True
         if testing:
             self.ctx._content['optimize'] = load_node(481308)
             return
@@ -284,7 +285,7 @@ class FrozenPhonon(WorkChain):
         self.ctx.number_of_displacements = len(structures)
 
         # Load data from nodes
-        testing = False
+        testing = True
         if testing:
             from aiida.orm import load_node
             nodes = [482152, 482154, 482156, 482158]  # LAMMPS
@@ -355,7 +356,7 @@ class FrozenPhonon(WorkChain):
         print 'collect phonopy data'
 
         try:
-            force_constants = self.ctx.phonopy_output['array_data']
+            force_constants = self.ctx.phonopy_output['force_constants']
         except TypeError:
             force_constants = self.ctx.phonopy_output.out.array_data
 

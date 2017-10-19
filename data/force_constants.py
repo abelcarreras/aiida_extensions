@@ -9,6 +9,8 @@ class ForceConstants(Data):
     def __init__(self, *args, **kwargs):
         super(ForceConstants, self).__init__(*args, **kwargs)
         self._cached_arrays = {}
+        if 'force_constants' in kwargs:
+            self.set_array(kwargs['force_constants'])
 
     def get_shape(self):
         """
