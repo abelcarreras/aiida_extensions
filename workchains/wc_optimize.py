@@ -28,9 +28,6 @@ class OptimizeStructure(WorkChain):
         spec.input("tolerance_forces", valid_type=Float, required=False, default=Float(1e-5))
         spec.input("tolerance_stress", valid_type=Float, required=False, default=Float(1e-2))
 
-
-
-
         spec.outline(cls.optimize_cycle, _While(cls.not_converged)(cls.optimize_cycle), cls.get_data)
 
         #spec.outline(cls.optimize_cycle, cls.get_data)
@@ -38,6 +35,7 @@ class OptimizeStructure(WorkChain):
     def not_converged(self):
 
         print ('Check convergence')
+        self.report('tolerace  F:{} S:{}'.format(self.inputs.tolerance_forces, self.inputs.tolerance_stress))
 
         output_array = self.ctx.get('optimize').out.output_array
         forces = output_array.get_array('forces')
@@ -50,10 +48,18 @@ class OptimizeStructure(WorkChain):
         if len(stresses.shape) > 2:
             stresses = stresses[-1] * 10
 
+        self.report('forces')
+        self.report(forces)
+
         not_converged_stress = len(np.where(abs(np.diag(stresses) - float(self.inputs.pressure)) >
                                             float(self.inputs.tolerance_stress))[0])
         np.fill_diagonal(stresses, 0.0)
+
+        self.report('stresses')
+        self.report(stresses)
+
         not_converged_stress += len(np.where(abs(stresses) > float(self.inputs.tolerance_stress))[0])
+
         not_converged = not_converged_forces + not_converged_stress
 
         if not_converged == 0:
