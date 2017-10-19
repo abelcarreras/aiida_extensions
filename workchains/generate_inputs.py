@@ -217,7 +217,7 @@ def generate_vasp_params(structure, machine, settings, type=None, pressure=0.0):
             'NSW': 1,
             'LWAVE': '.FALSE.',
             'LCHARG': '.FALSE.',
-            'EDIFF': 1e-08,
+            'EDIFF': 1e-02,
             'ADDGRID': '.TRUE.',
             'LREAL': '.FALSE.'})
         incar = vasp_input_forces
