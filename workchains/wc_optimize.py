@@ -35,7 +35,6 @@ class OptimizeStructure(WorkChain):
     def not_converged(self):
 
         print ('Check convergence')
-        self.report('tolerace  F:{} S:{}'.format(self.inputs.tolerance_forces, self.inputs.tolerance_stress))
 
         output_array = self.ctx.get('optimize').out.output_array
         forces = output_array.get_array('forces')
@@ -44,14 +43,9 @@ class OptimizeStructure(WorkChain):
             stresses = stresses[-1] * 10
 
         not_converged_forces = len(np.where(abs(forces) > float(self.inputs.tolerance_forces))[0])
-        self.report('forces {}'.format(not_converged_forces))
-        self.report(forces)
 
         stress_compare_matrix = stresses - np.diag([float(self.inputs.pressure)]*3)
         not_converged_stress = len(np.where(abs(stress_compare_matrix) > float(self.inputs.tolerance_stress))[0])
-
-        self.report('stresses {}'.format(not_converged_stress))
-        self.report(stress_compare_matrix)
 
         not_converged = not_converged_forces + not_converged_stress
 
@@ -60,8 +54,7 @@ class OptimizeStructure(WorkChain):
             self.report('converged')
             return False
 
-        print ('Not converged: {}'.format(not_converged))
-        self.report('Not converged: {}'.format(not_converged))
+        self.report('Not converged: F:{} S:{}'.format(not_converged_forces, not_converged_stress))
 
         return True
 
@@ -84,7 +77,6 @@ class OptimizeStructure(WorkChain):
 
         # calculation_input._label = 'optimize'
         future = submit(JobCalculation, **calculation_input)
-        print ('optimize calculation pk = {}'.format(future.pid))
         self.report('optimize calculation pk = {}'.format(future.pid))
 
         return ToContext(optimize=future)
