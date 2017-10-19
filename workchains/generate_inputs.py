@@ -309,7 +309,7 @@ def generate_inputs(structure, machine, es_settings, type=None, pressure=0.0):
 
     print 'plugin', plugin
     if plugin == 'vasp.vasp':
-        return generate_vasp_params(structure, machine, es_settings, type=type)
+        return generate_vasp_params(structure, machine, es_settings, type=type, pressure=pressure)
 
     # elif plugin == 'quantumespresso.pw':
     #     return generate_qe_params(structure, machine, es_settings)
