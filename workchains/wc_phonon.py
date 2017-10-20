@@ -162,7 +162,7 @@ def get_force_constants_from_phonopy(**kwargs):
 
 
 def get_path_using_seekpath(structure, band_resolution=30):
-    import seekpath
+    import seekpath.aiidawrappers
 
     path_data = seekpath.aiidawrappers.get_path(structure)
 
