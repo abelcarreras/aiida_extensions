@@ -38,14 +38,14 @@ if bs.get_labels() is not None:
     labels_e = []
     x_labels = []
     for i, freq in enumerate(bs.get_distances()):
-        if labels[i][0] == labels[i-1][1]:
-            labels_e.append('$'+labels[i][0].replace('GAMMA', '\Gamma')+'$')
+        if bs.get_labels(i)[0] == bs.get_labels(i-1)[1]:
+            labels_e.append('$'+ bs.get_labels(i)[0].replace('GAMMA', '\Gamma')+'$')
         else:
-            labels_e.append('$'+labels[i-1][1].replace('GAMMA', '\Gamma')+'/'+labels[i][0].replace('GAMMA', '\Gamma')+'$')
+            labels_e.append('$'+ bs.get_labels(i-1)[1].replace('GAMMA', '\Gamma')+'/'+ bs.get_labels(i)[0].replace('GAMMA', '\Gamma')+'$')
         x_labels.append(bs.get_distances(band=i)[0])
     x_labels.append(bs.get_distances(band=-1)[-1])
-    labels_e.append('$'+labels[-1][1].replace('GAMMA', '\Gamma')+'$')
-    labels_e[0]='$'+labels[0][0].replace('GAMMA', '\Gamma')+'$'
+    labels_e.append('$'+ bs.get_labels(-1)[1].replace('GAMMA', '\Gamma')+'$')
+    labels_e[0]='$'+ bs.get_labels(0)[0].replace('GAMMA', '\Gamma')+'$'
 
     plt.xticks(x_labels, labels_e, rotation='horizontal')
 
