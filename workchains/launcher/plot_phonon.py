@@ -31,7 +31,7 @@ plt.xlim([0, bs.get_distances()[-1][-1]])
 plt.axhline(y=0, color='k', ls='dashed')
 plt.suptitle('Phonon band structure')
 
-print bs.get_formatted_labels_matplotlib
+print bs.get_formatted_labels_matplotlib()
 
 if bs.get_labels() is not None:
     plt.rcParams.update({'mathtext.default': 'regular' })
