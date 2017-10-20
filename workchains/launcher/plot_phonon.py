@@ -53,6 +53,7 @@ plt.show()
 
 # Phonon density of states
 dos = wc.out.dos
+print dos.get_arraynames()
 
 frequency = dos.get_array('frequency')
 total_dos = dos.get_array('total_dos')
