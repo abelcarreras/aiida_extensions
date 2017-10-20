@@ -20,8 +20,8 @@ wc = load_node(488856)
 
 # Phonon Band structure
 bs = wc.out.band_structure
-for i, freq in enumerate(bs.get_frequencies()):
-    plt.plot(bs.get_distances()[i], freq, color='r')
+for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
+    plt.plot(dist, freq, color='r')
 
 plt.figure(1)
 plt.axes().get_xaxis().set_ticks([])
@@ -54,25 +54,6 @@ plt.show()
 # Phonon density of states
 dos = wc.out.dos
 
-if False:
-    frequency = dos.get_array('frequency')
-    total_dos = dos.get_array('total_dos')
-    partial_dos = dos.get_array('partial_dos')
-    partial_symbols = dos.get_array('partial_symbols')
-
-
-    # Check atom equivalences
-    delete_list = []
-    for i, dos_i in enumerate(partial_dos):
-        for j, dos_j in enumerate(partial_dos):
-            if i < j:
-                if np.allclose(dos_i, dos_j, rtol=1, atol=1e-8) and partial_symbols[i] == partial_symbols[j]:
-                    dos_i += dos_j
-                    delete_list.append(j)
-
-    partial_dos = np.delete(partial_dos, delete_list, 0)
-    partial_symbols = np.delete(partial_symbols, delete_list)
-
 total_dos = dos.get_dos()
 frequency = dos.get_frequencies()
 partial_dos = dos.get_partial_dos()
@@ -86,8 +67,8 @@ plt.ylim([0, np.max(total_dos)*1.1])
 
 plt.plot(frequency, total_dos, label='Total DOS')
 
-for i, dos in enumerate(partial_dos):
-    plt.plot(frequency, dos, label='{}'.format(partial_symbols[i]))
+for dos, symbol in zip(partial_dos, partial_symbols):
+    plt.plot(frequency, dos, label='{}'.format(symbol))
 
 plt.legend()
 plt.show()

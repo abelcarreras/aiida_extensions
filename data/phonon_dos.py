@@ -39,7 +39,7 @@ class PhononDosData(Data):
         array = numpy.load(self.get_abs_path(fname))
         return array
 
-    def get_number_of_partial_dos(self, atom=None, full=False):
+    def get_number_of_partial_dos(self, full=False):
         """
         Return the force constants stored in the node as a numpy array
         """
@@ -54,7 +54,7 @@ class PhononDosData(Data):
 
         return len(array[self._get_equivalent_atom_list()])
 
-    def get_partial_dos(self, atom=None, full=False):
+    def get_partial_dos(self, full=False):
         """
         Return the force constants stored in the node as a numpy array
         """
