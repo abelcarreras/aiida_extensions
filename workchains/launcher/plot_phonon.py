@@ -49,6 +49,7 @@ if bs.get_labels() is not None:
     labels_e.append('$'+ bs.get_labels(-1)[1].replace('GAMMA', '\Gamma')+'$')
     labels_e[0]='$'+ bs.get_labels(0)[0].replace('GAMMA', '\Gamma')+'$'
 
+    labels_e, x_labels = bs.get_formatted_labels_matplotlib()
     plt.xticks(x_labels, labels_e, rotation='horizontal')
 
 #plt.show()
