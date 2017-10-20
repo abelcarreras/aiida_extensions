@@ -389,7 +389,7 @@ class FrozenPhonon(WorkChain):
                                                         force_constants)
 
         self.out('force_constants', force_constants)
-        self.out('phonon_properties', phonon_properties['thermal_properties'])
+        self.out('thermal_properties', phonon_properties['thermal_properties'])
         self.out('dos', phonon_properties['dos'])
         self.out('band_structure', phonon_properties['band_structure'])
 
