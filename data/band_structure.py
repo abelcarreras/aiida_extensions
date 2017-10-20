@@ -139,6 +139,9 @@ class BandStructureData(Data):
 
         fname = 'band_labels.npy'
 
+        if fname not in self.get_folder_list():
+            return None
+
         array = numpy.load(self.get_abs_path(fname))
         if band is not None:
             array = array[band]
