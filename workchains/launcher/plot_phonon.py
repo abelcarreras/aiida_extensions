@@ -15,7 +15,7 @@ import numpy as np
 
 # Set WorkflowPhonon PK number
 ########################
-wc = load_node(488815)
+wc = load_node(488856)
 ########################
 
 # Phonon Band structure
@@ -53,7 +53,9 @@ plt.show()
 
 # Phonon density of states
 dos = wc.out.dos
-print dos.get_arraynames()
+print dos.get_frequencies()
+
+exit()
 
 frequency = dos.get_array('frequency')
 total_dos = dos.get_array('total_dos')
