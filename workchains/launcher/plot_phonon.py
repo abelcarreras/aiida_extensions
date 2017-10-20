@@ -31,24 +31,8 @@ plt.xlim([0, bs.get_distances()[-1][-1]])
 plt.axhline(y=0, color='k', ls='dashed')
 plt.suptitle('Phonon band structure')
 
-print bs.get_formatted_labels_matplotlib()
-
 if bs.get_labels() is not None:
     plt.rcParams.update({'mathtext.default': 'regular' })
-    labels = bs.get_labels()
-
-    labels_e = []
-    x_labels = []
-    for i, freq in enumerate(bs.get_distances()):
-        if bs.get_labels(i)[0] == bs.get_labels(i-1)[1]:
-            labels_e.append('$'+ bs.get_labels(i)[0].replace('GAMMA', '\Gamma')+'$')
-        else:
-            labels_e.append('$'+ bs.get_labels(i-1)[1].replace('GAMMA', '\Gamma')+'/'+ bs.get_labels(i)[0].replace('GAMMA', '\Gamma')+'$')
-        x_labels.append(bs.get_distances(band=i)[0])
-    x_labels.append(bs.get_distances(band=-1)[-1])
-    labels_e.append('$'+ bs.get_labels(-1)[1].replace('GAMMA', '\Gamma')+'$')
-    labels_e[0]='$'+ bs.get_labels(0)[0].replace('GAMMA', '\Gamma')+'$'
-
     labels_e, x_labels = bs.get_formatted_labels_matplotlib()
     plt.xticks(x_labels, labels_e, rotation='horizontal')
 
