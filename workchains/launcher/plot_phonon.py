@@ -49,7 +49,7 @@ if bs.get_labels() is not None:
 
     plt.xticks(x_labels, labels_e, rotation='horizontal')
 
-# plt.show()
+plt.show()
 
 # Phonon density of states
 dos = wc.out.dos
