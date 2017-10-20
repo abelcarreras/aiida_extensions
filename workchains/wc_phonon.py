@@ -18,6 +18,7 @@ from aiida.orm.data.base import Str, Float, Bool
 from aiida.orm.data.force_sets import ForceSets
 from aiida.orm.data.force_constants import ForceConstants
 from aiida.orm.data.band_structure import BandStructureData
+from aiida.orm.data.phonon_dos import PhononDosData
 
 from aiida.workflows.wc_optimize import OptimizeStructure
 
@@ -228,10 +229,17 @@ def get_properties_from_phonopy(structure, phonopy_input, force_constants):
     partial_dos = phonon.get_partial_DOS()*normalization_factor
 
     # Stores DOS data in DB as a workflow result
-    dos = ArrayData()
-    dos.set_array('frequency',total_dos[0])
-    dos.set_array('total_dos',total_dos[1])
-    dos.set_array('partial_dos',partial_dos[1])
+
+    dos = PhononDosData(frequencies=total_dos[0],
+                        dos=total_dos[1],
+                        partial_dos=partial_dos[1],
+                        atom_labels=np.array(phonon.primitive.symbols))
+
+    #dos = ArrayData()
+    #dos.set_array('frequency',total_dos[0])
+    #dos.set_array('total_dos',total_dos[1])
+    #dos.set_array('partial_dos',partial_dos[1])
+    #dos.set_array('partial_symbols', np.array(phonon.primitive.symbols))
 
 
     #THERMAL PROPERTIES (per primtive cell)
