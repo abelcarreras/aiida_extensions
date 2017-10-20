@@ -63,7 +63,10 @@ class PhononDosData(Data):
         fname = 'partial_dos.npy'
 
         array = numpy.load(self.get_abs_path(fname))
-        return array
+
+        if full:
+            return array
+        return array[self._get_equivalent_atom_list()]
 
     def get_frequencies(self, atom=None, full=False):
         """
@@ -74,6 +77,7 @@ class PhononDosData(Data):
         fname = 'frequencies.npy'
 
         array = numpy.load(self.get_abs_path(fname))
+
         return array
 
 
@@ -82,8 +86,13 @@ class PhononDosData(Data):
         Store the phonon dos as a numpy array.
         :param array: The numpy array to store.
         """
-        self.get_attr("atom_labels")
+        import numpy
 
+        labels = self.get_attr("atom_labels")
+
+        if full:
+            return labels
+        return numpy.array(labels)[self._get_equivalent_atom_list()].tolist()
 
     def set_atom_labels(self, labels):
         """
