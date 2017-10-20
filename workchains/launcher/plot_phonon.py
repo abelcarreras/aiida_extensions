@@ -33,8 +33,8 @@ plt.suptitle('Phonon band structure')
 
 if bs.get_labels() is not None:
     plt.rcParams.update({'mathtext.default': 'regular' })
-    labels_e, x_labels = bs.get_formatted_labels_matplotlib()
-    plt.xticks(x_labels, labels_e, rotation='horizontal')
+    labels, label_positions = bs.get_formatted_labels_matplotlib()
+    plt.xticks(label_positions, labels, rotation='horizontal')
 
 #plt.show()
 
