@@ -132,7 +132,7 @@ class ForceConstantsPhonopy(WorkChain):
 
     @classmethod
     def define(cls, spec):
-        super(OptimizeStructure, cls).define(spec)
+        super(ForceConstantsPhonopy, cls).define(spec)
         spec.input("structure", valid_type=StructureData)
         spec.input("phonopy_input", valid_type=ParameterData)
         spec.input("force_sets", valid_type=ForceSets)
