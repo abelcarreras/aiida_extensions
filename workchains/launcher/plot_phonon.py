@@ -55,6 +55,9 @@ plt.show()
 dos = wc.out.dos
 print dos.get_frequencies()
 print dos._get_equivalent_atom_list()
+print dos.get_number_of_partial_dos()
+print dos.get_number_of_partial_dos(full=True)
+
 exit()
 
 frequency = dos.get_array('frequency')
@@ -66,7 +69,7 @@ partial_symbols = dos.get_array('partial_symbols')
 # Check atom equivalences
 delete_list = []
 for i, dos_i in enumerate(partial_dos):
-    for j, dos_j  in enumerate(partial_dos):
+    for j, dos_j in enumerate(partial_dos):
         if i < j:
             if np.allclose(dos_i, dos_j, rtol=1, atol=1e-8) and partial_symbols[i] == partial_symbols[j]:
                 dos_i += dos_j

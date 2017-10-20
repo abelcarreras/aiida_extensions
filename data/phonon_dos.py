@@ -48,7 +48,11 @@ class PhononDosData(Data):
         fname = 'partial_dos.npy'
 
         array = numpy.load(self.get_abs_path(fname))
-        return len(array)
+
+        if full:
+            return len(array)
+
+        return len(array[self._get_equivalent_atom_list()])
 
     def get_partial_dos(self, atom=None, full=False):
         """
