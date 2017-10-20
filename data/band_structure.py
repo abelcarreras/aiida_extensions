@@ -131,7 +131,7 @@ class BandStructureData(Data):
 
         return array
 
-    def get_labels(self, band=None, matplotlib=True):
+    def get_labels(self, band=None):
         """
         Return the band labels in the node as a numpy array
         """
@@ -144,15 +144,16 @@ class BandStructureData(Data):
 
         array = numpy.load(self.get_abs_path(fname))
 
-        if matplotlib:
-            array = self._arrange_band_labels(array, self.get_distances())
-
         if band is not None:
             array = array[band]
 
         return array
 
-    def _arrange_band_labels(self, labels_array, distances):
+
+    def get_labels_matplotlib(self):
+        distances = self.get_distances()
+        labels_array = self.get_labels()
+
 
         substitutions = {'GAMMA': u'\u0393'
                          }
@@ -176,4 +177,4 @@ class BandStructureData(Data):
         labels.append(replace_list(labels_array[-1][1], substitutions))
         labels[0] = replace_list(labels_array[0][0], substitutions)
 
-        return labels
+        return labels, labels_positions
