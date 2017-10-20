@@ -21,7 +21,7 @@ wc = load_node(488815)
 # Phonon Band structure
 bs = wc.out.band_structure
 for i, freq in enumerate(bs.get_frequencies()):
-    plt.plot(bs.get_q_points()[i], freq, color='r')
+    plt.plot(bs.get_distances[i], freq, color='r')
 
 plt.figure(1)
 plt.axes().get_xaxis().set_ticks([])
@@ -30,6 +30,8 @@ plt.xlabel('Wave vector')
 plt.xlim([0, bs.get_distances()[-1][-1]])
 plt.axhline(y=0, color='k', ls='dashed')
 plt.suptitle('Phonon band structure')
+
+plt.show()
 
 if bs.get_labels() is not None:
     plt.rcParams.update({'mathtext.default':  'regular' })
