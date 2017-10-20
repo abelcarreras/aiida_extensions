@@ -90,7 +90,7 @@ for i, dos in enumerate(partial_dos):
     plt.plot(frequency, dos, label='{}'.format(partial_symbols[i]))
 
 plt.legend()
-#plt.show()
+plt.show()
 
 # Thermal properties
 thermal = wc.out.thermal_properties
