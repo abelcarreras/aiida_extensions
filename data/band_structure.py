@@ -144,14 +144,36 @@ class BandStructureData(Data):
 
         array = numpy.load(self.get_abs_path(fname))
 
-        for band in array:
-            for label in band:
-                label = '$' + label.replace('GAMMA', '\Gamma') + '$'
+        if matplotlib:
+            array = self._arrange_band_labels(array, self.get_distances())
 
         if band is not None:
             array = array[band]
 
-
-
         return array
 
+    def _arrange_band_labels(self, labels_array, distances):
+
+        substitutions = {'GAMMA': u'\u0393'
+                         }
+
+        def replace_list(text_string, substitutions):
+
+            for item in substitutions.iteritems():
+                text_string = text_string.replace(item[0], item[1])
+
+            return text_string
+
+        labels = []
+        labels_positions = []
+        for i, freq in enumerate(distances):
+            if labels_array[i][0] == labels_array[i-1][1]:
+                labels.append(replace_list(labels_array[i][0],substitutions))
+            else:
+                labels.append(replace_list(labels_array[i-1][1]+'/'+labels_array[i][0], substitutions))
+            labels_positions.append(distances[i][0])
+        labels_positions.append(distances[-1][-1])
+        labels.append(replace_list(labels_array[-1][1], substitutions))
+        labels[0] = replace_list(labels_array[0][0], substitutions)
+
+        return labels
