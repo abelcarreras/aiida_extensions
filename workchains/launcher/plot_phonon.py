@@ -49,7 +49,7 @@ if bs.get_labels() is not None:
 
     plt.xticks(x_labels, labels_e, rotation='horizontal')
 
-plt.show()
+#plt.show()
 
 # Phonon density of states
 dos = wc.out.dos
@@ -71,7 +71,7 @@ for dos, symbol in zip(partial_dos, partial_symbols):
     plt.plot(frequency, dos, label='{}'.format(symbol))
 
 plt.legend()
-plt.show()
+#plt.show()
 
 # Thermal properties
 thermal = wc.out.thermal_properties
