@@ -30,8 +30,6 @@ class OptimizeStructure(WorkChain):
 
         spec.outline(cls.optimize_cycle, _While(cls.not_converged)(cls.optimize_cycle), cls.get_data)
 
-        #spec.outline(cls.optimize_cycle, cls.get_data)
-
     def not_converged(self):
 
         print ('Check convergence')
@@ -39,7 +37,7 @@ class OptimizeStructure(WorkChain):
         output_array = self.ctx.get('optimize').out.output_array
         forces = output_array.get_array('forces')
         stresses = output_array.get_array('stress')
-        if len(stresses.shape) > 2:
+        if len(stresses.shape) > 2:  # For quantum espresso
             stresses = stresses[-1] * 10
 
         not_converged_forces = len(np.where(abs(forces) > float(self.inputs.tolerance_forces))[0])
@@ -88,4 +86,6 @@ class OptimizeStructure(WorkChain):
 
         self.out('optimized_structure', self.ctx.optimize.out.output_structure)
         self.out('optimized_structure_data', self.ctx.optimize.out.output_parameters)
+
+        return
 

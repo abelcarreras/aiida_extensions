@@ -8,7 +8,7 @@ from aiida.work.workchain import WorkChain, ToContext
 from aiida.work.workfunction import workfunction
 
 from aiida.work.run import run, submit, async
-from aiida.orm import Code, CalculationFactory, load_node
+from aiida.orm import Code, CalculationFactory, load_node, DataFactory
 from aiida.orm.data.parameter import ParameterData
 from aiida.orm.data.array import ArrayData
 from aiida.orm.data.structure import StructureData
@@ -17,10 +17,7 @@ from aiida.orm.data.upf import UpfData
 from aiida.orm.data.base import Str, Float, Bool
 from aiida.orm.data.force_sets import ForceSets
 from aiida.orm.data.force_constants import ForceConstants
-
-#from aiida.orm.calculation.job.quantumespresso.pw import PwCalculation
-#from aiida.orm.calculation.job.vasp.vasp import VaspCalculation
-from aiida.work.workchain import if_
+from aiida.orm.data.band_structure import BandStructureData
 
 from aiida.workflows.wc_optimize import OptimizeStructure
 
@@ -29,7 +26,6 @@ from generate_inputs import *
 
 PwCalculation = CalculationFactory('quantumespresso.pw')
 PhonopyCalculation = CalculationFactory('phonopy')
-
 
 def generate_phonopy_params(code, structure, parameters, machine, force_sets):
     """
@@ -125,54 +121,6 @@ def create_forces_set(**kwargs):
     return {'force_sets': force_sets}
 
 
-class ForceConstantsPhonopy(WorkChain):
-    """
-    Workflow to calculate the force constants using phonopy
-    """
-
-    @classmethod
-    def define(cls, spec):
-        super(ForceConstantsPhonopy, cls).define(spec)
-        spec.input("structure", valid_type=StructureData)
-        spec.input("phonopy_input", valid_type=ParameterData)
-        spec.input("force_sets", valid_type=ForceSets)
-
-        spec.outline(cls.phonopy_calculation)
-
-    def phonopy_calculation(self):
-
-        from phonopy.structure.atoms import Atoms as PhonopyAtoms
-        from phonopy import Phonopy
-        import numpy as np
-        # print 'function',kwargs
-
-        structure = self.inputs.structure
-        phonopy_input = self.inputs.phonopy_input.get_dict()
-        force_sets = self.inputs.force_sets
-
-        # Generate phonopy phonon object
-        bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
-                            positions=[site.position for site in structure.sites],
-                            cell=structure.cell)
-
-        phonon = Phonopy(bulk,
-                         phonopy_input['supercell'],
-                         primitive_matrix=phonopy_input['primitive'])
-
-        phonon.generate_displacements(distance=phonopy_input['distance'])
-
-        # Build data_sets from forces of supercells with displacments
-        phonon.set_displacement_dataset(force_sets.get_force_sets())
-        phonon.produce_force_constants()
-
-        # force_constants = phonon.get_force_constants()
-
-        array_force_constants = ForceConstants(array=phonon.get_force_constants())
-        # array_data.set_array('force_constants', force_constants)
-
-        self.out('force_constants', array_force_constants)
-
-
 @workfunction
 def get_force_constants_from_phonopy(**kwargs):
     """
@@ -211,6 +159,33 @@ def get_force_constants_from_phonopy(**kwargs):
     #array_data.set_array('force_constants', force_constants)
 
     return {'force_constants': array_force_constants}
+
+
+def get_path_using_seekpath(structure, band_resolution=30):
+    import seekpath
+
+    path_data = seekpath.aiidawrappers.get_path(structure)
+
+    labels = path_data['point_coords']
+
+    band_ranges = []
+    for set in path_data['path']:
+        band_ranges.append([labels[set[0]], labels[set[1]]])
+
+    bands =[]
+    for q_start, q_end in band_ranges:
+        band = []
+        for i in range(band_resolution+1):
+            band.append(np.array(q_start) + (np.array(q_end) - np.array(q_start)) / band_resolution * i)
+        bands.append(band)
+
+    band_structure = BandStructureData(ranges=bands,
+                                       labels=path_data['path'])
+
+    return band_structure
+
+    #return {'ranges': bands,
+    #        'labels': path_data['path']}
 
 
 @workfunction
@@ -283,18 +258,11 @@ class FrozenPhonon(WorkChain):
         spec.input("machine", valid_type=ParameterData)
         spec.input("ph_settings", valid_type=ParameterData)
         spec.input("es_settings", valid_type=ParameterData)
-        # Should be optional
+        # Optional arguments
         spec.input("optimize", valid_type=Bool, required=False, default=Bool(True))
         spec.input("pressure", valid_type=Float, required=False, default=Float(0.0))
-      #  spec.dynamic_input("optimize")
 
-        #spec.outline(cls.create_displacement_calculations,
-        #             if_(cls.remote_phonopy)(cls.get_force_constants_remote,
-        #                                     cls.collect_phonopy_data).else_(
-        #                 cls.get_force_constants))
-
-        spec.outline(cls.optimize, cls.create_displacement_calculations, cls.get_force_constants, cls.collect_phonopy_data)
-        #spec.outline(cls.create_displacement_calculations, cls.get_force_constants_remote, cls.collect_phonopy_data)
+        spec.outline(cls.optimize, cls.create_displacement_calculations, cls.get_force_constants, cls.calculate_phonon_properties)
 
     def optimize(self):
         print 'start optimize'
@@ -311,14 +279,18 @@ class FrozenPhonon(WorkChain):
             return
 
         print ('optimize workchain: {}'.format(future.pid))
-        #optimized = {'optimized': future}
-        #return ToContext(**optimized)
+
+        # BAND STRUCTURE
+        structure = self.inputs.structure
+        path = get_path_using_seekpath(structure)
+        print path
+        exit()
+
         return ToContext(optimized=future)
 
     def create_displacement_calculations(self):
         print 'create displacements'
         print self.ctx._get_dict()
-
 
         if 'optimized' in self.ctx:
             structure = self.ctx.optimized.out.optimized_structure
@@ -374,7 +346,7 @@ class FrozenPhonon(WorkChain):
         self.ctx.force_sets = create_forces_set(**wf_inputs)['force_sets']
 
         if 'code' in self.inputs.ph_settings.get_dict():
-            print ('remote phonopy calculation')
+            print ('remote phonopy FC calculation')
             code_label = self.inputs.ph_settings.get_dict()['code']
             JobCalculation, calculation_input = generate_phonopy_params(code=Code.get_from_string(code_label),
                                                                         structure=self.inputs.structure,
@@ -384,32 +356,24 @@ class FrozenPhonon(WorkChain):
             future = submit(JobCalculation, **calculation_input)
             print 'phonopy FC calc:', future.pid
 
-            #phonopy_input = {'phonopy_output': future}
-            #return ToContext(**phonopy_input)
-
             return ToContext(phonopy_output=future)
         else:
-            print ('local phonopy calculation')
-            #self.ctx.phonopy_output = get_force_constants_from_phonopy(structure=self.inputs.structure,
-            #                                                           phonopy_input=self.inputs.ph_settings,
-            #                                                           force_sets=self.ctx.force_sets)
-
-            self.ctx.phonopy_output = run(ForceConstantsPhonopy,
-                                          structure=self.inputs.structure,
-                                          phonopy_input=self.inputs.ph_settings,
-                                          force_sets=self.ctx.force_sets)
+            print ('local phonopy FC calculation')
+            self.ctx.phonopy_output = get_force_constants_from_phonopy(structure=self.inputs.structure,
+                                                                       phonopy_input=self.inputs.ph_settings,
+                                                                       force_sets=self.ctx.force_sets)
 
         return
 
-    def collect_phonopy_data(self):
+    def calculate_phonon_properties(self):
 
         # print self.ctx._get_dict()
-        print 'collect phonopy data'
+        print ('collect phonopy data')
 
-        #try:
-        #    force_constants = self.ctx.phonopy_output['force_constants']
-        #except TypeError:
-        force_constants = self.ctx.phonopy_output.out.force_constants
+        try:
+            force_constants = self.ctx.phonopy_output['force_constants']
+        except TypeError:
+            force_constants = self.ctx.phonopy_output.out.force_constants
 
         phonon_properties = get_properties_from_phonopy(self.inputs.structure,
                                                         self.inputs.ph_settings,
