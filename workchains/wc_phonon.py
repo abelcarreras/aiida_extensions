@@ -270,6 +270,7 @@ class FrozenPhonon(WorkChain):
         structure = self.inputs.structure
         path = get_path_using_seekpath(structure)
         print path.get_ranges()
+        print path.get_labels()
         exit()
 
 
