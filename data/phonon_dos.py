@@ -61,6 +61,17 @@ class PhononDosData(Data):
         array = numpy.load(self.get_abs_path(fname))
         return array
 
+    def get_frequencies(self, atom=None, full=False):
+        """
+        Return the frequencies stored in the node as a numpy array
+        """
+        import numpy
+
+        fname = 'frequencies.npy'
+
+        array = numpy.load(self.get_abs_path(fname))
+        return array
+
 
     def get_atom_labels(self, full=False):
         """
@@ -95,24 +106,6 @@ class PhononDosData(Data):
             f.flush()  # Important to flush here, otherwise the next copy command
             # will just copy an empty file
             self.add_path(f.name, fname)
-
-    def set_frequencies(self, array):
-        """
-        Get the phonon frequencies as a numpy array.
-        :param array: The numpy array to store.
-        """
-
-        import tempfile
-        import numpy
-
-        fname = "frequencies.npy"
-        with tempfile.NamedTemporaryFile() as f:
-            # Store in a temporary file, and then add to the node
-            numpy.save(f, array)
-            f.flush()  # Important to flush here, otherwise the next copy command
-            # will just copy an empty file
-            self.add_path(f.name, fname)
-
 
 
     def set_frequencies(self, array):
