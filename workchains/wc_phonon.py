@@ -265,6 +265,14 @@ class FrozenPhonon(WorkChain):
         spec.outline(cls.optimize, cls.create_displacement_calculations, cls.get_force_constants, cls.calculate_phonon_properties)
 
     def optimize(self):
+
+        # BAND STRUCTURE
+        structure = self.inputs.structure
+        path = get_path_using_seekpath(structure)
+        print path
+        exit()
+
+
         print 'start optimize'
         future = submit(OptimizeStructure,
                         structure=self.inputs.structure,
@@ -279,12 +287,6 @@ class FrozenPhonon(WorkChain):
             return
 
         print ('optimize workchain: {}'.format(future.pid))
-
-        # BAND STRUCTURE
-        structure = self.inputs.structure
-        path = get_path_using_seekpath(structure)
-        print path
-        exit()
 
         return ToContext(optimized=future)
 
