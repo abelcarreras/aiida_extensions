@@ -68,7 +68,7 @@ class PhononDosData(Data):
             return array
         return array[self._get_equivalent_atom_list()]
 
-    def get_frequencies(self, atom=None, full=False):
+    def get_frequencies(self):
         """
         Return the frequencies stored in the node as a numpy array
         """
