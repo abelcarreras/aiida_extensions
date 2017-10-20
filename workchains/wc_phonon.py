@@ -125,6 +125,54 @@ def create_forces_set(**kwargs):
     return {'force_sets': force_sets}
 
 
+class ForceConstantsPhonopy(WorkChain):
+    """
+    Workflow to calculate the force constants using phonopy
+    """
+
+    @classmethod
+    def define(cls, spec):
+        super(OptimizeStructure, cls).define(spec)
+        spec.input("structure", valid_type=StructureData)
+        spec.input("phonopy_input", valid_type=ParameterData)
+        spec.input("force_sets", valid_type=ForceSets)
+
+        spec.outline(cls.phonopy_calculation)
+
+    def phonopy_calculation(self):
+
+        from phonopy.structure.atoms import Atoms as PhonopyAtoms
+        from phonopy import Phonopy
+        import numpy as np
+        # print 'function',kwargs
+
+        structure = self.inputs.structure
+        phonopy_input = self.inputs.phonopy_input.get_dict()
+        force_sets = self.inputs.force_sets
+
+        # Generate phonopy phonon object
+        bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
+                            positions=[site.position for site in structure.sites],
+                            cell=structure.cell)
+
+        phonon = Phonopy(bulk,
+                         phonopy_input['supercell'],
+                         primitive_matrix=phonopy_input['primitive'])
+
+        phonon.generate_displacements(distance=phonopy_input['distance'])
+
+        # Build data_sets from forces of supercells with displacments
+        phonon.set_displacement_dataset(force_sets.get_force_sets())
+        phonon.produce_force_constants()
+
+        # force_constants = phonon.get_force_constants()
+
+        array_force_constants = ForceConstants(array=phonon.get_force_constants())
+        # array_data.set_array('force_constants', force_constants)
+
+        self.out('force_constants', array_force_constants)
+
+
 @workfunction
 def get_force_constants_from_phonopy(**kwargs):
     """
@@ -342,10 +390,15 @@ class FrozenPhonon(WorkChain):
             return ToContext(phonopy_output=future)
         else:
             print ('local phonopy calculation')
-            self.ctx.phonopy_output = get_force_constants_from_phonopy(structure=self.inputs.structure,
-                                                                       phonopy_input=self.inputs.ph_settings,
-                                                                       machine=self.inputs.machine,
-                                                                       force_sets=self.ctx.force_sets)
+            #self.ctx.phonopy_output = get_force_constants_from_phonopy(structure=self.inputs.structure,
+            #                                                           phonopy_input=self.inputs.ph_settings,
+            #                                                           force_sets=self.ctx.force_sets)
+
+            self.ctx.phonopy_output = run(ForceConstantsPhonopy,
+                                          structure=self.inputs.structure,
+                                          phonopy_input=self.inputs.ph_settings,
+                                          force_sets=self.ctx.force_sets)
+
         return
 
     def collect_phonopy_data(self):
