@@ -93,7 +93,7 @@ plt.legend()
 plt.show()
 
 # Thermal properties
-thermal = wc.out.phonon_properties
+thermal = wc.out.thermal_properties
 
 free_energy = thermal.get_array('free_energy')
 entropy = thermal.get_array('entropy')
