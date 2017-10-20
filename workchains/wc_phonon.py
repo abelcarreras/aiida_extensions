@@ -269,7 +269,7 @@ class FrozenPhonon(WorkChain):
         # BAND STRUCTURE
         structure = self.inputs.structure
         path = get_path_using_seekpath(structure)
-        print path
+        print path.get_ranges()
         exit()
 
 
