@@ -16,7 +16,7 @@ class ForceSets(Data):
         properties for efficiency reasons).
         :param name: The name of the array.
         """
-        return tuple(self.get_attr("natom"))
+        return self.get_attr("natom")
 
     def get_number_of_displacements(self):
         """

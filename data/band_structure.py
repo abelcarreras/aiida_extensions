@@ -9,6 +9,14 @@ class BandStructureData(Data):
     def __init__(self, *args, **kwargs):
         super(BandStructureData, self).__init__(*args, **kwargs)
 
+    def get_number_of_bands(self):
+
+        if 'nbands' in self.get_attrs():
+            return self.get_attr('nbands')
+        else:
+            return None
+
+
     def set_bands(self, ranges):
 
         import tempfile
@@ -16,11 +24,15 @@ class BandStructureData(Data):
 
         ranges = numpy.array(ranges)
 
+
+
         with tempfile.NamedTemporaryFile() as f:
             numpy.save(f, ranges)
             f.flush()  # Important to flush here, otherwise the next copy command
             # will just copy an empty file
             self.add_path(f.name, 'band_ranges.npy')
+
+        self._set_attr('nbands', len(ranges))
 
     def set_labels(self, band_labels):
 
@@ -62,7 +74,7 @@ class BandStructureData(Data):
             # will just copy an empty file
             self.add_path(f.name, 'frequencies.npy')
 
-    def get_q_points(self):
+    def get_q_points(self, band=None):
         """
         Return the q_points in the node as a numpy array
         """
@@ -71,43 +83,55 @@ class BandStructureData(Data):
         fname = 'q_points.npy'
 
         array = numpy.load(self.get_abs_path(fname))
+        if band is not None:
+            array = array[band]
+
         return array
 
 
-    def get_distances(self):
+    def get_distances(self, band=None):
         """
-        Return the q_points in the node as a numpy array
+        Return the distances in the node as a numpy array
         """
         import numpy
 
         fname = 'distances.npy'
 
         array = numpy.load(self.get_abs_path(fname))
+        if band is not None:
+            array = array[band]
+
         return array
 
-    def get_frequencies(self):
+    def get_frequencies(self, band=None):
         """
-        Return the q_points in the node as a numpy array
+        Return the frequencies in the node as a numpy array
         """
         import numpy
 
         fname = 'frequencies.npy'
 
         array = numpy.load(self.get_abs_path(fname))
+        if band is not None:
+            array = array[band]
+
         return array
 
-    def get_bands(self):
+    def get_bands(self, band=None):
         """
-        Return the band ranges in the node as a numpy array
+        Return the bands in the node as a numpy array
         """
         import numpy
 
         fname = 'band_ranges.npy'
 
         array = numpy.load(self.get_abs_path(fname))
+        if band is not None:
+            array = array[band]
+
         return array
 
-    def get_labels(self):
+    def get_labels(self, band=None):
         """
         Return the band labels in the node as a numpy array
         """
@@ -116,5 +140,8 @@ class BandStructureData(Data):
         fname = 'band_labels.npy'
 
         array = numpy.load(self.get_abs_path(fname))
+        if band is not None:
+            array = array[band]
+
         return array
 
