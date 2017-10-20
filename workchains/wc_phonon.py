@@ -179,7 +179,7 @@ def get_path_using_seekpath(structure, band_resolution=30):
             band.append(np.array(q_start) + (np.array(q_end) - np.array(q_start)) / band_resolution * i)
         bands.append(band)
 
-    band_structure = BandStructureData(ranges=bands,
+    band_structure = BandStructureData(bands=bands,
                                        labels=path_data['path'])
 
     return band_structure
@@ -201,6 +201,7 @@ def get_properties_from_phonopy(structure, phonopy_input, force_constants):
 
     from phonopy.structure.atoms import Atoms as PhonopyAtoms
     from phonopy import Phonopy
+
 
    # Generate phonopy phonon object
     bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
@@ -244,7 +245,12 @@ def get_properties_from_phonopy(structure, phonopy_input, force_constants):
     thermal_properties.set_array('entropy', entropy * normalization_factor)
     thermal_properties.set_array('cv', cv * normalization_factor)
 
-    return {'thermal_properties': thermal_properties, 'dos': dos}
+    # BAND STRUCTURE
+    band_structure = get_path_using_seekpath(structure)
+    phonon.set_band_structure(band_structure.get_bands())
+    band_structure.set_band_structure_phonopy(phonon.get_band_structure())
+
+    return {'thermal_properties': thermal_properties, 'dos': dos, 'band_structure': band_structure}
 
 class FrozenPhonon(WorkChain):
     """
@@ -265,14 +271,6 @@ class FrozenPhonon(WorkChain):
         spec.outline(cls.optimize, cls.create_displacement_calculations, cls.get_force_constants, cls.calculate_phonon_properties)
 
     def optimize(self):
-
-        # BAND STRUCTURE
-        structure = self.inputs.structure
-        path = get_path_using_seekpath(structure)
-        print path.get_ranges()
-        print path.get_labels()
-        exit()
-
 
         print 'start optimize'
         future = submit(OptimizeStructure,
@@ -385,5 +383,6 @@ class FrozenPhonon(WorkChain):
         self.out('force_constants', force_constants)
         self.out('phonon_properties', phonon_properties['thermal_properties'])
         self.out('dos', phonon_properties['dos'])
+        self.out('band_structure', phonon_properties['band_structure'])
 
         return
