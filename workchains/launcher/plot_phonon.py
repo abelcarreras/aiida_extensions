@@ -54,7 +54,7 @@ plt.show()
 # Phonon density of states
 dos = wc.out.dos
 print dos.get_frequencies()
-
+print dos._get_equivalent_atom_list()
 exit()
 
 frequency = dos.get_array('frequency')
