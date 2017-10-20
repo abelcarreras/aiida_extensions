@@ -66,7 +66,7 @@ plt.figure(2)
 plt.suptitle('Phonon density of states')
 plt.ylabel('Density')
 plt.xlabel('Frequency [THz]')
-plt.ylim([0, np.max(total_dos)*1.1])
+plt.ylim([0, np.max(total_dos) * 1.1])
 
 plt.plot(frequency, total_dos, label='Total DOS')
 

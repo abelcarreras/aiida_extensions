@@ -149,13 +149,14 @@ class BandStructureData(Data):
 
         return array
 
-
-    def get_labels_matplotlib(self):
+    def get_formatted_labels_matplotlib(self):
         distances = self.get_distances()
         labels_array = self.get_labels()
 
-
         substitutions = {'GAMMA': u'\u0393'
+                         }
+
+        substitutions = {'GAMMA': u'$\Gamma$'
                          }
 
         def replace_list(text_string, substitutions):
