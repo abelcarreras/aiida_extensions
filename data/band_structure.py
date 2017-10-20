@@ -62,6 +62,39 @@ class BandStructureData(Data):
             # will just copy an empty file
             self.add_path(f.name, 'frequencies.npy')
 
+    def get_q_points(self):
+        """
+        Return the q_points in the node as a numpy array
+        """
+        import numpy
+
+        fname = 'q_points.npy'
+
+        array = numpy.load(self.get_abs_path(fname))
+        return array
+
+
+    def get_distances(self):
+        """
+        Return the q_points in the node as a numpy array
+        """
+        import numpy
+
+        fname = 'distances.npy'
+
+        array = numpy.load(self.get_abs_path(fname))
+        return array
+
+    def get_frequencies(self):
+        """
+        Return the q_points in the node as a numpy array
+        """
+        import numpy
+
+        fname = 'frequencies.npy'
+
+        array = numpy.load(self.get_abs_path(fname))
+        return array
 
     def get_bands(self):
         """

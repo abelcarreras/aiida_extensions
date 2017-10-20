@@ -369,7 +369,7 @@ class FrozenPhonon(WorkChain):
     def calculate_phonon_properties(self):
 
         # print self.ctx._get_dict()
-        print ('collect phonopy data')
+        print ('calculate phonon properties')
 
         try:
             force_constants = self.ctx.phonopy_output['force_constants']
