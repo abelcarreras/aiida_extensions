@@ -111,6 +111,7 @@ class Array_data_parserInstruction(BaseInstruction):
         from aiida.orm.data.born_charges import BornChargesData
 
         born_data = BornChargesData()
+        print 'Object created'
         try:
             import xml.etree.cElementTree as ET
 
@@ -124,9 +125,13 @@ class Array_data_parserInstruction(BaseInstruction):
                         epsilon.append(np.array(row.text.split(), dtype=float))
 
                     epsilon = np.array(epsilon)
+                    print epsilon
                     born_data.set_epsilon(epsilon)
+                    print 'born_charges OK'
+
                     break
 
+            print born_data
             for elements in root.iter('array'):
                 try:
                     if elements.attrib['name'] == 'born_charges':
@@ -137,13 +142,16 @@ class Array_data_parserInstruction(BaseInstruction):
                                 atom_array.append(np.array(c.text.split(), dtype=float))
                             born_charges.append(atom_array)
 
+                        print born_charges
                         born_data.set_born_charges(born_charges)
-
+                        print 'born_charges OK'
                         break
                 except KeyError:
                     pass
         except:
             pass
+
+        print 'complete born object', born_data
 
         try:
             nodes_list.append((
