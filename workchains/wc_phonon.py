@@ -314,6 +314,8 @@ class FrozenPhonon(WorkChain):
         self.ctx.data_sets = structures.pop('data_sets')
         self.ctx.number_of_displacements = len(structures)
 
+        calcs = {}
+
         # Load data from nodes
         testing = True
         if testing:
@@ -323,26 +325,25 @@ class FrozenPhonon(WorkChain):
             for pk, label in zip(nodes, labels):
                 future = load_node(pk)
                 self.ctx._content[label] = future
-            return
 
-        calcs = {}
-        for label, structure in structures.iteritems():
-            # print label, structure
+        else:
+            for label, structure in structures.iteritems():
+                # print label, structure
 
-            print self.inputs.es_settings.dict.code
+                print self.inputs.es_settings.dict.code
 
-            # plugin = self.inputs.code.get_attr('input_plugin')
+                # plugin = self.inputs.code.get_attr('input_plugin')
 
-            JobCalculation, calculation_input = generate_inputs(structure,
-                                                                self.inputs.machine,
-                                                                self.inputs.es_settings,
-                                                                #pressure=self.input.pressure,
-                                                                type='forces')
+                JobCalculation, calculation_input = generate_inputs(structure,
+                                                                    self.inputs.machine,
+                                                                    self.inputs.es_settings,
+                                                                    #pressure=self.input.pressure,
+                                                                    type='forces')
 
-            calculation_input._label = label
-            future = submit(JobCalculation, **calculation_input)
-            print label, future.pid
-            calcs[label] = future
+                calculation_input._label = label
+                future = submit(JobCalculation, **calculation_input)
+                print label, future.pid
+                calcs[label] = future
 
         # Born charges
         if 'born_charges' in self.inputs.es_settings.dict.code:
