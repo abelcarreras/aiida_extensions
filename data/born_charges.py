@@ -40,7 +40,6 @@ class BornChargesData(Data):
         fname = 'epsilon.npy'
 
         array = numpy.load(self.get_abs_path(fname))
-        self._set_attr("shape", list(array.shape))
 
         return array
 
@@ -85,6 +84,9 @@ class BornChargesData(Data):
             f.flush()  # Important to flush here, otherwise the next copy command
             # will just copy an empty file
             self.add_path(f.name, fname)
+
+        self._set_attr("shape", list(array.shape))
+
 
     def get_born_parameters_phonopy(self, phonon, symprec=1e-5):
 
