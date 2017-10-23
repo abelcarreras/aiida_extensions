@@ -15,7 +15,7 @@ import numpy as np
 
 # Set WorkflowPhonon PK number
 ########################
-wc = load_node(14)
+wc = load_node(80)
 ########################
 
 # Phonon Band structure
