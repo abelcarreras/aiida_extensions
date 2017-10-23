@@ -9,7 +9,6 @@ class BornChargesData(Data):
 
     def __init__(self, *args, **kwargs):
         super(BornChargesData, self).__init__(*args, **kwargs)
-        self._cached_arrays = {}
 
     def get_shape(self):
         """

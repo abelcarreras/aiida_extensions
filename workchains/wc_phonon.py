@@ -400,7 +400,11 @@ class FrozenPhonon(WorkChain):
             force_constants = self.ctx.phonopy_output.out.force_constants
 
         if 'born_charges' in self.ctx:
-            born_charges = self.ctx.born_charges.out.output_array
+            from aiida.orm.data.born_charges import BornChargesData
+            born_charges = BornChargesData(epsilon=self.ctx.born_charges.out.output_array.get_array('epsilon'),
+                            born_charges=self.ctx.born_charges.out.output_array.get_array('born_charges'))
+            #born_charges = self.ctx.born_charges.out.output_array
+
         else:
             born_charges = None
 
