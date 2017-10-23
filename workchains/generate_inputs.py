@@ -260,7 +260,6 @@ def generate_vasp_params(structure, machine, settings, type=None, pressure=0.0):
     if 'kpoints_per_atom' in settings.get_dict():
         kpoints_pg = vaspio.Kpoints.automatic_density(structure.get_pymatgen_structure(), settings.dict.kpoints_per_atom)
     else:
-        print settings.dict.kpoints
         kpoints_pg = vaspio.Kpoints(comment='aiida generated',
                                     style=settings.dict.kpoints['type'],
                                     kpts=(settings.dict.kpoints['points'],),
@@ -304,10 +303,8 @@ def generate_inputs(structure, machine, es_settings, type=None, pressure=0.0):
         plugin = Code.get_from_string(es_settings.dict.code).get_attr('input_plugin')
 
     else:
-        print es_settings.dict.code
         plugin = Code.get_from_string(es_settings.dict.code[type]).get_attr('input_plugin')
 
-    print 'plugin', plugin
     if plugin == 'vasp.vasp':
         return generate_vasp_params(structure, machine, es_settings, type=type, pressure=pressure)
 
