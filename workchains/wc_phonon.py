@@ -288,7 +288,7 @@ class FrozenPhonon(WorkChain):
                         pressure=self.inputs.pressure,
                         )
         # For testing
-        testing = True
+        testing = False
         if testing:
             self.ctx._content['optimize'] = load_node(481308)
             return
@@ -312,7 +312,7 @@ class FrozenPhonon(WorkChain):
         self.ctx.number_of_displacements = len(structures)
 
         # Load data from nodes
-        testing = True
+        testing = False
         if testing:
             from aiida.orm import load_node
             nodes = [482152, 482154, 482156, 482158]  # LAMMPS
