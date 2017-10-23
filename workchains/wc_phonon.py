@@ -217,8 +217,8 @@ def get_properties_from_phonopy(structure, phonopy_input, force_constants, nac):
 
     phonon.set_force_constants(force_constants.get_array())
 
-    #if nac is not None:
-    #    phonon.set_nac_params(nac.get_born_parameters_phonopy(phonon))
+    if nac is not None:
+        phonon.set_nac_params(nac.get_born_parameters_phonopy(phonon))
 
     # Normalization factor primitive to unit cell
     normalization_factor = phonon.unitcell.get_number_of_atoms()/phonon.primitive.get_number_of_atoms()
