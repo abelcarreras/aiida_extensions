@@ -405,9 +405,6 @@ class FrozenPhonon(WorkChain):
             from aiida.orm.data.born_charges import BornChargesData
             born_charges = BornChargesData(epsilon=self.ctx.born_charges.out.output_array.get_array('epsilon'),
                             born_charges=self.ctx.born_charges.out.output_array.get_array('born_charges'))
-            #born_charges = self.ctx.born_charges.out.output_array
-            print born_charges.get_born_charges()
-            print born_charges.get_epsilon()
 
         else:
             born_charges = None
