@@ -80,7 +80,8 @@ if True:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
                     'shift': [0.0, 0.0, 0.0]}
 
     settings_dict = {'code': {'optimize': 'vasp544mpi@boston',
-                              'forces': 'vasp544mpi@boston'},
+                              'forces': 'vasp544mpi@boston',
+                              'born_charges': 'vasp544mpi@boston'},
                      'parameters': incar_dict,
                      #'kpoints': kpoints_dict,
                      'kpoints_per_atom': 100,  # k-point density
@@ -142,8 +143,9 @@ if False:
                   'max_iterations': 500000}
 
     settings_dict = {'code': {'optimize': 'lammps_optimize@boston',
-                              'forces': 'lammps_force@boston'},
-                     'parameters': parameters,
+                              'forces': 'lammps_force@boston',
+                              'born_charges': 'vasp544mpi@boston'},
+    'parameters': parameters,
                      'potential': potential}
 
     es_settings = ParameterData(dict=settings_dict)
@@ -168,7 +170,7 @@ if True:
                  ph_settings=ph_settings,
                  # Optional settings
                  pressure=Float(10),
-                 optimize=Bool(False)
+                 optimize=Bool(False),
                  )
 
     print (result)
@@ -180,7 +182,7 @@ else:
                     ph_settings=ph_settings,
                     # Optional settings
                     pressure=Float(10),
-                    optimize=Bool(False)
+                    optimize=Bool(False),
                     )
 
     print future

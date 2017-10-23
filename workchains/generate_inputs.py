@@ -237,9 +237,9 @@ def generate_vasp_params(structure, machine, settings, type=None, pressure=0.0):
     settings_parse = {'PARSER_INSTRUCTIONS': []}
     pinstr = settings_parse['PARSER_INSTRUCTIONS']
     pinstr += [{
-        'instr': 'array_data_parser',
-        'type': 'data',
-        'params': {}},
+            'instr': 'array_data_parser',
+            'type': 'data',
+            'params': {}},
         {
             'instr': 'output_parameters',
             'type': 'data',
@@ -254,7 +254,13 @@ def generate_vasp_params(structure, machine, settings, type=None, pressure=0.0):
             'params': {}}
     ]
 
-    # Kpoints
+    if type == 'born_charges':
+        pinstr += [{
+            'instr': 'born_charges_parser',
+            'type': 'data',
+            'params': {}}]
+
+        # Kpoints
     from pymatgen.io import vasp as vaspio
 
     if 'kpoints_per_atom' in settings.get_dict():

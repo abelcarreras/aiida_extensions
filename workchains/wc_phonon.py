@@ -190,7 +190,7 @@ def get_path_using_seekpath(structure, band_resolution=30):
 
 
 @workfunction
-def get_properties_from_phonopy(structure, phonopy_input, force_constants):
+def get_properties_from_phonopy(structure, phonopy_input, force_constants, nac=None):
     """
     Calculate DOS and thermal properties using phonopy (locally)
     :param structure: Aiida StructureData Object
@@ -216,6 +216,9 @@ def get_properties_from_phonopy(structure, phonopy_input, force_constants):
                      primitive_matrix=phonopy_input['primitive'])
 
     phonon.set_force_constants(force_constants.get_array())
+
+    if nac is not None:
+        phonon.set_nac_params(nac.get_born_parameters_phonopy(phonon))
 
     #Normalization factor primitive to unit cell
     normalization_factor = phonon.unitcell.get_number_of_atoms()/phonon.primitive.get_number_of_atoms()
@@ -341,6 +344,17 @@ class FrozenPhonon(WorkChain):
             print label, future.pid
             calcs[label] = future
 
+        # Born charges
+        if 'born_charges' in self.inputs.es_settings.dict.code:
+            JobCalculation, calculation_input = generate_inputs(structure,
+                                                                self.inputs.machine,
+                                                                self.inputs.es_settings,
+                                                                #pressure=self.input.pressure,
+                                                                type='born_charges')
+            future = submit(JobCalculation, **calculation_input)
+            print ('born_charges: {}'.format(future.pid))
+            calcs['born_charges'] = future
+
         return ToContext(**calcs)
 
     def get_force_constants(self):
@@ -384,9 +398,15 @@ class FrozenPhonon(WorkChain):
         except TypeError:
             force_constants = self.ctx.phonopy_output.out.force_constants
 
+        if 'born_charges' in self.ctx:
+            born_charges = self.ctx.born_charges.out.output_array
+        else:
+            born_charges = None
+
         phonon_properties = get_properties_from_phonopy(self.inputs.structure,
                                                         self.inputs.ph_settings,
-                                                        force_constants)
+                                                        force_constants,
+                                                        nac=born_charges)
 
         self.out('force_constants', force_constants)
         self.out('thermal_properties', phonon_properties['thermal_properties'])
