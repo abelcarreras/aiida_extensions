@@ -218,9 +218,7 @@ def get_properties_from_phonopy(structure, phonopy_input, force_constants, nac):
     phonon.set_force_constants(force_constants.get_array())
 
     if nac is not None:
-        pass
-        #print nac.get_born_parameters_phonopy(phonon)
-        #phonon.set_nac_params(nac.get_born_parameters_phonopy(phonon))
+        phonon.set_nac_params(nac.get_born_parameters_phonopy(phonon))
 
     # Normalization factor primitive to unit cell
     normalization_factor = phonon.unitcell.get_number_of_atoms()/phonon.primitive.get_number_of_atoms()
@@ -417,7 +415,7 @@ class FrozenPhonon(WorkChain):
         phonon_properties = get_properties_from_phonopy(self.inputs.structure,
                                                         self.inputs.ph_settings,
                                                         force_constants,
-                                                        born_charges)
+                                                        nac=born_charges)
 
         self.out('force_constants', force_constants)
         self.out('thermal_properties', phonon_properties['thermal_properties'])
