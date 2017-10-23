@@ -324,7 +324,7 @@ class FrozenPhonon(WorkChain):
 
         calcs = {}
         for label, structure in structures.iteritems():
-            print label, structure
+            # print label, structure
 
             print self.inputs.es_settings.dict.code
 
