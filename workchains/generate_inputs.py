@@ -256,7 +256,7 @@ def generate_vasp_params(structure, machine, settings, type=None, pressure=0.0):
 
     if type == 'born_charges':
         pinstr += [{
-            'instr': 'born_charges_parser',
+            'instr': 'born_data_parser',
             'type': 'data',
             'params': {}}]
 
