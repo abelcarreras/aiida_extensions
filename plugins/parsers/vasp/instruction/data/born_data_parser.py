@@ -24,8 +24,8 @@ class Born_data_parserInstruction(BaseInstruction):
 
         # Get born charges and epsilon
         nodes_list = []
-        born_data = BornChargesData()
 
+        born_data = BornChargesData()
         try:
             import xml.etree.cElementTree as ET
 
