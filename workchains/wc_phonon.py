@@ -415,7 +415,7 @@ class FrozenPhonon(WorkChain):
         phonon_properties = get_properties_from_phonopy(self.inputs.structure,
                                                         self.inputs.ph_settings,
                                                         force_constants,
-                                                        nac=force_constants)
+                                                        born_charges)
 
         self.out('force_constants', force_constants)
         self.out('thermal_properties', phonon_properties['thermal_properties'])
