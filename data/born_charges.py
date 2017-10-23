@@ -37,7 +37,7 @@ class BornChargesData(Data):
         """
         import numpy
 
-        fname = 'born_charges.npy'
+        fname = 'epsilon.npy'
 
         array = numpy.load(self.get_abs_path(fname))
         self._set_attr("shape", list(array.shape))
