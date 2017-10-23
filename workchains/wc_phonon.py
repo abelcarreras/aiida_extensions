@@ -326,24 +326,26 @@ class FrozenPhonon(WorkChain):
                 future = load_node(pk)
                 self.ctx._content[label] = future
 
-        else:
-            for label, structure in structures.iteritems():
-                # print label, structure
+            self.ctx._content['born_charges'] = load_node(752)
+            return
 
-                print self.inputs.es_settings.dict.code
+        for label, structure in structures.iteritems():
+            # print label, structure
 
-                # plugin = self.inputs.code.get_attr('input_plugin')
+            print self.inputs.es_settings.dict.code
 
-                JobCalculation, calculation_input = generate_inputs(structure,
-                                                                    self.inputs.machine,
-                                                                    self.inputs.es_settings,
-                                                                    #pressure=self.input.pressure,
-                                                                    type='forces')
+            # plugin = self.inputs.code.get_attr('input_plugin')
 
-                calculation_input._label = label
-                future = submit(JobCalculation, **calculation_input)
-                print label, future.pid
-                calcs[label] = future
+            JobCalculation, calculation_input = generate_inputs(structure,
+                                                                self.inputs.machine,
+                                                                self.inputs.es_settings,
+                                                                #pressure=self.input.pressure,
+                                                                type='forces')
+
+            calculation_input._label = label
+            future = submit(JobCalculation, **calculation_input)
+            print label, future.pid
+            calcs[label] = future
 
         # Born charges
         if 'born_charges' in self.inputs.es_settings.dict.code:
@@ -404,10 +406,10 @@ class FrozenPhonon(WorkChain):
             born_charges = BornChargesData(epsilon=self.ctx.born_charges.out.output_array.get_array('epsilon'),
                             born_charges=self.ctx.born_charges.out.output_array.get_array('born_charges'))
             #born_charges = self.ctx.born_charges.out.output_array
-
+            print born_charges
         else:
             born_charges = None
-
+        exit()
         phonon_properties = get_properties_from_phonopy(self.inputs.structure,
                                                         self.inputs.ph_settings,
                                                         force_constants,
