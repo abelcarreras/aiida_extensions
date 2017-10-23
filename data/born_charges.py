@@ -27,7 +27,6 @@ class BornChargesData(Data):
         fname = 'born_charges.npy'
 
         array = numpy.load(self.get_abs_path(fname))
-        self._set_attr("shape", list(array.shape))
 
         return array
 
@@ -64,6 +63,8 @@ class BornChargesData(Data):
             # will just copy an empty file
             self.add_path(f.name, fname)
 
+        self._set_attr("shape", list(array.shape))
+
     def set_epsilon(self, array):
         """
         Store the dielectric tensor as a numpy array. Possibly overwrite the array
@@ -85,7 +86,6 @@ class BornChargesData(Data):
             # will just copy an empty file
             self.add_path(f.name, fname)
 
-        self._set_attr("shape", list(array.shape))
 
 
     def get_born_parameters_phonopy(self, phonon, symprec=1e-5):
