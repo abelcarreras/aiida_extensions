@@ -188,15 +188,53 @@ def get_path_using_seekpath(structure, band_resolution=30):
     #return {'ranges': bands,
     #        'labels': path_data['path']}
 
+def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
+    from phonopy.structure.cells import get_primitive, get_supercell
+    from phonopy.structure.symmetry import Symmetry
+    from phonopy.interface import get_default_physical_units
+
+    print ('inside born parameters')
+    pmat = phonon.get_primitive_matrix()
+    smat = phonon.get_supercell_matrix()
+    ucell = phonon.get_unitcell()
+
+    print pmat
+    print smat
+    print ucell
+
+    num_atom = len(born_charges)
+    assert num_atom == ucell.get_number_of_atoms(), \
+        "num_atom %d != len(borns) %d" % (ucell.get_number_of_atoms(),
+                                          len(born_charges))
+
+    inv_smat = np.linalg.inv(smat)
+    scell = get_supercell(ucell, smat, symprec=symprec)
+    pcell = get_primitive(scell, np.dot(inv_smat, pmat), symprec=symprec)
+    p2s = np.array(pcell.get_primitive_to_supercell_map(), dtype='intc')
+    p_sym = Symmetry(pcell, is_symmetry=True, symprec=symprec)
+    s_indep_atoms = p2s[p_sym.get_independent_atoms()]
+    u2u = scell.get_unitcell_to_unitcell_map()
+    u_indep_atoms = [u2u[x] for x in s_indep_atoms]
+    reduced_borns = born_charges[u_indep_atoms].copy()
+
+    factor = get_default_physical_units('vasp')['nac_factor']  # born charges in VASP units
+
+    born_dict = {'born': reduced_borns, 'dielectric': epsilon, 'factor': factor}
+
+    print ('final born dict', born_dict)
+
+    return born_dict
+
 
 @workfunction
-def get_properties_from_phonopy(structure, phonopy_input, force_constants, nac):
+def get_properties_from_phonopy(structure, phonopy_input, force_constants, nac_data):
     """
     Calculate DOS and thermal properties using phonopy (locally)
     :param structure: Aiida StructureData Object
     :param phonopy_input: Aiida Parametersdata object containing a dictionary with the data needed to run phonopy:
             supercells matrix, primitive matrix and q-points mesh.
-    :param force_constants:
+    :param force_constants: ForceConstantsData object containing the 2nd order force constants
+    :param nac_data: ArrayData object from a single point calculation data containing dielectric tensor and Born charges
     :return: phonopy thermal properties and DOS
     """
 
@@ -217,8 +255,10 @@ def get_properties_from_phonopy(structure, phonopy_input, force_constants, nac):
 
     phonon.set_force_constants(force_constants.get_array())
 
-    if nac is not None:
-        phonon.set_nac_params(nac.get_born_parameters_phonopy(phonon))
+    if nac_data is not None:
+        phonon.set_nac_params(get_born_parameters(phonon,
+                                                  nac_data.get_array('born_charges'),
+                                                  nac_data.get_array('epsilon')))
 
     # Normalization factor primitive to unit cell
     normalization_factor = phonon.unitcell.get_number_of_atoms()/phonon.primitive.get_number_of_atoms()
@@ -402,10 +442,7 @@ class FrozenPhonon(WorkChain):
             force_constants = self.ctx.phonopy_output.out.force_constants
 
         if 'born_charges' in self.ctx:
-            from aiida.orm.data.born_charges import BornChargesData
-            born_charges = BornChargesData(epsilon=self.ctx.born_charges.out.output_array.get_array('epsilon'),
-                            born_charges=self.ctx.born_charges.out.output_array.get_array('born_charges'))
-
+            born_charges = self.ctx.born_charges.out.output_array
         else:
             born_charges = None
 
