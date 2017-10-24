@@ -16,6 +16,7 @@ from aiida.orm.data.band_structure import BandStructureData
 from aiida.orm.data.phonon_dos import PhononDosData
 
 from aiida.workflows.wc_optimize import OptimizeStructure
+from aiida.work.workchain import _If, _While
 
 import numpy as np
 from generate_inputs import *
@@ -295,7 +296,10 @@ class FrozenPhonon(WorkChain):
         spec.input("optimize", valid_type=Bool, required=False, default=Bool(True))
         spec.input("pressure", valid_type=Float, required=False, default=Float(0.0))
 
-        spec.outline(cls.optimize, cls.create_displacement_calculations, cls.get_force_constants, cls.calculate_phonon_properties)
+        spec.outline(_If(cls.use_optimize)(cls.optimize), cls.create_displacement_calculations, cls.get_force_constants, cls.calculate_phonon_properties)
+
+    def use_optimize(self):
+        return self.ctx.input.optimize
 
     def optimize(self):
 
