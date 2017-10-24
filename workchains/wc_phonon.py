@@ -193,14 +193,14 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
     from phonopy.structure.symmetry import Symmetry
     from phonopy.interface import get_default_physical_units
 
-    print ('inside born parameters')
+    # print ('inside born parameters')
     pmat = phonon.get_primitive_matrix()
     smat = phonon.get_supercell_matrix()
     ucell = phonon.get_unitcell()
 
-    print pmat
-    print smat
-    print ucell
+    # print pmat
+    # print smat
+    # print ucell
 
     num_atom = len(born_charges)
     assert num_atom == ucell.get_number_of_atoms(), \
@@ -221,7 +221,7 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
 
     born_dict = {'born': reduced_borns, 'dielectric': epsilon, 'factor': factor}
 
-    print ('final born dict', born_dict)
+    # print ('final born dict', born_dict)
 
     return born_dict
 
@@ -331,7 +331,7 @@ class FrozenPhonon(WorkChain):
                         pressure=self.inputs.pressure,
                         )
         # For testing
-        testing = True
+        testing = False
         if testing:
             self.ctx._content['optimize'] = load_node(88)
             return
@@ -357,7 +357,7 @@ class FrozenPhonon(WorkChain):
         calcs = {}
 
         # Load data from nodes
-        testing = True
+        testing = False
         if testing:
             from aiida.orm import load_node
             nodes = [111, 116, 121, 126] # LAMMPS
