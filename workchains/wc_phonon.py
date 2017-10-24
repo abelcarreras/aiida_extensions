@@ -7,13 +7,8 @@ if not is_dbenv_loaded():
 from aiida.work.workchain import WorkChain, ToContext
 from aiida.work.workfunction import workfunction
 
-from aiida.work.run import run, submit, async
 from aiida.orm import Code, CalculationFactory, load_node, DataFactory
-from aiida.orm.data.parameter import ParameterData
-from aiida.orm.data.array import ArrayData
-from aiida.orm.data.structure import StructureData
-from aiida.orm.data.array.kpoints import KpointsData
-from aiida.orm.data.upf import UpfData
+
 from aiida.orm.data.base import Str, Float, Bool
 from aiida.orm.data.force_sets import ForceSets
 from aiida.orm.data.force_constants import ForceConstants
@@ -125,7 +120,7 @@ def create_forces_set(**kwargs):
 @workfunction
 def get_force_constants_from_phonopy(**kwargs):
     """
-    Calculate the force constants using phonopy
+    Calculate the force constants locally using phonopy
     :param kwargs:
     :return: phonopy force constants
     """
@@ -185,8 +180,6 @@ def get_path_using_seekpath(structure, band_resolution=30):
 
     return band_structure
 
-    #return {'ranges': bands,
-    #        'labels': path_data['path']}
 
 def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
     from phonopy.structure.cells import get_primitive, get_supercell
@@ -197,10 +190,6 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
     pmat = phonon.get_primitive_matrix()
     smat = phonon.get_supercell_matrix()
     ucell = phonon.get_unitcell()
-
-    # print pmat
-    # print smat
-    # print ucell
 
     num_atom = len(born_charges)
     assert num_atom == ucell.get_number_of_atoms(), \
@@ -221,8 +210,6 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
 
     born_dict = {'born': reduced_borns, 'dielectric': epsilon, 'factor': factor}
 
-    # print ('final born dict', born_dict)
-
     return born_dict
 
 
@@ -241,8 +228,6 @@ def get_properties_from_phonopy(structure, phonopy_input, force_constants, nac_d
     from phonopy.structure.atoms import Atoms as PhonopyAtoms
     from phonopy import Phonopy
 
-
-   # Generate phonopy phonon object
     bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
                         positions=[site.position for site in structure.sites],
                         cell=structure.cell)
@@ -263,27 +248,18 @@ def get_properties_from_phonopy(structure, phonopy_input, force_constants, nac_d
     # Normalization factor primitive to unit cell
     normalization_factor = phonon.unitcell.get_number_of_atoms()/phonon.primitive.get_number_of_atoms()
 
+    # DOS
     phonon.set_mesh(phonopy_input['mesh'], is_eigenvectors=True, is_mesh_symmetry=False)
     phonon.set_total_DOS()
     phonon.set_partial_DOS()
 
-    # get DOS (normalized to unit cell)
-    total_dos = phonon.get_total_DOS()*normalization_factor
-    partial_dos = phonon.get_partial_DOS()*normalization_factor
-
-    # Stores DOS data in DB as a workflow result
+    total_dos = phonon.get_total_DOS()
+    partial_dos = phonon.get_partial_DOS()
 
     dos = PhononDosData(frequencies=total_dos[0],
-                        dos=total_dos[1],
-                        partial_dos=partial_dos[1],
+                        dos=total_dos[1]*normalization_factor,
+                        partial_dos=partial_dos[1]*normalization_factor,
                         atom_labels=np.array(phonon.primitive.symbols))
-
-    #dos = ArrayData()
-    #dos.set_array('frequency',total_dos[0])
-    #dos.set_array('total_dos',total_dos[1])
-    #dos.set_array('partial_dos',partial_dos[1])
-    #dos.set_array('partial_symbols', np.array(phonon.primitive.symbols))
-
 
     #THERMAL PROPERTIES (per primtive cell)
     phonon.set_thermal_properties()

@@ -143,9 +143,8 @@ if False:
                   'max_iterations': 500000}
 
     settings_dict = {'code': {'optimize': 'lammps_optimize@boston',
-                              'forces': 'lammps_force@boston',
-                              'born_charges': 'vasp544mpi@boston'},
-    'parameters': parameters,
+                              'forces': 'lammps_force@boston'},
+                     'parameters': parameters,
                      'potential': potential}
 
     es_settings = ParameterData(dict=settings_dict)
