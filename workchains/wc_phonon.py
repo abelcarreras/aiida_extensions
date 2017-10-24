@@ -299,7 +299,7 @@ class FrozenPhonon(WorkChain):
         spec.outline(_If(cls.use_optimize)(cls.optimize), cls.create_displacement_calculations, cls.get_force_constants, cls.calculate_phonon_properties)
 
     def use_optimize(self):
-        return self.ctx.inputs.optimize
+        return self.inputs.optimize
 
     def optimize(self):
 
