@@ -349,10 +349,10 @@ class FrozenPhonon(WorkChain):
         else:
             structure = self.inputs.structure
 
-        structures = create_supercells_with_displacements_using_phonopy(structure, self.inputs.ph_settings)
+        supercells = create_supercells_with_displacements_using_phonopy(structure, self.inputs.ph_settings)
 
-        self.ctx.data_sets = structures.pop('data_sets')
-        self.ctx.number_of_displacements = len(structures)
+        self.ctx.data_sets = supercells.pop('data_sets')
+        self.ctx.number_of_displacements = len(supercells)
 
         calcs = {}
 
@@ -360,7 +360,7 @@ class FrozenPhonon(WorkChain):
         testing = False
         if testing:
             from aiida.orm import load_node
-            nodes = [111, 116, 121, 126] # LAMMPS
+            nodes = [111, 116, 121, 126]  # VASP
             labels = ['structure_1', 'structure_0', 'structure_3', 'structure_2']
             for pk, label in zip(nodes, labels):
                 future = load_node(pk)
@@ -369,14 +369,14 @@ class FrozenPhonon(WorkChain):
             self.ctx._content['born_charges'] = load_node(752)
             return
 
-        for label, structure in structures.iteritems():
+        for label, supercell in supercells.iteritems():
             # print label, structure
 
             print self.inputs.es_settings.dict.code
 
             # plugin = self.inputs.code.get_attr('input_plugin')
 
-            JobCalculation, calculation_input = generate_inputs(structure,
+            JobCalculation, calculation_input = generate_inputs(supercell,
                                                                 self.inputs.machine,
                                                                 self.inputs.es_settings,
                                                                 #pressure=self.input.pressure,
