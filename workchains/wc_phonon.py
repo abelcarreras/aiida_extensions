@@ -322,7 +322,7 @@ class FrozenPhonon(WorkChain):
 
     def create_displacement_calculations(self):
         print 'create displacements'
-        print self.ctx._get_dict()
+        # print self.ctx._get_dict()
 
         if 'optimized' in self.ctx:
             structure = self.ctx.optimized.out.optimized_structure
