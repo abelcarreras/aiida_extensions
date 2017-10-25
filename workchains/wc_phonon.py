@@ -242,6 +242,7 @@ def get_properties_from_phonopy(structure, ph_settings, force_constants, data_se
     phonon.set_force_constants(force_constants.get_array())
 
     if data_sets.epsilon_and_born_exist():
+        print ('use born charges')
         phonon.set_nac_params(get_born_parameters(phonon,
                                                   data_sets.get_born_charges(),
                                                   data_sets.get_epsilon()))
@@ -363,7 +364,7 @@ class PhononPhonopy(WorkChain):
                 future = load_node(pk)
                 self.ctx._content[label] = future
 
-            #self.ctx._content['born_charges'] = load_node(752)
+            self.ctx._content['born_charges'] = load_node(752)
             return
 
         for label, supercell in supercells.iteritems():
