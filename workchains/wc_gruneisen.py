@@ -108,6 +108,14 @@ class GruneisenPhonopy(WorkChain):
 
         print 'start create cell expansions'
 
+        # For testing
+        testing = True
+        if testing:
+            self.ctx._content['plus'] = load_node(2381)
+            self.ctx._content['origin'] = load_node(2378)
+            self.ctx._content['minus'] = load_node(2384)
+            return
+
         calcs = {}
         for expansions in {'plus': float(self.inputs.stress_displacement),
                            'origin': 0.0,
@@ -133,7 +141,8 @@ class GruneisenPhonopy(WorkChain):
 
         gruneisen_results = phonopy_gruneisen(phonon_plus=self.ctx.plus,
                                               phonon_minus=self.ctx.minus,
-                                              phonon_origin=self.ctx.origin)
+                                              phonon_origin=self.ctx.origin,
+                                              ph_settings=self.inputs.ph_settings)
 
         self.out('band_structure', gruneisen_results['band_structure'])
         self.out('mesh', gruneisen_results['mesh'])
