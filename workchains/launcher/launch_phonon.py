@@ -119,7 +119,7 @@ if False:
 
 
 # LAMMPS SPECIFIC
-if False:
+if True:
     # GaN Tersoff potentials parameters (can be readed from a file if needed)
     tersoff_gan = {
         'Ga Ga Ga': '1.0 0.007874 1.846 1.918000 0.75000 -0.301300 1.0 1.0 1.44970 410.132 2.87 0.15 1.60916 535.199',
@@ -161,7 +161,7 @@ machine = ParameterData(dict=machine_dict)
 
 from aiida.workflows.wc_phonon import PhononPhonopy
 
-if False:
+if True:
     result = run(PhononPhonopy,
                  structure=structure,
                  machine=machine,
