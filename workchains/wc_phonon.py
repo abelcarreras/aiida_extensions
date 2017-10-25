@@ -141,10 +141,10 @@ def get_force_constants_from_phonopy(structure, ph_settings, force_sets):
                         cell=structure.cell)
 
     phonon = Phonopy(bulk,
-                     ph_settings['supercell'],
-                     primitive_matrix=ph_settings['primitive'])
+                     ph_settings.dict.supercell,
+                     primitive_matrix=ph_settings.dict.primitive)
 
-    phonon.generate_displacements(distance=ph_settings['distance'])
+    phonon.generate_displacements(distance=ph_settings.dict.distance)
 
     # Build data_sets from forces of supercells with displacments
     phonon.set_displacement_dataset(force_sets.get_force_sets())
@@ -212,11 +212,11 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
 
 
 @workfunction
-def get_properties_from_phonopy(structure, phonopy_input, force_constants, nac_data):
+def get_properties_from_phonopy(structure, ph_settings, force_constants, nac_data):
     """
     Calculate DOS and thermal properties using phonopy (locally)
-    :param structure: Aiida StructureData Object
-    :param phonopy_input: Aiida Parametersdata object containing a dictionary with the data needed to run phonopy:
+    :param structure: StructureData Object
+    :param ph_settings: Parametersdata object containing a dictionary with the data needed to run phonopy:
             supercells matrix, primitive matrix and q-points mesh.
     :param force_constants: ForceConstantsData object containing the 2nd order force constants
     :param nac_data: ArrayData object from a single point calculation data containing dielectric tensor and Born charges
@@ -230,11 +230,9 @@ def get_properties_from_phonopy(structure, phonopy_input, force_constants, nac_d
                         positions=[site.position for site in structure.sites],
                         cell=structure.cell)
 
-    phonopy_input = phonopy_input.get_dict()
-
     phonon = Phonopy(bulk,
-                     phonopy_input['supercell'],
-                     primitive_matrix=phonopy_input['primitive'])
+                     ph_settings.dict.supercell,
+                     primitive_matrix=ph_settings.dict.primitive)
 
     phonon.set_force_constants(force_constants.get_array())
 
@@ -247,7 +245,7 @@ def get_properties_from_phonopy(structure, phonopy_input, force_constants, nac_d
     normalization_factor = phonon.unitcell.get_number_of_atoms()/phonon.primitive.get_number_of_atoms()
 
     # DOS
-    phonon.set_mesh(phonopy_input['mesh'], is_eigenvectors=True, is_mesh_symmetry=False)
+    phonon.set_mesh(ph_settings.dict.mesh, is_eigenvectors=True, is_mesh_symmetry=False)
     phonon.set_total_DOS()
     phonon.set_partial_DOS()
 
@@ -259,7 +257,7 @@ def get_properties_from_phonopy(structure, phonopy_input, force_constants, nac_d
                         partial_dos=partial_dos[1]*normalization_factor,
                         atom_labels=np.array(phonon.primitive.symbols))
 
-    #THERMAL PROPERTIES (per primtive cell)
+    # THERMAL PROPERTIES (per primtive cell)
     phonon.set_thermal_properties()
     t, free_energy, entropy, cv = phonon.get_thermal_properties()
 
