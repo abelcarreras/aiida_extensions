@@ -106,7 +106,7 @@ class GruneisenPhonopy(WorkChain):
 
     def create_unit_cell_expansions(self):
 
-        print 'start optimize'
+        print 'start create cell expansions'
 
         calcs = {}
         for expansions in {'plus': self.inputs.stress_displacement,
@@ -128,6 +128,8 @@ class GruneisenPhonopy(WorkChain):
         return ToContext(**calcs)
 
     def calculate_gruneisen(self):
+
+        print 'calculate gruneisen'
 
         gruneisen_results = phonopy_gruneisen(phonon_plus=self.ctx.plus,
                                               phonon_minus=self.ctx.minus,
