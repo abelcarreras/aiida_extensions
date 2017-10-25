@@ -339,6 +339,8 @@ class PhononPhonopy(WorkChain):
 
     def create_displacement_calculations(self):
         print 'create displacements'
+        self.report('create displacements')
+
         # print self.ctx._get_dict()
 
         if 'optimized' in self.ctx:
@@ -383,10 +385,13 @@ class PhononPhonopy(WorkChain):
             calculation_input._label = label
             future = submit(JobCalculation, **calculation_input)
             print label, future.pid
+            self.report('{} pk = {}'.format(label, future.pid))
+
             calcs[label] = future
 
         # Born charges
         if 'born_charges' in self.inputs.es_settings.dict.code:
+            self.report('calculate born charges')
             JobCalculation, calculation_input = generate_inputs(self.ctx.final_structure,
                                                                 self.inputs.machine,
                                                                 self.inputs.es_settings,
@@ -401,6 +406,7 @@ class PhononPhonopy(WorkChain):
     def get_force_constants(self):
 
         print 'calculate force constants'
+        self.report('calculate force constants')
 
         wf_inputs = {}
         for i in range(self.ctx.number_of_displacements):
