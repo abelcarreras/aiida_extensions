@@ -109,9 +109,9 @@ class GruneisenPhonopy(WorkChain):
         print 'start create cell expansions'
 
         calcs = {}
-        for expansions in {'plus': self.inputs.stress_displacement,
+        for expansions in {'plus': float(self.inputs.stress_displacement),
                            'origin': 0.0,
-                           'minus': -self.inputs.stress_displacement}.items():
+                           'minus': -float(self.inputs.stress_displacement)}.items():
 
             future = submit(PhononPhonopy,
                             structure=self.inputs.structure,
