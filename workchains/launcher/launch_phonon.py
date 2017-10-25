@@ -159,10 +159,10 @@ machine_dict = {'resources': {'num_machines': 1,
 
 machine = ParameterData(dict=machine_dict)
 
-from aiida.workflows.wc_phonon import FrozenPhonon
+from aiida.workflows.wc_phonon import PhononPhonopy
 
 if False:
-    result = run(FrozenPhonon,
+    result = run(PhononPhonopy,
                  structure=structure,
                  machine=machine,
                  es_settings=es_settings,
@@ -174,7 +174,7 @@ if False:
 
     print (result)
 else:
-    future = submit(FrozenPhonon,
+    future = submit(PhononPhonopy,
                     structure=structure,
                     machine=machine,
                     es_settings=es_settings,
