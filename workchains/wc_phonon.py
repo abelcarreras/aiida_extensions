@@ -123,7 +123,7 @@ def create_forces_set(**kwargs):
 
 
 @workfunction
-def get_force_constants_from_phonopy(**kwargs):
+def get_force_constants_from_phonopy(structure, ph_settings, force_sets):
     """
     Calculate the force constants locally using phonopy
 
@@ -135,20 +135,16 @@ def get_force_constants_from_phonopy(**kwargs):
     from phonopy.structure.atoms import Atoms as PhonopyAtoms
     from phonopy import Phonopy
 
-    structure = kwargs.pop('structure')
-    phonopy_input = kwargs.pop('phonopy_input').get_dict()
-    force_sets = kwargs.pop('force_sets')
-
     # Generate phonopy phonon object
     bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
                         positions=[site.position for site in structure.sites],
                         cell=structure.cell)
 
     phonon = Phonopy(bulk,
-                     phonopy_input['supercell'],
-                     primitive_matrix=phonopy_input['primitive'])
+                     ph_settings['supercell'],
+                     primitive_matrix=ph_settings['primitive'])
 
-    phonon.generate_displacements(distance=phonopy_input['distance'])
+    phonon.generate_displacements(distance=ph_settings['distance'])
 
     # Build data_sets from forces of supercells with displacments
     phonon.set_displacement_dataset(force_sets.get_force_sets())
