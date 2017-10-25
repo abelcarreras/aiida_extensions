@@ -16,7 +16,7 @@ class ForceConstants(Data):
         properties for efficiency reasons).
         :param name: The name of the array.
         """
-        return tuple(self.get_attr("shape"))
+        return self.get_attr("shape")
 
     def get_array(self):
         """
