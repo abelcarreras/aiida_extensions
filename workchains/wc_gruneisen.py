@@ -138,6 +138,7 @@ class GruneisenPhonopy(WorkChain):
     def calculate_gruneisen(self):
 
         print 'calculate gruneisen'
+        print self.ctx.plus, self.ctx.minus, self.ctx.origin
 
         gruneisen_results = phonopy_gruneisen(phonon_plus=self.ctx.plus,
                                               phonon_minus=self.ctx.minus,
