@@ -16,6 +16,13 @@ class BandStructureData(Data):
         else:
             return None
 
+    def get_number_of_points(self):
+
+        if 'npoints' in self.get_attrs():
+            return self.get_attr('npoints')
+        else:
+            return None
+
 
     def set_bands(self, ranges):
 
@@ -24,8 +31,6 @@ class BandStructureData(Data):
 
         ranges = numpy.array(ranges)
 
-
-
         with tempfile.NamedTemporaryFile() as f:
             numpy.save(f, ranges)
             f.flush()  # Important to flush here, otherwise the next copy command
@@ -33,6 +38,7 @@ class BandStructureData(Data):
             self.add_path(f.name, 'band_ranges.npy')
 
         self._set_attr('nbands', len(ranges))
+        self._set_attr('npoints', len(ranges[0]))
 
     def set_labels(self, band_labels):
 
@@ -52,27 +58,35 @@ class BandStructureData(Data):
         import tempfile
         import numpy
 
-        q_points = numpy.array(band_structure_phonopy[0])
-        distances = numpy.array(band_structure_phonopy[1])
-        frequencies = numpy.array(band_structure_phonopy[2])
+        for element in {'q_points.npy': numpy.array(band_structure_phonopy[0]),
+                        'distances.npy': numpy.array(band_structure_phonopy[1]),
+                        'frequencies.npy':numpy.array(band_structure_phonopy[2]),
+                        }.items():
 
-        with tempfile.NamedTemporaryFile() as f:
-            numpy.save(f, q_points)
-            f.flush()  # Important to flush here, otherwise the next copy command
-            # will just copy an empty file
-            self.add_path(f.name, 'q_points.npy')
+            with tempfile.NamedTemporaryFile() as f:
+                numpy.save(f, element[1])
+                f.flush()  # Important to flush here, otherwise the next copy command
+                # will just copy an empty file
+                self.add_path(f.name, element[0])
 
-        with tempfile.NamedTemporaryFile() as f:
-            numpy.save(f, distances)
-            f.flush()  # Important to flush here, otherwise the next copy command
-            # will just copy an empty file
-            self.add_path(f.name, 'distances.npy')
+    def set_band_structure_guneisen(self, band_structure_gruneisen):
 
-        with tempfile.NamedTemporaryFile() as f:
-            numpy.save(f, frequencies)
-            f.flush()  # Important to flush here, otherwise the next copy command
-            # will just copy an empty file
-            self.add_path(f.name, 'frequencies.npy')
+        import tempfile
+        import numpy
+
+        for element in {'q_points.npy': numpy.array([band[0] for band in band_structure_gruneisen._paths]),
+                        'distances.npy': numpy.array([band[1] for band in band_structure_gruneisen._paths]),
+                        'gamma.npy': numpy.array([band[2] for band in band_structure_gruneisen._paths]),
+                        'eigenvalues.npy': numpy.array([band[3] for band in band_structure_gruneisen._paths]),
+                        'frequencies.npy': numpy.array([band[4] for band in band_structure_gruneisen._paths]),
+                        'distances_with_shift.npy': numpy.array([band[5] for band in band_structure_gruneisen._paths])
+                        }.items():
+
+            with tempfile.NamedTemporaryFile() as f:
+                numpy.save(f, element[1])
+                f.flush()  # Important to flush here, otherwise the next copy command
+                # will just copy an empty file
+                self.add_path(f.name, element[0])
 
     def get_q_points(self, band=None):
         """
@@ -87,7 +101,6 @@ class BandStructureData(Data):
             array = array[band]
 
         return array
-
 
     def get_distances(self, band=None):
         """
@@ -116,6 +129,49 @@ class BandStructureData(Data):
             array = array[band]
 
         return array
+
+    def get_gamma(self, band=None):
+        """
+        Return the frequencies in the node as a numpy array
+        """
+        import numpy
+
+        fname = 'gamma.npy'
+
+        array = numpy.load(self.get_abs_path(fname))
+        if band is not None:
+            array = array[band]
+
+        return array
+
+    def get_eigenvalues(self, band=None):
+        """
+        Return the frequencies in the node as a numpy array
+        """
+        import numpy
+
+        fname = 'eigenvalues.npy'
+
+        array = numpy.load(self.get_abs_path(fname))
+        if band is not None:
+            array = array[band]
+
+        return array
+
+    def get_distances_with_shift(self, band=None):
+        """
+        Return the frequencies in the node as a numpy array
+        """
+        import numpy
+
+        fname = 'distances_with_shift.npy'
+
+        array = numpy.load(self.get_abs_path(fname))
+        if band is not None:
+            array = array[band]
+
+        return array
+
 
     def get_bands(self, band=None):
         """

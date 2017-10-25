@@ -342,11 +342,12 @@ class PhononPhonopy(WorkChain):
         # print self.ctx._get_dict()
 
         if 'optimized' in self.ctx:
-            structure = self.ctx.optimized.out.optimized_structure
+            self.ctx.final_structure = self.ctx.optimized.out.optimized_structure
         else:
-            structure = self.inputs.structure
+            self.ctx.final_structure = self.inputs.structure
 
-        supercells = create_supercells_with_displacements_using_phonopy(structure, self.inputs.ph_settings)
+        supercells = create_supercells_with_displacements_using_phonopy(self.ctx.final_structure,
+                                                                        self.inputs.ph_settings)
 
         self.ctx.data_sets = supercells.pop('data_sets')
         self.ctx.number_of_displacements = len(supercells)
@@ -386,7 +387,7 @@ class PhononPhonopy(WorkChain):
 
         # Born charges
         if 'born_charges' in self.inputs.es_settings.dict.code:
-            JobCalculation, calculation_input = generate_inputs(structure,
+            JobCalculation, calculation_input = generate_inputs(self.ctx.final_structure,
                                                                 self.inputs.machine,
                                                                 self.inputs.es_settings,
                                                                 #pressure=self.input.pressure,
@@ -412,7 +413,7 @@ class PhononPhonopy(WorkChain):
             print ('remote phonopy FC calculation')
             code_label = self.inputs.ph_settings.get_dict()['code']
             JobCalculation, calculation_input = generate_phonopy_params(code=Code.get_from_string(code_label),
-                                                                        structure=self.inputs.structure,
+                                                                        structure=self.ctx.final_structure,
                                                                         ph_settings=self.inputs.ph_settings,
                                                                         machine=self.inputs.machine,
                                                                         force_sets=self.ctx.force_sets)
@@ -422,7 +423,7 @@ class PhononPhonopy(WorkChain):
             return ToContext(phonopy_output=future)
         else:
             print ('local phonopy FC calculation')
-            self.ctx.phonopy_output = get_force_constants_from_phonopy(structure=self.inputs.structure,
+            self.ctx.phonopy_output = get_force_constants_from_phonopy(structure=self.ctx.final_structure,
                                                                        ph_settings=self.inputs.ph_settings,
                                                                        force_sets=self.ctx.force_sets)
 
@@ -451,5 +452,6 @@ class PhononPhonopy(WorkChain):
         self.out('thermal_properties', phonon_properties['thermal_properties'])
         self.out('dos', phonon_properties['dos'])
         self.out('band_structure', phonon_properties['band_structure'])
+        self.out('final_structure', self.ctx.final_structure)
 
         return
