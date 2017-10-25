@@ -6,7 +6,7 @@ if not is_dbenv_loaded():
 
 from aiida.work.workchain import WorkChain, ToContext
 
-from aiida.orm.data.base import Str, Float, Bool
+from aiida.orm.data.base import Str, Float, Bool, Int
 from aiida.work.workchain import _If, _While
 
 import numpy as np
@@ -14,7 +14,7 @@ from generate_inputs import *
 
 class OptimizeStructure(WorkChain):
     """
-    Workflow to calculate the force constants and phonon properties using phonopy
+    Workchain to do crystal structure optimization and ensure proper convergence
     """
 
     @classmethod
@@ -27,6 +27,7 @@ class OptimizeStructure(WorkChain):
         spec.input("pressure", valid_type=Float, required=False, default=Float(0.0))
         spec.input("tolerance_forces", valid_type=Float, required=False, default=Float(1e-5))
         spec.input("tolerance_stress", valid_type=Float, required=False, default=Float(1e-2))
+        spec.input("max_iterations", valid_type=Int, required=False, default=Int(10))
 
         spec.outline(cls.optimize_cycle, _While(cls.not_converged)(cls.optimize_cycle), cls.get_data)
 
@@ -54,9 +55,19 @@ class OptimizeStructure(WorkChain):
 
         self.report('Not converged: F:{} S:{}'.format(not_converged_forces, not_converged_stress))
 
+        # Check max optimizations
+        if self.ctx.counter > self.inputs.max_iterations:
+            self.report('Max optimization iterations reached')
+            return False
+
         return True
 
     def optimize_cycle(self):
+
+        if not 'counter' in self.ctx:
+            self.ctx.counter = 0
+
+        self.ctx.counter +=1
 
         # self.ctx._get_dict()
         print 'start optimization'

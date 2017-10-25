@@ -21,20 +21,18 @@ from aiida.work.workchain import _If, _While
 import numpy as np
 from generate_inputs import *
 
-PwCalculation = CalculationFactory('quantumespresso.pw')
-PhonopyCalculation = CalculationFactory('phonopy')
-
-def generate_phonopy_params(code, structure, parameters, machine, force_sets):
+def generate_phonopy_params(code, structure, ph_settings, machine, force_sets):
     """
     Generate inputs parameters needed to do a remote phonopy calculation
-    :param code: AiiDA Code object
-    :param structure: AiiDA StructureData Object
-    :param parameters: AiiDA ParametersData object containing a dictionary with the data neede to run a phonopy
-                       calculation: supercell matrix, primitive matrix, displacement, distance and mesh
-    :param machine: AiiDA ParametersData object containing a dictionary with the computational resources information
-    :param force_sets: AiiDA ParametersData object containing the collected forces and displacement information
+
+    :param code: Code object of phonopy
+    :param structure: StructureData Object that constains the crystal structure unit cell
+    :param ph_settings: ParametersData object containing a dictionary with the phonopy input data
+    :param machine: ParametersData object containing a dictionary with the computational resources information
+    :param force_sets: ForceSetssData object containing the atomic forces and displacement information
     :return: Calculation process object, input dictionary
     """
+    PhonopyCalculation = CalculationFactory('phonopy')
 
     # The inputs
     inputs = PhonopyCalculation.process().get_inputs_template()
@@ -46,7 +44,7 @@ def generate_phonopy_params(code, structure, parameters, machine, force_sets):
     inputs.structure = structure
 
     # parameters
-    inputs.parameters = parameters
+    inputs.parameters = ph_settings
 
     # resources
     inputs._options.resources = machine.dict.resources
@@ -61,12 +59,12 @@ def generate_phonopy_params(code, structure, parameters, machine, force_sets):
 @workfunction
 def create_supercells_with_displacements_using_phonopy(structure, phonopy_input):
     """
-    Create the supercells with the displacements to use the finite displacements methodology to calculate the
-    force constants
-    :param structure: AiiDa StructureData object
-    :param phonopy_input: AiiDa ParametersData object containing a dictionary with the data needed to run phonopy:
-            supercells matrix, primitive matrix and displacement distance.
-    :return: dictionary of AiiDa StructureData Objects containing the cells with displacements
+    Use phonopy to create the supercells with displacements to calculate the force constants by using
+    finite displacements methodology
+
+    :param structure: StructureData object
+    :param phonopy_input: ParametersData object containing a dictionary with the data needed for phonopy
+    :return: A set of StructureData Objects containing the supercells with displacements
     """
     from phonopy.structure.atoms import Atoms as PhonopyAtoms
     from phonopy import Phonopy
@@ -103,8 +101,14 @@ def create_supercells_with_displacements_using_phonopy(structure, phonopy_input)
 
 @workfunction
 def create_forces_set(**kwargs):
-    # Build data_sets from forces of supercells with displacments
+    """
+    Build data_sets from forces of supercells with displacments
 
+    :param forces_X: ArrayData objects that contain the atomic forces for each supercell with displacement, respectively (X is integer)
+    :param data_sets: ForceSetsData object that contains the displacements info (This info should match with forces_X)
+    :return: ForceSetsData object that contains the atomic forces and displacements info (datasets dict in phonopy)
+
+    """
     data_sets = kwargs.pop('data_sets')
 
     force_sets = ForceSets(data_sets=data_sets.get_data_sets())
@@ -122,20 +126,20 @@ def create_forces_set(**kwargs):
 def get_force_constants_from_phonopy(**kwargs):
     """
     Calculate the force constants locally using phonopy
-    :param kwargs:
-    :return: phonopy force constants
-    """
 
+    :param structure:
+    :param phonopy_input: ParameterData object that contains phonopy settings
+    :param force_sets: ForceSetsData object that contains the atomic forces and displacements info (datasets dict in phonopy)
+    :return: ForceConstantsData object containing the 2nd order force constants calculated with phonopy
+    """
     from phonopy.structure.atoms import Atoms as PhonopyAtoms
     from phonopy import Phonopy
-    import numpy as np
-    # print 'function',kwargs
 
     structure = kwargs.pop('structure')
     phonopy_input = kwargs.pop('phonopy_input').get_dict()
     force_sets = kwargs.pop('force_sets')
 
- # Generate phonopy phonon object
+    # Generate phonopy phonon object
     bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
                         positions=[site.position for site in structure.sites],
                         cell=structure.cell)
@@ -146,14 +150,11 @@ def get_force_constants_from_phonopy(**kwargs):
 
     phonon.generate_displacements(distance=phonopy_input['distance'])
 
- # Build data_sets from forces of supercells with displacments
+    # Build data_sets from forces of supercells with displacments
     phonon.set_displacement_dataset(force_sets.get_force_sets())
     phonon.produce_force_constants()
 
-    #force_constants = phonon.get_force_constants()
-
     array_force_constants = ForceConstants(array=phonon.get_force_constants())
-    #array_data.set_array('force_constants', force_constants)
 
     return {'force_constants': array_force_constants}
 
@@ -280,14 +281,30 @@ def get_properties_from_phonopy(structure, phonopy_input, force_constants, nac_d
 
     return {'thermal_properties': thermal_properties, 'dos': dos, 'band_structure': band_structure}
 
-class FrozenPhonon(WorkChain):
+class PhononPhonopy(WorkChain):
     """
-    Workflow to calculate the force constants and phonon properties using phonopy
-    """
+    Workchain to do a phonon calculation using phonopy
 
+    :param structure: StructureData object that contains the crystal structure unit cell
+    :param ph_settings: ParametersData object that contains a dictionary with the data needed to run phonopy:
+                                  'supercell': [[2,0,0],
+                                                [0,2,0],
+                                                [0,0,2]],
+                                  'primitive': [[1.0, 0.0, 0.0],
+                                                [0.0, 1.0, 0.0],
+                                                [0.0, 0.0, 1.0]],
+                                  'distance': 0.01,
+                                  'mesh': [40, 40, 40],
+                                  # 'code': 'phonopy@boston'  # include this to run phonopy remotely otherwise run phonopy localy
+
+    :param es_settings: ParametersData object that contains a dictionary with the setting needed to calculate the electronic structure.
+                        The structure of this dictionary strongly depends on the software (VASP, QE, LAMMPS, ...)
+    :param optimize: Set true to perform a crystal structure optimization before the phonon calculation (default: True)
+    :param pressure: Set the external pressure (stress tensor) at which the optimization is performed in KBar (default: 0)
+    """
     @classmethod
     def define(cls, spec):
-        super(FrozenPhonon, cls).define(spec)
+        super(PhononPhonopy, cls).define(spec)
         spec.input("structure", valid_type=StructureData)
         spec.input("machine", valid_type=ParameterData)
         spec.input("ph_settings", valid_type=ParameterData)
@@ -396,7 +413,7 @@ class FrozenPhonon(WorkChain):
             code_label = self.inputs.ph_settings.get_dict()['code']
             JobCalculation, calculation_input = generate_phonopy_params(code=Code.get_from_string(code_label),
                                                                         structure=self.inputs.structure,
-                                                                        parameters=self.inputs.ph_settings,
+                                                                        ph_settings=self.inputs.ph_settings,
                                                                         machine=self.inputs.machine,
                                                                         force_sets=self.ctx.force_sets)
             future = submit(JobCalculation, **calculation_input)
@@ -406,7 +423,7 @@ class FrozenPhonon(WorkChain):
         else:
             print ('local phonopy FC calculation')
             self.ctx.phonopy_output = get_force_constants_from_phonopy(structure=self.inputs.structure,
-                                                                       phonopy_input=self.inputs.ph_settings,
+                                                                       ph_settings=self.inputs.ph_settings,
                                                                        force_sets=self.ctx.force_sets)
 
         return
