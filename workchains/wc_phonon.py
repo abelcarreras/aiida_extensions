@@ -114,7 +114,7 @@ def create_forces_set(**kwargs):
     force_sets = ForceSets(data_sets=data_sets.get_data_sets())
 
     if 'born_charges' in kwargs:
-        born_charges = kwargs.pop('data_sets')
+        born_charges = kwargs.pop('born_charges')
         force_sets.set_epsilon(born_charges.get_array('epsilon'))
         force_sets.set_born_charges(born_charges.get_array('born_charges'))
 
