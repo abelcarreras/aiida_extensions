@@ -15,7 +15,7 @@ import numpy as np
 
 # Set WorkChain GruneisenPhonopy PK number
 ########################
-wc = load_node(6019)
+wc = load_node(6047)
 ########################
 
 
