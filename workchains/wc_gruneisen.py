@@ -122,7 +122,7 @@ class GruneisenPhonopy(WorkChain):
                            'origin': 0.0,
                            'minus': -float(self.inputs.stress_displacement)}.items():
 
-            future = async(PhononPhonopy,
+            future = submit(PhononPhonopy,
                             structure=self.inputs.structure,
                             machine=self.inputs.machine,
                             ph_settings=self.inputs.ph_settings,
