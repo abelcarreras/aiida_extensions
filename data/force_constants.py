@@ -138,7 +138,7 @@ class ForceConstants(Data):
             self.add_path(f.name, fname)
 
 
-    def get_born_parameters(self, phonon, symprec=1e-5):
+    def get_nac_phonopy(self, phonon, symprec=1e-5):
 
         from phonopy.structure.cells import get_primitive, get_supercell
         from phonopy.structure.symmetry import Symmetry
