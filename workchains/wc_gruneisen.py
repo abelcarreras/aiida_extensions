@@ -133,7 +133,7 @@ class GruneisenPhonopy(WorkChain):
 
             calcs[expansions[0]] = future
             print ('phonon workchain: {} {}'.format(expansions[0], future.pid))
-            print calcs
+        print calcs
         exit()
         return ToContext(**calcs)
 
