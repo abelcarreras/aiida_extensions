@@ -106,7 +106,7 @@ class GruneisenPhonopy(WorkChain):
 
     def create_unit_cell_expansions(self):
 
-        print('start Gruneisen'.format(self.pid))
+        print('start Gruneisen {}'.format(self.pid))
         print 'start create cell expansions'
 
         # For testing
@@ -133,7 +133,8 @@ class GruneisenPhonopy(WorkChain):
 
             calcs[expansions[0]] = future
             print ('phonon workchain: {} {}'.format(expansions[0], future.pid))
-
+            print calcs
+        exit()
         return ToContext(**calcs)
 
     def calculate_gruneisen(self):
