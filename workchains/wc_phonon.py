@@ -372,7 +372,7 @@ class PhononPhonopy(WorkChain):
         for label, supercell in supercells.iteritems():
             # print label, structure
 
-            print self.inputs.es_settings.dict.code
+            #print self.inputs.es_settings.dict.code
 
             # plugin = self.inputs.code.get_attr('input_plugin')
 
