@@ -21,6 +21,9 @@ wc = load_node(6019)
 
 # Phonon Band structure
 bs = wc.out.band_structure
+
+print bs.get_frequencies().shape
+
 labels, label_positions = bs.get_formatted_labels_matplotlib()
 plt.rcParams.update({'mathtext.default': 'regular'})
 plt.xticks(label_positions, labels, rotation='horizontal')
