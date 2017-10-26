@@ -22,7 +22,7 @@ import numpy as np
 from generate_inputs import *
 
 
-def get_phonon(structure, force_constants, phonopy_input):
+def get_phonon(structure, force_constants, ph_settings):
     from phonopy.structure.atoms import Atoms as PhonopyAtoms
     from phonopy import Phonopy
 
@@ -32,10 +32,10 @@ def get_phonon(structure, force_constants, phonopy_input):
                         cell=structure.cell)
 
     phonon = Phonopy(bulk,
-                     phonopy_input['supercell'],
-                     primitive_matrix=phonopy_input['primitive'],
-                     distance=phonopy_input['distance'],
-                     symprec=phonopy_input['symmetry_precision'])
+                     ph_settings.dict.supercell,
+                     primitive_matrix=ph_settings.dict.primitive,
+                     distance=ph_settings.dict.distance,
+                     symprec=ph_settings.dict.symmetry_precision)
 
     phonon.set_force_constants(force_constants)
 
