@@ -155,9 +155,9 @@ class GruneisenPhonopy(WorkChain):
 
         gruneisen_results = phonopy_gruneisen(phonon_plus_structure=self.ctx.plus.out.final_structure,
                                               phonon_plus_fc=self.ctx.plus.out.force_constants,
-                                              phonon_minus_structure=self.ctx.minus.final_structure,
+                                              phonon_minus_structure=self.ctx.minus.out.final_structure,
                                               phonon_minus_fc=self.ctx.minus.out.force_constants,
-                                              phonon_origin_structure=self.ctx.origin.final_structure,
+                                              phonon_origin_structure=self.ctx.origin.out.final_structure,
                                               phonon_origin_fc=self.ctx.origin.out.force_constants,
                                               ph_settings=self.inputs.ph_settings)
 
