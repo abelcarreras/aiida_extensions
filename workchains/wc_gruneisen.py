@@ -34,7 +34,6 @@ def get_phonon(structure, force_constants, ph_settings):
     phonon = Phonopy(bulk,
                      ph_settings.dict.supercell,
                      primitive_matrix=ph_settings.dict.primitive,
-                     distance=ph_settings.dict.distance,
                      symprec=ph_settings.dict.symmetry_precision)
 
     phonon.set_force_constants(force_constants)
