@@ -187,6 +187,25 @@ class BandStructureData(Data):
 
         return array
 
+    def get_band_ranges(self, band=None):
+        """
+        Return the bands in the node as a numpy array
+        """
+        import numpy
+
+        fname = 'band_ranges.npy'
+
+        array = numpy.load(self.get_abs_path(fname))
+
+        band_ranges = numpy.array([ numpy.array([i.T[0],i.T[-1]]).T for i in array])
+
+        if band is not None:
+            band_ranges = band_ranges[band]
+
+        return band_ranges
+
+
+
     def get_labels(self, band=None):
         """
         Return the band labels in the node as a numpy array
