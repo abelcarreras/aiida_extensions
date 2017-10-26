@@ -137,14 +137,16 @@ class ForceConstants(Data):
             # will just copy an empty file
             self.add_path(f.name, fname)
 
-    def get_nac_phonopy(self, phonon, symprec=1e-5):
 
-        import numpy as np
+    def get_born_parameters(self, phonon, symprec=1e-5):
 
         from phonopy.structure.cells import get_primitive, get_supercell
         from phonopy.structure.symmetry import Symmetry
         from phonopy.interface import get_default_physical_units
 
+        import numpy as np
+
+        # print ('inside born parameters')
         pmat = phonon.get_primitive_matrix()
         smat = phonon.get_supercell_matrix()
         ucell = phonon.get_unitcell()
