@@ -106,6 +106,7 @@ class GruneisenPhonopy(WorkChain):
 
     def create_unit_cell_expansions(self):
 
+        print('start Gruneisen'.format(self.pid))
         print 'start create cell expansions'
 
         # For testing
@@ -137,7 +138,8 @@ class GruneisenPhonopy(WorkChain):
 
     def calculate_gruneisen(self):
 
-        print 'calculate gruneisen'
+        self.report('calculate gruneisen')
+        print ('calculate gruneisen')
         print self.ctx.plus, self.ctx.minus, self.ctx.origin
 
         gruneisen_results = phonopy_gruneisen(phonon_plus=self.ctx.plus,

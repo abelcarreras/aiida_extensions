@@ -436,10 +436,13 @@ class PhononPhonopy(WorkChain):
                                                                        ph_settings=self.inputs.ph_settings,
                                                                        force_sets=self.ctx.force_sets)
 
+        return
+
     def calculate_phonon_properties(self):
 
         # print self.ctx._get_dict()
         print ('calculate phonon properties')
+        self.report('calculate phonon properties')
 
         try:
             force_constants = self.ctx.phonopy_output['force_constants']
@@ -456,5 +459,7 @@ class PhononPhonopy(WorkChain):
         self.out('dos', phonon_properties['dos'])
         self.out('band_structure', phonon_properties['band_structure'])
         self.out('final_structure', self.ctx.final_structure)
+
+        self.report('finish phonon')
 
         return
