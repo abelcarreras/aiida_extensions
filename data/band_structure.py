@@ -69,7 +69,7 @@ class BandStructureData(Data):
                 # will just copy an empty file
                 self.add_path(f.name, element[0])
 
-    def set_band_structure_guneisen(self, band_structure_gruneisen):
+    def set_band_structure_gruneisen(self, band_structure_gruneisen):
 
         import tempfile
         import numpy
