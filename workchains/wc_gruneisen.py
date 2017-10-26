@@ -164,8 +164,6 @@ class GruneisenPhonopy(WorkChain):
                                               phonon_origin_fc=self.ctx.origin.out.force_constants,
                                               ph_settings=self.inputs.ph_settings)
 
-        print gruneisen_results
-        exit()
 
         self.out('band_structure', gruneisen_results['band_structure'])
         self.out('mesh', gruneisen_results['mesh'])
