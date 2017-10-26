@@ -57,7 +57,7 @@ def generate_phonopy_params(code, structure, ph_settings, machine, force_sets):
 
 
 @workfunction
-def create_supercells_with_displacements_using_phonopy(structure, phonopy_input):
+def create_supercells_with_displacements_using_phonopy(structure, ph_settings):
     """
     Use phonopy to create the supercells with displacements to calculate the force constants by using
     finite displacements methodology
@@ -75,12 +75,12 @@ def create_supercells_with_displacements_using_phonopy(structure, phonopy_input)
                         positions=[site.position for site in structure.sites],
                         cell=structure.cell)
 
-    phonopy_input = phonopy_input.get_dict()
     phonon = Phonopy(bulk,
-                     phonopy_input['supercell'],
-                     primitive_matrix=phonopy_input['primitive'])
+                     ph_settings.dict.supercell,
+                     primitive_matrix=ph_settings.dict.primitive,
+                     symprec=ph_settings.dict.symmetry_precision)
 
-    phonon.generate_displacements(distance=phonopy_input['distance'])
+    phonon.generate_displacements(distance=ph_settings.dict.distance)
 
     cells_with_disp = phonon.get_supercells_with_displacements()
 
@@ -147,7 +147,8 @@ def get_force_constants_from_phonopy(structure, ph_settings, force_sets):
 
     phonon = Phonopy(bulk,
                      ph_settings.dict.supercell,
-                     primitive_matrix=ph_settings.dict.primitive)
+                     primitive_matrix=ph_settings.dict.primitive,
+                     symprec=ph_settings.dict.symmetry_precision)
 
     phonon.generate_displacements(distance=ph_settings.dict.distance)
 
@@ -237,7 +238,8 @@ def get_properties_from_phonopy(structure, ph_settings, force_constants, data_se
 
     phonon = Phonopy(bulk,
                      ph_settings.dict.supercell,
-                     primitive_matrix=ph_settings.dict.primitive)
+                     primitive_matrix=ph_settings.dict.primitive,
+                     symprec=ph_settings.dict.symmetry_precision)
 
     phonon.set_force_constants(force_constants.get_array())
 
