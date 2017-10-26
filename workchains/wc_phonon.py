@@ -110,13 +110,7 @@ def create_forces_set(**kwargs):
 
     """
     data_sets = kwargs.pop('data_sets')
-
     force_sets = ForceSets(data_sets=data_sets.get_data_sets())
-
-    if 'born_charges' in kwargs:
-        born_charges = kwargs.pop('born_charges')
-        force_sets.set_epsilon(born_charges.get_array('epsilon'))
-        force_sets.set_born_charges(born_charges.get_array('born_charges'))
 
     forces = []
     for i in range(data_sets.get_number_of_displacements()):
@@ -126,6 +120,21 @@ def create_forces_set(**kwargs):
 
     return {'force_sets': force_sets}
 
+@workfunction
+def add_nac_to_force_constants(force_constants, array_data):
+    """
+    Create a new ForceConstants object with Born charges info from VASP array output included
+
+    :param force_constants: original force constants
+    :param array_data: ArrayData object that contains the dielectric tensor and Born charges
+    :return: force_constants: ForceConstants object
+    """
+
+    force_constants_nac = ForceConstants(array=force_constants.get_array(),
+                                         born_charges=array_data.get_array('epsilon'),
+                                         epsilon=array_data.get_array('epsilon'))
+
+    return {'force_constants': force_constants_nac}
 
 @workfunction
 def get_force_constants_from_phonopy(structure, ph_settings, force_sets):
@@ -156,9 +165,9 @@ def get_force_constants_from_phonopy(structure, ph_settings, force_sets):
     phonon.set_displacement_dataset(force_sets.get_force_sets())
     phonon.produce_force_constants()
 
-    array_force_constants = ForceConstants(array=phonon.get_force_constants())
+    force_constants = ForceConstants(array=phonon.get_force_constants())
 
-    return {'force_constants': array_force_constants}
+    return {'force_constants': force_constants}
 
 
 def get_path_using_seekpath(structure, band_resolution=30):
@@ -218,7 +227,7 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
 
 
 @workfunction
-def get_properties_from_phonopy(structure, ph_settings, force_constants, data_sets):
+def get_properties_from_phonopy(structure, ph_settings, force_constants):
     """
     Calculate DOS and thermal properties using phonopy (locally)
     :param structure: StructureData Object
@@ -243,11 +252,13 @@ def get_properties_from_phonopy(structure, ph_settings, force_constants, data_se
 
     phonon.set_force_constants(force_constants.get_array())
 
-    if data_sets.epsilon_and_born_exist():
+    if force_constants.epsilon_and_born_exist():
         print ('use born charges')
-        phonon.set_nac_params(get_born_parameters(phonon,
-                                                  data_sets.get_born_charges(),
-                                                  data_sets.get_epsilon()))
+        phonon.set_nac_params(force_constants.get_nac_phonopy(phonon, ph_settings.dict.symmetry_precision))
+
+#        phonon.set_nac_params(get_born_parameters(phonon,
+#                                                  force_constants.get_born_charges(),
+#                                                  force_constants.get_epsilon()))
 
     # Normalization factor primitive to unit cell
     normalization_factor = phonon.unitcell.get_number_of_atoms()/phonon.primitive.get_number_of_atoms()
@@ -415,9 +426,6 @@ class PhononPhonopy(WorkChain):
             wf_inputs['forces_{}'.format(i)] = self.ctx.get('structure_{}'.format(i)).out.output_array
         wf_inputs['data_sets'] = self.ctx.data_sets
 
-        if 'born_charges' in self.ctx:
-            wf_inputs['born_charges'] = self.ctx.born_charges.out.output_array
-
         self.ctx.force_sets = create_forces_set(**wf_inputs)['force_sets']
 
         if 'code' in self.inputs.ph_settings.get_dict():
@@ -451,10 +459,12 @@ class PhononPhonopy(WorkChain):
         except TypeError:
             force_constants = self.ctx.phonopy_output.out.force_constants
 
+        if 'born_charges' in self.ctx:
+            force_constants = add_nac_to_force_constants(force_constants, self.ctx.born_charges.out.output_array)['force_constants']
+
         phonon_properties = get_properties_from_phonopy(structure=self.inputs.structure,
                                                         ph_settings=self.inputs.ph_settings,
-                                                        force_constants=force_constants,
-                                                        data_sets=self.ctx.force_sets)
+                                                        force_constants=force_constants)
 
         self.out('force_constants', force_constants)
         self.out('thermal_properties', phonon_properties['thermal_properties'])

@@ -10,25 +10,6 @@ class BornChargesData(Data):
     def __init__(self, *args, **kwargs):
         super(BornChargesData, self).__init__(*args, **kwargs)
 
-    def get_shape(self):
-        """
-        Return the shape of an array (read from the value cached in the
-        properties for efficiency reasons).
-        :param name: The name of the array.
-        """
-        return tuple(self.get_attr("shape"))
-
-    def get_born_charges(self):
-        """
-        Return Born charges stored in the node as a numpy array
-        """
-        import numpy
-
-        fname = 'born_charges.npy'
-
-        array = numpy.load(self.get_abs_path(fname))
-
-        return array
 
     def get_epsilon(self):
         """
@@ -38,9 +19,35 @@ class BornChargesData(Data):
 
         fname = 'epsilon.npy'
 
+        if fname not in self.get_folder_list():
+            return None
+
         array = numpy.load(self.get_abs_path(fname))
 
         return array
+
+    def get_born_charges(self):
+        """
+        Return born charges stored in the node as a numpy array
+        """
+        import numpy
+
+        fname = 'born_charges.npy'
+
+        if fname not in self.get_folder_list():
+            return None
+
+        array = numpy.load(self.get_abs_path(fname))
+
+        return array
+
+    def epsilon_and_born_exist(self):
+
+        """
+        Check if born charges and epsion exists
+        """
+
+        return self.get_epsilon() is not None and self.get_born_charges() is not None
 
     def set_born_charges(self, array):
         """
@@ -63,8 +70,6 @@ class BornChargesData(Data):
             # will just copy an empty file
             self.add_path(f.name, fname)
 
-        self._set_attr("shape", list(array.shape))
-
     def set_epsilon(self, array):
         """
         Store the dielectric tensor as a numpy array. Possibly overwrite the array
@@ -85,8 +90,6 @@ class BornChargesData(Data):
             f.flush()  # Important to flush here, otherwise the next copy command
             # will just copy an empty file
             self.add_path(f.name, fname)
-
-
 
     def get_born_parameters_phonopy(self, phonon, symprec=1e-5):
 
@@ -121,7 +124,5 @@ class BornChargesData(Data):
         factor = get_default_physical_units('vasp')['nac_factor']  # born charges in VASP units
 
         born_dict = {'born': reduced_borns, 'dielectric': epsilon, 'factor': factor}
-
-        # print ('final born dict', born_dict)
 
         return born_dict

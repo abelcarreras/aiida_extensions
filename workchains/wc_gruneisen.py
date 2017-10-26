@@ -15,7 +15,7 @@ from aiida.orm.data.force_constants import ForceConstants
 from aiida.orm.data.band_structure import BandStructureData
 from aiida.orm.data.phonon_dos import PhononDosData
 
-from aiida.workflows.wc_phonon import PhononPhonopy, get_path_using_seekpath
+from aiida.workflows.wc_phonon import PhononPhonopy, get_path_using_seekpath, get_born_parameters
 from aiida.work.workchain import _If, _While
 
 import numpy as np
@@ -38,6 +38,11 @@ def get_phonon(structure, force_constants, ph_settings):
 
     phonon.set_force_constants(force_constants.get_array())
 
+    if force_constants.epsilon_and_born_exist():
+        phonon.set_nac_params(force_constants.get_nac_phonopy(phonon, ph_settings.dict.symmetry_precision))
+        #phonon.set_nac_params(get_born_parameters(phonon,
+        #                                          force_constants.get_born_charges(),
+        #                                          force_constants.get_epsilon()))
     return phonon
 
 
