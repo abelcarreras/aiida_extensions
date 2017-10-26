@@ -168,8 +168,8 @@ if True:
                  es_settings=es_settings,
                  ph_settings=ph_settings,
                  # Optional settings
-                 pressure=Float(0),
-                 optimize=Bool(False),
+                 pressure=Float(0.0),
+                 optimize=Bool(True),
                  )
 
     print (result)
@@ -181,7 +181,7 @@ else:
                     ph_settings=ph_settings,
                     # Optional settings
                     pressure=Float(0),
-                    optimize=Bool(False),
+                    optimize=Bool(True),
                     )
 
     print future
