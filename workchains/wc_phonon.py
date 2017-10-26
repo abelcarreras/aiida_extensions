@@ -257,11 +257,10 @@ def get_properties_from_phonopy(structure, ph_settings, force_constants):
         print force_constants.get_epsilon()
         print force_constants.get_born_charges()
 
-        phonon.set_nac_params(force_constants.get_nac_phonopy(phonon))
-
-#        phonon.set_nac_params(get_born_parameters(phonon,
-#                                                  force_constants.get_born_charges(),
-#                                                  force_constants.get_epsilon()))
+        phonon.set_nac_params(get_born_parameters(phonon,
+                                                  force_constants.get_born_charges(),
+                                                  force_constants.get_epsilon(),
+                                                  ph_settings.dict.symmetry_precision))
 
     # Normalization factor primitive to unit cell
     normalization_factor = phonon.unitcell.get_number_of_atoms()/phonon.primitive.get_number_of_atoms()
