@@ -46,6 +46,8 @@ def get_phonon(structure, force_constants, phonopy_input):
 def phonopy_gruneisen(phonon_plus, phonon_minus, phonon_origin, ph_settings):
     from phonopy import PhonopyGruneisen
 
+    return {'test': phonon_plus}
+
     phonon_plus2 = get_phonon(phonon_plus.out.final_structure,
                              phonon_plus.out.force_constants,
                              ph_settings)
@@ -150,6 +152,9 @@ class GruneisenPhonopy(WorkChain):
                                               phonon_minus=self.ctx.minus,
                                               phonon_origin=self.ctx.origin,
                                               ph_settings=self.inputs.ph_settings)
+
+        print gruneisen_results
+        exit()
 
         self.out('band_structure', gruneisen_results['band_structure'])
         self.out('mesh', gruneisen_results['mesh'])
