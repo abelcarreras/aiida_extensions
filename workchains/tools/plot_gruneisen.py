@@ -24,35 +24,31 @@ bs = wc.out.band_structure
 labels, label_positions = bs.get_formatted_labels_matplotlib()
 plt.rcParams.update({'mathtext.default': 'regular'})
 plt.xticks(label_positions, labels, rotation='horizontal')
+plt.xlabel('Wave vector')
 
 plt.figure(1)
 for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
-    plt.plot(dist, freq, color='r',
-             title='Phonon band structure',
-             ylabel='Frequency [THz]')
+    plt.plot(dist, freq, color='r', title='Phonon band structure')
+    plt.ylabel('Frequency [THz]')
 
 plt.figure(2)
 for dist, freq in zip(bs.get_distances(), bs.get_eigenvalues()):
-    plt.plot(dist, freq, color='r',
-             title='Eigenvalues',
-             ylabel='Eigenvalues')
-
+    plt.plot(dist, freq, color='r', title='Eigenvalues')
+    plt.ylabel('Eigenvalues')
 
 plt.figure(3)
 for dist, freq in zip(bs.get_distances(), bs.get_gamma()):
-    plt.plot(dist, freq, color='r',
-             title='Mode Gruneisen parameter',
-             ylabel='$\gamma$')
+    plt.plot(dist, freq, color='r', title='Mode Gruneisen parameter')
+    plt.ylabel('$\gamma$')
 
 # Mesh
-plt.figure(4)
 
 mesh = wc.out.mesh
-
 plt.xlabel('Frequency [THz]')
 plt.ylabel('$\gamma$')
 plt.suptitle('Mode Gruneisen parameter')
 
+plt.figure(4)
 for (g, freq) in zip(mesh.get_array('frequencies').T, mesh.get_array('gruneisen').T):
     plt.plot(g, freq, marker='o', linestyle='None', markeredgecolor='black', color='red')
 
