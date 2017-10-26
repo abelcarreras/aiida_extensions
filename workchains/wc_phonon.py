@@ -254,6 +254,9 @@ def get_properties_from_phonopy(structure, ph_settings, force_constants):
 
     if force_constants.epsilon_and_born_exist():
         print ('use born charges')
+        print force_constants.get_epsilon()
+        print force_constants.get_born_charges()
+
         phonon.set_nac_params(force_constants.get_nac_phonopy(phonon, ph_settings.dict.symmetry_precision))
 
 #        phonon.set_nac_params(get_born_parameters(phonon,
