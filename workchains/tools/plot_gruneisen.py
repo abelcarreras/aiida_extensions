@@ -27,12 +27,12 @@ plt.xticks(label_positions, labels, rotation='horizontal')
 plt.xlabel('Wave vector')
 
 plt.figure(1)
-for dist, freq in zip(bs.get_distances(), bs.get_frequencies().T):
+for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
     plt.plot(dist, freq, color='r')
 plt.ylabel('Frequency [THz]')
 plt.title('Phonon band structure')
 plt.show()
-
+exit()
 
 plt.figure(2)
 for dist, freq in zip(bs.get_distances(), bs.get_eigenvalues()):
