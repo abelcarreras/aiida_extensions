@@ -43,31 +43,36 @@ def get_phonon(structure, force_constants, phonopy_input):
 
 
 @workfunction
-def phonopy_gruneisen(phonon_plus, phonon_minus, phonon_origin, ph_settings):
+def phonopy_gruneisen(phonon_plus_structure,
+                      phonon_plus_fc,
+                      phonon_minus_structure,
+                      phonon_minus_fc,
+                      phonon_origin_structure,
+                      phonon_origin_fc,
+                      ph_settings):
     from phonopy import PhonopyGruneisen
 
-    return {'test': phonon_plus}
 
-    phonon_plus2 = get_phonon(phonon_plus.out.final_structure,
-                             phonon_plus.out.force_constants,
-                             ph_settings)
-
-    phonon_minus2 = get_phonon(phonon_minus.out.final_structure,
-                              phonon_minus.out.force_constants,
+    phonon_plus = get_phonon(phonon_plus_structure,
+                              phonon_plus_fc,
                               ph_settings)
 
-    phonon_origin2 = get_phonon(phonon_origin.out.final_structure,
-                               phonon_origin.out.force_constants,
+    phonon_minus = get_phonon(phonon_minus_structure,
+                               phonon_minus_fc,
                                ph_settings)
 
-    gruneisen = PhonopyGruneisen(phonon_origin2,  # equilibrium
-                                 phonon_plus2,  # plus
-                                 phonon_minus2)  # minus
+    phonon_origin = get_phonon(phonon_origin_structure,
+                                phonon_origin_fc,
+                                ph_settings)
+
+    gruneisen = PhonopyGruneisen(phonon_origin,  # equilibrium
+                                 phonon_plus,  # plus
+                                 phonon_minus)  # minus
 
     gruneisen.set_mesh(ph_settings.dict.mesh, is_gamma_center=False, is_mesh_symmetry=True)
 
     # BAND STRUCTURE
-    band_structure = get_path_using_seekpath(phonon_origin['final_structure'])
+    band_structure = get_path_using_seekpath(phonon_origin_structure)
     gruneisen.set_band_structure(band_structure.get_bands(),
                                  band_structure.get_number_of_points())
     #gruneisen.set_band_structure(band_structure.get_bands(), 51)
@@ -148,9 +153,12 @@ class GruneisenPhonopy(WorkChain):
         print ('calculate gruneisen')
         print self.ctx.plus, self.ctx.minus, self.ctx.origin
 
-        gruneisen_results = phonopy_gruneisen(phonon_plus=self.ctx.plus,
-                                              phonon_minus=self.ctx.minus,
-                                              phonon_origin=self.ctx.origin,
+        gruneisen_results = phonopy_gruneisen(phonon_plus_structure=self.ctx.plus.out.final_structure,
+                                              phonon_plus_fc=self.ctx.plus.out.force_constants,
+                                              phonon_minus_structure=self.ctx.minus.final_structure,
+                                              phonon_minus_fc=self.ctx.minus.out.force_constants,
+                                              phonon_origin_structure=self.ctx.origin.final_structure,
+                                              phonon_origin_fc=self.ctx.origin.out.force_constants,
                                               ph_settings=self.inputs.ph_settings)
 
         print gruneisen_results
