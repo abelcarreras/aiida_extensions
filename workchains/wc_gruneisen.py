@@ -134,8 +134,10 @@ class GruneisenPhonopy(WorkChain):
             calcs[expansions[0]] = future
             print ('phonon workchain: {} {}'.format(expansions[0], future.pid))
         print calcs
-        exit()
-        return ToContext(**calcs)
+
+        return ToContext(plus=calcs['plus'], origin=calcs['origin'], minus=calcs['minus'])
+
+        #return ToContext(**calcs)
 
     def calculate_gruneisen(self):
 
