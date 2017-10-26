@@ -46,16 +46,16 @@ def get_phonon(structure, force_constants, phonopy_input):
 def phonopy_gruneisen(phonon_plus, phonon_minus, phonon_origin, ph_settings):
     from phonopy import PhonopyGruneisen
 
-    phonon_plus2 = get_phonon(phonon_plus['final_structure'],
-                             phonon_plus['force_constants'],
+    phonon_plus2 = get_phonon(phonon_plus.out.final_structure,
+                             phonon_plus.out.force_constants,
                              ph_settings)
 
-    phonon_minus2 = get_phonon(phonon_minus['final_structure'],
-                              phonon_minus['force_constants'],
+    phonon_minus2 = get_phonon(phonon_minus.out.final_structure,
+                              phonon_minus.out.force_constants,
                               ph_settings)
 
-    phonon_origin2 = get_phonon(phonon_origin['final_structure'],
-                               phonon_origin['force_constants'],
+    phonon_origin2 = get_phonon(phonon_origin.out.final_structure,
+                               phonon_origin.out.force_constants,
                                ph_settings)
 
     gruneisen = PhonopyGruneisen(phonon_origin2,  # equilibrium
