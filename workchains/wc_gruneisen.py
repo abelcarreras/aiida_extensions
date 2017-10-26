@@ -123,7 +123,6 @@ class GruneisenPhonopy(WorkChain):
             self.ctx._content['minus'] = load_node(4952)
             return
 
-
         calcs = {}
         for expansions in {'plus': float(self.inputs.stress_displacement),
                            'origin': 0.0,
@@ -140,11 +139,11 @@ class GruneisenPhonopy(WorkChain):
 
             calcs[expansions[0]] = future
             print ('phonon workchain: {} {}'.format(expansions[0], future.pid))
-        print calcs
+        #print calcs
 
-        return ToContext(plus=calcs['plus'], origin=calcs['origin'], minus=calcs['minus'])
+        #return ToContext(plus=calcs['plus'], origin=calcs['origin'], minus=calcs['minus'])
 
-        #return ToContext(**calcs)
+        return ToContext(**calcs)
 
     def calculate_gruneisen(self):
 
