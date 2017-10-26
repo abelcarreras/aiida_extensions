@@ -36,7 +36,7 @@ def get_phonon(structure, force_constants, ph_settings):
                      primitive_matrix=ph_settings.dict.primitive,
                      symprec=ph_settings.dict.symmetry_precision)
 
-    phonon.set_force_constants(force_constants)
+    phonon.set_force_constants(force_constants.get_array())
 
     return phonon
 
