@@ -28,18 +28,21 @@ plt.xlabel('Wave vector')
 
 plt.figure(1)
 for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
-    plt.plot(dist, freq, color='r', title='Phonon band structure')
-    plt.ylabel('Frequency [THz]')
+    plt.plot(dist, freq, color='r')
+plt.ylabel('Frequency [THz]')
+plt.title('Phonon band structure')
 
 plt.figure(2)
 for dist, freq in zip(bs.get_distances(), bs.get_eigenvalues()):
-    plt.plot(dist, freq, color='r', title='Eigenvalues')
-    plt.ylabel('Eigenvalues')
+    plt.plot(dist, freq, color='r')
+plt.ylabel('Eigenvalues')
+plt.title('Eigenvalues')
 
 plt.figure(3)
 for dist, freq in zip(bs.get_distances(), bs.get_gamma()):
-    plt.plot(dist, freq, color='r', title='Mode Gruneisen parameter')
-    plt.ylabel('$\gamma$')
+    plt.plot(dist, freq, color='r')
+plt.ylabel('$\gamma$')
+plt.title('Mode Gruneisen parameter')
 
 # Mesh
 
