@@ -131,7 +131,7 @@ def add_nac_to_force_constants(force_constants, array_data):
     """
 
     force_constants_nac = ForceConstants(array=force_constants.get_array(),
-                                         born_charges=array_data.get_array('epsilon'),
+                                         born_charges=array_data.get_array('born_charges'),
                                          epsilon=array_data.get_array('epsilon'))
 
     return {'force_constants': force_constants_nac}
