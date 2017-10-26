@@ -31,6 +31,8 @@ for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
     plt.plot(dist, freq, color='r')
 plt.ylabel('Frequency [THz]')
 plt.title('Phonon band structure')
+plt.show()
+
 
 plt.figure(2)
 for dist, freq in zip(bs.get_distances(), bs.get_eigenvalues()):
