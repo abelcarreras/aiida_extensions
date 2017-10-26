@@ -21,7 +21,6 @@ wc = load_node(5852)
 
 # Phonon Band structure
 bs = wc.out.band_structure
-print bs.get_frequencies().shape
 labels, label_positions = bs.get_formatted_labels_matplotlib()
 plt.rcParams.update({'mathtext.default': 'regular'})
 plt.xticks(label_positions, labels, rotation='horizontal')
@@ -29,7 +28,7 @@ plt.xlabel('Wave vector')
 
 plt.figure(1)
 for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
-    plt.plot(freq, color='r')
+    plt.plot(dist, freq, color='r')
 plt.ylabel('Frequency [THz]')
 plt.title('Phonon band structure')
 plt.show()
