@@ -53,6 +53,20 @@ class BandStructureData(Data):
             # will just copy an empty file
             self.add_path(f.name, 'band_labels.npy')
 
+    def set_unitcell(self, unitcell):
+
+        import tempfile
+        import numpy
+
+        unitcell = numpy.array(unitcell)
+
+        with tempfile.NamedTemporaryFile() as f:
+            numpy.save(f, unitcell)
+            f.flush()  # Important to flush here, otherwise the next copy command
+            # will just copy an empty file
+            self.add_path(f.name, 'unitcell.npy')
+
+
     def set_band_structure_phonopy(self, band_structure_phonopy):
 
         import tempfile
@@ -116,16 +130,26 @@ class BandStructureData(Data):
 
         return array
 
+    def get_unitcell(self):
+        """
+        Return the unitcell in the node as a numpy array
+        """
+        import numpy
+
+        fname = 'unitcell.npy'
+
+        array = numpy.load(self.get_abs_path(fname))
+        return array
+
     def get_my_distances(self, band=None):
         """
         Return the distances in the node as a numpy array
         """
         import numpy as np
 
-        fname = 'band_ranges.npy'
+        inverse_unitcell = np.linalg.inv(self.get_unitcell())
 
-        array = np.load(self.get_abs_path(fname))
-
+        array = self.get_bands()
         # nbands = array.shape[0]
         npoints = array.shape[1]
 
@@ -136,10 +160,15 @@ class BandStructureData(Data):
             else:
                 band_dist = [distances[-1][-1]]
             for i in range(npoints-1):
-                band_dist.append(np.linalg.norm(np.array(band[i+1]) - np.array(band[i]))+band_dist[i])
+                #band_dist.append(np.linalg.norm(np.array(band[i+1]) - np.array(band[i]))+band_dist[i])
+                band_dist.append(np.linalg.norm(np.dot(band[i+1], inverse_unitcell) -
+                                                np.dot(band[i], inverse_unitcell)) + band_dist[i])
 
             distances.append(band_dist)
         distances = np.array(distances)
+
+        if band is not None:
+            distances = distances[band]
 
         return distances
 
