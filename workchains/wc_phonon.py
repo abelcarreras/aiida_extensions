@@ -170,32 +170,8 @@ def get_force_constants_from_phonopy(structure, ph_settings, force_sets):
     return {'force_constants': force_constants}
 
 
-def get_path_using_seekpath(structure, band_resolution=30):
-    import seekpath.aiidawrappers
 
-    path_data = seekpath.aiidawrappers.get_path(structure)
-
-    labels = path_data['point_coords']
-
-    band_ranges = []
-    for set in path_data['path']:
-        band_ranges.append([labels[set[0]], labels[set[1]]])
-
-    bands =[]
-    for q_start, q_end in band_ranges:
-        band = []
-        for i in range(band_resolution+1):
-            band.append(np.array(q_start) + (np.array(q_end) - np.array(q_start)) / band_resolution * i)
-        bands.append(band)
-
-    band_structure = BandStructureData(bands=bands,
-                                       labels=path_data['path'],
-                                       unitcell=structure.cell)
-
-
-    return band_structure
-
-def get_path_using_seekpath_phonopy(phonopy_structure, band_resolution=30):
+def get_path_using_seekpath(phonopy_structure, band_resolution=30):
     import seekpath
 
     cell = phonopy_structure.get_cell()
@@ -223,7 +199,7 @@ def get_path_using_seekpath_phonopy(phonopy_structure, band_resolution=30):
 
     band_structure = BandStructureData(bands=bands,
                                        labels=path_data['path'],
-                                       unitcell=phonopy_structure.get_cell().T)
+                                       unitcell=phonopy_structure.get_cell())
     return band_structure
 
 
@@ -327,7 +303,7 @@ def get_properties_from_phonopy(structure, ph_settings, force_constants):
     # BAND STRUCTURE
     band_structure = get_path_using_seekpath(structure)
 
-    band_structure = get_path_using_seekpath_phonopy(phonon.get_primitive())
+    band_structure = get_path_using_seekpath(phonon.get_primitive())
     phonon.set_band_structure(band_structure.get_bands())
     band_structure.set_band_structure_phonopy(phonon.get_band_structure())
 
