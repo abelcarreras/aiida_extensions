@@ -74,12 +74,12 @@ class BandStructureData(Data):
         import tempfile
         import numpy
 
-        for element in {'q_points.npy': numpy.array([band[0] for band in band_structure_gruneisen._paths]).T,
-                        'distances.npy': numpy.array([band[1] for band in band_structure_gruneisen._paths]).T,
-                        'gamma.npy': numpy.array([band[2] for band in band_structure_gruneisen._paths]).T,
-                        'eigenvalues.npy': numpy.array([band[3] for band in band_structure_gruneisen._paths]).T,
-                        'frequencies.npy': numpy.array([band[4] for band in band_structure_gruneisen._paths]).T,
-                        'distances_with_shift.npy': numpy.array([band[5] for band in band_structure_gruneisen._paths]).T
+        for element in {'q_points.npy': numpy.array([band[0] for band in band_structure_gruneisen._paths]),
+                        'distances.npy': numpy.array([band[1] for band in band_structure_gruneisen._paths]),
+                        'gamma.npy': numpy.array([band[2] for band in band_structure_gruneisen._paths]),
+                        'eigenvalues.npy': numpy.array([band[3] for band in band_structure_gruneisen._paths]),
+                        'frequencies.npy': numpy.array([band[4] for band in band_structure_gruneisen._paths]),
+                        'distances_with_shift.npy': numpy.array([band[5] for band in band_structure_gruneisen._paths])
                         }.items():
 
             with tempfile.NamedTemporaryFile() as f:
