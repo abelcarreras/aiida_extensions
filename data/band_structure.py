@@ -206,9 +206,7 @@ class BandStructureData(Data):
         """
         import numpy
 
-        fname = 'band_ranges.npy'
-
-        array = numpy.load(self.get_abs_path(fname))
+        array = self.get_bands()
 
         band_ranges = numpy.array([numpy.array([i[-0], i[-1]]) for i in array])
 
@@ -237,7 +235,7 @@ class BandStructureData(Data):
         return array
 
     def get_formatted_labels_matplotlib(self):
-        distances = self.get_distances()
+        distances = self.get_my_distances()
         labels_array = self.get_labels()
 
         substitutions = {'GAMMA': u'\u0393'
