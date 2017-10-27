@@ -75,11 +75,11 @@ class BandStructureData(Data):
         import numpy
 
         for element in {'q_points.npy': numpy.array([band[0] for band in band_structure_gruneisen._paths]),
-                        'distances.npy': numpy.array([band[1] for band in band_structure_gruneisen._paths]),
+                        #'distances_without_shift.npy': numpy.array([band[1] for band in band_structure_gruneisen._paths]),
                         'gamma.npy': numpy.array([band[2] for band in band_structure_gruneisen._paths]),
                         'eigenvalues.npy': numpy.array([band[3] for band in band_structure_gruneisen._paths]),
                         'frequencies.npy': numpy.array([band[4] for band in band_structure_gruneisen._paths]),
-                        'distances_with_shift.npy': numpy.array([band[5] for band in band_structure_gruneisen._paths])
+                        'distances.npy': numpy.array([band[5] for band in band_structure_gruneisen._paths])
                         }.items():
 
             with tempfile.NamedTemporaryFile() as f:
@@ -157,21 +157,6 @@ class BandStructureData(Data):
             array = array[band]
 
         return array
-
-    def get_distances_with_shift(self, band=None):
-        """
-        Return the frequencies in the node as a numpy array
-        """
-        import numpy
-
-        fname = 'distances_with_shift.npy'
-
-        array = numpy.load(self.get_abs_path(fname))
-        if band is not None:
-            array = array[band]
-
-        return array
-
 
     def get_bands(self, band=None):
         """
