@@ -50,7 +50,7 @@ plt.title('Mode Gruneisen parameter')
 mesh = wc.out.mesh
 plt.xlabel('Frequency [THz]')
 plt.ylabel('$\gamma$')
-plt.suptitle('Mode Gruneisen parameter')
+plt.title('Mode Gruneisen parameter')
 
 plt.figure(4)
 for (g, freq) in zip(mesh.get_array('frequencies').T, mesh.get_array('gruneisen').T):
