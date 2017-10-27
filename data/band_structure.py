@@ -54,6 +54,10 @@ class BandStructureData(Data):
             self.add_path(f.name, 'band_labels.npy')
 
     def set_unitcell(self, unitcell):
+        """
+        :param unitcell: Numpy Array that contains the unitcell matrix (Lattice vectors in rows)
+        :return:
+        """
 
         import tempfile
         import numpy
@@ -154,15 +158,15 @@ class BandStructureData(Data):
         npoints = array.shape[1]
 
         distances = []
-        for band in array:
+        for piece in array:
             if distances == []:
                 band_dist = [0.0]
             else:
                 band_dist = [distances[-1][-1]]
             for i in range(npoints-1):
                 #band_dist.append(np.linalg.norm(np.array(band[i+1]) - np.array(band[i]))+band_dist[i])
-                band_dist.append(np.linalg.norm(np.dot(band[i+1], inverse_unitcell.T) -
-                                                np.dot(band[i], inverse_unitcell.T)) + band_dist[i])
+                band_dist.append(np.linalg.norm(np.dot(piece[i+1], inverse_unitcell.T) -
+                                                np.dot(piece[i], inverse_unitcell.T)) + band_dist[i])
 
             distances.append(band_dist)
         distances = np.array(distances)
