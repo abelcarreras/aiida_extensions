@@ -218,8 +218,13 @@ def get_path_using_seekpath_phonopy(phonopy_structure, band_resolution=30):
             band.append(np.array(q_start) + (np.array(q_end) - np.array(q_start)) / band_resolution * i)
         bands.append(band)
 
-    return {'ranges': bands,
-            'labels': path_data['path']}
+#    return {'ranges': bands,
+#            'labels': path_data['path']}
+
+    band_structure = BandStructureData(bands=bands,
+                                       labels=path_data['path'],
+                                       unitcell=phonopy_structure.get_cell().T)
+    return band_structure
 
 
 def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
