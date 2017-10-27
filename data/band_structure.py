@@ -197,7 +197,7 @@ class BandStructureData(Data):
 
         array = numpy.load(self.get_abs_path(fname))
 
-        band_ranges = numpy.array([numpy.array([i[:,-0], i[:,-1]]) for i in array])
+        band_ranges = numpy.array([numpy.array([i[:,-0].T, i[:,-1].T]) for i in array])
 
         if band is not None:
             band_ranges = band_ranges[band]
