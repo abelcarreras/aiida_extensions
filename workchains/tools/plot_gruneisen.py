@@ -47,12 +47,12 @@ plt.title('Mode Gruneisen parameter')
 
 # Mesh
 mesh = wc.out.mesh
-plt.xlabel('Frequency [THz]')
-plt.ylabel('$\gamma$')
-plt.title('Mode Gruneisen parameter')
 
 plt.figure(4)
 for (g, freq) in zip(mesh.get_array('frequencies').T, mesh.get_array('gruneisen').T):
     plt.plot(g, freq, marker='o', linestyle='None', markeredgecolor='black', color='red')
+plt.xlabel('Frequency [THz]')
+plt.ylabel('$\gamma$')
+plt.title('Mode Gruneisen parameter (mesh)')
 
 plt.show()
