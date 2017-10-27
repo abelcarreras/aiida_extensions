@@ -81,8 +81,8 @@ class BandStructureData(Data):
         # Check consistency
         if self.get_bands() is None:
             self.set_bands(q_points)
-        else:
-            numpy.testing.assert_array_almost_equal(q_points, self.get_bands(), decimal=4)
+        #else:
+        #    numpy.testing.assert_array_almost_equal(q_points, self.get_bands(), decimal=4)
 
         numpy.testing.assert_array_almost_equal(distances, self.get_distances(), decimal=4)
 
