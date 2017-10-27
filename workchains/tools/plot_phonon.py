@@ -20,6 +20,8 @@ wc = load_node(1973)
 
 # Phonon Band structure
 bs = wc.out.band_structure
+print bs.get_distances()
+exit()
 
 print bs.get_frequencies().shape
 for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
