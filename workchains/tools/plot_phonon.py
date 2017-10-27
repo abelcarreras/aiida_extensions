@@ -15,7 +15,7 @@ import numpy as np
 
 # Set WorkChain PhononPhonopy PK number
 ########################
-wc = load_node(7570)
+wc = load_node(8235)
 ########################
 
 # Phonon Band structure
