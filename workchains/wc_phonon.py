@@ -345,9 +345,9 @@ class PhononPhonopy(WorkChain):
                         pressure=self.inputs.pressure,
                         )
         # For testing
-        testing = False
+        testing = True
         if testing:
-            self.ctx._content['optimize'] = load_node(88)
+            self.ctx._content['optimize'] = load_node(7025)
             return
 
         print ('optimize workchain: {}'.format(future.pid))
@@ -374,16 +374,16 @@ class PhononPhonopy(WorkChain):
         calcs = {}
 
         # Load data from nodes
-        testing = False
+        testing = True
         if testing:
             from aiida.orm import load_node
-            nodes = [111, 116, 121, 126]  # VASP
-            labels = ['structure_1', 'structure_0', 'structure_3', 'structure_2']
+            nodes = [7183, 7188]  # VASP
+            labels = ['structure_1', 'structure_0']
             for pk, label in zip(nodes, labels):
                 future = load_node(pk)
                 self.ctx._content[label] = future
 
-            self.ctx._content['born_charges'] = load_node(752)
+            self.ctx._content['born_charges'] = load_node(7194)
             return
 
         for label, supercell in supercells.iteritems():
