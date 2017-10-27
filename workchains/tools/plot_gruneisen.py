@@ -24,6 +24,7 @@ print bs.get_distances()
 print bs.get_bands()
 print bs.get_band_ranges()
 print bs.get_my_distances()
+print bs.get_distances()
 
 print bs.get_frequencies().shape
 
