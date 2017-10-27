@@ -122,7 +122,7 @@ class BandStructureData(Data):
         """
         import numpy as np
 
-        fname = 'bands_ranges.npy'
+        fname = 'band_ranges.npy'
 
         array = np.load(self.get_abs_path(fname))
 
