@@ -45,6 +45,31 @@ def get_phonon(structure, force_constants, ph_settings):
                                                   ph_settings.dict.symmetry_precision))
     return phonon
 
+def get_path_using_seekpath(structure, band_resolution=30):
+    import seekpath
+
+    cell = structure.cell
+    positions = [site.position for site in structure.sites]
+    scaled_positions = np.dot(positions, np.linalg.inv(cell))
+    numbers = np.unique([site.kind_name for site in structure.sites], return_inverse=True)[1]
+    structure2 = (cell, scaled_positions, numbers)
+    path_data = seekpath.get_path(structure2)
+
+    labels = path_data['point_coords']
+
+    band_ranges = []
+    for set in path_data['path']:
+        band_ranges.append([labels[set[0]], labels[set[1]]])
+
+    bands = []
+    for q_start, q_end in band_ranges:
+        band = []
+        for i in range(band_resolution+1):
+            band.append(np.array(q_start) + (np.array(q_end) - np.array(q_start)) / band_resolution * i)
+        bands.append(band)
+
+    return {'ranges': band_ranges,
+            'labels': path_data['path']}
 
 @workfunction
 def phonopy_gruneisen(phonon_plus_structure,
@@ -77,11 +102,15 @@ def phonopy_gruneisen(phonon_plus_structure,
 
     # BAND STRUCTURE
     band_structure = get_path_using_seekpath(phonon_origin_structure)
-    gruneisen.set_band_structure(band_structure.get_band_ranges(),
-                                 band_structure.get_number_of_points())
-    #gruneisen.set_band_structure(band_structure.get_bands(), 51)
+    #gruneisen.set_band_structure(band_structure.get_band_ranges(),
+    #                             band_structure.get_number_of_points())
+    #gruneisen.set_band_structure(band_structure.get_bands(), 31)
+
+    bands = get_path_using_seekpath(phonon_origin_structure)
+    gruneisen.set_band_structure(bands['ranges'], 31)
 
     band_structure.set_band_structure_gruneisen(gruneisen.get_band_structure())
+
 
     # mesh
     mesh = gruneisen.get_mesh()
