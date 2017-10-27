@@ -117,7 +117,7 @@ class GruneisenPhonopy(WorkChain):
         print 'start create cell expansions'
 
         # For testing
-        testing = True
+        testing = False
         if testing:
             self.ctx._content['plus'] = load_node(5858)
             self.ctx._content['origin'] = load_node(5855)
