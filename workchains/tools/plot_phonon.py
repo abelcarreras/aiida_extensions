@@ -23,10 +23,10 @@ bs = wc.out.band_structure
 print bs.get_distances()
 print bs.get_bands()
 print bs.get_band_ranges()
-exit()
+
 
 print bs.get_frequencies().shape
-for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
+for dist, freq in zip(bs.get_my_distances(), bs.get_frequencies()):
     plt.plot(dist, freq, color='r')
 
 plt.figure(1)
