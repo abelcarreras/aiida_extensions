@@ -147,9 +147,8 @@ class BandStructureData(Data):
         """
         import numpy as np
 
-        #inverse_unitcell = np.linalg.inv(self.get_unitcell())
+        inverse_unitcell = np.linalg.inv(self.get_unitcell())
 
-        inverse_unitcell = np.diag([1,1,1])
         array = self.get_bands()
         # nbands = array.shape[0]
         npoints = array.shape[1]
@@ -222,7 +221,7 @@ class BandStructureData(Data):
         """
         import numpy
 
-        fname = 'band_ranges.npy'
+        fname = 'bands.npy'
 
         array = numpy.load(self.get_abs_path(fname))
         if band is not None:
