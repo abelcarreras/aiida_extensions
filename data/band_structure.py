@@ -147,8 +147,9 @@ class BandStructureData(Data):
         """
         import numpy as np
 
-        inverse_unitcell = np.linalg.inv(self.get_unitcell())
+        #inverse_unitcell = np.linalg.inv(self.get_unitcell())
 
+        inverse_unitcell = np.diag([1,1,1])
         array = self.get_bands()
         # nbands = array.shape[0]
         npoints = array.shape[1]

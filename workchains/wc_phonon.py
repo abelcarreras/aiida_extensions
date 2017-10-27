@@ -189,7 +189,8 @@ def get_path_using_seekpath(structure, band_resolution=30):
         bands.append(band)
 
     band_structure = BandStructureData(bands=bands,
-                                       labels=path_data['path'])
+                                       labels=path_data['path'],
+                                       unitcell=structure.cell)
 
 
     return band_structure
