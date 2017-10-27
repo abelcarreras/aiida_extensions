@@ -20,12 +20,8 @@ wc = load_node(6213)
 
 # Phonon Band structure
 bs = wc.out.band_structure
-print bs.get_distances()
 print bs.get_bands()
-print bs.get_band_ranges()
-print bs.get_my_distances()
-print bs.get_distances()
-
+print bs.get_q_points()
 print bs.get_frequencies().shape
 
 labels, label_positions = bs.get_formatted_labels_matplotlib()
