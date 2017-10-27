@@ -85,6 +85,7 @@ def phonopy_gruneisen(phonon_plus_structure,
 
     band_structure.set_band_structure_gruneisen(gruneisen.get_band_structure())
 
+    exit()
     # mesh
     mesh = gruneisen.get_mesh()
     frequencies_mesh = np.array(mesh.get_frequencies())
