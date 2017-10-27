@@ -21,7 +21,7 @@ wc = load_node(6289)
 # Phonon Band structure
 bs = wc.out.band_structure
 
-for dist, freq in zip(bs.get_my_distances(), bs.get_frequencies()):
+for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
     plt.plot(dist, freq, color='r')
 
 plt.figure(1)
