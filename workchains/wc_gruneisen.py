@@ -79,6 +79,8 @@ def phonopy_gruneisen(phonon_plus_structure,
     gruneisen.set_band_structure(band_structure.get_band_ranges(),
                                  band_structure.get_number_of_points())
 
+    print ('out')
+
     # gruneisen.set_band_structure(band_structure.get_bands(), 31)
     # band_structure.set_band_structure_gruneisen(gruneisen.get_band_structure())
     # bands = get_path_using_seekpath2(phonon_origin_structure)
@@ -86,6 +88,7 @@ def phonopy_gruneisen(phonon_plus_structure,
 
     band_structure.set_band_structure_gruneisen(gruneisen.get_band_structure())
 
+    print ('out2')
 
     # mesh
     mesh = gruneisen.get_mesh()
