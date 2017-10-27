@@ -193,7 +193,7 @@ def get_path_using_seekpath(structure, band_resolution=30):
                                        unitcell=structure.cell)
 
     print band_structure.get_labels()
-    print band_structure.get_unitcell()
+    #print band_structure.get_unitcell()
 
     return band_structure
 
