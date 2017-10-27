@@ -195,6 +195,32 @@ def get_path_using_seekpath(structure, band_resolution=30):
 
     return band_structure
 
+def get_path_using_seekpath_phonopy(phonopy_structure, band_resolution=30):
+    import seekpath
+
+    cell = phonopy_structure.get_cell()
+    scaled_positions = phonopy_structure.get_scaled_positions()
+    numbers = phonopy_structure.get_atomic_numbers()
+
+    structure = (cell, scaled_positions, numbers)
+    path_data = seekpath.get_path(structure)
+
+    labels = path_data['point_coords']
+
+    band_ranges = []
+    for set in path_data['path']:
+        band_ranges.append([labels[set[0]], labels[set[1]]])
+
+    bands =[]
+    for q_start, q_end in band_ranges:
+        band = []
+        for i in range(band_resolution+1):
+            band.append(np.array(q_start) + (np.array(q_end) - np.array(q_start)) / band_resolution * i)
+        bands.append(band)
+
+    return {'ranges': bands,
+            'labels': path_data['path']}
+
 
 def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
     from phonopy.structure.cells import get_primitive, get_supercell
@@ -295,6 +321,8 @@ def get_properties_from_phonopy(structure, ph_settings, force_constants):
 
     # BAND STRUCTURE
     band_structure = get_path_using_seekpath(structure)
+
+    band_structure = get_path_using_seekpath_phonopy(phonon.get_primitive())
     phonon.set_band_structure(band_structure.get_bands())
     band_structure.set_band_structure_phonopy(phonon.get_band_structure())
 
