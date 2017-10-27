@@ -82,9 +82,9 @@ class BandStructureData(Data):
         if self.get_bands() is None:
             self.set_bands(q_points)
         else:
-            numpy.testing.assert_array_equal(q_points, self.get_bands())
+            numpy.testing.assert_array_almost_equal(q_points, self.get_bands(), decimal=4)
 
-        numpy.testing.assert_array_equal(distances, self.get_distances())
+        numpy.testing.assert_array_almost_equal(distances, self.get_distances(), decimal=4)
 
         for element in {
                         # 'q_points.npy': numpy.array(band_structure_phonopy[0]),
@@ -110,9 +110,9 @@ class BandStructureData(Data):
         if self.get_bands() is None:
             self.set_bands(q_points)
         else:
-            numpy.testing.assert_array_equal(q_points, self.get_bands())
+            numpy.testing.assert_array_almost_equal(q_points, self.get_bands(), decimal=4)
 
-        numpy.testing.assert_array_equal(distances, self.get_distances())
+        numpy.testing.assert_array_almost_equal(distances, self.get_distances(), decimal=4)
 
         for element in {'gamma.npy': numpy.array([band[2] for band in band_structure_gruneisen._paths]),
                         'eigenvalues.npy': numpy.array([band[3] for band in band_structure_gruneisen._paths]),
