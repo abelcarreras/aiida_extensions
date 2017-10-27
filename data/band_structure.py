@@ -35,7 +35,7 @@ class BandStructureData(Data):
             numpy.save(f, ranges)
             f.flush()  # Important to flush here, otherwise the next copy command
             # will just copy an empty file
-            self.add_path(f.name, 'band_ranges.npy')
+            self.add_path(f.name, 'bands.npy')
 
         self._set_attr('nbands', len(ranges))
         self._set_attr('npoints', len(ranges[0]))
@@ -116,6 +116,31 @@ class BandStructureData(Data):
 
         return array
 
+    def get_my_distances(self, band=None):
+        """
+        Return the distances in the node as a numpy array
+        """
+        import numpy as np
+
+        fname = 'bands_ranges.npy'
+
+        array = np.load(self.get_abs_path(fname))
+
+        # nbands = array.shape[0]
+        npoints = array.shape[1]
+
+        distances = []
+        for band in array:
+            band_dist = [0.0]
+            for i in range(npoints-1):
+                band_dist.append(np.linalg.norm(np.array(band[i+1]) - np.array(band[i+1])))
+
+            distances.append(band_dist)
+        distances = np.array(distances)
+
+        return distances
+
+
     def get_frequencies(self, band=None):
         """
         Return the frequencies in the node as a numpy array
@@ -188,7 +213,6 @@ class BandStructureData(Data):
             band_ranges = band_ranges[band]
 
         return band_ranges
-
 
 
     def get_labels(self, band=None):
