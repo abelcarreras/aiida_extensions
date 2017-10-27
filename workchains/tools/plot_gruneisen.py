@@ -15,14 +15,11 @@ import numpy as np
 
 # Set WorkChain GruneisenPhonopy PK number
 ########################
-wc = load_node(6213)
+wc = load_node(6279)
 ########################
 
 # Phonon Band structure
 bs = wc.out.band_structure
-print bs.get_bands()
-print bs.get_q_points()
-print bs.get_frequencies().shape
 
 labels, label_positions = bs.get_formatted_labels_matplotlib()
 print label_positions
@@ -31,7 +28,7 @@ plt.xticks(label_positions, labels, rotation='horizontal')
 plt.xlabel('Wave vector')
 
 plt.figure(1)
-for dist, freq in zip(bs.get_my_distances(), bs.get_frequencies()):
+for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
     plt.plot(dist, freq, color='r')
 plt.ylabel('Frequency [THz]')
 plt.title('Phonon band structure')
@@ -51,7 +48,6 @@ plt.ylabel('$\gamma$')
 plt.title('Mode Gruneisen parameter')
 
 # Mesh
-
 mesh = wc.out.mesh
 plt.xlabel('Frequency [THz]')
 plt.ylabel('$\gamma$')

@@ -76,8 +76,20 @@ class BandStructureData(Data):
         import tempfile
         import numpy
 
-        for element in {'q_points.npy': numpy.array(band_structure_phonopy[0]),
-                        'distances.npy': numpy.array(band_structure_phonopy[1]),
+        q_points = numpy.array(band_structure_phonopy[0])
+        distances = numpy.array(band_structure_phonopy[1])
+
+        # Check consistency
+        if self.get_bands() is None:
+            self.set_bands(q_points)
+        else:
+            numpy.testing.assert_array_equal(q_points, self.get_bands())
+
+        numpy.testing.assert_array_equal(distances, self.get_distances())
+
+        for element in {
+                        # 'q_points.npy': numpy.array(band_structure_phonopy[0]),
+                        # 'distances.npy': numpy.array(band_structure_phonopy[1]),
                         'frequencies.npy':numpy.array(band_structure_phonopy[2]),
                         }.items():
 
@@ -92,12 +104,20 @@ class BandStructureData(Data):
         import tempfile
         import numpy
 
-        for element in {'q_points.npy': numpy.array([band[0] for band in band_structure_gruneisen._paths]),
-                        #'distances_without_shift.npy': numpy.array([band[1] for band in band_structure_gruneisen._paths]),
-                        'gamma.npy': numpy.array([band[2] for band in band_structure_gruneisen._paths]),
+        q_points = numpy.array([band[0] for band in band_structure_gruneisen._paths])
+        distances = numpy.array([band[5] for band in band_structure_gruneisen._paths])
+
+        # Check consistency
+        if self.get_bands() is None:
+            self.set_bands(q_points)
+        else:
+            numpy.testing.assert_array_equal(q_points, self.get_bands())
+
+        numpy.testing.assert_array_equal(distances, self.get_distances())
+
+        for element in {'gamma.npy': numpy.array([band[2] for band in band_structure_gruneisen._paths]),
                         'eigenvalues.npy': numpy.array([band[3] for band in band_structure_gruneisen._paths]),
                         'frequencies.npy': numpy.array([band[4] for band in band_structure_gruneisen._paths]),
-                        'distances.npy': numpy.array([band[5] for band in band_structure_gruneisen._paths])
                         }.items():
 
             with tempfile.NamedTemporaryFile() as f:
@@ -106,33 +126,6 @@ class BandStructureData(Data):
                 # will just copy an empty file
                 self.add_path(f.name, element[0])
 
-    def get_q_points(self, band=None):
-        """
-        Return the q_points in the node as a numpy array
-        """
-        import numpy
-
-        fname = 'q_points.npy'
-
-        array = numpy.load(self.get_abs_path(fname))
-        if band is not None:
-            array = array[band]
-
-        return array
-
-    def get_distances(self, band=None):
-        """
-        Return the distances in the node as a numpy array
-        """
-        import numpy
-
-        fname = 'distances.npy'
-
-        array = numpy.load(self.get_abs_path(fname))
-        if band is not None:
-            array = array[band]
-
-        return array
 
     def get_unitcell(self):
         """
@@ -141,11 +134,13 @@ class BandStructureData(Data):
         import numpy
 
         fname = 'unitcell.npy'
+        if fname not in self.get_folder_list():
+            return None
 
         array = numpy.load(self.get_abs_path(fname))
         return array
 
-    def get_my_distances(self, band=None):
+    def get_distances(self, band=None):
         """
         Return the distances in the node as a numpy array
         """
@@ -184,6 +179,8 @@ class BandStructureData(Data):
         import numpy
 
         fname = 'frequencies.npy'
+        if fname not in self.get_folder_list():
+            return None
 
         array = numpy.load(self.get_abs_path(fname))
         if band is not None:
@@ -198,6 +195,8 @@ class BandStructureData(Data):
         import numpy
 
         fname = 'gamma.npy'
+        if fname not in self.get_folder_list():
+            return None
 
         array = numpy.load(self.get_abs_path(fname))
         if band is not None:
@@ -212,6 +211,9 @@ class BandStructureData(Data):
         import numpy
 
         fname = 'eigenvalues.npy'
+        if fname not in self.get_folder_list():
+            return None
+
 
         array = numpy.load(self.get_abs_path(fname))
         if band is not None:
@@ -226,10 +228,13 @@ class BandStructureData(Data):
         import numpy
 
         fname = 'bands.npy'
+        if fname not in self.get_folder_list():
+            return None
 
         array = numpy.load(self.get_abs_path(fname))
         if band is not None:
             array = array[band]
+
 
         return array
 
@@ -268,7 +273,7 @@ class BandStructureData(Data):
         return array
 
     def get_formatted_labels_matplotlib(self):
-        distances = self.get_my_distances()
+        distances = self.get_distances()
         labels_array = self.get_labels()
 
         substitutions = {'GAMMA': u'\u0393'

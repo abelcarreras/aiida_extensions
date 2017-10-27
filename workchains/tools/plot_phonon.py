@@ -15,15 +15,12 @@ import numpy as np
 
 # Set WorkChain PhononPhonopy PK number
 ########################
-wc = load_node(1973)
+wc = load_node(6289)
 ########################
 
 # Phonon Band structure
 bs = wc.out.band_structure
-print bs.get_bands()
-print bs.get_q_points()
 
-print bs.get_frequencies().shape
 for dist, freq in zip(bs.get_my_distances(), bs.get_frequencies()):
     plt.plot(dist, freq, color='r')
 
