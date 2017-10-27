@@ -15,13 +15,13 @@ import numpy as np
 
 # Set WorkChain GruneisenPhonopy PK number
 ########################
-wc = load_node(6183)
+wc = load_node(6213)
 ########################
 
 # Phonon Band structure
 bs = wc.out.band_structure
 print bs.get_distances()
-exit()
+
 
 print bs.get_frequencies().shape
 
