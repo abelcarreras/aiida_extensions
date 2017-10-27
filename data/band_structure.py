@@ -167,8 +167,8 @@ class BandStructureData(Data):
             distances.append(band_dist)
         distances = np.array(distances)
 
- #       if band is not None:
- #           distances = distances[band]
+        if band is not None:
+            distances = distances[band]
 
         return distances
 
