@@ -45,7 +45,7 @@ def get_phonon(structure, force_constants, ph_settings):
                                                   ph_settings.dict.symmetry_precision))
     return phonon
 
-def get_path_using_seekpath(structure, band_resolution=30):
+def get_path_using_seekpath2(structure, band_resolution=30):
     import seekpath
 
     cell = structure.cell
@@ -107,8 +107,10 @@ def phonopy_gruneisen(phonon_plus_structure,
     #gruneisen.set_band_structure(band_structure.get_bands(), 31)
     #band_structure.set_band_structure_gruneisen(gruneisen.get_band_structure())
 
-    bands = get_path_using_seekpath(phonon_origin_structure)
+    bands = get_path_using_seekpath2(phonon_origin_structure)
+
     gruneisen.set_band_structure(bands['ranges'], 31)
+    band_structure.set_band_structure_gruneisen(gruneisen.get_band_structure())
 
 
 
