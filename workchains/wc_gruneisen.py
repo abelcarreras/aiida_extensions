@@ -56,16 +56,16 @@ def phonopy_gruneisen(phonon_plus_structure,
     from phonopy import PhonopyGruneisen
 
     phonon_plus = get_phonon(phonon_plus_structure,
-                              phonon_plus_fc,
-                              ph_settings)
+                             phonon_plus_fc,
+                             ph_settings)
 
     phonon_minus = get_phonon(phonon_minus_structure,
-                               phonon_minus_fc,
-                               ph_settings)
+                              phonon_minus_fc,
+                              ph_settings)
 
     phonon_origin = get_phonon(phonon_origin_structure,
-                                phonon_origin_fc,
-                                ph_settings)
+                               phonon_origin_fc,
+                               ph_settings)
 
     gruneisen = PhonopyGruneisen(phonon_origin,  # equilibrium
                                  phonon_plus,  # plus
@@ -73,22 +73,12 @@ def phonopy_gruneisen(phonon_plus_structure,
 
     gruneisen.set_mesh(ph_settings.dict.mesh, is_gamma_center=False, is_mesh_symmetry=True)
 
-    print ('hereher')
     # BAND STRUCTURE
     band_structure = get_path_using_seekpath(phonon_origin_structure)
     gruneisen.set_band_structure(band_structure.get_band_ranges(),
                                  band_structure.get_number_of_points())
 
-    print ('out')
-
-    # gruneisen.set_band_structure(band_structure.get_bands(), 31)
-    # band_structure.set_band_structure_gruneisen(gruneisen.get_band_structure())
-    # bands = get_path_using_seekpath2(phonon_origin_structure)
-    # gruneisen.set_band_structure(bands['ranges'], 31)
-
     band_structure.set_band_structure_gruneisen(gruneisen.get_band_structure())
-
-    print ('out2')
 
     # mesh
     mesh = gruneisen.get_mesh()
@@ -150,9 +140,6 @@ class GruneisenPhonopy(WorkChain):
 
             calcs[expansions[0]] = future
             print ('phonon workchain: {} {}'.format(expansions[0], future.pid))
-        #print calcs
-
-        #return ToContext(plus=calcs['plus'], origin=calcs['origin'], minus=calcs['minus'])
 
         return ToContext(**calcs)
 
@@ -169,7 +156,6 @@ class GruneisenPhonopy(WorkChain):
                                               phonon_origin_structure=self.ctx.origin.out.final_structure,
                                               phonon_origin_fc=self.ctx.origin.out.force_constants,
                                               ph_settings=self.inputs.ph_settings)
-
 
         self.out('band_structure', gruneisen_results['band_structure'])
         self.out('mesh', gruneisen_results['mesh'])

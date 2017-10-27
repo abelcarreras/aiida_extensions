@@ -70,7 +70,6 @@ class BandStructureData(Data):
             # will just copy an empty file
             self.add_path(f.name, 'unitcell.npy')
 
-
     def set_band_structure_phonopy(self, band_structure_phonopy):
 
         import tempfile
