@@ -26,6 +26,7 @@ print bs.get_distances()
 print bs.get_frequencies().shape
 
 labels, label_positions = bs.get_formatted_labels_matplotlib()
+print label_positions
 plt.rcParams.update({'mathtext.default': 'regular'})
 plt.xticks(label_positions, labels, rotation='horizontal')
 plt.xlabel('Wave vector')
