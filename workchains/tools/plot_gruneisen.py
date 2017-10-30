@@ -23,6 +23,8 @@ if len(sys.argv) < 2:
 wc = load_node(int(sys.argv[1]))
 ################################
 
+gamma_cutoff = 0.1
+
 # Phonon Band structure
 bs = wc.out.band_structure
 
@@ -49,14 +51,13 @@ if bs.get_labels() is not None:
     labels, label_positions = bs.get_formatted_labels_matplotlib()
     plt.xticks(label_positions, labels, rotation='horizontal')
 
-
 plt.figure(3)
 bands = bs.get_bands()
 #for dist, freq in zip(bs.get_distances(), bs.get_gamma()):
 for i, dist in enumerate(bs.get_distances()):
     gamma = bs.get_gamma(band=i)
     q_points = bs.get_bands(band=i)
-    mask = np.where(np.linalg.norm(q_points, axis=1) > 0.1)
+    mask = np.where(np.linalg.norm(q_points, axis=1) > gamma_cutoff)
 
     plt.plot(dist[mask], gamma[mask], color='r')
 plt.ylabel('$\gamma$')
@@ -72,8 +73,14 @@ if bs.get_labels() is not None:
 mesh = wc.out.mesh
 
 plt.figure(4)
-for g, freq in zip(mesh.get_array('frequencies').T, mesh.get_array('gruneisen').T):
-    plt.plot(g, freq, marker='o', linestyle='None', markeredgecolor='black', color='red')
+#for g, freq in zip(mesh.get_array('frequencies').T, mesh.get_array('gruneisen').T):
+
+for i, freq in enumerate(mesh.get_array('frequencies').T):
+    gamma = mesh.get_array('frequencies').T[i]
+    q_points = mesh.get_array('q_points').T[i]
+    mask = np.where(np.linalg.norm(q_points, axis=1) > gamma_cutoff)
+
+    plt.plot(gamma[mask], freq[mask], marker='o', linestyle='None', markeredgecolor='black', color='red')
 plt.xlabel('Frequency [THz]')
 plt.ylabel('$\gamma$')
 plt.title('Mode Gruneisen parameter (mesh)')
