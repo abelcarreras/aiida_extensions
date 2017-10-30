@@ -30,7 +30,7 @@ bs = wc.out.band_structure
 
 plt.figure(1)
 for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
-    plt.plot(dist, freq, color='r')
+    plt.plot(dist, freq)
 plt.ylabel('Frequency [THz]')
 plt.title('Phonon band structure')
 
