@@ -54,11 +54,11 @@ plt.figure(3)
 bands = bs.get_bands()
 #for dist, freq in zip(bs.get_distances(), bs.get_gamma()):
 for i, dist in enumerate(bs.get_distances()):
-    freq = bs.get_frequencies(band=i)
+    gamma = bs.get_gamma(band=i)
     q_points = bs.get_bands(band=i)
     mask = np.where(np.linalg.norm(q_points, axis=1) > 0.1)
 
-    plt.plot(dist[mask], freq[mask], color='r')
+    plt.plot(dist[mask], gamma[mask], color='r')
 plt.ylabel('$\gamma$')
 plt.title('Mode Gruneisen parameter')
 
@@ -72,7 +72,7 @@ if bs.get_labels() is not None:
 mesh = wc.out.mesh
 
 plt.figure(4)
-for (g, freq) in zip(mesh.get_array('frequencies').T, mesh.get_array('gruneisen').T):
+for g, freq in zip(mesh.get_array('frequencies').T, mesh.get_array('gruneisen').T):
     plt.plot(g, freq, marker='o', linestyle='None', markeredgecolor='black', color='red')
 plt.xlabel('Frequency [THz]')
 plt.ylabel('$\gamma$')
