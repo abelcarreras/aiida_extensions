@@ -74,7 +74,7 @@ def phonopy_gruneisen(phonon_plus_structure,
     gruneisen.set_mesh(ph_settings.dict.mesh, is_gamma_center=False, is_mesh_symmetry=True)
 
     # BAND STRUCTURE
-    band_structure = get_path_using_seekpath(phonon_origin_structure)
+    band_structure = get_path_using_seekpath(phonon_origin.get_primitive())
     gruneisen.set_band_structure(band_structure.get_band_ranges(),
                                  band_structure.get_number_of_points())
 
