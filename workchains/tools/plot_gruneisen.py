@@ -25,21 +25,16 @@ wc = load_node(int(sys.argv[1]))
 # Phonon Band structure
 bs = wc.out.band_structure
 
-labels, label_positions = bs.get_formatted_labels_matplotlib()
-plt.rcParams.update({'mathtext.default': 'regular'})
-plt.xticks(label_positions, labels, rotation='horizontal')
-plt.xlabel('Wave vector')
-
-if bs.get_labels() is not None:
-    plt.rcParams.update({'mathtext.default': 'regular'})
-    labels, label_positions = bs.get_formatted_labels_matplotlib()
-    plt.xticks(label_positions, labels, rotation='horizontal')
-
 plt.figure(1)
 for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
     plt.plot(dist, freq, color='r')
 plt.ylabel('Frequency [THz]')
 plt.title('Phonon band structure')
+
+if bs.get_labels() is not None:
+    plt.rcParams.update({'mathtext.default': 'regular'})
+    labels, label_positions = bs.get_formatted_labels_matplotlib()
+    plt.xticks(label_positions, labels, rotation='horizontal')
 
 
 plt.figure(2)
@@ -48,11 +43,23 @@ for dist, freq in zip(bs.get_distances(), bs.get_eigenvalues()):
 plt.ylabel('Eigenvalues')
 plt.title('Eigenvalues')
 
+if bs.get_labels() is not None:
+    plt.rcParams.update({'mathtext.default': 'regular'})
+    labels, label_positions = bs.get_formatted_labels_matplotlib()
+    plt.xticks(label_positions, labels, rotation='horizontal')
+
+
 plt.figure(3)
 for dist, freq in zip(bs.get_distances(), bs.get_gamma()):
     plt.plot(dist, freq, color='r')
 plt.ylabel('$\gamma$')
 plt.title('Mode Gruneisen parameter')
+
+if bs.get_labels() is not None:
+    plt.rcParams.update({'mathtext.default': 'regular'})
+    labels, label_positions = bs.get_formatted_labels_matplotlib()
+    plt.xticks(label_positions, labels, rotation='horizontal')
+
 
 # Mesh
 mesh = wc.out.mesh
