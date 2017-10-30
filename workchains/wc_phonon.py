@@ -252,7 +252,7 @@ def get_properties_from_phonopy(structure, ph_settings, force_constants):
 
     bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
                         positions=[site.position for site in structure.sites],
-                        cell=np.array(structure.cell).T)
+                        cell=structure.cell)
 
     phonon = Phonopy(bulk,
                      supercell_matrix=ph_settings.dict.supercell,
@@ -267,6 +267,7 @@ def get_properties_from_phonopy(structure, ph_settings, force_constants):
                                               force_constants.get_born_charges(),
                                               force_constants.get_epsilon(),
                                               ph_settings.dict.symmetry_precision)
+        print bulk.get_cell()
         print born_parameters
 
         phonon.set_nac_params(born_parameters)
