@@ -12,10 +12,15 @@ ArrayData = DataFactory('array')
 KpointsData = DataFactory('array.kpoints')
 
 import numpy as np
+import sys
+
+if len(sys.argv) < 2:
+    print ('use: plot_phonon pk_number')
+    exit()
 
 # Set WorkChain PhononPhonopy PK number
 ########################
-wc = load_node(8235)
+wc = load_node(int(sys.argv[1]))
 ########################
 
 # Phonon Band structure
