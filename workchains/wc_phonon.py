@@ -301,8 +301,6 @@ def get_properties_from_phonopy(structure, ph_settings, force_constants):
     thermal_properties.set_array('cv', cv * normalization_factor)
 
     # BAND STRUCTURE
-    band_structure = get_path_using_seekpath(structure)
-
     band_structure = get_path_using_seekpath(phonon.get_primitive())
     phonon.set_band_structure(band_structure.get_bands())
     band_structure.set_band_structure_phonopy(phonon.get_band_structure())
