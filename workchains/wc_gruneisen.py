@@ -84,11 +84,16 @@ def phonopy_gruneisen(phonon_plus_structure,
     mesh = gruneisen.get_mesh()
     frequencies_mesh = np.array(mesh.get_frequencies())
     gruneisen_mesh = np.array(mesh.get_gruneisen())
+    q_points_mesh = np.array(mesh.get_qpoints())
+    eigenvalues_mesh = np.array(mesh.get_eigenvalues())
+
 
     # build mesh
     mesh_array = ArrayData()
     mesh_array.set_array('frequencies', frequencies_mesh)
     mesh_array.set_array('gruneisen', gruneisen_mesh)
+    mesh_array.set_array('q_points', q_points_mesh)
+    mesh_array.set_array('eigenvalues', eigenvalues_mesh)
 
     return {'band_structure': band_structure, 'mesh': mesh_array}
 
@@ -117,7 +122,7 @@ class GruneisenPhonopy(WorkChain):
         print ('start create cell expansions')
 
         # For testing
-        testing = False
+        testing = True
         if testing:
             self.ctx._content['plus'] = load_node(9842)
             self.ctx._content['origin'] = load_node(9839)
