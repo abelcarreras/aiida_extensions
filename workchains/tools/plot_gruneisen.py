@@ -60,6 +60,8 @@ for i, dist in enumerate(bs.get_distances()):
              gamma[mask],
              # color='r'
              )
+    plt.gca().set_color_cycle(None)
+
 plt.ylabel('$\gamma$')
 plt.title('Mode Gruneisen parameter')
 
