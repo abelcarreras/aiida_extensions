@@ -88,12 +88,6 @@ def phonopy_gruneisen(phonon_plus_structure,
     weights_mesh = np.array(mesh.get_weights())
     eigenvalues_mesh = np.array(mesh.get_eigenvalues())
 
-    print frequencies_mesh.shape
-    print gruneisen_mesh.shape
-    print q_points_mesh.shape
-    print weights_mesh.shape
-    print eigenvalues_mesh.shape
-
     # build mesh
     mesh_array = ArrayData()
     mesh_array.set_array('frequencies', frequencies_mesh)

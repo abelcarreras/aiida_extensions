@@ -58,13 +58,13 @@ ph_settings = ParameterData(dict={'supercell': [[2,0,0],
 # VASP SPECIFIC
 if True:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
     incar_dict = {
-        'NELMIN' : 5,
-        'NELM'   : 100,
-        'ENCUT'  : 400,
-        'ALGO'   : 38,
-        'ISMEAR' : 0,
-        'SIGMA'  : 0.01,
-        'GGA'    : 'PS'
+        'NELMIN': 5,
+        'NELM'  : 100,
+        'ENCUT' : 400,
+        'ALGO'  : 38,
+        'ISMEAR': 0,
+        'SIGMA' : 0.01,
+        'GGA'   : 'PS'
     }
 
     es_settings = ParameterData(dict=incar_dict)

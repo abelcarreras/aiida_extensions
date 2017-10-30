@@ -43,9 +43,9 @@ for i, scaled_position in enumerate(scaled_positions):
 
 
 # PHONOPY settings
-ph_settings = ParameterData(dict={'supercell': [[2,0,0],
-                                                [0,2,0],
-                                                [0,0,2]],
+ph_settings = ParameterData(dict={'supercell': [[2, 0, 0],
+                                                [0, 2, 0],
+                                                [0, 0, 2]],
                                   'primitive': [[1.0, 0.0, 0.0],
                                                 [0.0, 1.0, 0.0],
                                                 [0.0, 0.0, 1.0]],
