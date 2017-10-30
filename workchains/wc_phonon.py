@@ -223,7 +223,7 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
     print 'smat', smat
     print 'ucell', ucell
 
-    exit()
+
 
     print born_charges
     inv_smat = np.linalg.inv(smat)
@@ -241,6 +241,7 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
 
     born_dict = {'born': reduced_borns, 'dielectric': epsilon, 'factor': factor}
 
+    exit()
     return born_dict
 
 
