@@ -56,7 +56,7 @@ bands = bs.get_bands()
 for i, dist in enumerate(bs.get_distances()):
     freq = bs.get_frequencies(band=i)
     q_points = bs.get_bands(band=i)
-    print (np.where(np.linalg.norm(q_points, axis=1) < 0.1))
+    print (np.where(np.linalg.norm(q_points, axis=0) < 0.1))
 
     plt.plot(dist, freq, color='r')
 plt.ylabel('$\gamma$')
