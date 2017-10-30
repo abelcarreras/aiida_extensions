@@ -267,6 +267,7 @@ def get_properties_from_phonopy(structure, ph_settings, force_constants):
                                               force_constants.get_born_charges(),
                                               force_constants.get_epsilon(),
                                               ph_settings.dict.symmetry_precision)
+        print born_parameters
 
         phonon.set_nac_params(born_parameters)
 
