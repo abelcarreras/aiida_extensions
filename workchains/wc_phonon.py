@@ -263,9 +263,6 @@ def get_properties_from_phonopy(structure, ph_settings, force_constants):
 
     if force_constants.epsilon_and_born_exist():
         print ('use born charges')
-        print force_constants.get_epsilon()
-        print force_constants.get_born_charges()
-        print ('---')
         born_parameters = get_born_parameters(phonon,
                                               force_constants.get_born_charges(),
                                               force_constants.get_epsilon(),
