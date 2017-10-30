@@ -56,7 +56,7 @@ ph_settings = ParameterData(dict={'supercell': [[2, 0, 0],
                                   # 'code': 'phonopy@boston'  # comment to use local phonopy
                                   })
 
-# VASP SPECIFIC
+# VASP settings
 if True:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
     incar_dict = {
         'NELMIN' : 5,
@@ -89,11 +89,10 @@ if True:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
                      'kpoints_per_atom': 100,  # k-point density
                      'pseudos': potcar.as_dict()}
 
-    # pseudos = ParameterData(dict=potcar.as_dict())
     es_settings = ParameterData(dict=settings_dict)
 
 
-# CODE INDEPENDENT
+# Machine
 machine_dict = {'resources': {'num_machines': 1,
                               'parallel_env': 'mpi*',
                               'tot_num_mpiprocs': 16},
