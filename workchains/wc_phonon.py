@@ -234,6 +234,7 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
     s_indep_atoms = p2s[p_sym.get_independent_atoms()]
     u2u = scell.get_unitcell_to_unitcell_map()
     u_indep_atoms = [u2u[x] for x in s_indep_atoms]
+    print u_indep_atoms
     reduced_borns = born_charges[u_indep_atoms].copy()
 
     factor = get_default_physical_units('vasp')['nac_factor']  # born charges in VASP units
