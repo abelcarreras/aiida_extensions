@@ -1,6 +1,3 @@
-
-# Works run by the daemon (using submit)
-
 from aiida import load_dbenv, is_dbenv_loaded
 if not is_dbenv_loaded():
     load_dbenv()
