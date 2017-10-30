@@ -252,7 +252,7 @@ def get_properties_from_phonopy(structure, ph_settings, force_constants):
 
     bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
                         positions=[site.position for site in structure.sites],
-                        cell=structure.cell)
+                        cell=structure.cell.T)
 
     phonon = Phonopy(bulk,
                      supercell_matrix=ph_settings.dict.supercell,
