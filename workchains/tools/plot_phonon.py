@@ -19,9 +19,9 @@ if len(sys.argv) < 2:
     exit()
 
 # Set WorkChain PhononPhonopy PK number
-########################
+################################
 wc = load_node(int(sys.argv[1]))
-########################
+################################
 
 # Phonon Band structure
 bs = wc.out.band_structure
