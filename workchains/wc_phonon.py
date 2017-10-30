@@ -230,12 +230,16 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
     scell = get_supercell(ucell, smat, symprec=symprec)
     pcell = get_primitive(scell, np.dot(inv_smat, pmat), symprec=symprec)
     p2s = np.array(pcell.get_primitive_to_supercell_map(), dtype='intc')
-    p_sym = Symmetry(pcell, is_symmetry=False, symprec=symprec)
+    p_sym = Symmetry(pcell, is_symmetry=True, symprec=symprec)
     s_indep_atoms = p2s[p_sym.get_independent_atoms()]
     u2u = scell.get_unitcell_to_unitcell_map()
     u_indep_atoms = [u2u[x] for x in s_indep_atoms]
     print u_indep_atoms
     reduced_borns = born_charges[u_indep_atoms].copy()
+
+    print 'map', p_sym.get_map_atoms()
+
+
 
     factor = get_default_physical_units('vasp')['nac_factor']  # born charges in VASP units
 
