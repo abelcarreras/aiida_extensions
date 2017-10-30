@@ -81,7 +81,8 @@ if True:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
                     'shift': [0.0, 0.0, 0.0]}
 
     settings_dict = {'code': {'optimize': 'vasp544mpi@boston',
-                              'forces': 'vasp544mpi@boston'},
+                              'forces': 'vasp544mpi@boston',
+                              'born_charges': 'vasp544mpi@boston'},
                      'parameters': incar_dict,
                      #'kpoints': kpoints_dict,
                      'kpoints_per_atom': 100,  # k-point density
