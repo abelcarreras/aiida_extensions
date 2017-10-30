@@ -80,7 +80,8 @@ for i, freq in enumerate(mesh.get_array('frequencies').T):
     q_points = mesh.get_array('q_points')[i]
     print q_points
 
-    #mask = np.where(np.linalg.norm(q_points, axis=1) > gamma_cutoff)
+    mask = np.where(np.linalg.norm(q_points, axis=1) > gamma_cutoff)
+    print mask
     plt.plot(freq, gamma, marker='o', linestyle='None', markeredgecolor='black', color='red')
 plt.xlabel('Frequency [THz]')
 plt.ylabel('$\gamma$')
