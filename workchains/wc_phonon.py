@@ -475,7 +475,7 @@ class PhononPhonopy(WorkChain):
         if 'born_charges' in self.ctx:
             force_constants = add_nac_to_force_constants(force_constants, self.ctx.born_charges.out.output_array)['force_constants']
 
-        phonon_properties = get_properties_from_phonopy(structure=self.inputs.structure,
+        phonon_properties = get_properties_from_phonopy(structure=self.ctx.final_structure,
                                                         ph_settings=self.inputs.ph_settings,
                                                         force_constants=force_constants)
 
