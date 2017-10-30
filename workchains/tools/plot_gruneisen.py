@@ -28,12 +28,17 @@ gamma_cutoff = 0.1
 # Phonon Band structure
 bs = wc.out.band_structure
 
+prop_cicle = plt.rcParams['axes.prop_cycle']
+colors = prop_cicle.by_key()['color']
+
 plt.figure(1)
 for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
     plt.plot(dist,
              freq,
              #color='r'
              )
+    plt.gca().set_color_cycle(None)
+
 plt.ylabel('Frequency [THz]')
 plt.title('Phonon band structure')
 
