@@ -30,7 +30,10 @@ bs = wc.out.band_structure
 
 plt.figure(1)
 for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
-    plt.plot(dist, freq)
+    plt.plot(dist,
+             freq,
+             #color='r'
+             )
 plt.ylabel('Frequency [THz]')
 plt.title('Phonon band structure')
 
@@ -48,7 +51,10 @@ for i, dist in enumerate(bs.get_distances()):
     q_points = bs.get_bands(band=i)
     mask = np.where(np.linalg.norm(q_points, axis=1) > gamma_cutoff)
 
-    plt.plot(dist[mask], gamma[mask], color='r')
+    plt.plot(dist[mask],
+             gamma[mask],
+             # color='r'
+             )
 plt.ylabel('$\gamma$')
 plt.title('Mode Gruneisen parameter')
 
@@ -69,7 +75,12 @@ mask = np.where(np.linalg.norm(q_points, axis=1) > gamma_cutoff)
 
 for gamma, freq in zip( mesh.get_array('gruneisen').T,
                         mesh.get_array('frequencies').T):
-    plt.plot(freq[mask], gamma[mask], marker='o', linestyle='None', markeredgecolor='black')
+    plt.plot(freq[mask], gamma[mask],
+             marker='o',
+             linestyle='None',
+             markeredgecolor='black',
+             # color='red'
+             )
 plt.xlabel('Frequency [THz]')
 plt.ylabel('$\gamma$')
 plt.title('Mode Gruneisen parameter (mesh)')
