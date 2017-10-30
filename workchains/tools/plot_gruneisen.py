@@ -76,7 +76,7 @@ plt.figure(4)
 #for g, freq in zip(mesh.get_array('frequencies').T, mesh.get_array('gruneisen').T):
 
 for i, freq in enumerate(mesh.get_array('frequencies').T):
-    gamma = mesh.get_array('gamma').T[i]
+    gamma = mesh.get_array('gruneisen').T[i]
     #q_points = mesh.get_array('q_points').T
     #print q_points
 
