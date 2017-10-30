@@ -198,6 +198,7 @@ class BandStructureData(Data):
             return None
 
         array = numpy.load(self.get_abs_path(fname))
+
         if band is not None:
             array = array[band]
 

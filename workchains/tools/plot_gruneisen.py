@@ -12,6 +12,7 @@ ArrayData = DataFactory('array')
 KpointsData = DataFactory('array.kpoints')
 
 import sys
+import numpy as np
 
 if len(sys.argv) < 2:
     print ('use: plot_gruneisen pk_number')
@@ -50,7 +51,13 @@ if bs.get_labels() is not None:
 
 
 plt.figure(3)
-for dist, freq in zip(bs.get_distances(), bs.get_gamma()):
+bands = bs.get_bands()
+#for dist, freq in zip(bs.get_distances(), bs.get_gamma()):
+for i, dist in enumerate(bs.get_distances()):
+    freq = bs.get_frequencies(band=i)
+    q_points = bs.get_bands(band=i)
+    print (np.where(np.linalg.norm(q_points, axis=1) < 0.1))
+
     plt.plot(dist, freq, color='r')
 plt.ylabel('$\gamma$')
 plt.title('Mode Gruneisen parameter')
