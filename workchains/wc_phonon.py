@@ -218,6 +218,8 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
         "num_atom %d != len(borns) %d" % (ucell.get_number_of_atoms(),
                                           len(born_charges))
 
+
+    print born_charges
     inv_smat = np.linalg.inv(smat)
     scell = get_supercell(ucell, smat, symprec=symprec)
     pcell = get_primitive(scell, np.dot(inv_smat, pmat), symprec=symprec)
