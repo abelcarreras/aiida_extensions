@@ -347,8 +347,8 @@ class PhononPhonopy(WorkChain):
         return self.inputs.optimize
 
     def optimize(self):
-
-        print 'start optimize'
+        print('start phonon {}'.format(self.pid))
+        print ('start optimize')
         future = submit(OptimizeStructure,
                         structure=self.inputs.structure,
                         machine=self.inputs.machine,
@@ -366,7 +366,7 @@ class PhononPhonopy(WorkChain):
         return ToContext(optimized=future)
 
     def create_displacement_calculations(self):
-        print 'create displacements'
+        print ('create displacements')
         self.report('create displacements')
 
         # print self.ctx._get_dict()
@@ -433,7 +433,7 @@ class PhononPhonopy(WorkChain):
 
     def get_force_constants(self):
 
-        print 'calculate force constants'
+        print ('calculate force constants')
         self.report('calculate force constants')
 
         wf_inputs = {}

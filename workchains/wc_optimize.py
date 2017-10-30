@@ -70,7 +70,7 @@ class OptimizeStructure(WorkChain):
         self.ctx.counter +=1
 
         # self.ctx._get_dict()
-        print 'start optimization'
+        print ('start optimization')
 
         if not 'optimize' in self.ctx:
             structure = self.inputs.structure
@@ -91,7 +91,7 @@ class OptimizeStructure(WorkChain):
         return ToContext(optimize=future)
 
     def get_data(self):
-        print 'get_job'
+        print ('get_job')
 
         # self.ctx.structure = self.ctx.get('optimize').out.output_structure
 
