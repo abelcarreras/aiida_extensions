@@ -117,11 +117,11 @@ class GruneisenPhonopy(WorkChain):
         print ('start create cell expansions')
 
         # For testing
-        testing = False
+        testing = True
         if testing:
-            self.ctx._content['plus'] = load_node(5858)
-            self.ctx._content['origin'] = load_node(5855)
-            self.ctx._content['minus'] = load_node(5861)
+            self.ctx._content['plus'] = load_node(9842)
+            self.ctx._content['origin'] = load_node(9839)
+            self.ctx._content['minus'] = load_node(9845)
             return
 
         calcs = {}
