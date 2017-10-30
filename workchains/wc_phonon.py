@@ -219,6 +219,12 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
                                           len(born_charges))
 
 
+    print 'pmat', pmat
+    print 'smat', smat
+    print 'ucell', ucell
+
+    exit()
+
     print born_charges
     inv_smat = np.linalg.inv(smat)
     scell = get_supercell(ucell, smat, symprec=symprec)
