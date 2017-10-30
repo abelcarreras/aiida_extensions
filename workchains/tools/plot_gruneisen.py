@@ -81,7 +81,7 @@ for i, freq in enumerate(mesh.get_array('frequencies').T):
     print q_points
 
     mask = np.where(np.linalg.norm(q_points, axis=1) > gamma_cutoff)
-    plt.plot(gamma[mask], freq[mask], marker='o', linestyle='None', markeredgecolor='black', color='red')
+    plt.plot(gamma, freq, marker='o', linestyle='None', markeredgecolor='black', color='red')
 plt.xlabel('Frequency [THz]')
 plt.ylabel('$\gamma$')
 plt.title('Mode Gruneisen parameter (mesh)')
