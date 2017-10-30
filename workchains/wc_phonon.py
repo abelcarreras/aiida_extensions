@@ -389,7 +389,7 @@ class PhononPhonopy(WorkChain):
                 future = load_node(pk)
                 self.ctx._content[label] = future
 
-            self.ctx._content['born_charges'] = load_node(7194)
+            self.ctx._content['born_charges'] = load_node(13167)
             return
 
         for label, supercell in supercells.iteritems():
