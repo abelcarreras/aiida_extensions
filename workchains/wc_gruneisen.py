@@ -85,8 +85,14 @@ def phonopy_gruneisen(phonon_plus_structure,
     frequencies_mesh = np.array(mesh.get_frequencies())
     gruneisen_mesh = np.array(mesh.get_gruneisen())
     q_points_mesh = np.array(mesh.get_qpoints())
+    weights_mesh = np.array(mesh.get_weights())
     eigenvalues_mesh = np.array(mesh.get_eigenvalues())
 
+    print frequencies_mesh.shape
+    print gruneisen_mesh.shape
+    print q_points_mesh.shape
+    print weights_mesh.shape
+    print eigenvalues_mesh.shape
 
     # build mesh
     mesh_array = ArrayData()
@@ -94,6 +100,8 @@ def phonopy_gruneisen(phonon_plus_structure,
     mesh_array.set_array('gruneisen', gruneisen_mesh)
     mesh_array.set_array('q_points', q_points_mesh)
     mesh_array.set_array('eigenvalues', eigenvalues_mesh)
+    mesh_array.set_array('weights', weights_mesh)
+
 
     return {'band_structure': band_structure, 'mesh': mesh_array}
 
