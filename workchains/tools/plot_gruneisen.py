@@ -14,7 +14,7 @@ KpointsData = DataFactory('array.kpoints')
 import sys
 
 if len(sys.argv) < 2:
-    print ('use: plot_phonon pk_number')
+    print ('use: plot_gruneisen pk_number')
     exit()
 
 # Set WorkChain GruneisenPhonopy PK number
@@ -29,6 +29,11 @@ labels, label_positions = bs.get_formatted_labels_matplotlib()
 plt.rcParams.update({'mathtext.default': 'regular'})
 plt.xticks(label_positions, labels, rotation='horizontal')
 plt.xlabel('Wave vector')
+
+if bs.get_labels() is not None:
+    plt.rcParams.update({'mathtext.default': 'regular'})
+    labels, label_positions = bs.get_formatted_labels_matplotlib()
+    plt.xticks(label_positions, labels, rotation='horizontal')
 
 plt.figure(1)
 for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
