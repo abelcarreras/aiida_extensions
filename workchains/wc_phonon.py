@@ -76,7 +76,7 @@ def create_supercells_with_displacements_using_phonopy(structure, ph_settings):
                         cell=structure.cell)
 
     phonon = Phonopy(bulk,
-                     ph_settings.dict.supercell,
+                     supercell_matrix=ph_settings.dict.supercell,
                      primitive_matrix=ph_settings.dict.primitive,
                      symprec=ph_settings.dict.symmetry_precision)
 
@@ -255,7 +255,7 @@ def get_properties_from_phonopy(structure, ph_settings, force_constants):
                         cell=structure.cell)
 
     phonon = Phonopy(bulk,
-                     ph_settings.dict.supercell,
+                     supercell_matrix=ph_settings.dict.supercell,
                      primitive_matrix=ph_settings.dict.primitive,
                      symprec=ph_settings.dict.symmetry_precision)
 
@@ -351,7 +351,7 @@ class PhononPhonopy(WorkChain):
                         pressure=self.inputs.pressure,
                         )
         # For testing
-        testing = False
+        testing = True
         if testing:
             self.ctx._content['optimize'] = load_node(11402)
             return
@@ -380,7 +380,7 @@ class PhononPhonopy(WorkChain):
         calcs = {}
 
         # Load data from nodes
-        testing = False
+        testing = True
         if testing:
             from aiida.orm import load_node
             nodes = [11466, 11470, 11474, 11476]  # VASP

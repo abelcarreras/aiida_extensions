@@ -159,8 +159,8 @@ class BandStructureData(Data):
                 band_dist = [distances[-1][-1]]
             for i in range(npoints-1):
                 #band_dist.append(np.linalg.norm(np.array(band[i+1]) - np.array(band[i]))+band_dist[i])
-                band_dist.append(np.linalg.norm(np.dot(piece[i+1], inverse_unitcell) -
-                                                np.dot(piece[i], inverse_unitcell)) + band_dist[i])
+                band_dist.append(np.linalg.norm(np.dot(piece[i+1], inverse_unitcell.T) -
+                                                np.dot(piece[i], inverse_unitcell.T)) + band_dist[i])
 
             distances.append(band_dist)
         distances = np.array(distances)
