@@ -41,17 +41,6 @@ if bs.get_labels() is not None:
 
 
 plt.figure(2)
-for dist, freq in zip(bs.get_distances(), bs.get_eigenvalues()):
-    plt.plot(dist, freq, color='r')
-plt.ylabel('Eigenvalues')
-plt.title('Eigenvalues')
-
-if bs.get_labels() is not None:
-    plt.rcParams.update({'mathtext.default': 'regular'})
-    labels, label_positions = bs.get_formatted_labels_matplotlib()
-    plt.xticks(label_positions, labels, rotation='horizontal')
-
-plt.figure(3)
 bands = bs.get_bands()
 #for dist, freq in zip(bs.get_distances(), bs.get_gamma()):
 for i, dist in enumerate(bs.get_distances()):
@@ -72,7 +61,7 @@ if bs.get_labels() is not None:
 # Mesh
 mesh = wc.out.mesh
 
-plt.figure(4)
+plt.figure(3)
 #for g, freq in zip(mesh.get_array('frequencies').T, mesh.get_array('gruneisen').T):
 
 q_points = mesh.get_array('q_points')
