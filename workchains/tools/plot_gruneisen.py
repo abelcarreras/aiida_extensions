@@ -28,16 +28,13 @@ gamma_cutoff = 0.1
 # Phonon Band structure
 bs = wc.out.band_structure
 
-prop_cicle = plt.rcParams['axes.prop_cycle']
-colors = prop_cicle.by_key()['color']
-
 plt.figure(1)
 for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
     plt.plot(dist,
              freq,
              #color='r'
              )
-    #plt.gca().set_color_cycle(None)
+    plt.gca().set_color_cycle(None)
 
 plt.ylabel('Frequency [THz]')
 plt.title('Phonon band structure')
@@ -47,10 +44,7 @@ if bs.get_labels() is not None:
     labels, label_positions = bs.get_formatted_labels_matplotlib()
     plt.xticks(label_positions, labels, rotation='horizontal')
 
-
 plt.figure(2)
-bands = bs.get_bands()
-#for dist, freq in zip(bs.get_distances(), bs.get_gamma()):
 for i, dist in enumerate(bs.get_distances()):
     gamma = bs.get_gamma(band=i)
     q_points = bs.get_bands(band=i)
@@ -60,7 +54,7 @@ for i, dist in enumerate(bs.get_distances()):
              gamma[mask],
              # color='r'
              )
-    #plt.gca().set_color_cycle(None)
+    plt.gca().set_color_cycle(None)
 
 plt.ylabel('$\gamma$')
 plt.title('Mode Gruneisen parameter')
@@ -75,8 +69,6 @@ if bs.get_labels() is not None:
 mesh = wc.out.mesh
 
 plt.figure(3)
-#for g, freq in zip(mesh.get_array('frequencies').T, mesh.get_array('gruneisen').T):
-
 q_points = mesh.get_array('q_points')
 mask = np.where(np.linalg.norm(q_points, axis=1) > gamma_cutoff)
 
