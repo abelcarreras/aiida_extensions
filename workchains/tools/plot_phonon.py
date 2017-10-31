@@ -26,10 +26,10 @@ wc = load_node(int(sys.argv[1]))
 # Phonon Band structure
 bs = wc.out.band_structure
 
+plt.figure(1)
 for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
     plt.plot(dist, freq, color='r')
 
-plt.figure(1)
 plt.axes().get_xaxis().set_ticks([])
 plt.ylabel('Frequency [THz]')
 plt.xlabel('Wave vector')
@@ -84,4 +84,14 @@ plt.plot(temperature, entropy, label='entropy (KJ/mol)')
 plt.plot(temperature, cv, label='Cv (J/mol)')
 
 plt.legend()
+plt.show()
+
+
+bs = wc.out.band_structure
+
+# Two subplots, unpack the axes array immediately
+f, (ax1, ax2) = plt.subplots(1, 2, sharey=True)
+ax1.plot(bs.get_distances()[0], bs.get_frequencies()[0])
+ax2.plot(bs.get_distances()[1], bs.get_frequencies()[1])
+
 plt.show()
