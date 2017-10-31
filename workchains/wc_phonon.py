@@ -211,8 +211,8 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
     # print ('inside born parameters')
     pmat = phonon.get_primitive_matrix()
     smat = phonon.get_supercell_matrix()
+    smat = np.identity(3)
     ucell = phonon.get_unitcell()
-
     num_atom = len(born_charges)
     assert num_atom == ucell.get_number_of_atoms(), \
         "num_atom %d != len(borns) %d" % (ucell.get_number_of_atoms(),
@@ -237,6 +237,7 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
     print u_indep_atoms
     reduced_borns = born_charges[u_indep_atoms].copy()
 
+    pcell = get_primitive(scell, np.dot(inv_smat, pmat), symprec=symprec)
     print 'map', pcell.get_primitive_to_supercell_map()
 
 
