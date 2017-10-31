@@ -93,13 +93,19 @@ bs = wc.out.band_structure
 labels, positions = bs.get_formatted_labels_blocks()
 
 plt.figure(4)
-for i, dist in enumerate(bs.get_distances()):
-    label = labels[i]
+
+i = 0
+for label, position in zip(labels, positions):
+
     freq = bs.get_frequencies(band=i)
-    position = positions[i]
+    dist = bs.get_distances(band=i)
+
+    print label
+    print position
 
     for j in range(len(label)):
         plt.plot(dist, freq, color='r')
+        i = i+1
 
     plt.xlim([position[0], position[-1]])
     plt.rcParams.update({'mathtext.default': 'regular'})
