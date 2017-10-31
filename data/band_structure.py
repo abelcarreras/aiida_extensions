@@ -272,6 +272,42 @@ class BandStructureData(Data):
 
         return array
 
+    def get_formatted_labels_blocs(self):
+        distances = self.get_distances()
+        labels_array = self.get_labels()
+
+        substitutions = {'GAMMA': u'\u0393'
+                         }
+
+        substitutions = {'GAMMA': u'$\Gamma$'
+                         }
+
+        def replace_list(text_string, substitutions):
+
+            for item in substitutions.iteritems():
+                text_string = text_string.replace(item[0], item[1])
+
+            return text_string
+
+        labels = []
+        labels_positions = []
+        for i, freq in enumerate(distances):
+            block = [replace_list(labels_array[i-1][0], substitutions)]
+            while labels_array[i][0] == labels_array[i-1][1]:
+                block.append(replace_list(labels_array[i][0], substitutions))
+
+            block.append(replace_list(labels_array[i-1][0], substitutions))
+            labels_positions.append(block)
+
+        print labels
+
+        #labels_positions.append(distances[-1][-1])
+        #labels.append(replace_list(labels_array[-1][1], substitutions))
+        #labels[0] = replace_list(labels_array[0][0], substitutions)
+
+        return labels, labels_positions
+
+
     def get_formatted_labels_matplotlib(self):
         distances = self.get_distances()
         labels_array = self.get_labels()
