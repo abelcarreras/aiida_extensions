@@ -203,13 +203,13 @@ def get_path_using_seekpath(phonopy_structure, band_resolution=30):
     return band_structure
 
 
+# Dirty temporal interface for the non analitical corrections term (copied and adapted from phonopy)
 def get_born_parameters(phonon, born_unitcell, epsilon, symprec=1e-5):
     from phonopy.structure.cells import get_primitive, get_supercell
     from phonopy.interface import get_default_physical_units
     from phonopy.interface.vasp import _get_borns
     from phonopy.harmonic.force_constants import similarity_transformation
 
-    # print ('inside born parameters')
     pmat = phonon.get_primitive_matrix()
     smat = phonon.get_supercell_matrix()
     unitcell = phonon.get_unitcell()
@@ -218,7 +218,7 @@ def get_born_parameters(phonon, born_unitcell, epsilon, symprec=1e-5):
     scell = get_supercell(unitcell, smat, symprec=symprec)
     primitive = get_primitive(scell, np.dot(inv_smat, pmat), symprec=symprec)
 
-
+    # This function needs phonopy 1.12!
     reduced_borns, epsilon, s_indep_atoms = _get_borns(unitcell, born_unitcell, epsilon, primitive_matrix=pmat, supercell_matrix=smat, symprec=symprec)
 
     symmetry = phonon.get_primitive_symmetry()
@@ -283,8 +283,6 @@ def get_properties_from_phonopy(structure, ph_settings, force_constants):
                                               force_constants.get_born_charges(),
                                               force_constants.get_epsilon(),
                                               ph_settings.dict.symmetry_precision)
-        print bulk.get_cell()
-        print born_parameters
 
         phonon.set_nac_params(born_parameters)
 
@@ -369,7 +367,7 @@ class PhononPhonopy(WorkChain):
                         pressure=self.inputs.pressure,
                         )
         # For testing
-        testing = True
+        testing = False
         if testing:
             self.ctx._content['optimize'] = load_node(13047)
             return
@@ -398,7 +396,7 @@ class PhononPhonopy(WorkChain):
         calcs = {}
 
         # Load data from nodes
-        testing = True
+        testing = False
         if testing:
             from aiida.orm import load_node
             nodes = [13147, 13152, 13157, 13162]  # VASP
