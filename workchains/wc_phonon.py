@@ -210,7 +210,7 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
 
     # print ('inside born parameters')
     pmat = phonon.get_primitive_matrix()
-    smat = np.array([[0.5,0.0,0.0],[0.0,0.5, 0.0],[0.0,0.0,0.5]])
+    pmat = np.array([[0.5,0.0,0.0],[0.0,0.5, 0.0],[0.0,0.0,0.5]])
     smat = phonon.get_supercell_matrix()
     smat = np.identity(3)
     ucell = phonon.get_unitcell()
