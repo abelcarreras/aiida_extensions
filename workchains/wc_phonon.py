@@ -401,7 +401,7 @@ class PhononPhonopy(WorkChain):
                         pressure=self.inputs.pressure,
                         )
         # For testing
-        testing = False
+        testing = True
         if testing:
             self.ctx._content['optimize'] = load_node(13047)
             return
@@ -430,7 +430,7 @@ class PhononPhonopy(WorkChain):
         calcs = {}
 
         # Load data from nodes
-        testing = False
+        testing = True
         if testing:
             from aiida.orm import load_node
             nodes = [13147, 13152, 13157, 13162]  # VASP
