@@ -94,8 +94,11 @@ f, (ax1, ax2) = plt.subplots(1, 2, sharey=True)
 # Two subplots, unpack the axes array immediately
 plt.rcParams.update({'mathtext.default': 'regular'})
 labels, label_positions = bs.get_formatted_labels_matplotlib()
+
+plt.xticks(label_positions, labels, rotation='horizontal')
 ax1.plot(bs.get_distances()[0], bs.get_frequencies()[0])
+
 plt.xticks(label_positions, labels, rotation='horizontal')
 ax2.plot(bs.get_distances()[1], bs.get_frequencies()[1])
-plt.xticks(label_positions, labels, rotation='horizontal')
+
 plt.show()
