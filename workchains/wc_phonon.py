@@ -249,7 +249,7 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
     reduced_borns, epsilon, s_indep_atoms = _get_borns(ucell,born_charges, epsilon, primitive_matrix=pmat, supercell_matrix=smat,symprec=symprec)
 
     print reduced_borns
-    born_dict = {'born': reduced_borns, 'dielectric': epsilon, 'factor': factor}
+    born_dict = {'born': born_charges, 'dielectric': epsilon, 'factor': factor}
 
 
     return born_dict
