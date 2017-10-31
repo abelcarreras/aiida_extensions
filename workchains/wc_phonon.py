@@ -258,7 +258,7 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
     born = np.zeros((primitive.get_number_of_atoms(), 3, 3),
                     dtype='double', order='C')
 
-    print independent_atoms
+    print 'indep', independent_atoms
     exit()
     for i in independent_atoms:
         born[i] = reduced_borns[i]
