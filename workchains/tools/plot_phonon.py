@@ -101,6 +101,12 @@ for i, dist in enumerate(bs.get_distances()):
     for j in range(len(label)):
         plt.plot(dist, freq, color='r')
 
+    plt.xlim([position[0], position[-1]])
+    plt.rcParams.update({'mathtext.default': 'regular'})
+    plt.xticks(position, label, rotation='horizontal')
+
+    plt.show()
+
 
 
 for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
