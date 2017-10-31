@@ -203,69 +203,31 @@ def get_path_using_seekpath(phonopy_structure, band_resolution=30):
     return band_structure
 
 
-def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
+def get_born_parameters(phonon, born_unitcell, epsilon, symprec=1e-5):
     from phonopy.structure.cells import get_primitive, get_supercell
-    from phonopy.structure.symmetry import Symmetry
     from phonopy.interface import get_default_physical_units
     from phonopy.interface.vasp import _get_borns
+    from phonopy.harmonic.force_constants import similarity_transformation
 
     # print ('inside born parameters')
     pmat = phonon.get_primitive_matrix()
     smat = phonon.get_supercell_matrix()
-    ucell = phonon.get_unitcell()
-    num_atom = len(born_charges)
-    assert num_atom == ucell.get_number_of_atoms(), \
-        "num_atom %d != len(borns) %d" % (ucell.get_number_of_atoms(),
-                                          len(born_charges))
+    unitcell = phonon.get_unitcell()
 
-
-    print 'pmat', pmat
-    print 'smat', smat
-    print 'ucell', ucell
-
-
-
-    print born_charges
     inv_smat = np.linalg.inv(smat)
-    scell = get_supercell(ucell, smat, symprec=symprec)
-    pcell = get_primitive(scell, np.dot(inv_smat, pmat), symprec=symprec)
-    p2s = np.array(pcell.get_primitive_to_supercell_map(), dtype='intc')
-    p_sym = Symmetry(pcell, is_symmetry=True, symprec=symprec)
-    s_indep_atoms = p2s[p_sym.get_independent_atoms()]
-    u2u = scell.get_unitcell_to_unitcell_map()
-    u_indep_atoms = [u2u[x] for x in s_indep_atoms]
-    print u_indep_atoms
-    reduced_borns = born_charges[u_indep_atoms].copy()
-
-    pcell = get_primitive(scell, np.dot(inv_smat, pmat), symprec=symprec)
-    print 'map', pcell.get_primitive_to_supercell_map()
-    print 'map', pcell.get_supercell_to_primitive_map()
-    print 'map', scell.get_supercell_to_unitcell_map()
-    print 'map', scell.get_unitcell_to_supercell_map()
-
-    factor = get_default_physical_units('vasp')['nac_factor']  # born charges in VASP units
-
-    reduced_borns, epsilon, s_indep_atoms = _get_borns(ucell, born_charges, epsilon, primitive_matrix=pmat, supercell_matrix=smat,symprec=symprec)
+    scell = get_supercell(unitcell, smat, symprec=symprec)
+    primitive = get_primitive(scell, np.dot(inv_smat, pmat), symprec=symprec)
 
 
+    reduced_borns, epsilon, s_indep_atoms = _get_borns(unitcell, born_unitcell, epsilon, primitive_matrix=pmat, supercell_matrix=smat, symprec=symprec)
 
-    # Read Born effective charge
-    from phonopy.harmonic.force_constants import similarity_transformation
-
-    primitive = pcell
     symmetry = phonon.get_primitive_symmetry()
     independent_atoms = symmetry.get_independent_atoms()
-    born = np.zeros((primitive.get_number_of_atoms(), 3, 3),
-                    dtype='double', order='C')
-
-    print 'indep', independent_atoms
 
     born = np.zeros((primitive.get_number_of_atoms(), 3, 3),
                     dtype='double', order='C')
-    for j, i in enumerate(independent_atoms):
-        born[i] = reduced_borns[j]
-
-    # Check that the number of atoms in the BORN file was correct
+    for i, j in enumerate(independent_atoms):
+        born[j] = reduced_borns[i]
 
     # Expand Born effective charges to all atoms in the primitive cell
     rotations = symmetry.get_symmetry_operations()['rotations']
@@ -280,21 +242,13 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
         born[i] = similarity_transformation(rot_cartesian.transpose(),
                                             born[map_atoms[i]])
 
+    factor = get_default_physical_units('vasp')['nac_factor']  # born charges in VASP units
+
     non_anal = {'born': born,
                 'factor': factor,
                 'dielectric': epsilon}
 
-    print non_anal
-
-
-    exit()
-
-
-    print reduced_borns
-    born_dict = {'born': born_charges, 'dielectric': epsilon, 'factor': factor}
-
-
-    return born_dict
+    return non_anal
 
 
 @workfunction
