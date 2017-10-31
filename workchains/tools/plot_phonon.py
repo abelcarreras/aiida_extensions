@@ -108,7 +108,7 @@ for j, index in enumerate(indices):
     plt.rcParams.update({'mathtext.default': 'regular'})
     plt.xticks(position, labels[j], rotation='horizontal')
 
-    plt.show()
+plt.show()
 
 
 exit()
