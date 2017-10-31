@@ -204,7 +204,7 @@ def get_path_using_seekpath(phonopy_structure, band_resolution=30):
 
 
 # Dirty temporal interface for the non analitical corrections term (copied and adapted from phonopy)
-def get_born_parameters(phonon, born_unitcell, epsilon, symprec=1e-5):
+def get_born_parameters2(phonon, born_unitcell, epsilon, symprec=1e-5):
     from phonopy.structure.cells import get_primitive, get_supercell
     from phonopy.interface import get_default_physical_units
     from phonopy.interface.vasp import _get_borns
@@ -250,6 +250,40 @@ def get_born_parameters(phonon, born_unitcell, epsilon, symprec=1e-5):
 
     return non_anal
 
+
+def get_born_parameters(phonon, borns, epsilon, symprec=1e-5):
+    from phonopy.interface import get_default_physical_units
+    from phonopy import Phonopy
+    from phonopy.interface.vasp import symmetrize_borns_and_epsilon
+    from phonopy.structure.cells import get_supercell, get_primitive
+    import numpy as np
+
+    pmat = phonon.get_primitive_matrix()
+    smat = phonon.get_supercell_matrix()
+    cell = phonon.get_unitcell()
+
+    # Initialize phonon. Supercell matrix has to have the shape of (3, 3)
+    # phonon = Phonopy(cell, smat)
+
+    borns_, epsilon_ = symmetrize_borns_and_epsilon(borns, epsilon, cell,
+                                                    symprec=symprec)
+    inv_smat = np.linalg.inv(smat)
+    scell = get_supercell(cell, smat, symprec=symprec)
+    u2u_map = scell.get_unitcell_to_unitcell_map()
+    pcell = get_primitive(scell, np.dot(inv_smat, pmat), symprec=symprec)
+    p2s_map = pcell.get_primitive_to_supercell_map()
+    print(borns_[[u2u_map[i] for i in p2s_map]])
+    born = borns_[[u2u_map[i] for i in p2s_map]]
+
+    factor = get_default_physical_units('vasp')['nac_factor']  # born charges in VASP units
+
+    non_anal = {'born': born,
+                'factor': factor,
+                'dielectric': epsilon}
+
+    print non_anal
+    exit()
+    return non_anal
 
 @workfunction
 def get_properties_from_phonopy(structure, ph_settings, force_constants):
