@@ -91,42 +91,30 @@ bs = wc.out.band_structure
 
 
 labels, indices = bs.get_formatted_labels_blocks()
+
+ax_list = plt.subplots(*range(len(labels)))[1]
+
 plt.figure(4)
-for index, label in zip(indices, labels):
+for j, index in enumerate(indices):
 
     for i in index:
         freq = bs.get_frequencies(band=i)
         dist = bs.get_distances(band=i)
-        plt.plot(dist, freq, color='r')
+        ax_list[j].plot(dist, freq, color='r')
     print [bs.get_bands(band=index[0])[0], bs.get_bands(band=index[-1])[-1]]
 
     plt.xlim([bs.get_distances(band=index[0])[0], bs.get_distances(band=index[-1])[-1]])
     position = [ bs.get_distances(band=i)[0] for i in index] + [bs.get_distances(band=index[-1])[-1]]
     plt.rcParams.update({'mathtext.default': 'regular'})
-    plt.xticks(position, label, rotation='horizontal')
+    plt.xticks(position, labels[j], rotation='horizontal')
 
     plt.show()
 
 
-for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
-    plt.plot(dist, freq, color='r')
-
-plt.axes().get_xaxis().set_ticks([])
-plt.ylabel('Frequency [THz]')
-plt.xlabel('Wave vector')
-plt.xlim([0, bs.get_distances()[-1][-1]])
-plt.axhline(y=0, color='k', ls='dashed')
-plt.suptitle('Phonon band structure')
-
-if bs.get_labels() is not None:
-    plt.rcParams.update({'mathtext.default': 'regular'})
-    labels, label_positions = bs.get_formatted_labels_matplotlib()
-    plt.xticks(label_positions, labels, rotation='horizontal')
-
-
 exit()
 
-f, (ax1, ax2) = plt.subplots(1, 2, sharey=True)
+ax_list = plt.subplots(*range(len(labels)))[1]
+ax1, ax2 = plt.subplots(1, 2)[1]
 
 # Two subplots, unpack the axes array immediately
 plt.rcParams.update({'mathtext.default': 'regular'})
