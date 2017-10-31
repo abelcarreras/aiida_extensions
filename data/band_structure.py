@@ -291,7 +291,7 @@ class BandStructureData(Data):
 
 
         print labels_array
-        print distances
+        #print distances
         print ('-----')
 
         labels = []
