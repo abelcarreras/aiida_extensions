@@ -252,7 +252,7 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
     # Read Born effective charge
     from phonopy.harmonic.force_constants import similarity_transformation
 
-    primitive = pmat
+    primitive = pcell
     symmetry = phonon.get_primitive_symmetry()
     independent_atoms = symmetry.get_independent_atoms()
     born = np.zeros((primitive.get_number_of_atoms(), 3, 3),
