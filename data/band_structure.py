@@ -297,7 +297,7 @@ class BandStructureData(Data):
         labels = []
         labels_positions = []
         block = [replace_list(labels_array[0][0], substitutions)]
-        for i, freq in enumerate(distances[:-1]):
+        for i, freq in enumerate(distances):
             if labels_array[i+1][0] == labels_array[i][1]:
                 block.append(replace_list(labels_array[i+1][0], substitutions))
             else:
