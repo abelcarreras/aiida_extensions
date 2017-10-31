@@ -212,7 +212,6 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
     # print ('inside born parameters')
     pmat = phonon.get_primitive_matrix()
     smat = phonon.get_supercell_matrix()
-    #smat = np.identity(3)
     ucell = phonon.get_unitcell()
     num_atom = len(born_charges)
     assert num_atom == ucell.get_number_of_atoms(), \
@@ -246,7 +245,46 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
 
     factor = get_default_physical_units('vasp')['nac_factor']  # born charges in VASP units
 
-    reduced_borns, epsilon, s_indep_atoms = _get_borns(ucell,born_charges, epsilon, primitive_matrix=pmat, supercell_matrix=smat,symprec=symprec)
+    reduced_borns, epsilon, s_indep_atoms = _get_borns(ucell, born_charges, epsilon, primitive_matrix=pmat, supercell_matrix=smat,symprec=symprec)
+
+
+
+    # Read Born effective charge
+    from phonopy.harmonic.force_constants import similarity_transformation
+
+    primitive = pmat
+    symmetry = phonon.get_primitive_symmetry()
+    independent_atoms = symmetry.get_independent_atoms()
+    born = np.zeros((primitive.get_number_of_atoms(), 3, 3),
+                    dtype='double', order='C')
+
+    for i in independent_atoms:
+        born[i] = reduced_borns[i]
+
+    # Check that the number of atoms in the BORN file was correct
+
+    # Expand Born effective charges to all atoms in the primitive cell
+    rotations = symmetry.get_symmetry_operations()['rotations']
+    map_operations = symmetry.get_map_operations()
+    map_atoms = symmetry.get_map_atoms()
+
+    for i in range(primitive.get_number_of_atoms()):
+        # R_cart = L R L^-1
+        rot_cartesian = similarity_transformation(
+            primitive.get_cell().transpose(), rotations[map_operations[i]])
+        # R_cart^T B R_cart^-T (inverse rotation is required to transform)
+        born[i] = similarity_transformation(rot_cartesian.transpose(),
+                                            born[map_atoms[i]])
+
+    non_anal = {'born': born,
+                'factor': factor,
+                'dielectric': epsilon}
+
+    print non_anal
+
+
+    exit()
+
 
     print reduced_borns
     born_dict = {'born': born_charges, 'dielectric': epsilon, 'factor': factor}
