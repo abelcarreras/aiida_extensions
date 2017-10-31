@@ -102,6 +102,8 @@ for j, index in enumerate(indices):
         ax1.plot(dist, freq, color='r')
     print [bs.get_bands(band=index[0])[0], bs.get_bands(band=index[-1])[-1]]
 
+    plt.ylim([0, 20])
+
     plt.xlim([bs.get_distances(band=index[0])[0], bs.get_distances(band=index[-1])[-1]])
     position = [ bs.get_distances(band=i)[0] for i in index] + [bs.get_distances(band=index[-1])[-1]]
     plt.rcParams.update({'mathtext.default': 'regular'})
