@@ -251,7 +251,7 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
     print reduced_borns
     born_dict = {'born': reduced_borns, 'dielectric': epsilon, 'factor': factor}
 
-    exit()
+
     return born_dict
 
 
