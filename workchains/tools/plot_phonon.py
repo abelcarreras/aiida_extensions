@@ -95,7 +95,7 @@ labels, indices = bs.get_formatted_labels_blocks()
 plt.figure(4)
 for j, index in enumerate(indices):
 
-    ax1 = plt.subplot(1, len(labels), j+1, gridspec_kw = {'width_ratios':[3, 1, 1]})
+    ax1 = plt.subplot(1, len(labels), j+1)
     for i in index:
         freq = bs.get_frequencies(band=i)
         dist = bs.get_distances(band=i)
