@@ -91,8 +91,8 @@ bs = wc.out.band_structure
 
 
 labels, indices = bs.get_formatted_labels_blocks()
-print range(len(labels))
-ax_list = plt.subplots(*range(len(labels)))[1]
+print range(1, len(labels)+1)
+ax_list = plt.subplots(*range(1, len(labels)+1))[1]
 print ax_list
 exit()
 plt.figure(4)
