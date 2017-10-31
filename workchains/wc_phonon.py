@@ -207,6 +207,7 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
     from phonopy.structure.cells import get_primitive, get_supercell
     from phonopy.structure.symmetry import Symmetry
     from phonopy.interface import get_default_physical_units
+    from phonopy.interface.vasp import _get_borns
 
     # print ('inside born parameters')
     pmat = phonon.get_primitive_matrix()
@@ -243,10 +244,11 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
     print 'map', scell.get_supercell_to_unitcell_map()
     print 'map', scell.get_unitcell_to_supercell_map()
 
-
-
     factor = get_default_physical_units('vasp')['nac_factor']  # born charges in VASP units
 
+    reduced_borns, epsilon, s_indep_atoms = _get_borns(ucell,born_charges, epsilon, primitive_matrix=pmat, supercell_matrix=smat,symprec=symprec)
+
+    print reduced_borns
     born_dict = {'born': reduced_borns, 'dielectric': epsilon, 'factor': factor}
 
     exit()
