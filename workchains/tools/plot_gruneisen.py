@@ -23,7 +23,7 @@ if len(sys.argv) < 2:
 wc = load_node(int(sys.argv[1]))
 ################################
 
-gamma_cutoff = 0.1
+gamma_cutoff = 0.01
 
 # Phonon Band structure
 bs = wc.out.band_structure
