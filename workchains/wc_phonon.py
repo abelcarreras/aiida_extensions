@@ -281,8 +281,6 @@ def get_born_parameters(phonon, borns, epsilon, symprec=1e-5):
                 'factor': factor,
                 'dielectric': epsilon}
 
-    print non_anal
-    exit()
     return non_anal
 
 @workfunction
@@ -401,7 +399,7 @@ class PhononPhonopy(WorkChain):
                         pressure=self.inputs.pressure,
                         )
         # For testing
-        testing = True
+        testing = False
         if testing:
             self.ctx._content['optimize'] = load_node(13047)
             return
@@ -430,7 +428,7 @@ class PhononPhonopy(WorkChain):
         calcs = {}
 
         # Load data from nodes
-        testing = True
+        testing = False
         if testing:
             from aiida.orm import load_node
             nodes = [13147, 13152, 13157, 13162]  # VASP
