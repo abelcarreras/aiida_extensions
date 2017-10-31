@@ -319,6 +319,9 @@ class BandStructureData(Data):
         labels.append(block)
         labels_positions.append(block_positions)
 
+        print labels_positions
+        exit()
+
         #labels_positions.append(distances[-1][-1])
         #labels.append(replace_list(labels_array[-1][1], substitutions))
         #labels[0] = replace_list(labels_array[0][0], substitutions)
