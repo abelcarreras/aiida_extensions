@@ -289,6 +289,10 @@ class BandStructureData(Data):
 
             return text_string
 
+
+        print labels_array
+        print ('-----')
+
         labels = []
         labels_positions = []
         block = []
