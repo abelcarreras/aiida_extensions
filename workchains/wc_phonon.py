@@ -120,6 +120,7 @@ def create_forces_set(**kwargs):
 
     return {'force_sets': force_sets}
 
+
 @workfunction
 def add_nac_to_force_constants(force_constants, array_data):
     """
@@ -135,6 +136,7 @@ def add_nac_to_force_constants(force_constants, array_data):
                                          epsilon=array_data.get_array('epsilon'))
 
     return {'force_constants': force_constants_nac}
+
 
 @workfunction
 def get_force_constants_from_phonopy(structure, ph_settings, force_sets):
@@ -170,7 +172,6 @@ def get_force_constants_from_phonopy(structure, ph_settings, force_sets):
     return {'force_constants': force_constants}
 
 
-
 def get_path_using_seekpath(phonopy_structure, band_resolution=30):
     import seekpath
 
@@ -194,94 +195,38 @@ def get_path_using_seekpath(phonopy_structure, band_resolution=30):
             band.append(np.array(q_start) + (np.array(q_end) - np.array(q_start)) / band_resolution * i)
         bands.append(band)
 
-#    return {'ranges': bands,
-#            'labels': path_data['path']}
-
     band_structure = BandStructureData(bands=bands,
                                        labels=path_data['path'],
                                        unitcell=phonopy_structure.get_cell())
     return band_structure
 
 
-# Dirty temporal interface for the non analitical corrections term (copied and adapted from phonopy)
-def get_born_parameters2(phonon, born_unitcell, epsilon, symprec=1e-5):
-    from phonopy.structure.cells import get_primitive, get_supercell
+def get_born_parameters(phonon, born_unitcell, epsilon, symprec=1e-5):
     from phonopy.interface import get_default_physical_units
-    from phonopy.interface.vasp import _get_borns
-    from phonopy.harmonic.force_constants import similarity_transformation
-
-    pmat = phonon.get_primitive_matrix()
-    smat = phonon.get_supercell_matrix()
-    unitcell = phonon.get_unitcell()
-
-    inv_smat = np.linalg.inv(smat)
-    scell = get_supercell(unitcell, smat, symprec=symprec)
-    primitive = get_primitive(scell, np.dot(inv_smat, pmat), symprec=symprec)
-
-    # This function needs phonopy 1.12!
-    reduced_borns, epsilon, s_indep_atoms = _get_borns(unitcell, born_unitcell, epsilon, primitive_matrix=pmat, supercell_matrix=smat, symprec=symprec)
-
-    symmetry = phonon.get_primitive_symmetry()
-    independent_atoms = symmetry.get_independent_atoms()
-
-    born = np.zeros((primitive.get_number_of_atoms(), 3, 3),
-                    dtype='double', order='C')
-    for i, j in enumerate(independent_atoms):
-        born[j] = reduced_borns[i]
-
-    # Expand Born effective charges to all atoms in the primitive cell
-    rotations = symmetry.get_symmetry_operations()['rotations']
-    map_operations = symmetry.get_map_operations()
-    map_atoms = symmetry.get_map_atoms()
-
-    for i in range(primitive.get_number_of_atoms()):
-        # R_cart = L R L^-1
-        rot_cartesian = similarity_transformation(
-            primitive.get_cell().transpose(), rotations[map_operations[i]])
-        # R_cart^T B R_cart^-T (inverse rotation is required to transform)
-        born[i] = similarity_transformation(rot_cartesian.transpose(),
-                                            born[map_atoms[i]])
-
-    factor = get_default_physical_units('vasp')['nac_factor']  # born charges in VASP units
-
-    non_anal = {'born': born,
-                'factor': factor,
-                'dielectric': epsilon}
-
-    return non_anal
-
-
-def get_born_parameters(phonon, borns, epsilon, symprec=1e-5):
-    from phonopy.interface import get_default_physical_units
-    from phonopy import Phonopy
     from phonopy.interface.vasp import symmetrize_borns_and_epsilon
     from phonopy.structure.cells import get_supercell, get_primitive
-    import numpy as np
 
     pmat = phonon.get_primitive_matrix()
     smat = phonon.get_supercell_matrix()
     cell = phonon.get_unitcell()
 
-    # Initialize phonon. Supercell matrix has to have the shape of (3, 3)
-    # phonon = Phonopy(cell, smat)
-
-    borns_, epsilon_ = symmetrize_borns_and_epsilon(borns, epsilon, cell,
+    borns_, epsilon_ = symmetrize_borns_and_epsilon(born_unitcell, epsilon, cell,
                                                     symprec=symprec)
     inv_smat = np.linalg.inv(smat)
     scell = get_supercell(cell, smat, symprec=symprec)
     u2u_map = scell.get_unitcell_to_unitcell_map()
     pcell = get_primitive(scell, np.dot(inv_smat, pmat), symprec=symprec)
     p2s_map = pcell.get_primitive_to_supercell_map()
-    print(borns_[[u2u_map[i] for i in p2s_map]])
-    born = borns_[[u2u_map[i] for i in p2s_map]]
+    born_primitive = borns_[[u2u_map[i] for i in p2s_map]]
 
     factor = get_default_physical_units('vasp')['nac_factor']  # born charges in VASP units
 
-    non_anal = {'born': born,
+    non_anal = {'born': born_primitive,
                 'factor': factor,
                 'dielectric': epsilon}
 
     return non_anal
+
 
 @workfunction
 def get_properties_from_phonopy(structure, ph_settings, force_constants):
@@ -351,6 +296,7 @@ def get_properties_from_phonopy(structure, ph_settings, force_constants):
     band_structure.set_band_structure_phonopy(phonon.get_band_structure())
 
     return {'thermal_properties': thermal_properties, 'dos': dos, 'band_structure': band_structure}
+
 
 class PhononPhonopy(WorkChain):
     """
@@ -440,12 +386,8 @@ class PhononPhonopy(WorkChain):
             self.ctx._content['born_charges'] = load_node(13167)
             return
 
+        # Forces
         for label, supercell in supercells.iteritems():
-            # print label, structure
-
-            #print self.inputs.es_settings.dict.code
-
-            # plugin = self.inputs.code.get_attr('input_plugin')
 
             JobCalculation, calculation_input = generate_inputs(supercell,
                                                                 self.inputs.machine,
