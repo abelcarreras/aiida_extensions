@@ -259,9 +259,11 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
                     dtype='double', order='C')
 
     print 'indep', independent_atoms
-    exit()
-    for i in independent_atoms:
-        born[i] = reduced_borns[i]
+
+    born = np.zeros((primitive.get_number_of_atoms(), 3, 3),
+                    dtype='double', order='C')
+    for j, i in enumerate(independent_atoms):
+        born[i] = reduced_borns[j]
 
     # Check that the number of atoms in the BORN file was correct
 
