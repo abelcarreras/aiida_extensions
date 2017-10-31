@@ -90,33 +90,24 @@ plt.show()
 bs = wc.out.band_structure
 
 
-labels, positions = bs.get_formatted_labels_blocks()
-
+labels, indices = bs.get_formatted_labels_blocks()
 plt.figure(4)
+for index, label in zip(indices, labels):
 
-i = 0
-for label, position in zip(labels, positions):
-
-    freq = bs.get_frequencies(band=i)
-    dist = bs.get_distances(band=i)
-
-    print label
-    print position
-
-    for j in range(len(label)):
+    for i in index:
+        freq = bs.get_frequencies(band=i)
+        dist = bs.get_distances(band=i)
         plt.plot(dist, freq, color='r')
-        i = i+1
 
-    plt.xlim([position[0], position[-1]])
+    plt.xlim([ bs.get_bands(band=index[0])[0], bs.get_bands(band=index[-1])[-1]])
+    position = [ bs.get_bands(band=i)[0] for i in index] + [bs.get_bands(band=index[-1])[-1]]
     plt.rcParams.update({'mathtext.default': 'regular'})
     plt.xticks(position, label, rotation='horizontal')
 
     plt.show()
 
 
-
 for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
-
     plt.plot(dist, freq, color='r')
 
 plt.axes().get_xaxis().set_ticks([])

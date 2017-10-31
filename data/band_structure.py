@@ -320,7 +320,6 @@ class BandStructureData(Data):
         labels_positions.append(block_positions)
 
         print labels_positions
-        exit()
 
         #labels_positions.append(distances[-1][-1])
         #labels.append(replace_list(labels_array[-1][1], substitutions))
