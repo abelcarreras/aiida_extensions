@@ -300,7 +300,7 @@ class BandStructureData(Data):
             if labels_array[i][0] == labels_array[i-1][1]:
                 block.append(replace_list(labels_array[i][0], substitutions))
             else:
-                block.append(replace_list(labels_array[i-1][0], substitutions))
+                #block.append(replace_list(labels_array[i-1][0], substitutions))
                 labels_positions.append(block)
                 block = [replace_list(labels_array[i-1][0], substitutions)]
 
