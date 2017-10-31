@@ -29,7 +29,6 @@ bs = wc.out.band_structure
 plt.figure(1)
 for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
     plt.plot(dist, freq, color='r')
-    print ('test')
 
 plt.axes().get_xaxis().set_ticks([])
 plt.ylabel('Frequency [THz]')
@@ -93,13 +92,19 @@ bs = wc.out.band_structure
 
 labels, positions = bs.get_formatted_labels_blocks()
 
-for i, l in enumerate(labels):
-    n = len(l)
-    distances = np.reshape(bs.get_distances()[i: i+n], [1])
+plt.figure(4)
+for i, dist in enumerate(bs.get_distances()):
+    label = labels[i]
+    freq = bs.get_frequencies(band=i)
+    position = positions[i]
+
+    for j in range(len(label)):
+        plt.plot(dist, freq, color='r')
 
 
-plt.figure(1)
+
 for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
+
     plt.plot(dist, freq, color='r')
 
 plt.axes().get_xaxis().set_ticks([])

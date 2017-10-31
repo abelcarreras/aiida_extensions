@@ -43,6 +43,7 @@ if bs.get_labels() is not None:
     plt.rcParams.update({'mathtext.default': 'regular'})
     labels, label_positions = bs.get_formatted_labels_matplotlib()
     plt.xticks(label_positions, labels, rotation='horizontal')
+    plt.xlim([0, bs.get_distances()[-1][-1]])
 
 plt.figure(2)
 for i, dist in enumerate(bs.get_distances()):
@@ -63,7 +64,7 @@ if bs.get_labels() is not None:
     plt.rcParams.update({'mathtext.default': 'regular'})
     labels, label_positions = bs.get_formatted_labels_matplotlib()
     plt.xticks(label_positions, labels, rotation='horizontal')
-
+    plt.xlim([0, bs.get_distances()[-1][-1]])
 
 # Mesh
 mesh = wc.out.mesh
