@@ -91,17 +91,15 @@ bs = wc.out.band_structure
 
 
 labels, indices = bs.get_formatted_labels_blocks()
-print range(1, len(labels)+1)
-ax_list = plt.subplots(*range(1, len(labels)+1))[1]
-print ax_list
-exit()
+
 plt.figure(4)
 for j, index in enumerate(indices):
 
+    ax1 = plt.subplot(len(labels),1, j)
     for i in index:
         freq = bs.get_frequencies(band=i)
         dist = bs.get_distances(band=i)
-        ax_list[j].plot(dist, freq, color='r')
+        ax1.plot(dist, freq, color='r')
     print [bs.get_bands(band=index[0])[0], bs.get_bands(band=index[-1])[-1]]
 
     plt.xlim([bs.get_distances(band=index[0])[0], bs.get_distances(band=index[-1])[-1]])
