@@ -98,8 +98,9 @@ for index, label in zip(indices, labels):
         freq = bs.get_frequencies(band=i)
         dist = bs.get_distances(band=i)
         plt.plot(dist, freq, color='r')
+    print [bs.get_bands(band=index[0])[0], bs.get_bands(band=index[-1])[-1]]
 
-    plt.xlim([ bs.get_bands(band=index[0])[0], bs.get_bands(band=index[-1])[-1]])
+    plt.xlim([bs.get_bands(band=index[0])[0], bs.get_bands(band=index[-1])[-1]])
     position = [ bs.get_bands(band=i)[0] for i in index] + [bs.get_bands(band=index[-1])[-1]]
     plt.rcParams.update({'mathtext.default': 'regular'})
     plt.xticks(position, label, rotation='horizontal')
