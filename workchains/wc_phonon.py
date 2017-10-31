@@ -239,6 +239,7 @@ def get_born_parameters(phonon, born_charges, epsilon, symprec=1e-5):
 
     pcell = get_primitive(scell, np.dot(inv_smat, pmat), symprec=symprec)
     print 'map', pcell.get_primitive_to_supercell_map()
+    print 'map', pcell.get_supercell_to_primitive_map()
     print 'map', scell.get_supercell_to_unitcell_map()
     print 'map', scell.get_unitcell_to_supercell_map()
 
