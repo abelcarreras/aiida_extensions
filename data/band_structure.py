@@ -305,6 +305,8 @@ class BandStructureData(Data):
                 labels.append(block)
                 block = [replace_list(labels_array[i+1][0], substitutions)]
                 print block
+        block.append(replace_list(labels_array[-1][1], substitutions))
+        labels_positions.append(block)
 
         print labels
 
