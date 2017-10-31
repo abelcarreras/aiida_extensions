@@ -272,7 +272,7 @@ class BandStructureData(Data):
 
         return array
 
-    def get_formatted_labels_blocs(self):
+    def get_formatted_labels_blocks(self):
         distances = self.get_distances()
         labels_array = self.get_labels()
 

@@ -89,6 +89,10 @@ plt.show()
 
 bs = wc.out.band_structure
 
+
+print(bs.get_formatted_labels_blocks())
+exit()
+
 f, (ax1, ax2) = plt.subplots(1, 2, sharey=True)
 
 # Two subplots, unpack the axes array immediately
