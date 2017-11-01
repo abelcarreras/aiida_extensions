@@ -268,8 +268,8 @@ def get_properties_from_phonopy(structure, ph_settings, force_constants):
 
     # DOS
     phonon.set_mesh(ph_settings.dict.mesh, is_eigenvectors=True, is_mesh_symmetry=False)
-    phonon.set_total_DOS()
-    phonon.set_partial_DOS()
+    phonon.set_total_DOS(tetrahedron_method=True)
+    phonon.set_partial_DOS(tetrahedron_method=True)
 
     total_dos = phonon.get_total_DOS()
     partial_dos = phonon.get_partial_DOS()
