@@ -272,7 +272,7 @@ class BandStructureData(Data):
 
         return array
 
-    def get_formatted_labels_blocks(self, style='latex'):
+    def get_plot_helpers(self, style='latex'):
 
         # Collection of helpers to plot band data
 
@@ -296,7 +296,6 @@ class BandStructureData(Data):
                 text_string = text_string.replace(item[0], item[1])
 
             return text_string
-
 
         print labels_array
 
@@ -328,10 +327,6 @@ class BandStructureData(Data):
         indices.append(block_indices)
 
         print indices
-
-        #labels_positions.append(distances[-1][-1])
-        #labels.append(replace_list(labels_array[-1][1], substitutions))
-        #labels[0] = replace_list(labels_array[0][0], substitutions)
 
         widths = []
         ranges = []

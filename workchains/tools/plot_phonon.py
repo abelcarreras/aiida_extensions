@@ -111,9 +111,7 @@ for j, index in enumerate(indices):
 
     plt.axhline(y=0.0, color='b', linestyle='--')
     plt.ylabel('Frequency (THz)')
-    plt.xlim([bs.get_distances(band=index[0])[0], bs.get_distances(band=index[-1])[-1]])
     plt.xlim(ranges[j])
-    #position = [bs.get_distances(band=i)[0] for i in index] + [bs.get_distances(band=index[-1])[-1]]
     plt.xticks(positions[j], labels[j], rotation='horizontal')
 
 plt.autoscale(enable=True, axis='y')
