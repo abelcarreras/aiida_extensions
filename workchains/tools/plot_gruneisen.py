@@ -77,7 +77,7 @@ for j, index in enumerate(indices):
 
     if j != 0:
         ax1.axes.get_yaxis().set_visible(False)
-        #ax0 = plt.subplot(gs[j-1])
+        ax0 = plt.subplot(gs[j-1])
         #ax1.set_ylim(ax0.get_ylim())
 
     plt.axhline(y=0.0, color='black', linestyle='--', linewidth=0.1)
