@@ -333,12 +333,15 @@ class BandStructureData(Data):
         #labels.append(replace_list(labels_array[-1][1], substitutions))
         #labels[0] = replace_list(labels_array[0][0], substitutions)
 
-
         widths = []
-        for ind in indices:
-            widths.append(self.get_distances(band=ind[-1])[-1] - self.get_distances(band=ind[0])[0])
+        ranges = []
+        positions = []
+        for j, index in enumerate(indices):
+            widths.append(self.get_distances(band=index[-1])[-1] - self.get_distances(band=index[0])[0])
+            range = [self.get_distances(band=index[0])[0], self.get_distances(band=index[-1])[-1]]
+            position = [self.get_distances(band=i)[0] for i in index] + [self.get_distances(band=index[-1])[-1]]
 
-        return labels, indices, widths
+        return labels, indices, widths, ranges, positions
 
 
     def get_formatted_labels_matplotlib(self):

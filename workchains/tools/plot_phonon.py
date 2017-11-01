@@ -90,7 +90,7 @@ plt.show()
 
 bs = wc.out.band_structure
 
-labels, indices, widths = bs.get_formatted_labels_blocks()
+labels, indices, widths, ranges, positions = bs.get_formatted_labels_blocks()
 
 gs = gridspec.GridSpec(1, len(widths), width_ratios=widths, wspace=0.05)
 
@@ -106,15 +106,15 @@ for j, index in enumerate(indices):
         ax1.plot(bs.get_distances(band=i),
                  bs.get_frequencies(band=i),
                  color='r')
-    if j !=0:
+    if j != 0:
         ax1.axes.get_yaxis().set_visible(False)
 
     plt.axhline(y=0.0, color='b', linestyle='--')
     plt.ylabel('Frequency (THz)')
     plt.xlim([bs.get_distances(band=index[0])[0], bs.get_distances(band=index[-1])[-1]])
-
-    position = [bs.get_distances(band=i)[0] for i in index] + [bs.get_distances(band=index[-1])[-1]]
-    plt.xticks(position, labels[j], rotation='horizontal')
+    plt.xlim(ranges[j])
+    #position = [bs.get_distances(band=i)[0] for i in index] + [bs.get_distances(band=index[-1])[-1]]
+    plt.xticks(positions[j], labels[j], rotation='horizontal')
 
 plt.autoscale(enable=True, axis='y')
 plt.figtext(0.5, 0.02, 'Wave vector', ha='center')
