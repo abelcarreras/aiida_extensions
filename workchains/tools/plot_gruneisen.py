@@ -77,7 +77,7 @@ for j, index in enumerate(indices):
 
     if j != 0:
         ax1.axes.get_yaxis().set_visible(False)
-        ax1.set_ylim(ylim)
+        #ax1.set_ylim(ylim)
 
     ylim = ax1.get_ylim()
 
