@@ -43,7 +43,7 @@ for j, index in enumerate(indices):
     if j != 0:
         ax1.axes.get_yaxis().set_visible(False)
 
-    plt.axhline(y=0.0, color='b', linestyle='--')
+    plt.axhline(y=0.0, color='black', linestyle='--', linewidth=0.1)
     plt.ylabel('Frequency (THz)')
     plt.xlim(ranges[j])
     plt.xticks(positions[j], labels[j], rotation='horizontal')
@@ -51,8 +51,8 @@ for j, index in enumerate(indices):
 plt.suptitle('Phonon band structure')
 plt.autoscale(enable=True, axis='y')
 plt.figtext(0.5, 0.02, 'Wave vector', ha='center')
+# plt.show()
 
-#plt.show()
 
 # Phonon density of states
 dos = wc.out.dos
@@ -63,7 +63,7 @@ partial_dos = dos.get_partial_dos()
 partial_symbols = dos.get_atom_labels()
 
 plt.figure(2)
-plt.suptitle('Phonon density of states')
+plt.suptitle('Phonon density of states (per unit cell)')
 plt.ylabel('Density')
 plt.xlabel('Frequency [THz]')
 plt.ylim([0, np.max(total_dos) * 1.1])
