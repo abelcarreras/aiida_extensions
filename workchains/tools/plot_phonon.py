@@ -116,7 +116,7 @@ for j, index in enumerate(indices):
     if j !=0:
         ax1.axes.get_yaxis().set_visible(False)
 
-    plt.ylim([0, 20])
+    plt.ylim([0, 25])
 
     plt.xlim([bs.get_distances(band=index[0])[0], bs.get_distances(band=index[-1])[-1]])
     position = [bs.get_distances(band=i)[0] for i in index] + [bs.get_distances(band=index[-1])[-1]]
