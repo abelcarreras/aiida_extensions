@@ -130,7 +130,7 @@ for j, index in enumerate(indices):
     plt.xticks(position, labels[j], rotation='horizontal')
 
 plt.autoscale(enable=True, axis='y')
-plt.figtext(0.5, 0.0, 'common xlabel', ha='center')
+plt.figtext(0.5, 0.1, 'Wave vector', ha='center')
 plt.show()
 
 exit()
