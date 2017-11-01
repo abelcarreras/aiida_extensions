@@ -56,6 +56,45 @@ for j, index in enumerate(indices):
 plt.suptitle('Phonon band structure')
 plt.autoscale(enable=True, axis='y')
 plt.figtext(0.5, 0.02, 'Wave vector', ha='center')
+
+
+plt.figure(2)
+
+plt.rcParams.update({'mathtext.default': 'regular'})
+
+for j, index in enumerate(indices):
+    ax1 = plt.subplot(gs[j])
+
+    plt.gca().set_color_cycle(None)
+    for i in index:
+        dist = bs.get_distances(band=i)
+        gamma = bs.get_gamma(band=i)
+        q_points = bs.get_bands(band=i)
+        mask = np.where(np.linalg.norm(q_points, axis=1) > gamma_cutoff)
+
+        ax1.plot(dist[mask],
+                 gamma[mask],
+                 # color='r'
+                 )
+
+        ax1.plot(bs.get_distances(band=i),
+                 bs.get_frequencies(band=i),
+                 #color='r'
+                 )
+    if j != 0:
+        ax1.axes.get_yaxis().set_visible(False)
+
+    plt.axhline(y=0.0, color='black', linestyle='--', linewidth=0.1)
+    plt.ylabel('$\gamma$')
+    plt.xlim(ranges[j])
+    plt.xticks(positions[j], labels[j], rotation='horizontal')
+
+plt.suptitle('Mode Gruneisen parameter')
+plt.autoscale(enable=True, axis='y')
+plt.figtext(0.5, 0.02, 'Wave vector', ha='center')
+
+
+
 plt.show()
 
 
