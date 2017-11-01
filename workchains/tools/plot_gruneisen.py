@@ -77,10 +77,6 @@ for j, index in enumerate(indices):
                  # color='r'
                  )
 
-        ax1.plot(bs.get_distances(band=i),
-                 bs.get_frequencies(band=i),
-                 #color='r'
-                 )
     if j != 0:
         ax1.axes.get_yaxis().set_visible(False)
 
