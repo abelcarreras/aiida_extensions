@@ -117,6 +117,7 @@ for j, index in enumerate(indices):
         freq = bs.get_frequencies(band=i)
         dist = bs.get_distances(band=i)
         ax1.plot(dist, freq, color='r')
+
     print [bs.get_bands(band=index[0])[0], bs.get_bands(band=index[-1])[-1]]
     if j !=0:
         ax1.axes.get_yaxis().set_visible(False)
