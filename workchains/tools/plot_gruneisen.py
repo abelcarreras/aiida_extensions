@@ -47,6 +47,9 @@ for j, index in enumerate(indices):
                  )
     if j != 0:
         ax1.axes.get_yaxis().set_visible(False)
+        ax1.set_ylim(ylim)
+
+    ylim = ax1.get_ylim()
 
     plt.axhline(y=0.0, color='black', linestyle='--', linewidth=0.1)
     plt.ylabel('Frequency (THz)')
@@ -54,7 +57,6 @@ for j, index in enumerate(indices):
     plt.xticks(positions[j], labels[j], rotation='horizontal')
 
 plt.suptitle('Phonon band structure')
-plt.autoscale(enable=True, axis='y')
 plt.figtext(0.5, 0.02, 'Wave vector', ha='center')
 
 
@@ -80,7 +82,6 @@ for j, index in enumerate(indices):
         ax1.set_ylim(ylim)
 
     ylim = ax1.get_ylim()
-
 
     plt.axhline(y=0.0, color='black', linestyle='--', linewidth=0.1)
     plt.ylabel('$\gamma$')
