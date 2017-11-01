@@ -9,6 +9,7 @@ from aiida.orm.data.parameter import ParameterData
 from aiida.orm.data.array import ArrayData
 from aiida.orm.data.structure import StructureData
 from aiida.orm.data.array.kpoints import KpointsData
+from aiida.orm.data.upf import UpfData
 
 PhonopyCalculation = CalculationFactory('phonopy')
 
@@ -49,41 +50,68 @@ def get_pseudos(structure, family_name):
     return pseudos
 
 
-def generate_qe_params(code, structure, machine, settings, kpoints, pseudo):
+def generate_qe_params(structure, machine, settings, pressure=0.0, type=None):
+
     """
-    generate the input paramemeters needed to run a calculation for PW (Quantum Espresso)
-    :param code: aiida Code object
-    :param structure:  aiida StructureData object
-    :param machine: aiida ParametersData object containing a dictionary with the computational resources information
-    :param settings: aiida ParametersData object containing a dictionary with the input parameters for PW
-    :param kpoints: aiida KpointsData object
-    :param pseudo: aiida Str object containing the label of the pseudopotentals family to use
+    Generate the input paramemeters needed to run a calculation for PW (Quantum Espresso)
+
+    :param structure:  StructureData object containing the crystal structure
+    :param machine:  ParametersData object containing a dictionary with the computational resources information
+    :param settings:  ParametersData object containing a dictionary with the INCAR parameters
     :return: Calculation process object, input dictionary
     """
 
-    PwCalculation = CalculationFactory('quantumespresso.pw')
-    from aiida.orm.data.upf import UpfData
+    if type is None:
+        code = settings.dict.code
+    else:
+        code = settings.dict.code[type]
 
-
-    # The inputs
+    plugin = Code.get_from_string(code).get_attr('input_plugin')
+    PwCalculation = CalculationFactory(plugin)
     inputs = PwCalculation.process().get_inputs_template()
-    inputs.code = code
 
-    # The structure
+    # code
+    inputs.code = Code.get_from_string(code)
+
+    # structure
     inputs.structure = structure
 
-    # Machine
     inputs._options.resources = machine.dict.resources
     inputs._options.max_wallclock_seconds = machine.dict.max_wallclock_seconds
 
+
     # Parameters
-    inputs.parameters = settings
+    parameters = dict(settings.dict.parameters)
+
+    if type == 'optimize':
+        parameters['CONTROL'].update({'calculation': 'vc-relax'})
+        parameters['CELL'] = {'press': pressure,
+                                 'press_conv_thr': 1.e-2,
+                                 'cell_dynamics': 'bfgs',  # Quasi-Newton algorithm
+                                 'cell_dofree': 'all'}  # Degrees of movement
+        parameters['IONS'] = {'ion_dynamics': 'bfgs'}
+
+        parameters['CONTROL'].update({'tstress': True,
+                                     'tprnfor': True,
+                                     'etot_conv_thr': 1.e-8,
+                                     'forc_conv_thr': 1.e-6})
+
+    if type == 'born_charges':
+        parameters['INPUTPH'] = {'epsil': True,
+                                 'zeu': True}  # Degrees of movement
+
+    inputs.parameters = ParameterData(dict=parameters)
+
 
     # Kpoints
+    kpoints = KpointsData()
+    kpoints.set_cell_from_structure(structure)
+    kpoints.set_kpoints_mesh_from_density(settings.dict.kpoints_density)
+
     inputs.kpoints = kpoints
 
     # Pseudopotentials
-    ######## MANUALTEST #########
+    ######## TEST: Manual import #########
     manual_pseudo = False
     if manual_pseudo:
         # Pseudopotentials (test)
@@ -100,16 +128,17 @@ def generate_qe_params(code, structure, machine, settings, kpoints, pseudo):
 
         inputs.pseudo = pseudos
         return PwCalculation.process(), inputs
-    ######## MANUAL TEST #########
+    ######## END TEST #########
 
-    inputs.pseudo = get_pseudos(structure, pseudo)
+    inputs.pseudo = get_pseudos(structure, settings.dict.pseudos_family)
 
     return PwCalculation.process(), inputs
 
 
 def generate_lammps_params(structure, machine, settings, pressure=0.0, type=None):
     """
-    generate the input paramemeters needed to run a calculation for LAMMPS
+    Generate the input paramemeters needed to run a calculation for LAMMPS
+
     :param structure:  aiida StructureData object
     :param machine: aiida ParametersData object containing a dictionary with the computational resources information
     :param settings: aiida ParametersData object containing a dictionary with the LAMMPS parameters
@@ -143,10 +172,11 @@ def generate_lammps_params(structure, machine, settings, pressure=0.0, type=None
 
 def generate_vasp_params(structure, machine, settings, type=None, pressure=0.0):
     """
-    generate the input paramemeters needed to run a calculation for VASP
-    :param structure:  aiida StructureData object
-    :param machine: aiida ParametersData object containing a dictionary with the computational resources information
-    :param settings: aiida ParametersData object containing a dictionary with the INCAR parameters
+    Generate the input paramemeters needed to run a calculation for VASP
+
+    :param structure:  StructureData object containing the crystal structure
+    :param machine:  ParametersData object containing a dictionary with the computational resources information
+    :param settings:  ParametersData object containing a dictionary with the INCAR parameters
     :return: Calculation process object, input dictionary
     """
 
