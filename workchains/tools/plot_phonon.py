@@ -85,7 +85,6 @@ plt.plot(temperature, entropy, label='entropy (KJ/mol)')
 plt.plot(temperature, cv, label='Cv (J/mol)')
 
 plt.legend()
-plt.show()
 
 
 bs = wc.out.band_structure
