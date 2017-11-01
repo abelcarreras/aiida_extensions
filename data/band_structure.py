@@ -276,9 +276,6 @@ class BandStructureData(Data):
 
         # Collection of helpers to plot band data
 
-        distances = self.get_distances()
-        labels_array = self.get_labels()
-
         if style == 'unicode':
 
             substitutions = {'GAMMA': u'\u0393'
@@ -291,15 +288,13 @@ class BandStructureData(Data):
             return Exception('label_style not supported')
 
         def replace_list(text_string, substitutions):
-
             for item in substitutions.iteritems():
                 text_string = text_string.replace(item[0], item[1])
-
             return text_string
 
-        print labels_array
 
-        print ('-----')
+        distances = self.get_distances()
+        labels_array = self.get_labels()
 
         labels = []
         indices = []

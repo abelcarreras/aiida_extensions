@@ -51,10 +51,6 @@ for j, index in enumerate(indices):
 plt.suptitle('Phonon band structure')
 plt.autoscale(enable=True, axis='y')
 plt.figtext(0.5, 0.02, 'Wave vector', ha='center')
-plt.show()
-
-
-
 
 #plt.show()
 
