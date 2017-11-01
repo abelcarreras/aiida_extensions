@@ -90,41 +90,32 @@ plt.show()
 
 bs = wc.out.band_structure
 
-labels, indices = bs.get_formatted_labels_blocks()
+labels, indices, widths = bs.get_formatted_labels_blocks()
 
-
-width = []
-for ind in indices:
-    width.append(bs.get_distances(band=ind[-1])[-1] - bs.get_distances(band=ind[0])[0])
-
-print ('width', width)
-
-gs = gridspec.GridSpec(1, len(width), width_ratios=width, wspace=0.05)
+gs = gridspec.GridSpec(1, len(widths), width_ratios=widths, wspace=0.05)
 
 plt.figure(4,
            #figsize=(20, 10)
            )
 
-ylim = None
-for j, index in enumerate(indices):
-    print ('j', j)
-    ax1 = plt.subplot(gs[j])
+plt.rcParams.update({'mathtext.default': 'regular'})
 
+for j, index in enumerate(indices):
+    ax1 = plt.subplot(gs[j])
     for i in index:
-        freq = bs.get_frequencies(band=i)
-        dist = bs.get_distances(band=i)
-        ax1.plot(dist, freq, color='r')
-    print [bs.get_bands(band=index[0])[0], bs.get_bands(band=index[-1])[-1]]
+        ax1.plot(bs.get_distances(band=i),
+                 bs.get_frequencies(band=i),
+                 color='r')
     if j !=0:
         ax1.axes.get_yaxis().set_visible(False)
 
-    plt.axhline(y=0.0, color='b', linestyle='--')
     plt.ylabel('Frequency (THz)')
     plt.xlim([bs.get_distances(band=index[0])[0], bs.get_distances(band=index[-1])[-1]])
+
     position = [bs.get_distances(band=i)[0] for i in index] + [bs.get_distances(band=index[-1])[-1]]
-    plt.rcParams.update({'mathtext.default': 'regular'})
     plt.xticks(position, labels[j], rotation='horizontal')
 
+plt.axhline(y=0.0, color='b', linestyle='--')
 plt.autoscale(enable=True, axis='y')
 plt.figtext(0.5, 0.02, 'Wave vector', ha='center')
 plt.show()

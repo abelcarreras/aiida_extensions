@@ -272,15 +272,23 @@ class BandStructureData(Data):
 
         return array
 
-    def get_formatted_labels_blocks(self):
+    def get_formatted_labels_blocks(self, style='latex'):
+
+        # Collection of helpers to plot band data
+
         distances = self.get_distances()
         labels_array = self.get_labels()
 
-        substitutions = {'GAMMA': u'\u0393'
-                         }
+        if style == 'unicode':
 
-        substitutions = {'GAMMA': u'$\Gamma$'
-                         }
+            substitutions = {'GAMMA': u'\u0393'
+                            }
+
+        elif style == 'latex':
+            substitutions = {'GAMMA': u'$\Gamma$'
+                             }
+        else:
+            return Exception('label_style not supported')
 
         def replace_list(text_string, substitutions):
 
@@ -291,41 +299,46 @@ class BandStructureData(Data):
 
 
         print labels_array
-        #print distances
+
         print ('-----')
 
         labels = []
-        labels_positions = []
+        indices = []
         block = [replace_list(labels_array[0][0], substitutions)]
-        block_positions = [0]
+        block_indices = [0]
 
         for i, freq in enumerate(distances[:-1]):
             if labels_array[i+1][0] == labels_array[i][1]:
                 block.append(replace_list(labels_array[i+1][0], substitutions))
-                block_positions.append(i+1)
+                block_indices.append(i+1)
             else:
                 block.append(replace_list(labels_array[i][1], substitutions))
                 #block_positions.append(i)
                 labels.append(block)
-                labels_positions.append(block_positions)
+                indices.append(block_indices)
 
                 block = [replace_list(labels_array[i+1][0], substitutions)]
-                block_positions = [i+1]
+                block_indices = [i+1]
 
                 #print block
         block.append(replace_list(labels_array[-1][1], substitutions))
         #block_positions.append(len(distances)-1)
 
         labels.append(block)
-        labels_positions.append(block_positions)
+        indices.append(block_indices)
 
-        print labels_positions
+        print indices
 
         #labels_positions.append(distances[-1][-1])
         #labels.append(replace_list(labels_array[-1][1], substitutions))
         #labels[0] = replace_list(labels_array[0][0], substitutions)
 
-        return labels, labels_positions
+
+        widths = []
+        for ind in indices:
+            widths.append(self.get_distances(band=ind[-1])[-1] - self.get_distances(band=ind[0])[0])
+
+        return labels, indices, widths
 
 
     def get_formatted_labels_matplotlib(self):
