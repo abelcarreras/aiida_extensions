@@ -102,7 +102,7 @@ print ('width', width)
 
 gs = gridspec.GridSpec(1, 3, width_ratios=width, wspace=0.05)
 print gs
-plt.figure(4)
+plt.figure(4, figsize=(20, 10))
 ylim = None
 for j, index in enumerate(indices):
     print ('j', j)
@@ -125,7 +125,6 @@ for j, index in enumerate(indices):
     plt.rcParams.update({'mathtext.default': 'regular'})
     plt.xticks(position, labels[j], rotation='horizontal')
 
-plt.figure(figsize=(20, 10))
 plt.autoscale(enable=True, axis='y')
 plt.show()
 
