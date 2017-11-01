@@ -109,13 +109,13 @@ for j, index in enumerate(indices):
     if j !=0:
         ax1.axes.get_yaxis().set_visible(False)
 
+    plt.axhline(y=0.0, color='b', linestyle='--')
     plt.ylabel('Frequency (THz)')
     plt.xlim([bs.get_distances(band=index[0])[0], bs.get_distances(band=index[-1])[-1]])
 
     position = [bs.get_distances(band=i)[0] for i in index] + [bs.get_distances(band=index[-1])[-1]]
     plt.xticks(position, labels[j], rotation='horizontal')
 
-plt.axhline(y=0.0, color='b', linestyle='--')
 plt.autoscale(enable=True, axis='y')
 plt.figtext(0.5, 0.02, 'Wave vector', ha='center')
 plt.show()
