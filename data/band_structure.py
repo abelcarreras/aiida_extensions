@@ -338,8 +338,8 @@ class BandStructureData(Data):
         positions = []
         for j, index in enumerate(indices):
             widths.append(self.get_distances(band=index[-1])[-1] - self.get_distances(band=index[0])[0])
-            range = [self.get_distances(band=index[0])[0], self.get_distances(band=index[-1])[-1]]
-            position = [self.get_distances(band=i)[0] for i in index] + [self.get_distances(band=index[-1])[-1]]
+            ranges.append([self.get_distances(band=index[0])[0], self.get_distances(band=index[-1])[-1]])
+            positions.append([self.get_distances(band=i)[0] for i in index] + [self.get_distances(band=index[-1])[-1]])
 
         return labels, indices, widths, ranges, positions
 
