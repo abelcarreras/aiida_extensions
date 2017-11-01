@@ -94,7 +94,7 @@ labels, indices = bs.get_formatted_labels_blocks()
 
 from matplotlib import gridspec
 gs = gridspec.GridSpec(1, len(indices)+1, width_ratios=[3, 1, 1])
-
+print gs
 plt.figure(4)
 for j, index in enumerate(indices):
     ax1 = plt.subplot(gs[j])
