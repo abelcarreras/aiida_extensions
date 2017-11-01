@@ -292,7 +292,6 @@ class BandStructureData(Data):
                 text_string = text_string.replace(item[0], item[1])
             return text_string
 
-
         distances = self.get_distances()
         labels_array = self.get_labels()
 
@@ -307,21 +306,15 @@ class BandStructureData(Data):
                 block_indices.append(i+1)
             else:
                 block.append(replace_list(labels_array[i][1], substitutions))
-                #block_positions.append(i)
                 labels.append(block)
                 indices.append(block_indices)
 
                 block = [replace_list(labels_array[i+1][0], substitutions)]
                 block_indices = [i+1]
 
-                #print block
         block.append(replace_list(labels_array[-1][1], substitutions))
-        #block_positions.append(len(distances)-1)
-
         labels.append(block)
         indices.append(block_indices)
-
-        print indices
 
         widths = []
         ranges = []
