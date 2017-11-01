@@ -27,21 +27,34 @@ wc = load_node(int(sys.argv[1]))
 # Phonon Band structure
 bs = wc.out.band_structure
 
+labels, indices, widths, ranges, positions = bs.get_plot_helpers()
+gs = gridspec.GridSpec(1, len(widths), width_ratios=widths, wspace=0.05)
+
 plt.figure(1)
-for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
-    plt.plot(dist, freq, color='r')
 
-plt.axes().get_xaxis().set_ticks([])
-plt.ylabel('Frequency [THz]')
-plt.xlabel('Wave vector')
-plt.xlim([0, bs.get_distances()[-1][-1]])
-plt.axhline(y=0, color='k', ls='dashed')
+plt.rcParams.update({'mathtext.default': 'regular'})
+
+for j, index in enumerate(indices):
+    ax1 = plt.subplot(gs[j])
+    for i in index:
+        ax1.plot(bs.get_distances(band=i),
+                 bs.get_frequencies(band=i),
+                 color='r')
+    if j != 0:
+        ax1.axes.get_yaxis().set_visible(False)
+
+    plt.axhline(y=0.0, color='b', linestyle='--')
+    plt.ylabel('Frequency (THz)')
+    plt.xlim(ranges[j])
+    plt.xticks(positions[j], labels[j], rotation='horizontal')
+
 plt.suptitle('Phonon band structure')
+plt.autoscale(enable=True, axis='y')
+plt.figtext(0.5, 0.02, 'Wave vector', ha='center')
+plt.show()
 
-if bs.get_labels() is not None:
-    plt.rcParams.update({'mathtext.default': 'regular'})
-    labels, label_positions = bs.get_formatted_labels_matplotlib()
-    plt.xticks(label_positions, labels, rotation='horizontal')
+
+
 
 #plt.show()
 
@@ -85,33 +98,5 @@ plt.plot(temperature, entropy, label='entropy (KJ/mol)')
 plt.plot(temperature, cv, label='Cv (J/mol)')
 
 plt.legend()
-
-
-bs = wc.out.band_structure
-
-labels, indices, widths, ranges, positions = bs.get_plot_helpers()
-gs = gridspec.GridSpec(1, len(widths), width_ratios=widths, wspace=0.05)
-
-plt.figure(4)
-
-plt.rcParams.update({'mathtext.default': 'regular'})
-
-for j, index in enumerate(indices):
-    ax1 = plt.subplot(gs[j])
-    for i in index:
-        ax1.plot(bs.get_distances(band=i),
-                 bs.get_frequencies(band=i),
-                 color='r')
-    if j != 0:
-        ax1.axes.get_yaxis().set_visible(False)
-
-    plt.axhline(y=0.0, color='b', linestyle='--')
-    plt.ylabel('Frequency (THz)')
-    plt.xlim(ranges[j])
-    plt.xticks(positions[j], labels[j], rotation='horizontal')
-
-plt.suptitle('Phonon band structure')
-plt.autoscale(enable=True, axis='y')
-plt.figtext(0.5, 0.02, 'Wave vector', ha='center')
 plt.show()
 
