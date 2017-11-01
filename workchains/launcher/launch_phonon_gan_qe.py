@@ -99,8 +99,8 @@ if True:
         'ELECTRONS': {'conv_thr': 1.e-6,}
     }
 
-    settings_dict = {'code': {'optimize': 'pw@stern',
-                              'forces': 'pw@stern'},
+    settings_dict = {'code': {'optimize': 'pw@boston',
+                              'forces': 'pw@boston'},
                      'parameters': parameters_dict,
                      'kpoints_density': 0.1,  # k-point density (Amstrong^-1)
                      'pseudos_family': 'pbe_ps'}
