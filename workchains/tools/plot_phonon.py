@@ -130,7 +130,7 @@ for j, index in enumerate(indices):
     plt.xticks(position, labels[j], rotation='horizontal')
 
 plt.autoscale(enable=True, axis='y')
-plt.text(0.5, 0.04, 'common xlabel', ha='bottom', va='center')
+plt.text(0.5, 0.04, 'common xlabel', ha='center', va='bottom')
 plt.show()
 
 exit()
