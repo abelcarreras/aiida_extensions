@@ -100,7 +100,7 @@ for ind in indices:
 
 print ('width', width)
 
-gs = gridspec.GridSpec(1, 3, width_ratios=width, wspace=0.5)
+gs = gridspec.GridSpec(1, 3, width_ratios=width, wspace=0.05)
 print gs
 plt.figure(4)
 for j, index in enumerate(indices):
