@@ -63,7 +63,7 @@ plt.figure(2)
 plt.rcParams.update({'mathtext.default': 'regular'})
 y_min = np.min(bs.get_gamma())
 y_max = np.max(bs.get_gamma())
-y_len = y_max - y_max
+y_len = y_max - y_min
 
 for j, index in enumerate(indices):
     ax1 = plt.subplot(gs[j])
