@@ -64,7 +64,6 @@ plt.rcParams.update({'mathtext.default': 'regular'})
 
 for j, index in enumerate(indices):
     ax1 = plt.subplot(gs[j])
-    ax1.set_ylim([-2,2])
 
     plt.gca().set_color_cycle(None)
     for i in index:
@@ -76,10 +75,11 @@ for j, index in enumerate(indices):
                  # color='r'
                  )
 
-
     if j != 0:
         ax1.axes.get_yaxis().set_visible(False)
+        ax1.set_ylim(ylim)
 
+    ylim = ax1.get_ylim()
 
 
     plt.axhline(y=0.0, color='black', linestyle='--', linewidth=0.1)
@@ -88,7 +88,7 @@ for j, index in enumerate(indices):
     plt.xticks(positions[j], labels[j], rotation='horizontal')
 
 plt.suptitle('Mode Gruneisen parameter')
-plt.autoscale(enable=True, axis='y')
+#plt.autoscale(enable=True, axis='y')
 plt.figtext(0.5, 0.02, 'Wave vector', ha='center')
 
 
