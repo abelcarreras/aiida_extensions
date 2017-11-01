@@ -112,7 +112,7 @@ for j, index in enumerate(indices):
     position = [bs.get_distances(band=i)[0] for i in index] + [bs.get_distances(band=index[-1])[-1]]
     plt.rcParams.update({'mathtext.default': 'regular'})
     plt.xticks(position, labels[j], rotation='horizontal')
-
+    plt.tick_params(axis='y', which='both', right='off', labelbottom='off')
 plt.show()
 
 exit()
