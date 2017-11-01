@@ -99,7 +99,7 @@ plt.figure(4)
 for j, index in enumerate(indices):
     ax1 = plt.subplot(gs[j+1])
 
-    ax1 = plt.subplot(1, len(labels), j+1)
+    #ax1 = plt.subplot(1, len(labels), j+1)
     for i in index:
         freq = bs.get_frequencies(band=i)
         dist = bs.get_distances(band=i)
