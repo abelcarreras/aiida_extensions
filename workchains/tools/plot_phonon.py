@@ -48,9 +48,9 @@ for j, index in enumerate(indices):
     plt.xlim(ranges[j])
     plt.xticks(positions[j], labels[j], rotation='horizontal')
 
-    if np.min(bs.get_frequencies()) > -1e1:
+    if np.min(bs.get_frequencies()) > -1e-2:
         print ('yeah')
-        plt.ylim([0, 25])
+        plt.ylim([0, None])
 
 plt.suptitle('Phonon band structure')
 plt.autoscale(enable=True, axis='y')
