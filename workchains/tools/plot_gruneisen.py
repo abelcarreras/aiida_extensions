@@ -60,7 +60,7 @@ plt.suptitle('Phonon band structure')
 plt.figtext(0.5, 0.02, 'Wave vector', ha='center')
 
 
-plt.figure(2)
+plt.figure(2, figsize=(8, 5))
 
 plt.rcParams.update({'mathtext.default': 'regular'})
 

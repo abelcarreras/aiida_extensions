@@ -30,7 +30,7 @@ bs = wc.out.band_structure
 labels, indices, widths, ranges, positions = bs.get_plot_helpers()
 gs = gridspec.GridSpec(1, len(widths), width_ratios=widths, wspace=0.05)
 
-plt.figure(1)
+plt.figure(1, figsize=(8, 5))
 
 plt.rcParams.update({'mathtext.default': 'regular'})
 
