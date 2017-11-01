@@ -93,7 +93,7 @@ bs = wc.out.band_structure
 labels, indices = bs.get_formatted_labels_blocks()
 
 from matplotlib import gridspec
-gs = gridspec.GridSpec(1, len(labels), width_ratios=[3, 1, 1])
+gs = gridspec.GridSpec(1, 4, width_ratios=[3, 1, 1])
 
 plt.figure(4)
 for j, index in enumerate(indices):
