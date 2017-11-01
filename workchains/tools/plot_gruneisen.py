@@ -61,6 +61,9 @@ plt.figtext(0.5, 0.02, 'Wave vector', ha='center')
 plt.figure(2)
 
 plt.rcParams.update({'mathtext.default': 'regular'})
+y_min = np.min(bs.get_bands())
+y_max = np.max(bs.get_bands())
+y_len = y_max - y_max
 
 for j, index in enumerate(indices):
     ax1 = plt.subplot(gs[j])
@@ -81,6 +84,7 @@ for j, index in enumerate(indices):
     plt.axhline(y=0.0, color='black', linestyle='--', linewidth=0.1)
     plt.ylabel('$\gamma$')
     plt.xlim(ranges[j])
+    plt.ylim([y_max - y_len*0.1, y_max + y_len*0.1])
     plt.xticks(positions[j], labels[j], rotation='horizontal')
 
 plt.suptitle('Mode Gruneisen parameter')
