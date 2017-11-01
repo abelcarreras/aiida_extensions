@@ -100,7 +100,7 @@ for ind in indices:
 
 print ('width', width)
 
-gs = gridspec.GridSpec(1, 3, width_ratios=width)
+gs = gridspec.GridSpec(1, 3, width_ratios=width, hspace=0.05)
 print gs
 plt.figure(4)
 for j, index in enumerate(indices):
@@ -117,7 +117,7 @@ for j, index in enumerate(indices):
         ax1.axes.get_yaxis().set_visible(False)
 
     plt.ylim([0, 25])
-
+    plt.axhline(y=0.0, color='b', linestyle='-')
     plt.xlim([bs.get_distances(band=index[0])[0], bs.get_distances(band=index[-1])[-1]])
     position = [bs.get_distances(band=i)[0] for i in index] + [bs.get_distances(band=index[-1])[-1]]
     plt.rcParams.update({'mathtext.default': 'regular'})
