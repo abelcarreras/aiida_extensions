@@ -92,8 +92,12 @@ bs = wc.out.band_structure
 
 labels, indices = bs.get_formatted_labels_blocks()
 
+from matplotlib import gridspec
+gs = gridspec.GridSpec(1, len(labels), width_ratios=[3, 1, 1])
+
 plt.figure(4)
 for j, index in enumerate(indices):
+    ax1 = plt.subplot(gs[j+1])
 
     ax1 = plt.subplot(1, len(labels), j+1)
     for i in index:
@@ -105,12 +109,11 @@ for j, index in enumerate(indices):
     plt.ylim([0, 20])
 
     plt.xlim([bs.get_distances(band=index[0])[0], bs.get_distances(band=index[-1])[-1]])
-    position = [ bs.get_distances(band=i)[0] for i in index] + [bs.get_distances(band=index[-1])[-1]]
+    position = [bs.get_distances(band=i)[0] for i in index] + [bs.get_distances(band=index[-1])[-1]]
     plt.rcParams.update({'mathtext.default': 'regular'})
     plt.xticks(position, labels[j], rotation='horizontal')
 
 plt.show()
-
 
 exit()
 
