@@ -91,12 +91,9 @@ plt.show()
 bs = wc.out.band_structure
 
 labels, indices, widths, ranges, positions = bs.get_plot_helpers()
-
 gs = gridspec.GridSpec(1, len(widths), width_ratios=widths, wspace=0.05)
 
-plt.figure(4,
-           #figsize=(20, 10)
-           )
+plt.figure(4)
 
 plt.rcParams.update({'mathtext.default': 'regular'})
 
@@ -114,6 +111,7 @@ for j, index in enumerate(indices):
     plt.xlim(ranges[j])
     plt.xticks(positions[j], labels[j], rotation='horizontal')
 
+plt.suptitle('Phonon band structure')
 plt.autoscale(enable=True, axis='y')
 plt.figtext(0.5, 0.02, 'Wave vector', ha='center')
 plt.show()
