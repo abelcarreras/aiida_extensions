@@ -64,6 +64,7 @@ plt.rcParams.update({'mathtext.default': 'regular'})
 
 for j, index in enumerate(indices):
     ax1 = plt.subplot(gs[j])
+    ax1.set_ylim([-2,2])
 
     plt.gca().set_color_cycle(None)
     for i in index:
@@ -74,7 +75,6 @@ for j, index in enumerate(indices):
                  bs.get_gamma(band=i)[mask],
                  # color='r'
                  )
-    ax1.set_ylim([-2,2])
 
 
     if j != 0:
