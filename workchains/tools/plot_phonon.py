@@ -31,6 +31,7 @@ plt.figure(1)
 #    plt.plot(dist, freq, color='r')
 
 for i, dist in enumerate(bs.get_distances()):
+    print ('i', i)
     plt.plot(dist, bs.get_frequencies(band=i), color='r')
 
 
