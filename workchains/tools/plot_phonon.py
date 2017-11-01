@@ -50,7 +50,7 @@ for j, index in enumerate(indices):
 
     if np.min(bs.get_frequencies()) > -1e-2:
         print ('yeah')
-        plt.ylim([0, None])
+        ax1.ylim([0, None])
 
 plt.suptitle('Phonon band structure')
 plt.autoscale(enable=True, axis='y')
