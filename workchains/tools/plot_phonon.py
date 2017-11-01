@@ -106,7 +106,7 @@ for j, index in enumerate(indices):
         dist = bs.get_distances(band=i)
         ax1.plot(dist, freq, color='r')
     print [bs.get_bands(band=index[0])[0], bs.get_bands(band=index[-1])[-1]]
-    ax1.axes.get_yaxis().set_visible(False)
+    #ax1.axes.get_yaxis().set_visible(False)
 
     plt.ylim([0, 20])
 
