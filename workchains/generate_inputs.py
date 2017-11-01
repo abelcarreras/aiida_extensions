@@ -342,8 +342,9 @@ def generate_inputs(structure, machine, es_settings, type=None, pressure=0.0):
     if plugin == 'vasp.vasp':
         return generate_vasp_params(structure, machine, es_settings, type=type, pressure=pressure)
 
-    # elif plugin == 'quantumespresso.pw':
-    #     return generate_qe_params(structure, machine, es_settings)
+
+    elif plugin in ['quantumespresso.pw']:
+        return generate_qe_params(structure, machine, es_settings, type=type, pressure=pressure)
 
     elif plugin in ['lammps.force', 'lammps.optimize', 'lammps.md']:
         return generate_lammps_params(structure, machine, es_settings, type=type, pressure=pressure)
