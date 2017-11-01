@@ -65,6 +65,11 @@ plt.rcParams.update({'mathtext.default': 'regular'})
 for j, index in enumerate(indices):
     ax1 = plt.subplot(gs[j])
 
+    if j != 0:
+        ax1.axes.get_yaxis().set_visible(False)
+        #ax1.set_ylim(ylim)
+        plt.ylim(ylim)
+
     plt.gca().set_color_cycle(None)
     for i in index:
         q_points = bs.get_bands(band=i)
@@ -75,10 +80,7 @@ for j, index in enumerate(indices):
                  # color='r'
                  )
 
-    if j != 0:
-        ax1.axes.get_yaxis().set_visible(False)
-        #ax1.set_ylim(ylim)
-        plt.ylim(ylim)
+
 
     ylim = ax1.get_ylim()
 
