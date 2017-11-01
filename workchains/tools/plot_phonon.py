@@ -97,6 +97,7 @@ gs = gridspec.GridSpec(1, len(indices)+1, width_ratios=[3, 1, 1])
 print gs
 plt.figure(4)
 for j, index in enumerate(indices):
+    print ('j', j)
     ax1 = plt.subplot(gs[j])
 
     #ax1 = plt.subplot(1, len(labels), j+1)
