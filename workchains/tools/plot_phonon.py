@@ -113,7 +113,7 @@ for j, index in enumerate(indices):
     ax1 = plt.subplot(gs[j])
 
     #ax1 = plt.subplot(1, len(labels), j+1)
-    for i in index:
+    for i in range(8):
         freq = bs.get_frequencies(band=i)
         dist = bs.get_distances(band=i)
         ax1.plot(dist, freq, color='r')
