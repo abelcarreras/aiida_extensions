@@ -85,7 +85,7 @@ for j, index in enumerate(indices):
     plt.axhline(y=0.0, color='black', linestyle='--', linewidth=0.1)
     plt.ylabel('$\gamma$')
     plt.xlim(ranges[j])
-    #plt.ylim([y_max - y_len*0.1, y_max + y_len*0.1])
+    plt.ylim(ylim)
     plt.xticks(positions[j], labels[j], rotation='horizontal')
 
 plt.suptitle('Mode Gruneisen parameter')
