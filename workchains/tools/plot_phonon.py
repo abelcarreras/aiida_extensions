@@ -112,11 +112,15 @@ for j, index in enumerate(indices):
     print ('j', j)
     ax1 = plt.subplot(gs[j])
 
-    #ax1 = plt.subplot(1, len(labels), j+1)
-    for i in range(9):
-        freq = bs.get_frequencies(band=i)
-        dist = bs.get_distances(band=i)
+    for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
         ax1.plot(dist, freq, color='r')
+
+
+    #ax1 = plt.subplot(1, len(labels), j+1)
+    #for i in range(9):
+    #    freq = bs.get_frequencies(band=i)
+    #    dist = bs.get_distances(band=i)
+    #    ax1.plot(dist, freq, color='r')
 
     print [bs.get_bands(band=index[0])[0], bs.get_bands(band=index[-1])[-1]]
     if j !=0:
