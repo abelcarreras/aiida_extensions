@@ -103,6 +103,7 @@ print ('width', width)
 gs = gridspec.GridSpec(1, 3, width_ratios=width, wspace=0.05)
 print gs
 plt.figure(4)
+ylim = None
 for j, index in enumerate(indices):
     print ('j', j)
     ax1 = plt.subplot(gs[j])
