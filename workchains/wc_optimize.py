@@ -11,6 +11,7 @@ from aiida.work.workchain import _If, _While
 
 import numpy as np
 from generate_inputs import *
+from parse_interface import *
 
 class OptimizeStructure(WorkChain):
     """
@@ -35,9 +36,14 @@ class OptimizeStructure(WorkChain):
 
         print ('Check convergence')
 
-        output_array = self.ctx.get('optimize').out.output_array
-        forces = output_array.get_array('forces')
-        stresses = output_array.get_array('stress')
+        #output_array = self.ctx.get('optimize').out.output_array
+        #forces = output_array.get_array('forces')
+        #stresses = output_array.get_array('stress')
+
+        parsed_data = parse_optimize_calculation(self.ctx.get('optimize'))
+        forces = parsed_data['forces']
+        stresses = parsed_data['stresses']
+
         if len(stresses.shape) > 2:  # For quantum espresso
             stresses = stresses[-1] * 10
 
