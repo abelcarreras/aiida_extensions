@@ -5,6 +5,7 @@ from aiida.orm import load_node, load_workflow
 from aiida.orm import Code, DataFactory
 
 import matplotlib.pyplot as plt
+from matplotlib import gridspec
 
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
@@ -89,10 +90,8 @@ plt.show()
 
 bs = wc.out.band_structure
 
-
 labels, indices = bs.get_formatted_labels_blocks()
 
-from matplotlib import gridspec
 
 width = []
 for ind in indices:
@@ -100,7 +99,7 @@ for ind in indices:
 
 print ('width', width)
 
-gs = gridspec.GridSpec(1, 3, width_ratios=width, wspace=0.05)
+gs = gridspec.GridSpec(1, len(width), width_ratios=width, wspace=0.05)
 
 plt.figure(4,
            #figsize=(20, 10)
@@ -111,7 +110,6 @@ for j, index in enumerate(indices):
     print ('j', j)
     ax1 = plt.subplot(gs[j])
 
-    #ax1 = plt.subplot(1, len(labels), j+1)
     for i in index:
         freq = bs.get_frequencies(band=i)
         dist = bs.get_distances(band=i)
@@ -120,8 +118,6 @@ for j, index in enumerate(indices):
     if j !=0:
         ax1.axes.get_yaxis().set_visible(False)
 
-
-    #plt.ylim([0, 25])
     plt.axhline(y=0.0, color='b', linestyle='--')
     plt.ylabel('Frequency (THz)')
     plt.xlim([bs.get_distances(band=index[0])[0], bs.get_distances(band=index[-1])[-1]])
@@ -133,20 +129,3 @@ plt.autoscale(enable=True, axis='y')
 plt.figtext(0.5, 0.02, 'Wave vector', ha='center')
 plt.show()
 
-exit()
-
-ax_list = plt.subplots(*range(len(labels)))[1]
-ax1, ax2 = plt.subplots(1, 2)[1]
-
-# Two subplots, unpack the axes array immediately
-plt.rcParams.update({'mathtext.default': 'regular'})
-labels, label_positions = bs.get_formatted_labels_matplotlib()
-a = bs.get_labels()
-
-plt.xticks(label_positions, labels, rotation='horizontal')
-ax1.plot(bs.get_distances()[0], bs.get_frequencies()[0])
-
-plt.xticks(label_positions, labels, rotation='horizontal')
-ax2.plot(bs.get_distances()[1], bs.get_frequencies()[1])
-
-plt.show()
