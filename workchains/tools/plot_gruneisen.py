@@ -5,6 +5,7 @@ from aiida.orm import load_node, load_workflow
 from aiida.orm import Code, DataFactory
 
 import matplotlib.pyplot as plt
+from matplotlib import gridspec
 
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
@@ -27,6 +28,38 @@ gamma_cutoff = 0.01
 
 # Phonon Band structure
 bs = wc.out.band_structure
+
+labels, indices, widths, ranges, positions = bs.get_plot_helpers()
+gs = gridspec.GridSpec(1, len(widths), width_ratios=widths, wspace=0.05)
+
+plt.figure(1)
+
+plt.rcParams.update({'mathtext.default': 'regular'})
+
+for j, index in enumerate(indices):
+    ax1 = plt.subplot(gs[j])
+
+    plt.gca().set_color_cycle(None)
+    for i in index:
+        ax1.plot(bs.get_distances(band=i),
+                 bs.get_frequencies(band=i),
+                 #color='r'
+                 )
+    if j != 0:
+        ax1.axes.get_yaxis().set_visible(False)
+
+    plt.axhline(y=0.0, color='black', linestyle='--', linewidth=0.1)
+    plt.ylabel('Frequency (THz)')
+    plt.xlim(ranges[j])
+    plt.xticks(positions[j], labels[j], rotation='horizontal')
+
+plt.suptitle('Phonon band structure')
+plt.autoscale(enable=True, axis='y')
+plt.figtext(0.5, 0.02, 'Wave vector', ha='center')
+plt.show()
+
+
+
 
 plt.figure(1)
 for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
