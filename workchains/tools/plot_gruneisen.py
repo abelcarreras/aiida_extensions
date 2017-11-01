@@ -67,13 +67,11 @@ for j, index in enumerate(indices):
 
     plt.gca().set_color_cycle(None)
     for i in index:
-        dist = bs.get_distances(band=i)
-        gamma = bs.get_gamma(band=i)
         q_points = bs.get_bands(band=i)
         mask = np.where(np.linalg.norm(q_points, axis=1) > gamma_cutoff)
 
-        ax1.plot(dist[mask],
-                 gamma[mask],
+        ax1.plot(bs.get_distances(band=i)[mask],
+                 bs.get_gamma(band=i)[mask],
                  # color='r'
                  )
 
