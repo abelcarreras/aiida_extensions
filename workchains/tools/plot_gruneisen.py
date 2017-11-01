@@ -74,10 +74,11 @@ for j, index in enumerate(indices):
                  bs.get_gamma(band=i)[mask],
                  # color='r'
                  )
+    ax1.set_ylim([-2,2])
+
 
     if j != 0:
         ax1.axes.get_yaxis().set_visible(False)
-        ax1.set_ylim([-2,2])
 
 
 
