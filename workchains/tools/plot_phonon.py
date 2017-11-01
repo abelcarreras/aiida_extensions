@@ -96,7 +96,7 @@ from matplotlib import gridspec
 
 width = []
 for ind in indices:
-    width.append(bs.get_distances(band=ind[-1][-1])) - bs.get_distances(band=ind[-1][-1])
+    width.append(bs.get_distances(band=ind[-1])[-1] - bs.get_distances(band=ind[0])[0])
 
 print ('width', width)
 
