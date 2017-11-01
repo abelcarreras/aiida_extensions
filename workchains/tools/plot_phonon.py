@@ -102,7 +102,10 @@ print ('width', width)
 
 gs = gridspec.GridSpec(1, 3, width_ratios=width, wspace=0.05)
 print gs
-plt.figure(4, figsize=(20, 10))
+plt.figure(4,
+           #figsize=(20, 10)
+           )
+
 ylim = None
 for j, index in enumerate(indices):
     print ('j', j)
