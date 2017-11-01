@@ -89,53 +89,8 @@ for j, index in enumerate(indices):
     plt.xticks(positions[j], labels[j], rotation='horizontal')
 
 plt.suptitle('Mode Gruneisen parameter')
-#plt.autoscale(enable=True, axis='y')
 plt.figtext(0.5, 0.02, 'Wave vector', ha='center')
 
-
-
-plt.show()
-
-
-
-
-plt.figure(1)
-for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
-    plt.plot(dist,
-             freq,
-             #color='r'
-             )
-    plt.gca().set_color_cycle(None)
-
-plt.ylabel('Frequency [THz]')
-plt.title('Phonon band structure')
-
-if bs.get_labels() is not None:
-    plt.rcParams.update({'mathtext.default': 'regular'})
-    labels, label_positions = bs.get_formatted_labels_matplotlib()
-    plt.xticks(label_positions, labels, rotation='horizontal')
-    plt.xlim([0, bs.get_distances()[-1][-1]])
-
-plt.figure(2)
-for i, dist in enumerate(bs.get_distances()):
-    gamma = bs.get_gamma(band=i)
-    q_points = bs.get_bands(band=i)
-    mask = np.where(np.linalg.norm(q_points, axis=1) > gamma_cutoff)
-
-    plt.plot(dist[mask],
-             gamma[mask],
-             # color='r'
-             )
-    plt.gca().set_color_cycle(None)
-
-plt.ylabel('$\gamma$')
-plt.title('Mode Gruneisen parameter')
-
-if bs.get_labels() is not None:
-    plt.rcParams.update({'mathtext.default': 'regular'})
-    labels, label_positions = bs.get_formatted_labels_matplotlib()
-    plt.xticks(label_positions, labels, rotation='horizontal')
-    plt.xlim([0, bs.get_distances()[-1][-1]])
 
 # Mesh
 mesh = wc.out.mesh
