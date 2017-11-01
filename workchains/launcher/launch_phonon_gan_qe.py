@@ -103,7 +103,7 @@ if True:
                               'forces': 'pw@boston'},
                      'parameters': parameters_dict,
                      'kpoints_density': 0.1,  # k-point density (Amstrong^-1)
-                     'pseudos_family': 'pbe_ps'}
+                     'pseudos_family': 'pbe_test_family'}
 
     es_settings = ParameterData(dict=settings_dict)
 
