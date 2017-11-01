@@ -119,7 +119,7 @@ for j, index in enumerate(indices):
 
 
     #plt.ylim([0, 25])
-    plt.axhline(y=0.0, color='b', linestyle='-')
+    plt.axhline(y=0.0, color='b', linestyle='--')
     plt.xlim([bs.get_distances(band=index[0])[0], bs.get_distances(band=index[-1])[-1]])
     position = [bs.get_distances(band=i)[0] for i in index] + [bs.get_distances(band=index[-1])[-1]]
     plt.rcParams.update({'mathtext.default': 'regular'})
