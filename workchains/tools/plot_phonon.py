@@ -125,6 +125,7 @@ for j, index in enumerate(indices):
     plt.rcParams.update({'mathtext.default': 'regular'})
     plt.xticks(position, labels[j], rotation='horizontal')
 
+plt.figure(figsize=(20, 10))
 plt.autoscale(enable=True, axis='y')
 plt.show()
 
