@@ -27,13 +27,8 @@ wc = load_node(int(sys.argv[1]))
 bs = wc.out.band_structure
 
 plt.figure(1)
-#for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
-#    plt.plot(dist, freq, color='r')
-
-for i, dist in enumerate(bs.get_distances()):
-    print ('i', i)
-    plt.plot(dist, bs.get_frequencies(band=i), color='r')
-
+for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
+    plt.plot(dist, freq, color='r')
 
 plt.axes().get_xaxis().set_ticks([])
 plt.ylabel('Frequency [THz]')
@@ -112,16 +107,11 @@ for j, index in enumerate(indices):
     print ('j', j)
     ax1 = plt.subplot(gs[j])
 
-    # for dist, freq in zip(bs.get_distances(), bs.get_frequencies()):
-    #    plt.plot(dist, freq, color='r')
-
-
     #ax1 = plt.subplot(1, len(labels), j+1)
-    for i in range(9):
+    for i in index:
         freq = bs.get_frequencies(band=i)
         dist = bs.get_distances(band=i)
         ax1.plot(dist, freq, color='r')
-
     print [bs.get_bands(band=index[0])[0], bs.get_bands(band=index[-1])[-1]]
     if j !=0:
         ax1.axes.get_yaxis().set_visible(False)
