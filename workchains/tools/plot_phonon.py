@@ -101,7 +101,7 @@ for ind in indices:
 print ('width', width)
 
 gs = gridspec.GridSpec(1, 3, width_ratios=width, wspace=0.05)
-print gs
+
 plt.figure(4,
            #figsize=(20, 10)
            )
@@ -130,7 +130,7 @@ for j, index in enumerate(indices):
     plt.xticks(position, labels[j], rotation='horizontal')
 
 plt.autoscale(enable=True, axis='y')
-plt.xlabel('Wave vector')
+plt.text(0.5, 0.04, 'common xlabel', ha='center', va='center')
 plt.show()
 
 exit()
