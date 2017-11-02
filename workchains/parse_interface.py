@@ -12,9 +12,8 @@ def parse_optimize_calculation(calc):
         stresses = calc.out.output_array.get_array('stress')
 
     elif plugin == 'quantumespresso.pw':
-        output_trajectory = calc.output_trajectory
-        forces = output_trajectory.get_array('forces')[-1]
-        stresses = output_trajectory.get_array('stress')[-1]
+        forces = calc.out.output_trajectory.get_array('forces')[-1]
+        stresses = calc.out.output_trajectory.get_array('stress')[-1]
     else:
         return Exception('Not supported plugin')
 
