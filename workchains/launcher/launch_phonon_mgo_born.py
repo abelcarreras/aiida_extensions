@@ -51,7 +51,7 @@ ph_settings = ParameterData(dict={'supercell': [[2, 0, 0],
                                                 [0.5, 0.0, 0.5],
                                                 [0.5, 0.5, 0.0]],
                                   'distance': 0.01,
-                                  'mesh': [80, 80, 80],
+                                  'mesh': [20, 20, 20],
                                   'symmetry_precision': 1e-5
                                   # 'code': 'phonopy@boston'  # comment to use local phonopy
                                   })

@@ -46,7 +46,7 @@ ph_settings = ParameterData(dict={'supercell': [[2, 0, 0],
                                                 [0.0, 1.0, 0.0],
                                                 [0.0, 0.0, 1.0]],
                                   'distance': 0.01,
-                                  'mesh': [80, 80, 80],
+                                  'mesh': [20, 20, 20],
                                   'symmetry_precision': 1e-5
                                   # 'code': 'phonopy@boston'  # comment to use local phonopy
                                   })
@@ -102,7 +102,7 @@ if True:
     settings_dict = {'code': {'optimize': 'pw@boston',
                               'forces': 'pw@boston'},
                      'parameters': parameters_dict,
-                     'kpoints_density': 0.1,  # k-point density (Amstrong^-1)
+                     'kpoints_density': 0.5,  # k-point density (Amstrong^-1)
                      'pseudos_family': 'pbe_test_family'}
 
     es_settings = ParameterData(dict=settings_dict)

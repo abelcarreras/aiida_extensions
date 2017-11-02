@@ -59,7 +59,7 @@ for j, index in enumerate(indices):
 plt.suptitle('Phonon band structure')
 plt.figtext(0.5, 0.02, 'Wave vector', ha='center')
 
-
+# Mode Gruneisen parameter band structure
 plt.figure(2, figsize=(8, 5))
 
 plt.rcParams.update({'mathtext.default': 'regular'})
@@ -92,7 +92,7 @@ plt.suptitle('Mode Gruneisen parameter')
 plt.figtext(0.5, 0.02, 'Wave vector', ha='center')
 
 
-# Mesh
+# Mode Gruneisen parameter mesh (freq vs gamma)
 mesh = wc.out.mesh
 
 plt.figure(3)

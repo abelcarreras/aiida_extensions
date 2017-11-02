@@ -6,7 +6,7 @@ setup(
     description='AiiDA plugin for running phonon calculations using phonopy',
     url='https://github.com/abelcarreras/aiida_extensions',
     author='Abel Carreras',
-    author_email='abelcarreras@gmail.com',
+    author_email='abelcarreras83@gmail.com',
     license='MIT license',
     packages=find_packages(exclude=['aiida']),
     requires=['phonopy', 'numpy', 'dynaphopy'],
