@@ -157,7 +157,7 @@ if True:
                  ph_settings=ph_settings,
                  # Optional settings
                  pressure=Float(0.0),
-                 optimize=Bool(True),
+                 optimize=Bool(False),
                  )
 
     print (result)
