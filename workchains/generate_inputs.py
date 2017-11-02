@@ -93,7 +93,8 @@ def generate_qe_params(structure, machine, settings, pressure=0.0, type=None):
                                  'cell_dynamics': 'bfgs',  # Quasi-Newton algorithm
                               #   'cell_dofree': 'all'
                               }  # Degrees of movement
-        parameters['IONS'] = {'ion_dynamics': 'bfgs'}
+        parameters['IONS'] = {'ion_dynamics': 'bfgs',
+                              'ion_nstepe': 10}
 
         parameters['CONTROL'].update({'tstress': True,
                                       'tprnfor': True,
@@ -101,7 +102,10 @@ def generate_qe_params(structure, machine, settings, pressure=0.0, type=None):
                                       'forc_conv_thr': 1.e-8})
 
     if type == 'forces':
-        parameters['CONTROL'].update({'calculation': 'scf'})
+        parameters['CONTROL'].update({'calculation': 'scf',
+                                      'tstress': True,
+                                      'tprnfor': True
+                                      })
         parameters['CELL'] = {'press': pressure}
 
         parameters['CONTROL'].update({'tstress': True,
