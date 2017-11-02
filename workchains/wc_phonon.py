@@ -114,7 +114,7 @@ def create_forces_set(**kwargs):
 
     forces = []
     for i in range(data_sets.get_number_of_displacements()):
-        forces.append(kwargs.pop('forces_{}'.format(i)).get_array('forces')[0])
+        forces.append(kwargs.pop('forces_{}'.format(i)).get_array('forces')[-1])
 
     force_sets.set_forces(forces)
 
@@ -423,7 +423,12 @@ class PhononPhonopy(WorkChain):
 
         wf_inputs = {}
         for i in range(self.ctx.number_of_displacements):
-            wf_inputs['forces_{}'.format(i)] = self.ctx.get('structure_{}'.format(i)).out.output_array
+            # This has to be changed to make uniform plugin interface
+            try:
+                wf_inputs['forces_{}'.format(i)] = self.ctx.get('structure_{}'.format(i)).out.output_trajectory
+            except:
+                wf_inputs['forces_{}'.format(i)] = self.ctx.get('structure_{}'.format(i)).out.output_array
+
         wf_inputs['data_sets'] = self.ctx.data_sets
 
         self.ctx.force_sets = create_forces_set(**wf_inputs)['force_sets']

@@ -628,7 +628,6 @@ class Wf_phononWorkflow(Workflow):
             try:
                 structure = last_calc.out.output_structure
 
-
                 forces = last_calc.out.output_array.get_array('forces')[-1]
                 stresses = last_calc.out.output_array.get_array('stress')
 
