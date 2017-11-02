@@ -89,7 +89,7 @@ def generate_qe_params(structure, machine, settings, pressure=0.0, type=None):
     if type == 'optimize':
         parameters['CONTROL'].update({'calculation': 'vc-relax'})
         parameters['CELL'] = {'press': pressure,
-                                 #'press_conv_thr': 1.e-3,
+                              'press_conv_thr': 1.e-3,
                                  'cell_dynamics': 'bfgs',  # Quasi-Newton algorithm
                               #   'cell_dofree': 'all'
                               }  # Degrees of movement
@@ -104,7 +104,9 @@ def generate_qe_params(structure, machine, settings, pressure=0.0, type=None):
     if type == 'forces':
         parameters['CONTROL'].update({'calculation': 'scf',
                                       'tstress': True,
-                                      'tprnfor': True
+                                      'tprnfor': True,
+                                      'etot_conv_thr': 1.e-8,
+                                      'forc_conv_thr': 1.e-8
                                       })
         parameters['CELL'] = {'press': pressure}
 
@@ -112,6 +114,10 @@ def generate_qe_params(structure, machine, settings, pressure=0.0, type=None):
                                       'tprnfor': True})
 
     if type == 'born_charges':
+        parameters['CONTROL'].update({'calculation': 'scf',
+                                      'tstress': True,
+                                      'tprnfor': True
+                                      })
         parameters['INPUTPH'] = {'epsil': True,
                                  'zeu': True}  # Degrees of movement
 
