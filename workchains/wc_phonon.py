@@ -212,10 +212,12 @@ def get_born_parameters(phonon, born_unitcell, epsilon, symprec=1e-5):
 
     borns_, epsilon_ = symmetrize_borns_and_epsilon(born_unitcell, epsilon, cell,
                                                     symprec=symprec)
-    inv_smat = np.linalg.inv(smat)
+    #inv_smat = np.linalg.inv(smat)
     scell = get_supercell(cell, smat, symprec=symprec)
     u2u_map = scell.get_unitcell_to_unitcell_map()
-    pcell = get_primitive(scell, np.dot(inv_smat, pmat), symprec=symprec)
+    # pcell = get_primitive(scell, np.dot(inv_smat, pmat), symprec=symprec)
+
+    pcell = phonon.get_primitive()
     p2s_map = pcell.get_primitive_to_supercell_map()
     born_primitive = borns_[[u2u_map[i] for i in p2s_map]]
 

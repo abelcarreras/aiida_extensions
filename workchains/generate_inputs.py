@@ -86,15 +86,16 @@ def generate_qe_params(structure, machine, settings, pressure=0.0, type=None):
     if type == 'optimize':
         parameters['CONTROL'].update({'calculation': 'vc-relax'})
         parameters['CELL'] = {'press': pressure,
-                                 'press_conv_thr': 1.e-3,
+                                 #'press_conv_thr': 1.e-3,
                                  'cell_dynamics': 'bfgs',  # Quasi-Newton algorithm
-                                 'cell_dofree': 'all'}  # Degrees of movement
+                              #   'cell_dofree': 'all'
+                              }  # Degrees of movement
         parameters['IONS'] = {'ion_dynamics': 'bfgs'}
 
         parameters['CONTROL'].update({'tstress': True,
-                                     'tprnfor': True,
-                                     'etot_conv_thr': 1.e-8,
-                                     'forc_conv_thr': 1.e-8})
+                                      'tprnfor': True,
+                                      'etot_conv_thr': 1.e-8,
+                                      'forc_conv_thr': 1.e-8})
 
     if type == 'born_charges':
         parameters['INPUTPH'] = {'epsil': True,
