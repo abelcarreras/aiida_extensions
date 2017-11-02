@@ -7,7 +7,7 @@ class ForceConstantsData(Data):
     """
 
     def __init__(self, *args, **kwargs):
-        super(ForceConstants, self).__init__(*args, **kwargs)
+        super(ForceConstantsData, self).__init__(*args, **kwargs)
         self._cached_arrays = {}
 
     def get_shape(self):
