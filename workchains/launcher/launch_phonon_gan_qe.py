@@ -91,13 +91,9 @@ if False:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
 # QE SPECIFIC
 if True:
     parameters_dict = {
-        'CONTROL': {'calculation': 'scf',
-                    'tstress': True,  #  Important that this stays to get stress
-                    'tprnfor': True,},
         'SYSTEM': {'ecutwfc': 30.,
-                   'ecutrho': 200.,},
-        'ELECTRONS': {'conv_thr': 1.e-6,}
-    }
+                   'ecutrho': 200.,}
+                   }
 
     settings_dict = {'code': {'optimize': 'pw@boston',
                               'forces': 'pw@boston'},

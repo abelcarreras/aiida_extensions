@@ -83,6 +83,9 @@ def generate_qe_params(structure, machine, settings, pressure=0.0, type=None):
     # Parameters
     parameters = dict(settings.dict.parameters)
 
+    parameters['CONTROL'] = {'calculation': 'scf'}
+    parameters['ELECTRONS'] = {'conv_thr': 1.e-8}
+
     if type == 'optimize':
         parameters['CONTROL'].update({'calculation': 'vc-relax'})
         parameters['CELL'] = {'press': pressure,
@@ -96,6 +99,13 @@ def generate_qe_params(structure, machine, settings, pressure=0.0, type=None):
                                       'tprnfor': True,
                                       'etot_conv_thr': 1.e-8,
                                       'forc_conv_thr': 1.e-8})
+
+    if type == 'forces':
+        parameters['CONTROL'].update({'calculation': 'scf'})
+        parameters['CELL'] = {'press': pressure}
+
+        parameters['CONTROL'].update({'tstress': True,
+                                      'tprnfor': True})
 
     if type == 'born_charges':
         parameters['INPUTPH'] = {'epsil': True,
