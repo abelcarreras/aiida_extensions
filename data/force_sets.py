@@ -1,7 +1,7 @@
 from aiida.orm import Data
 
 
-class ForceSets(Data):
+class ForceSetsData(Data):
     """
     Store the force constants on disk as a numpy array. It requires numpy to be installed.
     """

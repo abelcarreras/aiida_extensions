@@ -10,8 +10,8 @@ from aiida.work.workfunction import workfunction
 from aiida.orm import Code, CalculationFactory, load_node, DataFactory
 
 from aiida.orm.data.base import Str, Float, Bool
-from aiida.orm.data.force_sets import ForceSets
-from aiida.orm.data.force_constants import ForceConstants
+from aiida.orm.data.force_sets import ForceSetsData
+from aiida.orm.data.force_constants import ForceConstantsData
 from aiida.orm.data.band_structure import BandStructureData
 from aiida.orm.data.phonon_dos import PhononDosData
 

@@ -10,8 +10,8 @@ from aiida.work.workfunction import workfunction
 from aiida.orm import Code, CalculationFactory, load_node, DataFactory
 
 from aiida.orm.data.base import Str, Float, Bool
-from aiida.orm.data.force_sets import ForceSets
-from aiida.orm.data.force_constants import ForceConstants
+from aiida.orm.data.force_sets import ForceSetsData
+from aiida.orm.data.force_constants import ForceConstantsData
 from aiida.orm.data.band_structure import BandStructureData
 from aiida.orm.data.phonon_dos import PhononDosData
 
@@ -86,7 +86,7 @@ def create_supercells_with_displacements_using_phonopy(structure, ph_settings):
 
     # Transform cells to StructureData and set them ready to return
     data_sets = phonon.get_displacement_dataset()
-    data_sets_object = ForceSets(data_sets=data_sets)
+    data_sets_object = ForceSetsData(data_sets=data_sets)
 
     disp_cells = {'data_sets': data_sets_object}
     for i, phonopy_supercell in enumerate(cells_with_disp):
@@ -110,7 +110,7 @@ def create_forces_set(**kwargs):
 
     """
     data_sets = kwargs.pop('data_sets')
-    force_sets = ForceSets(data_sets=data_sets.get_data_sets())
+    force_sets = ForceSetsData(data_sets=data_sets.get_data_sets())
 
     forces = []
     for i in range(data_sets.get_number_of_displacements()):
@@ -131,9 +131,9 @@ def add_nac_to_force_constants(force_constants, array_data):
     :return: force_constants: ForceConstants object
     """
 
-    force_constants_nac = ForceConstants(array=force_constants.get_array(),
-                                         born_charges=array_data.get_array('born_charges'),
-                                         epsilon=array_data.get_array('epsilon'))
+    force_constants_nac = ForceConstantsData(array=force_constants.get_array(),
+                                             born_charges=array_data.get_array('born_charges'),
+                                             epsilon=array_data.get_array('epsilon'))
 
     return {'force_constants': force_constants_nac}
 
@@ -167,7 +167,7 @@ def get_force_constants_from_phonopy(structure, ph_settings, force_sets):
     phonon.set_displacement_dataset(force_sets.get_force_sets())
     phonon.produce_force_constants()
 
-    force_constants = ForceConstants(array=phonon.get_force_constants())
+    force_constants = ForceConstantsData(array=phonon.get_force_constants())
 
     return {'force_constants': force_constants}
 
