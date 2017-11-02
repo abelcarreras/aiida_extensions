@@ -100,8 +100,7 @@ if True:
     }
 
     settings_dict = {'code': {'optimize': 'pw@boston',
-                              'forces': 'pw@boston',
-                              'born_charges': 'vasp544mpi@boston'},
+                              'forces': 'pw@boston'},
                      'parameters': parameters_dict,
                      'kpoints_density': 0.5,  # k-point density (Amstrong^-1)
                      'pseudos_family': 'pbe_test_family'}
