@@ -223,13 +223,21 @@ def get_force_sets_inline(**kwargs):
 
     # Build data_sets from forces of supercells with displacments
     data_sets = phonon.get_displacement_dataset()
-    for i, first_atoms in enumerate(data_sets['first_atoms']):
-        first_atoms['forces'] = kwargs.pop('force_{}'.format(i)).get_array('forces')[-1]
+    #for i, first_atoms in enumerate(data_sets['first_atoms']):
+    #    first_atoms['forces'] = kwargs.pop('force_{}'.format(i)).get_array('forces')[-1]
 
-    data = ArrayData()
-    data.set_array('force_sets', np.array(data_sets))
+    #data = ArrayData()
+    #data.set_array('force_sets', np.array(data_sets))
 
-    return {'phonopy_output': data}
+    force_sets = ForceSetsData(data_sets=data_sets)
+
+    forces = []
+    for i in range(data_sets.get_number_of_displacements()):
+        forces.append(kwargs.pop('forces_{}'.format(i)).get_array('forces')[-1])
+
+    force_sets.set_forces(forces)
+
+    return {'phonopy_output': force_sets}
 
 
 # Get calculation from phonopy
@@ -389,8 +397,7 @@ class Wf_phononWorkflow(Workflow):
         calc.use_code(code)
         calc.use_structure(structure)
         calc.use_parameters(ParameterData(dict=parameters['parameters']))
-        data_sets_object = ForceSetsData(data_sets=data_sets.get_dict())
-        calc.use_data_sets(data_sets_object)
+        calc.use_data_sets(data_sets)
 
         calc.store_all()
 
