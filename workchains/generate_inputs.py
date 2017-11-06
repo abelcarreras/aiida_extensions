@@ -108,7 +108,6 @@ def generate_qe_params(structure, machine, settings, pressure=0.0, type=None):
                                       'etot_conv_thr': 1.e-8,
                                       'forc_conv_thr': 1.e-8
                                       })
-        parameters['CELL'] = {'press': pressure}
 
         parameters['CONTROL'].update({'tstress': True,
                                       'tprnfor': True})
