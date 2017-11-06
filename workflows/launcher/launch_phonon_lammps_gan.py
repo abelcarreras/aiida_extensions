@@ -78,7 +78,10 @@ parameters_opt = {'relaxation': 'tri',  # iso/aniso/tri
 
 wf_parameters = {
      'structure': structure,
-     'phonopy_input': {'parameters': phonopy_parameters},
+     'phonopy_input': {'code': 'phonopy@stern',
+                       'parameters': phonopy_parameters,
+                       'resources': machine_parameters
+                       },
      'input_force': {'code': 'lammps_force@boston',
                      'potential': potential,
                      'resources': machine_parameters},
