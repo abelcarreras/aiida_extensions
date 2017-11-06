@@ -92,8 +92,10 @@ if False:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
 if True:
     parameters_dict = {
         'SYSTEM': {'ecutwfc': 30.,
-                   'ecutrho': 200.,}
-                   }
+                   'ecutrho': 200.,},
+        'ELECTRONS': {'conv_thr': 1.e-6,}
+    }
+
 
     settings_dict = {'code': {'optimize': 'pw@boston',
                               'forces': 'pw@boston'},

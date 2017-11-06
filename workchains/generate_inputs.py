@@ -84,7 +84,6 @@ def generate_qe_params(structure, machine, settings, pressure=0.0, type=None):
     parameters = dict(settings.dict.parameters)
 
     parameters['CONTROL'] = {'calculation': 'scf'}
-    parameters['ELECTRONS'] = {'conv_thr': 1.e-8}
 
     if type == 'optimize':
         parameters['CONTROL'].update({'calculation': 'vc-relax'})
