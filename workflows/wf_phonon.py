@@ -2,6 +2,8 @@ from aiida.orm import Code, DataFactory
 from aiida.orm.workflow import Workflow
 from aiida.orm.calculation.inline import make_inline
 from aiida.common.exceptions import AiidaException
+from aiida.orm.data.force_sets import ForceSetsData
+
 
 StructureData = DataFactory('structure')
 ParameterData = DataFactory('parameter')
@@ -387,7 +389,8 @@ class Wf_phononWorkflow(Workflow):
         calc.use_code(code)
         calc.use_structure(structure)
         calc.use_parameters(ParameterData(dict=parameters['parameters']))
-        calc.use_data_sets(data_sets)
+        data_sets_object = ForceSetsData(data_sets=data_sets.get_dict())
+        calc.use_data_sets(data_sets_object)
 
         calc.store_all()
 
@@ -855,7 +858,9 @@ class Wf_phononWorkflow(Workflow):
         else:
             calc = self.get_step_calculations(self.force_constants_calculation_remote)[0]
             force_constants = calc.get_outputs_dict()['array_data']
-            self.add_result('force_constants', force_constants)
+            force_constants_array = ArrayData()
+            force_constants_array.set_array('force_constants', force_constants.get_array())
+            self.add_result('force_constants', force_constants_array)
 
         structure = self.get_result('final_structure')
 
