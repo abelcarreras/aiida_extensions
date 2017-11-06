@@ -233,7 +233,7 @@ def get_force_sets_inline(**kwargs):
 
     forces = []
     for i in range(force_sets.get_number_of_displacements()):
-        forces.append(kwargs.pop('forces_{}'.format(i)).get_array('forces')[-1])
+        forces.append(kwargs.pop('force_{}'.format(i)).get_array('forces')[-1])
 
     force_sets.set_forces(forces)
 
