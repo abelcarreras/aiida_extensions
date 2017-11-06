@@ -33,7 +33,7 @@ def standardize_cell(structure):
     lattice, standardized_positions, numbers = spglib.standardize_cell(structure_data,
                                                                        symprec=1e-5,
                                                                        to_primitive=False,
-                                                                       no_idealize=True)
+                                                                       no_idealize=False)
 
     symbols = [atom_data[i][1] for i in numbers]
 

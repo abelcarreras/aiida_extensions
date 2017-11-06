@@ -325,7 +325,7 @@ class PhononPhonopy(WorkChain):
     def define(cls, spec):
         super(PhononPhonopy, cls).define(spec)
         spec.input("structure", valid_type=StructureData)
-        spec.input("machine", valid_type=ParameterData)
+        # spec.input("machine", valid_type=ParameterData)
         spec.input("ph_settings", valid_type=ParameterData)
         spec.input("es_settings", valid_type=ParameterData)
         # Optional arguments
@@ -342,7 +342,7 @@ class PhononPhonopy(WorkChain):
         print ('start optimize')
         future = submit(OptimizeStructure,
                         structure=self.inputs.structure,
-                        machine=self.inputs.machine,
+                        # machine=self.inputs.machine,
                         es_settings=self.inputs.es_settings,
                         pressure=self.inputs.pressure,
                         )
@@ -392,7 +392,7 @@ class PhononPhonopy(WorkChain):
         for label, supercell in supercells.iteritems():
 
             JobCalculation, calculation_input = generate_inputs(supercell,
-                                                                self.inputs.machine,
+                                                                # self.inputs.machine,
                                                                 self.inputs.es_settings,
                                                                 #pressure=self.input.pressure,
                                                                 type='forces')
@@ -408,7 +408,7 @@ class PhononPhonopy(WorkChain):
         if 'born_charges' in self.inputs.es_settings.dict.code:
             self.report('calculate born charges')
             JobCalculation, calculation_input = generate_inputs(self.ctx.final_structure,
-                                                                self.inputs.machine,
+                                                                # self.inputs.machine,
                                                                 self.inputs.es_settings,
                                                                 #pressure=self.input.pressure,
                                                                 type='born_charges')
@@ -441,7 +441,7 @@ class PhononPhonopy(WorkChain):
             JobCalculation, calculation_input = generate_phonopy_params(code=Code.get_from_string(code_label),
                                                                         structure=self.ctx.final_structure,
                                                                         ph_settings=self.inputs.ph_settings,
-                                                                        machine=self.inputs.machine,
+                                                                        # machine=self.inputs.machine,
                                                                         force_sets=self.ctx.force_sets)
             future = submit(JobCalculation, **calculation_input)
             print 'phonopy FC calc:', future.pid
