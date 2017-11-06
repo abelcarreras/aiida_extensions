@@ -61,7 +61,7 @@ class OptimizeStructure(WorkChain):
     def define(cls, spec):
         super(OptimizeStructure, cls).define(spec)
         spec.input("structure", valid_type=StructureData)
-        spec.input("machine", valid_type=ParameterData)
+        # spec.input("machine", valid_type=ParameterData)
         spec.input("es_settings", valid_type=ParameterData)
         # Optional
         spec.input("pressure", valid_type=Float, required=False, default=Float(0.0))
@@ -123,7 +123,7 @@ class OptimizeStructure(WorkChain):
             structure = standardize_cell(self.ctx.optimize.out.output_structure)['standardized_structure']
 
         JobCalculation, calculation_input = generate_inputs(structure,
-                                                            self.inputs.machine,
+                                                            # self.inputs.machine,
                                                             self.inputs.es_settings,
                                                             pressure=self.inputs.pressure,
                                                             type='optimize',
