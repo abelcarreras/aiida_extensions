@@ -1,7 +1,7 @@
 from aiida.parsers.parser import Parser
 from aiida.parsers.exceptions import OutputParsingError
 from aiida.orm.data.array import ArrayData
-from aiida.orm.data.force_constants import ForceConstants
+from aiida.orm.data.force_constants import ForceConstantsData
 
 from aiida.orm.data.parameter import ParameterData
 
