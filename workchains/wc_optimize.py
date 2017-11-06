@@ -5,6 +5,7 @@ if not is_dbenv_loaded():
     load_dbenv()
 
 from aiida.work.workchain import WorkChain, ToContext
+from aiida.work.workfunction import workfunction
 
 from aiida.orm.data.base import Str, Float, Bool, Int
 from aiida.work.workchain import _If, _While
@@ -12,6 +13,44 @@ from aiida.work.workchain import _If, _While
 import numpy as np
 from generate_inputs import *
 from parse_interface import *
+
+@workfunction
+def standardize_cell(structure):
+    import spglib
+    from phonopy.structure.atoms import Atoms as PhonopyAtoms
+    from phonopy.structure.atoms import atom_data
+
+
+    bulk = PhonopyAtoms(symbols=[site.kind_name for site in structure.sites],
+                        positions=[site.position for site in structure.sites],
+                        cell=structure.cell)
+
+    structure_data = (structure.cell,
+                      bulk.get_scaled_positions(),
+                      bulk.get_atomic_numbers())
+
+    #lattice, refined_positions, numbers = spglib.refine_cell(structure_data, symprec=1e-5)
+    lattice, standardized_positions, numbers = spglib.standardize_cell(structure_data,
+                                                                       symprec=1e-5,
+                                                                       to_primitive=False,
+                                                                       no_idealize=True)
+
+    symbols = [atom_data[i][1] for i in numbers]
+
+    # print lattice, standardized_positions, numbers
+    # print [site.kind_name for site in structure.sites]
+    standardized_bulk = PhonopyAtoms(symbols=symbols,
+                                     scaled_positions=standardized_positions,
+                                     cell=lattice)
+
+    # create new aiida structure object
+    standarized = StructureData(cell=standardized_bulk.get_cell())
+    for position, symbol in zip(standardized_bulk.get_positions(), standardized_bulk.get_chemical_symbols()):
+        standarized.append_atom(position=position,
+                                      symbols=symbol)
+
+    return {'standardized_structure': standarized}
+
 
 class OptimizeStructure(WorkChain):
     """
@@ -81,7 +120,7 @@ class OptimizeStructure(WorkChain):
         if not 'optimize' in self.ctx:
             structure = self.inputs.structure
         else:
-            structure = self.ctx.optimize.out.output_structure
+            structure = standardize_cell(self.ctx.optimize.out.output_structure)['standardized_structure']
 
         JobCalculation, calculation_input = generate_inputs(structure,
                                                             self.inputs.machine,

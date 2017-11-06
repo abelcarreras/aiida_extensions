@@ -41,6 +41,12 @@ for i, scaled_position in enumerate(scaled_positions):
     structure.append_atom(position=np.dot(scaled_position, cell).tolist(),
                           symbols=symbols[i])
 
+# CODE INDEPENDENT
+machine_dict = {'resources': {'num_machines': 1,
+                              'parallel_env': 'mpi*',
+                              'tot_num_mpiprocs': 16},
+                'max_wallclock_seconds': 30 * 60,
+                }
 
 # PHONOPY settings
 ph_settings = ParameterData(dict={'supercell': [[2,0,0],
@@ -52,7 +58,8 @@ ph_settings = ParameterData(dict={'supercell': [[2,0,0],
                                   'distance': 0.01,
                                   'mesh': [20, 20, 20],
                                   'symmetry_precision': 1e-5
-                                  # 'code': 'phonopy@stern_outside'  # comment to use local phonopy
+                                  # 'code': 'phonopy@stern_outside',  # comment to use local phonopy
+                                  # 'machine': machine_dict
                                   })
 
 # VASP SPECIFIC
@@ -85,7 +92,8 @@ if True:   # Set TRUE to use VASP or FALSE to use Quantum Espresso
                      'parameters': incar_dict,
                      #'kpoints': kpoints_dict,
                      'kpoints_per_atom': 100,  # k-point density
-                     'pseudos': potcar.as_dict()}
+                     'pseudos': potcar.as_dict(),
+                     'machine': machine_dict}
 
     # pseudos = ParameterData(dict=potcar.as_dict())
     es_settings = ParameterData(dict=settings_dict)
@@ -112,7 +120,8 @@ if False:
     settings_dict = {'code': 'pw@stern_outside',
                      'parameters': parameters_dict,
                      'kpoints_per_atom': 1000,  # k-point density
-                     'pseudos_family': 'pbe_ps'}
+                     'pseudos_family': 'pbe_ps',
+                     'machine': machine_dict}
 
     es_settings = ParameterData(dict=settings_dict)
 
@@ -148,17 +157,11 @@ if False:
     settings_dict = {'code': {'optimize': 'lammps_optimize@boston',
                               'forces': 'lammps_force@boston'},
                      'parameters': parameters,
-                     'potential': potential}
+                     'potential': potential,
+                     'machine': machine_dict}
 
     es_settings = ParameterData(dict=settings_dict)
 
-
-# CODE INDEPENDENT
-machine_dict = {'resources': {'num_machines': 1,
-                              'parallel_env': 'mpi*',
-                              'tot_num_mpiprocs': 16},
-                'max_wallclock_seconds': 30 * 60,
-                }
 
 machine = ParameterData(dict=machine_dict)
 
