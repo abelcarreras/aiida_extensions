@@ -76,9 +76,9 @@ def generate_qe_params(structure, machine, settings, pressure=0.0, type=None):
     # structure
     inputs.structure = structure
 
-    inputs._options.resources = machine.dict.resources
-    inputs._options.max_wallclock_seconds = machine.dict.max_wallclock_seconds
-
+    # machine
+    inputs._options.resources = settings.dict.machine['resources']
+    inputs._options.max_wallclock_seconds = settings.dict.machine['max_wallclock_seconds']
 
     # Parameters
     parameters = dict(settings.dict.parameters)
@@ -120,7 +120,6 @@ def generate_qe_params(structure, machine, settings, pressure=0.0, type=None):
                                  'zeu': True}  # Degrees of movement
 
     inputs.parameters = ParameterData(dict=parameters)
-
 
     # Kpoints
     kpoints = KpointsData()
@@ -174,8 +173,8 @@ def generate_lammps_params(structure, machine, settings, pressure=0.0, type=None
     inputs = LammpsCalculation.process().get_inputs_template()
     inputs.code = Code.get_from_string(code)
 
-    inputs._options.resources = machine.dict.resources
-    inputs._options.max_wallclock_seconds = machine.dict.max_wallclock_seconds
+    inputs._options.resources = settings.dict.machine['resources']
+    inputs._options.max_wallclock_seconds = settings.dict.machine['max_wallclock_seconds']
 
     inputs.structure = structure
     inputs.potential = ParameterData(dict=settings.dict.potential)
@@ -217,8 +216,9 @@ def generate_vasp_params(structure, machine, settings, type=None, pressure=0.0):
     # structure
     inputs.structure = structure
 
-    inputs._options.resources = machine.dict.resources
-    inputs._options.max_wallclock_seconds = machine.dict.max_wallclock_seconds
+    # machine
+    inputs._options.resources = settings.dict.machine['resources']
+    inputs._options.max_wallclock_seconds = settings.dict.machine['max_wallclock_seconds']
 
     # INCAR (parameters)
     incar = dict(settings.dict.parameters)
