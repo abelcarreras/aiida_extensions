@@ -31,7 +31,7 @@ def standardize_cell(structure):
 
     #lattice, refined_positions, numbers = spglib.refine_cell(structure_data, symprec=1e-5)
     lattice, standardized_positions, numbers = spglib.standardize_cell(structure_data,
-                                                                       symprec=1e-5,
+                                                                       symprec=1e-2,
                                                                        to_primitive=False,
                                                                        no_idealize=False)
 
