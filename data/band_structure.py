@@ -40,7 +40,7 @@ class BandStructureData(ArrayData):
 
         band_labels = numpy.array(band_labels)
 
-        self.set_array('labels', band_labels)
+        self.set_array('band_labels', band_labels)
 
     def set_unitcell(self, unitcell):
         """
@@ -197,7 +197,7 @@ class BandStructureData(ArrayData):
         Return the band labels in the node as a numpy array
         """
 
-        band_labels = self.get_array('labels')
+        band_labels = self.get_array('band_labels')
 
         if band is not None:
             band_labels = band_labels[band]
