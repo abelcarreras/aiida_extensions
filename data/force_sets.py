@@ -74,6 +74,8 @@ class ForceSetsData(ArrayData):
 
     def set_data_sets(self, data_sets):
 
+        import numpy
+
         self._set_attr('natom', data_sets['natom'])
         self._set_attr('ndisplacements', len(data_sets['first_atoms']))
 
@@ -85,10 +87,11 @@ class ForceSetsData(ArrayData):
             number.append(first_atoms['number'])
             displacement.append(first_atoms['displacement'])
 
-        self.set_array('direction', direction)
-        self.set_array('number', number)
-        self.set_array('displacement', displacement)
+        self.set_array('direction', numpy.array(direction))
+        self.set_array('number', numpy.array(number))
+        self.set_array('displacement', numpy.array(displacement))
 
     def set_forces(self, forces):
 
-        self.set_array('forces', forces)
+        import numpy
+        self.set_array('forces', numpy.array(forces))

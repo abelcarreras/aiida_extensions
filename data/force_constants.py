@@ -14,7 +14,6 @@ class ForceConstantsData(ArrayData):
         """
         Return the force constants stored in the node as a numpy array
         """
-        import numpy
 
         return self.get_array('force_constants')
 
@@ -25,7 +24,9 @@ class ForceConstantsData(ArrayData):
         Internally, it is stored as a force_constants.npy file in numpy format.
         :param array: The numpy array to store.
         """
-        self.set_array('force_constants', force_constants)
+        import numpy
+
+        self.set_array('force_constants', numpy.array(force_constants))
 
     def get_epsilon(self):
         """
@@ -55,8 +56,9 @@ class ForceConstantsData(ArrayData):
         Internally, it is stored as a force_constants.npy file in numpy format.
         :param array: The numpy array to store.
         """
+        import numpy
 
-        self.set_array('_born_charges', born_charges)
+        self.set_array('_born_charges', numpy.array(born_charges))
 
     def set_epsilon(self, epsilon):
         """
@@ -65,5 +67,6 @@ class ForceConstantsData(ArrayData):
         Internally, it is stored as a force_constants.npy file in numpy format.
         :param array: The numpy array to store.
         """
+        import numpy
 
-        self.set_array('_born_charges', epsilon)
+        self.set_array('_born_charges', numpy.array(epsilon))
