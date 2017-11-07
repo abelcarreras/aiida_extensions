@@ -46,7 +46,7 @@ class ForceConstantsData(ArrayData):
         Check if born charges and epsion exists
         """
 
-        return self.get_epsilon() is not None and self.get_born_charges() is not None
+        return 'born_charges' in self.get_arraynames() and 'epsilon' in self.get_arraynames()
 
     def set_born_charges(self, born_charges):
         """
