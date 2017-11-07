@@ -1,7 +1,7 @@
-from aiida.orm import Data
+from aiida.orm.data.array import ArrayData
 
 
-class BandStructureData(Data):
+class BandStructureData(ArrayData):
     """
     Store the band structure.
     """
@@ -24,34 +24,24 @@ class BandStructureData(Data):
             return None
 
 
-    def set_bands(self, ranges):
+    def set_bands(self, bands):
 
-        import tempfile
         import numpy
 
-        ranges = numpy.array(ranges)
+        bands = numpy.array(bands)
 
-        with tempfile.NamedTemporaryFile() as f:
-            numpy.save(f, ranges)
-            f.flush()  # Important to flush here, otherwise the next copy command
-            # will just copy an empty file
-            self.add_path(f.name, 'bands.npy')
+        self.set_array('bands', bands)
 
-        self._set_attr('nbands', len(ranges))
-        self._set_attr('npoints', len(ranges[0]))
+        self._set_attr('nbands', len(bands))
+        self._set_attr('npoints', len(bands[0]))
 
     def set_labels(self, band_labels):
 
-        import tempfile
         import numpy
 
         band_labels = numpy.array(band_labels)
 
-        with tempfile.NamedTemporaryFile() as f:
-            numpy.save(f, band_labels)
-            f.flush()  # Important to flush here, otherwise the next copy command
-            # will just copy an empty file
-            self.add_path(f.name, 'band_labels.npy')
+        self.set_array('labels', band_labels)
 
     def set_unitcell(self, unitcell):
         """
@@ -59,16 +49,11 @@ class BandStructureData(Data):
         :return:
         """
 
-        import tempfile
         import numpy
 
         unitcell = numpy.array(unitcell)
 
-        with tempfile.NamedTemporaryFile() as f:
-            numpy.save(f, unitcell)
-            f.flush()  # Important to flush here, otherwise the next copy command
-            # will just copy an empty file
-            self.add_path(f.name, 'unitcell.npy')
+        self.set_array('unitcell', unitcell)
 
     def set_band_structure_phonopy(self, band_structure_phonopy):
 
@@ -86,21 +71,12 @@ class BandStructureData(Data):
 
         numpy.testing.assert_array_almost_equal(distances, self.get_distances(), decimal=4)
 
-        for element in {
-                        # 'q_points.npy': numpy.array(band_structure_phonopy[0]),
-                        # 'distances.npy': numpy.array(band_structure_phonopy[1]),
-                        'frequencies.npy':numpy.array(band_structure_phonopy[2]),
-                        }.items():
-
-            with tempfile.NamedTemporaryFile() as f:
-                numpy.save(f, element[1])
-                f.flush()  # Important to flush here, otherwise the next copy command
-                # will just copy an empty file
-                self.add_path(f.name, element[0])
+        # self.set_array('q_points', numpy.array(band_structure_phonopy[0]))
+        # self.set_array('distances', numpy.array(band_structure_phonopy[1]))
+        self.set_array('frequencies', numpy.array(band_structure_phonopy[2]))
 
     def set_band_structure_gruneisen(self, band_structure_gruneisen):
 
-        import tempfile
         import numpy
 
         q_points = numpy.array([band[0] for band in band_structure_gruneisen._paths])
@@ -114,30 +90,16 @@ class BandStructureData(Data):
 
         numpy.testing.assert_array_almost_equal(distances, self.get_distances(), decimal=4)
 
-        for element in {'gamma.npy': numpy.array([band[2] for band in band_structure_gruneisen._paths]),
-                        'eigenvalues.npy': numpy.array([band[3] for band in band_structure_gruneisen._paths]),
-                        'frequencies.npy': numpy.array([band[4] for band in band_structure_gruneisen._paths]),
-                        }.items():
-
-            with tempfile.NamedTemporaryFile() as f:
-                numpy.save(f, element[1])
-                f.flush()  # Important to flush here, otherwise the next copy command
-                # will just copy an empty file
-                self.add_path(f.name, element[0])
-
+        self.set_array('gamma', numpy.array([band[2] for band in band_structure_gruneisen._paths]))
+        self.set_array('eigenvalues', numpy.array([band[3] for band in band_structure_gruneisen._paths]))
+        self.set_array('frequencies', numpy.array([band[4] for band in band_structure_gruneisen._paths]))
 
     def get_unitcell(self):
         """
         Return the unitcell in the node as a numpy array
         """
-        import numpy
 
-        fname = 'unitcell.npy'
-        if fname not in self.get_folder_list():
-            return None
-
-        array = numpy.load(self.get_abs_path(fname))
-        return array
+        return self.get_array('unitcell')
 
     def get_distances(self, band=None):
         """
@@ -175,68 +137,42 @@ class BandStructureData(Data):
         """
         Return the frequencies in the node as a numpy array
         """
-        import numpy
 
-        fname = 'frequencies.npy'
-        if fname not in self.get_folder_list():
-            return None
-
-        array = numpy.load(self.get_abs_path(fname))
-        if band is not None:
-            array = array[band]
-
-        return array
+        return self.get_array('frequencies')
 
     def get_gamma(self, band=None):
         """
         Return the frequencies in the node as a numpy array
         """
-        import numpy
 
-        fname = 'gamma.npy'
-        if fname not in self.get_folder_list():
-            return None
-
-        array = numpy.load(self.get_abs_path(fname))
+        gamma =  self.get_array('gamma')
 
         if band is not None:
-            array = array[band]
+            gamma = gamma[band]
 
-        return array
+        return gamma
 
     def get_eigenvalues(self, band=None):
         """
         Return the frequencies in the node as a numpy array
         """
-        import numpy
+        eigenvalues = self.get_array('eigenvalues')
 
-        fname = 'eigenvalues.npy'
-        if fname not in self.get_folder_list():
-            return None
-
-
-        array = numpy.load(self.get_abs_path(fname))
         if band is not None:
-            array = array[band]
+            eigenvalues = eigenvalues[band]
 
-        return array
+        return eigenvalues
 
     def get_bands(self, band=None):
         """
         Return the bands in the node as a numpy array
         """
-        import numpy
+        bands = self.get_array('bands')
 
-        fname = 'bands.npy'
-        if fname not in self.get_folder_list():
-            return None
-
-        array = numpy.load(self.get_abs_path(fname))
         if band is not None:
-            array = array[band]
+            bands = bands[band]
 
-
-        return array
+        return bands
 
     def get_band_ranges(self, band=None):
         """
@@ -258,19 +194,13 @@ class BandStructureData(Data):
         """
         Return the band labels in the node as a numpy array
         """
-        import numpy
 
-        fname = 'band_labels.npy'
-
-        if fname not in self.get_folder_list():
-            return None
-
-        array = numpy.load(self.get_abs_path(fname))
+        band_labels = self.get_array('band_labels')
 
         if band is not None:
-            array = array[band]
+            band_labels = band_labels[band]
 
-        return array
+        return band_labels
 
     def get_plot_helpers(self, style='latex'):
 
