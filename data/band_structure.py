@@ -57,7 +57,6 @@ class BandStructureData(ArrayData):
 
     def set_band_structure_phonopy(self, band_structure_phonopy):
 
-        import tempfile
         import numpy
 
         q_points = numpy.array(band_structure_phonopy[0])
@@ -103,7 +102,7 @@ class BandStructureData(ArrayData):
 
     def get_distances(self, band=None):
         """
-        Return the distances in the node as a numpy array
+        Return the distances between q-points calculated from bands
         """
         import numpy as np
 
@@ -189,13 +188,12 @@ class BandStructureData(ArrayData):
 
         return band_ranges
 
-
     def get_labels(self, band=None):
         """
         Return the band labels in the node as a numpy array
         """
 
-        band_labels = self.get_array('band_labels')
+        band_labels = self.get_array('labels')
 
         if band is not None:
             band_labels = band_labels[band]
@@ -255,35 +253,3 @@ class BandStructureData(ArrayData):
             positions.append([self.get_distances(band=i)[0] for i in index] + [self.get_distances(band=index[-1])[-1]])
 
         return labels, indices, widths, ranges, positions
-
-
-    def get_formatted_labels_matplotlib(self):
-        distances = self.get_distances()
-        labels_array = self.get_labels()
-
-        substitutions = {'GAMMA': u'\u0393'
-                         }
-
-        substitutions = {'GAMMA': u'$\Gamma$'
-                         }
-
-        def replace_list(text_string, substitutions):
-
-            for item in substitutions.iteritems():
-                text_string = text_string.replace(item[0], item[1])
-
-            return text_string
-
-        labels = []
-        labels_positions = []
-        for i, freq in enumerate(distances):
-            if labels_array[i][0] == labels_array[i-1][1]:
-                labels.append(replace_list(labels_array[i][0],substitutions))
-            else:
-                labels.append(replace_list(labels_array[i-1][1]+'/'+labels_array[i][0], substitutions))
-            labels_positions.append(distances[i][0])
-        labels_positions.append(distances[-1][-1])
-        labels.append(replace_list(labels_array[-1][1], substitutions))
-        labels[0] = replace_list(labels_array[0][0], substitutions)
-
-        return labels, labels_positions
