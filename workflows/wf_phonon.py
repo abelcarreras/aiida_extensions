@@ -867,6 +867,7 @@ class Wf_phononWorkflow(Workflow):
 
             force_constants = ArrayData()
             force_constants.set_array('force_constants', calc.out.force_constants.get_array())
+            force_constants.store()
 
         self.add_result('force_constants', force_constants)
 
