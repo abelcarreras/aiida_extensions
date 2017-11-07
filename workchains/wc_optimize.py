@@ -123,7 +123,7 @@ class OptimizeStructure(WorkChain):
         else:
             structure = self.ctx.optimize.out.output_structure
 
-        if self.inputs.standarize_cell:
+        if Bool(self.inputs.standarize_cell):
             structure = standardize_cell(structure)['standardized_structure']
 
         JobCalculation, calculation_input = generate_inputs(structure,
