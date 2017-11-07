@@ -866,7 +866,7 @@ class Wf_phononWorkflow(Workflow):
             calc = self.get_step_calculations(self.force_constants_calculation_remote)[0]
 
             force_constants = ArrayData()
-            force_constants.set_array('force_constants', calc.n.out.force_constants.get_array())
+            force_constants.set_array('force_constants', calc.out.force_constants.get_array())
 
         self.add_result('force_constants', force_constants)
 
