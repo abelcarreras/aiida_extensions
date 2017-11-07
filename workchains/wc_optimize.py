@@ -68,7 +68,7 @@ class OptimizeStructure(WorkChain):
         spec.input("tolerance_forces", valid_type=Float, required=False, default=Float(1e-5))
         spec.input("tolerance_stress", valid_type=Float, required=False, default=Float(1e-2))
         spec.input("max_iterations", valid_type=Int, required=False, default=Int(3))
-        spec.input("standarize_cell", valid_type=Bool, required=False, default=Bool(True))
+        spec.input("standarize_cell", valid_type=Bool, required=False, default=Bool(0))
 
         spec.outline(cls.optimize_cycle, _While(cls.not_converged)(cls.optimize_cycle), cls.get_data)
 

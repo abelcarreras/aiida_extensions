@@ -157,6 +157,7 @@ if True:
                   structure=structure,
                   machine=machine,
                   es_settings=es_settings,
+                  standarize_cell=Bool(False),
                   # Optional settings
                   # pressure=Float(10.0),
                   )
