@@ -23,7 +23,6 @@ class BandStructureData(ArrayData):
         else:
             return None
 
-
     def set_bands(self, bands):
 
         import numpy
@@ -137,7 +136,12 @@ class BandStructureData(ArrayData):
         Return the frequencies in the node as a numpy array
         """
 
-        return self.get_array('frequencies')
+        frequencies = self.get_array('frequencies')
+
+        if band is not None:
+            frequencies = frequencies[band]
+
+        return frequencies
 
     def get_gamma(self, band=None):
         """
