@@ -170,7 +170,7 @@ from aiida.workflows.wc_optimize import OptimizeStructure
 if True:
     results = run(OptimizeStructure,
                   structure=structure,
-                  machine=machine,
+                  # machine=machine,
                   es_settings=es_settings,
                   # Optional settings
                   # pressure=Float(10.0),
@@ -180,7 +180,7 @@ if True:
 else:
     future = submit(OptimizeStructure,
                     structure=structure,
-                    machine=machine,
+                    # machine=machine,
                     es_settings=es_settings,
                     # Optional settings
                     # pressure=Float(10.0),

@@ -156,7 +156,6 @@ from aiida.workflows.wc_phonon import PhononPhonopy
 if True:
     result = run(PhononPhonopy,
                  structure=structure,
-                 machine=machine,
                  es_settings=es_settings,
                  ph_settings=ph_settings,
                  # Optional settings
@@ -168,7 +167,6 @@ if True:
 else:
     future = submit(PhononPhonopy,
                     structure=structure,
-                    machine=machine,
                     es_settings=es_settings,
                     ph_settings=ph_settings,
                     # Optional settings
