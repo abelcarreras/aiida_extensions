@@ -17,7 +17,6 @@ class PhononDosData(Data):
         partial_symbols = self.get_attr("atom_labels")
 
         # Check atom equivalences
-        list = range(len(partial_dos))
         delete_list = []
         for i, dos_i in enumerate(partial_dos):
             for j, dos_j in enumerate(partial_dos):

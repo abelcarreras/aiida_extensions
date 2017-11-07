@@ -170,7 +170,7 @@ machine_dict = {
 phonopy_parameters = {'supercell': supercell,
                       'primitive': primitive_matrix,
                       'distance': 0.01,
-                      'mesh': [60, 60, 60],
+                      'mesh': [20, 20, 20],
                       'symmetry_precision': 1e-5}
 
 # Global parameters dictionary that contains all the parameters defined before
