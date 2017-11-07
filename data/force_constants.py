@@ -1,7 +1,7 @@
-from aiida.orm import Data
+from aiida.orm.data.array import ArrayData
 
 
-class ForceConstantsData(Data):
+class ForceConstantsData(ArrayData):
     """
     Store the force constants on disk as a numpy array. It requires numpy to be installed.
     """
@@ -10,82 +10,35 @@ class ForceConstantsData(Data):
         super(ForceConstantsData, self).__init__(*args, **kwargs)
         self._cached_arrays = {}
 
-    def get_shape(self):
-        """
-        Return the shape of an array (read from the value cached in the
-        properties for efficiency reasons).
-        :param name: The name of the array.
-        """
-        return self.get_attr("shape")
-
-    def get_array(self):
+    def get_data(self):
         """
         Return the force constants stored in the node as a numpy array
         """
         import numpy
 
-        fname = 'force_constants.npy'
+        return self.get_array('force_constants')
 
-        array = numpy.load(self.get_abs_path(fname))
-        return array
-
-    def set_array(self, array):
+    def set_data(self, force_constants):
         """
         Store the force constants as a numpy array. Possibly overwrite the array
         if it already existed.
         Internally, it is stored as a force_constants.npy file in numpy format.
         :param array: The numpy array to store.
         """
-
-        import tempfile
-
-        import numpy
-
-        if not (isinstance(array, numpy.ndarray)):
-            raise TypeError("ArrayData can only store numpy arrays. Convert "
-                            "the object to an array first")
-
-        fname = "force_constants.npy"
-
-        with tempfile.NamedTemporaryFile() as f:
-            # Store in a temporary file, and then add to the node
-            numpy.save(f, array)
-            f.flush()  # Important to flush here, otherwise the next copy command
-            # will just copy an empty file
-            self.add_path(f.name, fname)
-
-        self._set_attr("shape", list(array.shape))
-
+        self.set_array('force_constants', force_constants)
 
     def get_epsilon(self):
         """
         Return dielectric tensor stored in the node as a numpy array
         """
-        import numpy
 
-        fname = 'epsilon.npy'
-
-        if fname not in self.get_folder_list():
-            return None
-
-        array = numpy.load(self.get_abs_path(fname))
-
-        return array
+        return self.get_array('epsilon')
 
     def get_born_charges(self):
         """
         Return born charges stored in the node as a numpy array
         """
-        import numpy
-
-        fname = 'born_charges.npy'
-
-        if fname not in self.get_folder_list():
-            return None
-
-        array = numpy.load(self.get_abs_path(fname))
-
-        return array
+        return self.get_array('born_charges')
 
     def epsilon_and_born_exist(self):
 
@@ -95,7 +48,7 @@ class ForceConstantsData(Data):
 
         return self.get_epsilon() is not None and self.get_born_charges() is not None
 
-    def set_born_charges(self, array):
+    def set_born_charges(self, born_charges):
         """
         Store Born charges as a numpy array. Possibly overwrite the array
         if it already existed.
@@ -103,20 +56,9 @@ class ForceConstantsData(Data):
         :param array: The numpy array to store.
         """
 
-        import tempfile
-        import numpy
+        self.set_array('_born_charges', born_charges)
 
-        fname = "born_charges.npy"
-
-        array = numpy.array(array)
-        with tempfile.NamedTemporaryFile() as f:
-            # Store in a temporary file, and then add to the node
-            numpy.save(f, array)
-            f.flush()  # Important to flush here, otherwise the next copy command
-            # will just copy an empty file
-            self.add_path(f.name, fname)
-
-    def set_epsilon(self, array):
+    def set_epsilon(self, epsilon):
         """
         Store the dielectric tensor as a numpy array. Possibly overwrite the array
         if it already existed.
@@ -124,15 +66,4 @@ class ForceConstantsData(Data):
         :param array: The numpy array to store.
         """
 
-        import tempfile
-        import numpy
-
-        fname = "epsilon.npy"
-
-        array = numpy.array(array)
-        with tempfile.NamedTemporaryFile() as f:
-            # Store in a temporary file, and then add to the node
-            numpy.save(f, array)
-            f.flush()  # Important to flush here, otherwise the next copy command
-            # will just copy an empty file
-            self.add_path(f.name, fname)
+        self.set_array('_born_charges', epsilon)

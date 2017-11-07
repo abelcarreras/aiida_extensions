@@ -131,7 +131,7 @@ def add_nac_to_force_constants(force_constants, array_data):
     :return: force_constants: ForceConstants object
     """
 
-    force_constants_nac = ForceConstantsData(array=force_constants.get_array(),
+    force_constants_nac = ForceConstantsData(data=force_constants.get_data(),
                                              born_charges=array_data.get_array('born_charges'),
                                              epsilon=array_data.get_array('epsilon'))
 
@@ -167,7 +167,7 @@ def get_force_constants_from_phonopy(structure, ph_settings, force_sets):
     phonon.set_displacement_dataset(force_sets.get_force_sets())
     phonon.produce_force_constants()
 
-    force_constants = ForceConstantsData(array=phonon.get_force_constants())
+    force_constants = ForceConstantsData(data=phonon.get_force_constants())
 
     return {'force_constants': force_constants}
 
@@ -254,7 +254,7 @@ def get_properties_from_phonopy(structure, ph_settings, force_constants):
                      primitive_matrix=ph_settings.dict.primitive,
                      symprec=ph_settings.dict.symmetry_precision)
 
-    phonon.set_force_constants(force_constants.get_array())
+    phonon.set_force_constants(force_constants.get_data())
 
     if force_constants.epsilon_and_born_exist():
         print ('use born charges')
