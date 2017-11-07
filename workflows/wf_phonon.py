@@ -864,10 +864,11 @@ class Wf_phononWorkflow(Workflow):
             force_constants = self.get_result('force_constants')
         else:
             calc = self.get_step_calculations(self.force_constants_calculation_remote)[0]
-            force_constants = calc.get_outputs_dict()['array_data']
-            force_constants_array = ArrayData()
-            force_constants_array.set_array('force_constants', force_constants.get_array())
-            self.add_result('force_constants', force_constants_array)
+
+            force_constants = ArrayData()
+            force_constants.set_array('force_constants', calc.n.out.force_constants.get_array())
+
+        self.add_result('force_constants', force_constants)
 
         structure = self.get_result('final_structure')
 
