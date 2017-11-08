@@ -225,7 +225,7 @@ class Phonopy_dosCalculation(JobCalculation):
         calcinfo.retrieve_list.append(self._OUTPUT_DOS)
 
         codeinfo = CodeInfo()
-        codeinfo.cmdline_params = [self._INPUT_FILE_NAME, '--readfc', '--pdos 0']
+        codeinfo.cmdline_params = [self._INPUT_FILE_NAME, '--readfc', '--pdos=0']
         codeinfo.code_uuid = code.uuid
         codeinfo.withmpi = False
         calcinfo.codes_info = [codeinfo]
