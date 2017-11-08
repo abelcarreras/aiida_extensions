@@ -43,7 +43,7 @@ parameters = ParameterData(dict={'supercell': [[3,0,0],
 
 calc = code.new_calc(max_wallclock_seconds=3600,
                      resources={"num_machines": 1,
-                                "parallel_env":"localmpi",
+                                "parallel_env":"mpi*",
                                 "tot_num_mpiprocs": 6})
 
 
