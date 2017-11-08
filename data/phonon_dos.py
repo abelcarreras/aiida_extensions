@@ -14,6 +14,7 @@ class PhononDosData(ArrayData):
         import numpy
         fname = 'partial_dos.npy'
         partial_dos = numpy.load(self.get_abs_path(fname))
+
         partial_symbols = self.get_attr("atom_labels")
 
         # Check atom equivalences

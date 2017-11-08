@@ -22,13 +22,13 @@ def parse_FORCE_CONSTANTS(filename):
             force_constants[i, j] = np.array(tensor)
     return force_constants
 
-def parse_partial_DOS(filename):
-
+def parse_partial_DOS(filename, structure):
     partial_dos = np.loadtxt(filename)
 
     dos = PhononDosData(frequencies=partial_dos[0],
                         dos=np.sum(partial_dos[:, 1:], axis=1),
-                        partial_dos=partial_dos[:, 1:])
+                        partial_dos=partial_dos[:, 1:],
+                        atom_labels=[site.kind_name for site in structure.sites])
 
     return dos
 
@@ -78,7 +78,7 @@ class PhonopyParser(Parser):
 
         if self._calc._OUTPUT_DOS in list_of_files:
             outfile = out_folder.get_abs_path(self._calc._OUTPUT_DOS)
-            dos_object = parse_partial_DOS(outfile)
+            dos_object = parse_partial_DOS(outfile, self._calc.inp.structure)
 
 
         # look at warnings
