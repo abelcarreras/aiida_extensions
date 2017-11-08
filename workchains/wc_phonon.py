@@ -14,9 +14,13 @@ from aiida.orm.data.force_sets import ForceSetsData
 from aiida.orm.data.force_constants import ForceConstantsData
 from aiida.orm.data.band_structure import BandStructureData
 from aiida.orm.data.phonon_dos import PhononDosData
+from aiida.work.run import run, submit, async
 
 from aiida.workflows.wc_optimize import OptimizeStructure
 from aiida.work.workchain import _If, _While
+
+ParameterData = DataFactory('parameter')
+StructureData = DataFactory('structure')
 
 import numpy as np
 from generate_inputs import generate_inputs

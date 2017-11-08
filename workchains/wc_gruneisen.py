@@ -10,10 +10,7 @@ from aiida.work.workfunction import workfunction
 from aiida.orm import Code, CalculationFactory, load_node, DataFactory
 
 from aiida.orm.data.base import Str, Float, Bool
-from aiida.orm.data.force_sets import ForceSetsData
-from aiida.orm.data.force_constants import ForceConstantsData
-from aiida.orm.data.band_structure import BandStructureData
-from aiida.orm.data.phonon_dos import PhononDosData
+
 
 from aiida.workflows.wc_phonon import PhononPhonopy, get_path_using_seekpath, get_born_parameters
 from aiida.work.workchain import _If, _While

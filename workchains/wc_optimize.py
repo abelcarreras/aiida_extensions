@@ -6,9 +6,15 @@ if not is_dbenv_loaded():
 
 from aiida.work.workchain import WorkChain, ToContext
 from aiida.work.workfunction import workfunction
+from aiida.work.run import run, submit, async
+
+from aiida.orm import DataFactory
 
 from aiida.orm.data.base import Str, Float, Bool, Int
 from aiida.work.workchain import _If, _While
+
+ParameterData = DataFactory('parameter')
+StructureData = DataFactory('structure')
 
 import numpy as np
 from generate_inputs import generate_inputs
