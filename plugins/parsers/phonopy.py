@@ -2,6 +2,7 @@ from aiida.parsers.parser import Parser
 from aiida.parsers.exceptions import OutputParsingError
 from aiida.orm.data.array import ArrayData
 from aiida.orm.data.force_constants import ForceConstantsData
+from aiida.orm.data.phonon_dos import PhononDosData
 
 from aiida.orm.data.parameter import ParameterData
 
@@ -20,6 +21,17 @@ def parse_FORCE_CONSTANTS(filename):
                 tensor.append([float(x) for x in fcfile.readline().strip().split()])
             force_constants[i, j] = np.array(tensor)
     return force_constants
+
+def parse_partial_DOS(filename):
+
+    partial_dos = np.loadtxt(filename)
+
+    dos = PhononDosData(frequencies=partial_dos[0],
+                        total_dos=np.sum(partial_dos[:, 1:], axis=1),
+                        partial_dos=partial_dos[:, 1:])
+
+    return dos
+
 
 
 class PhonopyParser(Parser):
@@ -60,8 +72,14 @@ class PhonopyParser(Parser):
 
         # Get file and do the parsing
         outfile = out_folder.get_abs_path(self._calc._OUTPUT_FILE_NAME)
+        print self._calc
 
         force_constants = parse_FORCE_CONSTANTS(outfile)
+
+        if self._calc._OUTPUT_DOS in list_of_files:
+            outfile = out_folder.get_abs_path(self._calc._OUTPUT_DOS)
+            dos_object = parse_partial_DOS(outfile)
+
 
         # look at warnings
         warnings = []
@@ -70,6 +88,8 @@ class PhonopyParser(Parser):
         if errors:
             warnings = [errors]
 
+
+
         # ====================== prepare the output node ======================
 
         # save the outputs
@@ -77,12 +97,14 @@ class PhonopyParser(Parser):
 
         # save force constants into node
         try:
-            #array_data = ArrayData()
-            #array_data.set_array('force_constants', force_constants)
-
             new_nodes_list.append(('force_constants', ForceConstantsData(data=force_constants)))
         except KeyError:  # keys not found in json
             pass
+        try:
+            new_nodes_list.append(('dos', dos_object))
+        except:
+            pass
+
 
         # add the dictionary with warnings
         new_nodes_list.append((self.get_linkname_outparams(), ParameterData(dict={'warnings': warnings})))

@@ -105,7 +105,8 @@ class Phonopy_dosCalculation(JobCalculation):
         self._INPUT_FORCE_CONSTANTS = 'FORCE_CONSTANTS'
         self._INPUT_NAC = 'BORN'
 
-        self._OUTPUT_DOS = 'densityofstates'
+        self._OUTPUT_FILE_NAME = 'FORCE_CONSTANTS'
+        self._OUTPUT_DOS = 'partial_dos.dat'
 
         self._default_parser = "phonopy"
 
@@ -220,10 +221,11 @@ class Phonopy_dosCalculation(JobCalculation):
 
         # Retrieve files
         calcinfo.retrieve_list = []
-        #calcinfo.retrieve_list.append(self._OUTPUT_FILE_NAME)
+        calcinfo.retrieve_list.append(self._OUTPUT_FILE_NAME)
+        calcinfo.retrieve_list.append(self._OUTPUT_DOS)
 
         codeinfo = CodeInfo()
-        codeinfo.cmdline_params = [self._INPUT_FILE_NAME, '--readfc', '--dos']
+        codeinfo.cmdline_params = [self._INPUT_FILE_NAME, '--readfc', '--pdos 0']
         codeinfo.code_uuid = code.uuid
         codeinfo.withmpi = False
         calcinfo.codes_info = [codeinfo]
