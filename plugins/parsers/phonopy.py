@@ -22,6 +22,7 @@ def parse_FORCE_CONSTANTS(filename):
             force_constants[i, j] = np.array(tensor)
     return force_constants
 
+
 def parse_partial_DOS(filename, structure):
     partial_dos = np.loadtxt(filename)
 
@@ -31,7 +32,6 @@ def parse_partial_DOS(filename, structure):
                         atom_labels=[site.kind_name for site in structure.sites])
 
     return dos
-
 
 
 class PhonopyParser(Parser):

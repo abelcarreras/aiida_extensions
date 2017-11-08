@@ -12,9 +12,8 @@ class PhononDosData(ArrayData):
 
     def _get_equivalent_atom_list(self):
         import numpy
-        fname = 'partial_dos.npy'
-        partial_dos = numpy.load(self.get_abs_path(fname))
 
+        partial_dos = self.get_array('partial_dos')
         partial_symbols = self.get_attr("atom_labels")
 
         # Check atom equivalences
@@ -25,7 +24,7 @@ class PhononDosData(ArrayData):
                     if numpy.allclose(dos_i, dos_j, rtol=1, atol=1e-8) and partial_symbols[i] == partial_symbols[j]:
                         dos_i += dos_j
                         delete_list.append(j)
-
+        print delete_list
         return numpy.delete(range(len(partial_dos)), delete_list)
 
     def get_dos(self):
