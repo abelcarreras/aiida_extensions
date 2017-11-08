@@ -53,7 +53,7 @@ calc.description = "A much longer description"
 calc.use_structure(s)
 calc.use_code(code)
 calc.use_parameters(parameters)
-calc.use_data_sets(load_node(23913))
+calc.use_data_sets(load_node(21989))
 
 if False:
     subfolder, script_filename = calc.submit_test()
