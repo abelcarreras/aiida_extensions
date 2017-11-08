@@ -14,7 +14,7 @@ class PhononDosData(ArrayData):
         import numpy
 
         partial_dos = self.get_array('partial_dos')
-        partial_symbols = self.get_attr("atom_labels")
+        partial_symbols = self.get_attr('atom_labels')
 
         print partial_dos
         print partial_symbols
