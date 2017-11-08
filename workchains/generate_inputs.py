@@ -351,7 +351,7 @@ def generate_inputs(structure,  es_settings, type=None, pressure=0.0, machine=No
     else:
         plugin = Code.get_from_string(es_settings.dict.code[type]).get_attr('input_plugin')
 
-    if plugin in ['vasp.vasp']:
+    if plugin == 'vasp.vasp':
         return generate_vasp_params(structure, es_settings, type=type, pressure=pressure)
 
     elif plugin in ['quantumespresso.pw']:
