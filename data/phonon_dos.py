@@ -13,7 +13,7 @@ class PhononDosData(ArrayData):
     def _get_equivalent_atom_list(self):
         import numpy
 
-        partial_dos = self.get_array('partial_dos')
+        partial_dos = numpy.array(self.get_array('partial_dos'))
         partial_symbols = self.get_attr("atom_labels")
 
         # Check atom equivalences
