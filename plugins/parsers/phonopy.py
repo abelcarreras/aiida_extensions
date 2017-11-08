@@ -28,7 +28,7 @@ def parse_partial_DOS(filename, structure):
 
     dos = PhononDosData(frequencies=partial_dos[0],
                         dos=np.sum(partial_dos[:, 1:], axis=1),
-                        partial_dos=partial_dos[:, 1:],
+                        partial_dos=partial_dos[:, 1:].T,
                         atom_labels=[site.kind_name for site in structure.sites])
 
     return dos
