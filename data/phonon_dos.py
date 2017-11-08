@@ -23,7 +23,7 @@ class PhononDosData(ArrayData):
                 if i < j:
                     print ('i',i, 'j', j)
                     if numpy.allclose(dos_i, dos_j, rtol=1, atol=1e-8) and partial_symbols[i] == partial_symbols[j]:
-                        dos_i += dos_j
+                        #dos_i += dos_j
                         delete_list.append(j)
         print delete_list
         return numpy.delete(range(len(partial_dos)), delete_list)
