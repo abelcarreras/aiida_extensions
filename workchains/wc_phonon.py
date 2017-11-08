@@ -19,16 +19,16 @@ from aiida.workflows.wc_optimize import OptimizeStructure
 from aiida.work.workchain import _If, _While
 
 import numpy as np
-from generate_inputs import *
+from generate_inputs import generate_inputs
 
-def generate_phonopy_params(code, structure, ph_settings, machine, force_sets):
+
+def generate_phonopy_params(code, structure, ph_settings, force_sets):
     """
     Generate inputs parameters needed to do a remote phonopy calculation
 
     :param code: Code object of phonopy
     :param structure: StructureData Object that constains the crystal structure unit cell
     :param ph_settings: ParametersData object containing a dictionary with the phonopy input data
-    :param machine: ParametersData object containing a dictionary with the computational resources information
     :param force_sets: ForceSetssData object containing the atomic forces and displacement information
     :return: Calculation process object, input dictionary
     """
@@ -47,8 +47,8 @@ def generate_phonopy_params(code, structure, ph_settings, machine, force_sets):
     inputs.parameters = ph_settings
 
     # resources
-    inputs._options.resources = machine.dict.resources
-    inputs._options.max_wallclock_seconds = machine.dict.max_wallclock_seconds
+    inputs._options.resources = ph_settings.dict.machine['resources']
+    inputs._options.max_wallclock_seconds = ph_settings.dict.machine['max_wallclock_seconds']
 
     # data_sets
     inputs.data_sets = force_sets

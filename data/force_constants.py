@@ -70,3 +70,17 @@ class ForceConstantsData(ArrayData):
         import numpy
 
         self.set_array('_born_charges', numpy.array(epsilon))
+
+    def get_phonopy_formatted_txt(self):
+
+        force_constants = self.get_data()
+
+        # Write FORCE CONSTANTS
+        force_constants_txt = '{0}\n'.format(len(force_constants))
+        for i, fc in enumerate(force_constants):
+            for j, atomic_fc in enumerate(fc):
+                force_constants_txt += '{0} {1}\n'.format(i, j)
+                for line in atomic_fc:
+                    force_constants_txt += '{0:20.16f} {1:20.16f} {2:20.16f}\n'.format(*line)
+
+        return force_constants_txt

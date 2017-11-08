@@ -95,3 +95,29 @@ class ForceSetsData(ArrayData):
 
         import numpy
         self.set_array('forces', numpy.array(forces))
+
+    def get_phonopy_formatted_txt(self):
+
+        data_sets = self.get_force_sets()
+
+    #    data_list = []
+    #    for name in names:
+    #        data_list.append({'direction': data_sets_object.get_array(name)[0],
+    #                          'number': data_sets_object.get_array(name)[1],
+    #                          'displacement': data_sets_object.get_array(name)[2],
+    #                          'forces': data_sets_object.get_array(name)[3]})
+    #    data_sets = {'natom': num_atom, 'first_atoms': data_list}
+
+        displacements = data_sets['first_atoms']
+        forces = [x['forces'] for x in data_sets['first_atoms']]
+
+        # Write FORCE_SETS
+        force_sets_txt = "%-5d\n" % data_sets['natom']
+        force_sets_txt += "%-5d\n" % len(displacements)
+        for count, disp in enumerate(displacements):
+            force_sets_txt += "\n%-5d\n" % (disp['number'] + 1)
+            force_sets_txt += "%20.16f %20.16f %20.16f\n" % (tuple(disp['displacement']))
+
+            for f in forces[count]:
+                force_sets_txt += "%15.10f %15.10f %15.10f\n" % (tuple(f))
+        return force_sets_txt

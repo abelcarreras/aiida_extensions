@@ -11,8 +11,8 @@ from aiida.orm.data.base import Str, Float, Bool, Int
 from aiida.work.workchain import _If, _While
 
 import numpy as np
-from generate_inputs import *
-from parse_interface import *
+from generate_inputs import generate_inputs
+from parse_interface import parse_optimize_calculation
 
 @workfunction
 def standardize_cell(structure):
