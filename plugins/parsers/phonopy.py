@@ -27,7 +27,7 @@ def parse_partial_DOS(filename):
     partial_dos = np.loadtxt(filename)
 
     dos = PhononDosData(frequencies=partial_dos[0],
-                        total_dos=np.sum(partial_dos[:, 1:], axis=1),
+                        dos=np.sum(partial_dos[:, 1:], axis=1),
                         partial_dos=partial_dos[:, 1:])
 
     return dos
