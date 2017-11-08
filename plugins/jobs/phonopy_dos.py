@@ -102,10 +102,9 @@ class Phonopy_dosCalculation(JobCalculation):
 
         self._INPUT_FILE_NAME = 'phonopy.conf'
         self._INPUT_CELL = 'POSCAR'
-        self._INPUT_FORCE_SETS = 'FORCE_SETS'
+        self._INPUT_FORCE_CONSTANTS = 'FORCE_CONSTANTS'
         self._INPUT_NAC = 'BORN'
 
-        self._OUTPUT_FILE_NAME = 'FORCE_CONSTANTS'
         self._default_parser = "phonopy"
 
     @classproperty
