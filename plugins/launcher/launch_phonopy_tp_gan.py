@@ -9,7 +9,6 @@ import numpy as np
 import os
 
 
-
 codename = 'phonopy_tp@boston'
 code = Code.get_from_string(codename)
 
