@@ -90,7 +90,7 @@ def parameters_to_input_file(parameters_object):
     return input_file
 
 
-class Phonopy_dosCalculation(JobCalculation):
+class Phonopy_tpCalculation(JobCalculation):
     """
     A basic plugin for calculating force constants using Phonopy.
 
@@ -98,7 +98,7 @@ class Phonopy_dosCalculation(JobCalculation):
     """
 
     def _init_internal_params(self):
-        super(Phonopy_dosCalculation, self)._init_internal_params()
+        super(Phonopy_tpCalculation, self)._init_internal_params()
 
         self._INPUT_FILE_NAME = 'phonopy.conf'
         self._INPUT_CELL = 'POSCAR'
