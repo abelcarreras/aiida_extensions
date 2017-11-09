@@ -49,10 +49,13 @@ def parse_thermal_properties(filename):
             free_energy.append(tp['free_energy'])
             cv.append(tp['heat_capacity'])
 
-    return {'temperature': np.array(temperature),
-            'free_energy': free_energy,
-            'entropy': entropy,
-            'heat_capacity': cv}
+    tp_object = ArrayData()
+    tp_object.set_array('temperature', np.array(temperature))
+    tp_object.set_array('free_energy', np.array(free_energy))
+    tp_object.set_array('entropy', np.array(entropy))
+    tp_object.set_array('heat_capacity', np.array(cv))
+
+    return tp_object
 
 class PhonopyParser(Parser):
     """
@@ -102,7 +105,7 @@ class PhonopyParser(Parser):
 
         if self._calc._OUTPUT_TP in list_of_files:
             outfile = out_folder.get_abs_path(self._calc._OUTPUT_TP)
-            dos_object = parse_thermal_properties(outfile)
+            tp_object = parse_thermal_properties(outfile)
 
 
         # look at warnings
@@ -128,6 +131,12 @@ class PhonopyParser(Parser):
             new_nodes_list.append(('dos', dos_object))
         except:
             pass
+
+        try:
+            new_nodes_list.append(('thermal_properties', tp_object))
+        except:
+            pass
+
 
 
         # add the dictionary with warnings
