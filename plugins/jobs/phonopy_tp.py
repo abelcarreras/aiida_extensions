@@ -107,7 +107,7 @@ class Phonopy_tpCalculation(JobCalculation):
 
         self._OUTPUT_FILE_NAME = 'FORCE_CONSTANTS'
         self._OUTPUT_DOS = 'partial_dos.dat'
-        self._OUTPUT_TP = 'thermal_properties'
+        self._OUTPUT_TP = 'thermal_properties.yaml'
 
         self._default_parser = "phonopy"
 
