@@ -34,6 +34,26 @@ def parse_partial_DOS(filename, structure):
     return dos
 
 
+def parse_thermal_properties(filename):
+    import yaml
+    temperature = []
+    free_energy = []
+    entropy = []
+    cv = []
+
+    with open(filename, 'r') as stream:
+        thermal_properties = dict(yaml.load(stream))
+        for tp in thermal_properties['thermal_properties']:
+            temperature.append(tp['temperature'])
+            entropy.append(tp['entropy'])
+            free_energy.append(tp['free_energy'])
+            cv.append(tp['heat_capacity'])
+
+    return {'temperature': np.array(temperature),
+            'free_energy': free_energy,
+            'entropy': entropy,
+            'heat_capacity': cv}
+
 class PhonopyParser(Parser):
     """
     Parser the FORCE_CONSTANTS file of phonopy.
@@ -79,6 +99,10 @@ class PhonopyParser(Parser):
         if self._calc._OUTPUT_DOS in list_of_files:
             outfile = out_folder.get_abs_path(self._calc._OUTPUT_DOS)
             dos_object = parse_partial_DOS(outfile, self._calc.inp.structure)
+
+        if self._calc._OUTPUT_TP in list_of_files:
+            outfile = out_folder.get_abs_path(self._calc._OUTPUT_TP)
+            dos_object = parse_thermal_properties(outfile)
 
 
         # look at warnings
