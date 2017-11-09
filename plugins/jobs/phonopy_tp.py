@@ -224,6 +224,7 @@ class Phonopy_tpCalculation(JobCalculation):
         calcinfo.retrieve_list = []
         calcinfo.retrieve_list.append(self._OUTPUT_FILE_NAME)
         calcinfo.retrieve_list.append(self._OUTPUT_DOS)
+        calcinfo.retrieve_list.append(self._OUTPUT_TP)
 
         codeinfo = CodeInfo()
         codeinfo.cmdline_params = [self._INPUT_FILE_NAME, '--readfc', '-t']
