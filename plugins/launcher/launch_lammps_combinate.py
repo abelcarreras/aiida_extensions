@@ -85,7 +85,6 @@ calc.description = "A much longer description"
 calc.use_code(code)
 calc.use_structure(structure)
 calc.use_potential(ParameterData(dict=potential))
-calc.use_force_constants(force_constants)
 calc.use_parameters_dynaphopy(ParameterData(dict=dynaphopy_parameters))
 calc.use_supercell_md(ParameterData(dict={'shape': [2, 2, 2]}))
 
