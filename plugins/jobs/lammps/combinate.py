@@ -388,7 +388,7 @@ class CombinateCalculation(JobCalculation):
         codeinfo = CodeInfo()
         codeinfo.cmdline_params = [ self._INPUT_FILE_NAME_DYNA,
                                    '--run_lammps', self._INPUT_FILE_NAME,
-                                    '{}'.format(time_step), '{}'.format(total_time), '{}'.format(equilibrium_time),
+                                    '{}'.format(total_time), '{}'.format(time_step), '{}'.format(equilibrium_time),
                                    '-ts', '{}'.format(time_step), '--silent',
                                    '-sfc', self._OUTPUT_FORCE_CONSTANTS, '-thm',  # '--resolution 0.01',
                                    '-psm','2', '--normalize_dos', '-sdata']
