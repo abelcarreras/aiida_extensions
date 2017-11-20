@@ -386,7 +386,7 @@ class CombinateCalculation(JobCalculation):
                                   self._OUTPUT_QUASIPARTICLES]
 
         codeinfo = CodeInfo()
-        codeinfo.cmdline_params = [ self.INPUT_FILE_NAME_DYNA,
+        codeinfo.cmdline_params = [ self._INPUT_FILE_NAME_DYNA,
                                    '--run_lammps', self._INPUT_FILE_NAME,
                                     '{}'.format(time_step), '{}'.format(total_time), '{}'.format(equilibrium_time),
                                    '-ts', '{}'.format(time_step), '--silent',
