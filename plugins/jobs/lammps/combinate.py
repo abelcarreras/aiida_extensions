@@ -32,7 +32,7 @@ def get_supercell(structure, supercell_shape):
 
 def get_FORCE_CONSTANTS_txt(force_constants):
 
-    force_constants = force_constants.get_array('force_constants')
+    force_constants = force_constants.get_data()
 
     fc_shape = force_constants.shape
     fc_txt = "%4d\n" % (fc_shape[0])

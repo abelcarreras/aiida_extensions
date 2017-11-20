@@ -59,7 +59,7 @@ dynaphopy_parameters ={'supercell': [[2, 0, 0],
 
 
 from aiida.orm import load_node
-force_constants = load_node(20569)  # Loads node that contains the harmonic force constants (Array data)
+force_constants = load_node(25492)  # Loads node that contains the harmonic force constants (Array data)
 
 machine = {
     'num_machines': 1,
@@ -85,6 +85,7 @@ calc.description = "A much longer description"
 calc.use_code(code)
 calc.use_structure(structure)
 calc.use_potential(ParameterData(dict=potential))
+calc.use_force_constants(force_constants)
 calc.use_parameters_dynaphopy(ParameterData(dict=dynaphopy_parameters))
 calc.use_supercell_md(ParameterData(dict={'shape': [2, 2, 2]}))
 
