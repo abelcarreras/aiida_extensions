@@ -391,7 +391,7 @@ class CombinateCalculation(JobCalculation):
                                     '{}'.format(total_time), '{}'.format(time_step), '{}'.format(equilibrium_time),
                                    '-ts', '{}'.format(time_step), '--silent',
                                    '-sfc', self._OUTPUT_FORCE_CONSTANTS, '-thm',  # '--resolution 0.01',
-                                   '-psm','2', '--normalize_dos', '-sdata']
+                                   '-psm','2', '--normalize_dos', '-sdata', '>', self._OUTPUT_FILE_NAME]
 
         if 'temperature' in parameters_data.get_dict():
             codeinfo.cmdline_params.append('--temperature')
