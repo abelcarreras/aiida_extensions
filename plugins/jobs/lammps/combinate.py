@@ -402,6 +402,6 @@ class CombinateCalculation(JobCalculation):
                 codeinfo.cmdline_params.append('--MD_commensurate')
 
         codeinfo.code_uuid = code.uuid
-        codeinfo.withmpi = True
+        codeinfo.withmpi = False
         calcinfo.codes_info = [codeinfo]
         return calcinfo
