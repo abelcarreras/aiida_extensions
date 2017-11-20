@@ -28,6 +28,10 @@ def parse_quasiparticle_data(qp_file):
     f = open(qp_file, "r")
     quasiparticle_data = yaml.load(f)
     f.close()
+    data_dict = {}
+    for i, data in enumerate(quasiparticle_data):
+        data_dict['q_point {}'.format(i)] = data
+
     return quasiparticle_data
 
 
