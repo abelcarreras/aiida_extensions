@@ -32,7 +32,7 @@ def parse_quasiparticle_data(qp_file):
     for i, data in enumerate(quasiparticle_data):
         data_dict['q_point {}'.format(i)] = data
 
-    return quasiparticle_data
+    return data_dict
 
 
 def parse_dynaphopy_output(file):
