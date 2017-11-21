@@ -324,8 +324,7 @@ class CombinateCalculation(JobCalculation):
         total_time = parameters_data.dict.total_steps * time_step
         # =================== prepare the python input files =====================
 
-        structure_md = get_supercell(structure, supercell_shape)
-        potential_object = LammpsPotential(potential_data, structure_md, potential_filename=self._INPUT_POTENTIAL)
+        potential_object = LammpsPotential(potential_data, structure, potential_filename=self._INPUT_POTENTIAL)
 
         structure_txt = generate_LAMMPS_structure(structure_md)
         input_txt = generate_LAMMPS_input(parameters_data,
@@ -389,9 +388,11 @@ class CombinateCalculation(JobCalculation):
                                   self._OUTPUT_QUASIPARTICLES]
 
         codeinfo = CodeInfo()
-        codeinfo.cmdline_params = [ self._INPUT_FILE_NAME_DYNA,
+        codeinfo.cmdline_params = [self._INPUT_FILE_NAME_DYNA,
                                    '--run_lammps', self._INPUT_FILE_NAME,
-                                    '{}'.format(total_time), '{}'.format(time_step), '{}'.format(equilibrium_time),
+                                   '{}'.format(total_time), '{}'.format(time_step), '{}'.format(equilibrium_time),
+                                   '--dim', '{}'.format(supercell_shape[0]), '{}'.format(supercell_shape[1]),
+                                   '{}'.format(supercell_shape[2]),
                                    '-ts', '{}'.format(time_step), '--silent',
                                    '-sfc', self._OUTPUT_FORCE_CONSTANTS, '-thm',  # '--resolution 0.01',
                                    '-psm','2', '--normalize_dos', '-sdata']
