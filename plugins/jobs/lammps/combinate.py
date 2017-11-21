@@ -326,7 +326,7 @@ class CombinateCalculation(JobCalculation):
 
         potential_object = LammpsPotential(potential_data, structure, potential_filename=self._INPUT_POTENTIAL)
 
-        structure_txt = generate_LAMMPS_structure(structure_md)
+        structure_txt = generate_LAMMPS_structure(structure)
         input_txt = generate_LAMMPS_input(parameters_data,
                                           potential_object,
                                           structure_file=self._INPUT_STRUCTURE,
