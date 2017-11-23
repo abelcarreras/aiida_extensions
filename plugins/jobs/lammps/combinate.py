@@ -391,8 +391,9 @@ class CombinateCalculation(JobCalculation):
         codeinfo.cmdline_params = [self._INPUT_FILE_NAME_DYNA,
                                    '--run_lammps', self._INPUT_FILE_NAME,
                                    '{}'.format(total_time), '{}'.format(time_step), '{}'.format(equilibrium_time),
-                                   '--dim', '{}'.format(supercell_shape[0]), '{}'.format(supercell_shape[1]),
-                                   '{}'.format(supercell_shape[2]),
+                                   '--dim', '{}'.format(supercell_shape.dict.shape[0]),
+                                   '{}'.format(supercell_shape.dict.shape[1]),
+                                   '{}'.format(supercell_shape.dict.shape[2]),
                                    '-ts', '{}'.format(time_step), '--silent',
                                    '-sfc', self._OUTPUT_FORCE_CONSTANTS, '-thm',  # '--resolution 0.01',
                                    '-psm','2', '--normalize_dos', '-sdata']
