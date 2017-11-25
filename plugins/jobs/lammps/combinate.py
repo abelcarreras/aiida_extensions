@@ -396,7 +396,7 @@ class CombinateCalculation(JobCalculation):
                                    '{}'.format(supercell_shape.dict.shape[2]),
                                    '-ts', '{}'.format(time_step), '--silent',
                                    '-sfc', self._OUTPUT_FORCE_CONSTANTS, '-thm',  # '--resolution 0.01',
-                                   '-psm','2', '--normalize_dos', '-sdata']
+                                   '-psm','2', '--normalize_dos', '-sdata', '--velocity_only']
 
         if 'temperature' in parameters_data.get_dict():
             codeinfo.cmdline_params.append('--temperature')
