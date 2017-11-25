@@ -30,7 +30,7 @@ def parse_quasiparticle_data(qp_file):
     f.close()
     data_dict = {}
     for i, data in enumerate(quasiparticle_data):
-        data_dict['q_point {}'.format(i)] = data
+        data_dict['q_point_{}'.format(i)] = data
 
     return data_dict
 
