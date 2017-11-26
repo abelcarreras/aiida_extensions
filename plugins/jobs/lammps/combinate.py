@@ -409,5 +409,5 @@ class CombinateCalculation(JobCalculation):
         codeinfo.stdout_name = self._OUTPUT_FILE_NAME
         codeinfo.code_uuid = code.uuid
         codeinfo.withmpi = False
-        calcinfo.codes_info = [codeinfo]
+        calcinfo.codes_info = [codeinfo, codeinfo]
         return calcinfo
