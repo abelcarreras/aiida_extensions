@@ -409,5 +409,20 @@ class CombinateCalculation(JobCalculation):
         codeinfo.stdout_name = self._OUTPUT_FILE_NAME
         codeinfo.code_uuid = code.uuid
         codeinfo.withmpi = False
-        calcinfo.codes_info = [codeinfo, codeinfo]
+
+
+        codeinfo2 = CodeInfo()
+        codeinfo2.cmdline_params = [self._INPUT_FILE_NAME_DYNA,
+                                    '--run_lammps', self._INPUT_FILE_NAME,
+                                    '{}'.format(total_time), '{}'.format(time_step), '{}'.format(equilibrium_time),
+                                    '--dim', '{}'.format(supercell_shape.dict.shape[0]),
+                                    '{}'.format(supercell_shape.dict.shape[1]),
+                                    '{}'.format(supercell_shape.dict.shape[2]),
+                                    '--silent', '--velocity_only']
+
+        codeinfo2.code_uuid = code.uuid
+        codeinfo2.withmpi = False
+
+        calcinfo.codes_info = [codeinfo, codeinfo2]
+
         return calcinfo
