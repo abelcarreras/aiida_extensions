@@ -394,8 +394,7 @@ class CombinateCalculation(JobCalculation):
                                    '--dim', '{}'.format(supercell_shape.dict.shape[0]),
                                    '{}'.format(supercell_shape.dict.shape[1]),
                                    '{}'.format(supercell_shape.dict.shape[2]),
-                                   '-ts', '{}'.format(time_step), '--silent',
-                                   '-sfc', self._OUTPUT_FORCE_CONSTANTS, '-thm',  # '--resolution 0.01',
+                                   '--silent', '-sfc', self._OUTPUT_FORCE_CONSTANTS, '-thm',  # '--resolution 0.01',
                                    '-psm','2', '--normalize_dos', '-sdata', '--velocity_only']
 
         if 'temperature' in parameters_data.get_dict():
@@ -410,19 +409,6 @@ class CombinateCalculation(JobCalculation):
         codeinfo.code_uuid = code.uuid
         codeinfo.withmpi = False
 
-
-        codeinfo2 = CodeInfo()
-        codeinfo2.cmdline_params = [self._INPUT_FILE_NAME_DYNA,
-                                    '--run_lammps', self._INPUT_FILE_NAME,
-                                    '{}'.format(total_time), '{}'.format(time_step), '{}'.format(equilibrium_time),
-                                    '--dim', '{}'.format(supercell_shape.dict.shape[0]),
-                                    '{}'.format(supercell_shape.dict.shape[1]),
-                                    '{}'.format(supercell_shape.dict.shape[2]),
-                                    '--silent', '--velocity_only']
-
-        codeinfo2.code_uuid = code.uuid
-        codeinfo2.withmpi = False
-
-        calcinfo.codes_info = [codeinfo, codeinfo2]
+        calcinfo.codes_info = [codeinfo]
 
         return calcinfo
