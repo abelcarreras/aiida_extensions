@@ -52,11 +52,11 @@ lammps_machine = {
 
 
 parameters_md = {'timestep': 0.001,
-                 'temperature' : 900,
+                 'temperature' : 200,
                  'thermostat_variable': 0.5,
-                 'equilibrium_steps': 1000000,
-                 'total_steps': 200000,
-                 'dump_rate': 1000}
+                 'equilibrium_steps': 5000000,
+                 'total_steps': 2000000,
+                 'dump_rate': 10000}
 
 
 code = Code.get_from_string(codename)
