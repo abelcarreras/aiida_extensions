@@ -61,7 +61,7 @@ parameters_md = {'timestep': 0.001,
 
 code = Code.get_from_string(codename)
 
-calc = code.new_calc(max_wallclock_seconds=3600,
+calc = code.new_calc(max_wallclock_seconds=360000,
                      resources=lammps_machine)
 
 calc.label = "test lammps calculation"
