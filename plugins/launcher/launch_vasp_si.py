@@ -73,7 +73,7 @@ test_only = True
 
 code = Code.get_from_string(codename)
 calc = code.new_calc(
-    max_wallclock_seconds=3600,
+    max_wallclock_seconds=36000,
     resources=machine_dict
 )
 calc.set_withmpi(True)

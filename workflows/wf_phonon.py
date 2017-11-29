@@ -391,7 +391,7 @@ class Wf_phononWorkflow(Workflow):
 
         code = Code.get_from_string(parameters['code'])
 
-        calc = code.new_calc(max_wallclock_seconds=3600,
+        calc = code.new_calc(max_wallclock_seconds=36000,
                              resources=parameters['resources'])
 
         calc.use_code(code)
@@ -407,7 +407,7 @@ class Wf_phononWorkflow(Workflow):
         # On development
         code = Code.get_from_string(parameters['code'])
 
-        calc = code.new_calc(max_wallclock_seconds=3600,
+        calc = code.new_calc(max_wallclock_seconds=360000,
                              resources=parameters['resources'])
 
         parameters_qe = dict(parameters['parameters'])
