@@ -52,7 +52,7 @@ lammps_machine = {
 
 
 parameters_md = {'timestep': 0.001,
-                 'temperature' : 500,
+                 'temperature' : 600,
                  'thermostat_variable': 0.5,
                  'equilibrium_steps': 5000000,
                  'total_steps': 2000000,
