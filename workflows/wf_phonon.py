@@ -368,7 +368,7 @@ class Wf_phononWorkflow(Workflow):
         codename = parameters['code']
         code = Code.get_from_string(codename)
 
-        calc = code.new_calc(max_wallclock_seconds=36000,
+        calc = code.new_calc(max_wallclock_seconds=360000,
                              resources=parameters['resources'])
 
         calc.label = "test lammps calculation"
@@ -391,7 +391,7 @@ class Wf_phononWorkflow(Workflow):
 
         code = Code.get_from_string(parameters['code'])
 
-        calc = code.new_calc(max_wallclock_seconds=36000,
+        calc = code.new_calc(max_wallclock_seconds=360000,
                              resources=parameters['resources'])
 
         calc.use_code(code)
@@ -455,7 +455,7 @@ class Wf_phononWorkflow(Workflow):
 
         # Set calculation
         calc = code.new_calc(
-            max_wallclock_seconds=3600,
+            max_wallclock_seconds=360000,
             resources=parameters['resources']
         )
         calc.set_withmpi(True)
