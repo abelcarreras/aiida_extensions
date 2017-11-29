@@ -70,7 +70,8 @@ def generate_LAMMPS_structure(structure):
 def generate_LAMMPS_input(parameters,
                           potential_obj,
                           structure_file='potential.pot',
-                          trajectory_file='trajectory.lammpstr'):
+                          trajectory_file='trajectory.lammpstr',
+                          supercell=(2,2,2)):
 
     random_number = np.random.randint(10000000)
 
@@ -81,6 +82,8 @@ def generate_LAMMPS_input(parameters,
     lammps_input_file += 'box tilt large\n'
     lammps_input_file += 'atom_style      atomic\n'
     lammps_input_file += 'read_data       {}\n'.format(structure_file)
+
+    lammps_input_file += 'replicate {} {} {}\n'.format(*supercell)
 
     lammps_input_file += potential_obj.get_input_potential_lines()
 
