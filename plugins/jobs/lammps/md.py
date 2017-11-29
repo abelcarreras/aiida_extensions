@@ -71,7 +71,7 @@ def generate_LAMMPS_input(parameters,
                           potential_obj,
                           structure_file='potential.pot',
                           trajectory_file='trajectory.lammpstr',
-                          supercell=(2,2,2)):
+                          supercell=(5, 5, 5)):
 
     random_number = np.random.randint(10000000)
 
