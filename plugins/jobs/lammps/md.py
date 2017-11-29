@@ -95,7 +95,9 @@ def generate_LAMMPS_input(parameters,
     lammps_input_file += 'velocity        all create {0} {1} dist gaussian mom yes\n'.format(parameters.dict.temperature, random_number)
     lammps_input_file += 'velocity        all scale {}\n'.format(parameters.dict.temperature)
 
-    lammps_input_file += 'fix             int all nvt temp {0} {0} {1}\n'.format(parameters.dict.temperature, parameters.dict.thermostat_variable)
+#    lammps_input_file += 'fix             int all nvt temp {0} {0} {1}\n'.format(parameters.dict.temperature, parameters.dict.thermostat_variable)
+    lammps_input_file += 'fix             int all npt temp {0} {0} {1} iso 0.0 0.0 1000.0\n'.format(parameters.dict.temperature, parameters.dict.thermostat_variable)
+
 
     lammps_input_file += 'run             {}\n'.format(parameters.dict.equilibrium_steps)
     lammps_input_file += 'reset_timestep  0\n'
