@@ -61,7 +61,7 @@ class Wf_quasiparticleWorkflow(Workflow):
         codename = parameters['code']
         code = Code.get_from_string(codename)
 
-        calc = code.new_calc(max_wallclock_seconds=None,
+        calc = code.new_calc(max_wallclock_seconds=3600000,
                              resources=parameters['resources'])
 
         calc.label = "md lammps calculation"
@@ -78,7 +78,7 @@ class Wf_quasiparticleWorkflow(Workflow):
 
         codename = parameters['code']
         code = Code.get_from_string(codename)
-        calc = code.new_calc(max_wallclock_seconds=None,
+        calc = code.new_calc(max_wallclock_seconds=3600000,
                              resources=parameters['resources'])
         calc.use_code(code)
 

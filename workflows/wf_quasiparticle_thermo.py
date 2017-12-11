@@ -67,7 +67,7 @@ class Wf_quasiparticle_thermoWorkflow(Workflow):
         codename = parameters_md['code']
         code = Code.get_from_string(codename)
 
-        calc = code.new_calc(max_wallclock_seconds=None,
+        calc = code.new_calc(max_wallclock_seconds=3600000,
                              resources=parameters_md['resources'])
 
         calc.label = "test lammps calculation"
