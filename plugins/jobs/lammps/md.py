@@ -71,7 +71,8 @@ def generate_LAMMPS_input(parameters,
                           potential_obj,
                           structure_file='potential.pot',
                           trajectory_file='trajectory.lammpstr',
-                          supercell=(6, 6, )):
+                          supercell=(6, 6, ),
+                          pressure=0.0):
 
     random_number = np.random.randint(10000000)
 
@@ -97,9 +98,13 @@ def generate_LAMMPS_input(parameters,
 
     lammps_input_file += 'velocity        all create {0} {1} dist gaussian mom yes\n'.format(parameters.dict.temperature, random_number)
     lammps_input_file += 'velocity        all scale {}\n'.format(parameters.dict.temperature)
-
-#    lammps_input_file += 'fix             int all nvt temp {0} {0} {1}\n'.format(parameters.dict.temperature, parameters.dict.thermostat_variable)
-    lammps_input_file += 'fix             int all npt temp {0} {0} {1} iso 0.0 0.0 1000.0\n'.format(parameters.dict.temperature, parameters.dict.thermostat_variable)
+    if pressure is None:
+        lammps_input_file += 'fix             int all nvt temp {0} {0} {1}\n'.format(parameters.dict.temperature,
+                                                                                     parameters.dict.thermostat_variable)
+    else:
+        lammps_input_file += 'fix             int all npt temp {0} {0} {1} tri {2} {2} 1000.0\n'.format(parameters.dict.temperature,
+                                                                                                        parameters.dict.thermostat_variable,
+                                                                                                        pressure)
 
 
     lammps_input_file += 'run             {}\n'.format(parameters.dict.equilibrium_steps)
